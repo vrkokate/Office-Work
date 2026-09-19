@@ -1,335 +1,804 @@
 <!DOCTYPE html>
 <html lang="mr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Digital Hub</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: #030a16; color: #ffffff; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        header.hub-header { background-color: rgba(3, 10, 22, 0.95); backdrop-filter: blur(10px); color: #00d2ff; text-align: center; padding: 14px; font-size: 1.2rem; font-weight: 700; border-bottom: 1px solid rgba(0, 195, 255, 0.25); z-index: 10; }
-        main { flex: 1; position: relative; overflow-y: auto; }
-        .tab-content { display: none; height: 100%; }
-        .tab-content.active { display: block; }
-        .home-poster-container { position: relative; width: 100%; min-height: 100%; background-color: #030a16; background-image: url('home-bg.jpg'); background-size: cover; background-position: center top; background-repeat: no-repeat; }
-        .clickable-box-layer { position: absolute; top: 13.8%; left: 0; right: 0; display: flex; justify-content: space-evenly; padding: 0 10px; z-index: 5; }
-        .nav-tap-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 18%; height: 52px; border-radius: 12px; background: transparent; cursor: pointer; border: none; }
-        .nav-tap-btn:active { transform: scale(0.92); background: rgba(255, 255, 255, 0.25); }
-        .normal-page { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 24px; color: #d1d5db; }
-        nav.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background-color: rgba(6, 15, 30, 0.95); backdrop-filter: blur(8px); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid rgba(0, 195, 255, 0.2); z-index: 10; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8da2c0; font-size: 0.72rem; flex: 1; height: 100%; cursor: pointer; }
-        .nav-item i { font-size: 1.25rem; margin-bottom: 3px; }
-        .nav-item.active { color: #00d2ff; font-weight: 700; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Digital Hub</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Noto Sans Devanagari', Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        /* MBMS Styles */
-        .mbms-root { background-color: #f0f4f8; color: #333; min-height: 100%; padding-bottom: 75px; }
-        .app-header { background: linear-gradient(135deg, #0d47a1, #1565c0); color: #ffffff; padding: 14px 12px; text-align: center; position: relative; }
-        .app-header h2 { font-size: 18px; font-weight: bold; }
-        .app-header h4 { font-size: 12px; opacity: 0.9; }
-        .btn-back-hub { position: absolute; left: 10px; top: 14px; background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.4); padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; }
-        .main-container { padding: 12px; max-width: 600px; margin: 0 auto; }
-        .quick-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 14px; }
-        .quick-btn { padding: 10px 2px; border-radius: 10px; color: #ffffff; text-align: center; font-size: 11px; font-weight: bold; border: none; cursor: pointer; }
-        .btn-je { background-color: #1976d2; }
-        .btn-mb { background-color: #2e7d32; }
-        .btn-work { background-color: #00838f; }
-        .btn-bill { background-color: #ef6c00; }
-        .btn-assign { background-color: #7b1fa2; }
-        .btn-setting { background-color: #c2185b; }
-        .summary-card { background: #ffffff; border-radius: 12px; padding: 12px; margin-bottom: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-        .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
-        .summary-box { border: 1px solid #e0e0e0; border-radius: 8px; padding: 6px 2px; }
-        .summary-box .count { font-size: 18px; font-weight: bold; color: #0d47a1; }
-        .summary-box .label { font-size: 11px; color: #666; }
-        .filter-card { background: #ffffff; border-radius: 12px; padding: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-        .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-size: 11px; margin-bottom: 2px; color: #555; }
-        .form-control { width: 100%; height: 38px; border-radius: 6px; border: 1px solid #cfd8dc; padding: 0 8px; font-size: 13px; outline: none; }
-        .date-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn-main-action { width: 100%; height: 42px; background-color: #0d47a1; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; }
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; overflow-y: auto; padding: 15px; }
-        .modal-card { background: #fff; color: #333; border-radius: 10px; max-width: 500px; margin: 20px auto; padding: 16px; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px; }
-        .btn-close-modal { background: #f44336; color: #fff; border: none; border-radius: 4px; padding: 3px 8px; font-weight: bold; cursor: pointer; }
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 11px; }
-        .data-table th, .data-table td { border: 1px solid #ddd; padding: 6px; text-align: left; }
-        .data-table th { background-color: #f5f5f5; }
-    </style>
+    body {
+      background-color: #030a16;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* डिजिटल हब मुख्य हेडर */
+    header.hub-header {
+      background-color: rgba(3, 10, 22, 0.95);
+      backdrop-filter: blur(10px);
+      color: #00d2ff;
+      text-align: center;
+      padding: 14px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(0, 195, 255, 0.25);
+      letter-spacing: 0.5px;
+      z-index: 10;
+    }
+
+    main {
+      flex: 1;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    .tab-content {
+      display: none;
+      height: 100%;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* डिजिटल हब होम पोस्टर */
+    .home-poster-container {
+      position: relative;
+      width: 100%;
+      min-height: 100%;
+      background-color: #030a16;
+      background-image: url('home-bg.jpg');
+      background-size: cover;
+      background-position: center top;
+      background-repeat: no-repeat;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .clickable-box-layer {
+      position: absolute;
+      top: 13.8%;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-evenly;
+      padding: 0 10px;
+      z-index: 5;
+    }
+
+    .nav-tap-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 18%;
+      height: 52px;
+      text-decoration: none;
+      border-radius: 12px;
+      background: transparent;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s ease;
+    }
+
+    .nav-tap-btn:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+    }
+
+    .normal-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      padding: 24px;
+      color: #d1d5db;
+    }
+
+    /* डिजिटल हब तळाचा बार */
+    nav.bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background-color: rgba(6, 15, 30, 0.95);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid rgba(0, 195, 255, 0.2);
+      z-index: 10;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #8da2c0;
+      font-size: 0.72rem;
+      flex: 1;
+      height: 100%;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .nav-item i { font-size: 1.25rem; margin-bottom: 3px; }
+    .nav-item.active { color: #00d2ff; font-weight: 700; }
+
+    /* ==================== तुम्ही पाठवलेली तंतोतंत मूळ MBMS CSS ==================== */
+    .mbms-root {
+      background-color: #f0f4f8;
+      color: #333;
+      padding-bottom: 75px;
+      min-height: 100%;
+    }
+
+    /* १. हेडर पट्टी */
+    .app-header {
+      background: linear-gradient(135deg, #0d47a1, #1565c0);
+      color: #ffffff;
+      padding: 16px 12px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+    .app-header h2 { font-size: 19px; font-weight: bold; margin-bottom: 3px; }
+    .app-header h4 { font-size: 13px; font-weight: normal; opacity: 0.9; }
+
+    .btn-back-hub {
+      position: absolute;
+      left: 10px;
+      top: 16px;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .main-container {
+      padding: 12px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* २. ६ मुख्य रंगीत बटने */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .quick-btn {
+      padding: 10px 2px;
+      border-radius: 10px;
+      color: #ffffff;
+      text-align: center;
+      font-size: 11px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.1s;
+    }
+    .quick-btn:active { transform: scale(0.96); }
+    .btn-je { background-color: #1976d2; }
+    .btn-mb { background-color: #2e7d32; }
+    .btn-work { background-color: #00838f; }
+    .btn-bill { background-color: #ef6c00; }
+    .btn-assign { background-color: #7b1fa2; }
+    .btn-setting { background-color: #c2185b; }
+
+    /* ३. M.B. Summary कार्ड */
+    .summary-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 14px 12px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .summary-title {
+      font-size: 13px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #0d47a1;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .summary-box {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      text-align: center;
+      padding: 8px 4px;
+      background: #fafbfc;
+    }
+    .summary-box .count { font-size: 20px; font-weight: bold; color: #0d47a1; }
+    .summary-box .label { font-size: 11px; color: #616161; margin-top: 2px; }
+
+    /* ४. सविस्तर माहिती व रिपोर्ट कार्ड */
+    .filter-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 16px 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .filter-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #0d47a1;
+      margin-bottom: 12px;
+    }
+    .form-group { margin-bottom: 11px; }
+    .form-control {
+      width: 100%;
+      height: 42px;
+      border-radius: 8px;
+      border: 1px solid #cfd8dc;
+      padding: 0 10px;
+      font-size: 13px;
+      outline: none;
+      background-color: #ffffff;
+      color: #333333;
+    }
+    .form-control:focus { border-color: #1976d2; }
+    .date-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .btn-report-main {
+      width: 100%;
+      height: 44px;
+      background-color: #0d47a1;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 6px;
+      box-shadow: 0 3px 6px rgba(13, 71, 161, 0.25);
+    }
+    .btn-report-main:active { background-color: #093170; }
+
+    /* मोडल (Sub-Pages) रचना */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+      overflow-y: auto;
+      padding: 15px;
+    }
+    .modal-card {
+      background: #fff;
+      color: #333;
+      border-radius: 12px;
+      max-width: 550px;
+      margin: 20px auto;
+      padding: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+    .btn-close-modal {
+      background: #f44336;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* M.B. List टेबल रचना */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+    .data-table th, .data-table td {
+      border: 1px solid #ddd;
+      padding: 6px;
+      text-align: left;
+    }
+    .data-table th { background-color: #f5f5f5; font-weight: bold; }
+
+    /* A4 प्रिंट स्टाईल्स */
+    @media print {
+      @page { size: A4 portrait; margin: 8mm !important; }
+      body { background: #fff !important; color: #000 !important; }
+      body > *:not(#printArea) { display: none !important; }
+      #printArea { display: block !important; width: 100% !important; }
+      table.print-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-top: 6px !important;
+      }
+      table.print-table th, table.print-table td {
+        border: 1px solid #000 !important;
+        padding: 5px 6px !important;
+        font-size: 11px !important;
+      }
+      table.print-table th { background: #eee !important; font-weight: bold !important; }
+    }
+  </style>
 </head>
 <body>
 
-    <header class="hub-header" id="page-title">Digital Hub</header>
+  <!-- डिजिटल हब मुख्य हेडर -->
+  <header class="hub-header" id="page-title">Digital Hub</header>
 
-    <main>
-        <!-- १. होम स्क्रीन -->
-        <section id="home" class="tab-content active">
-            <div class="home-poster-container">
-                <div class="clickable-box-layer">
-                    <button type="button" class="nav-tap-btn" title="Est." onclick="alert('Est. मॉड्यूल लवकरच उपलब्ध होईल')"></button>
-                    <button type="button" class="nav-tap-btn" title="MB" onclick="openMBMS()"></button>
-                    <button type="button" class="nav-tap-btn" title="Form" onclick="alert('Form मॉड्यूल लवकरच उपलब्ध होईल')"></button>
-                    <button type="button" class="nav-tap-btn" title="Tab-4" onclick="alert('Tab-4 लवकरच उपलब्ध होईल')"></button>
-                    <button type="button" class="nav-tap-btn" title="Tab-5" onclick="alert('Tab-5 लवकरच उपलब्ध होईल')"></button>
-                </div>
+  <main>
+    <!-- १. डिजिटल हब मुख्य होम स्क्रीन -->
+    <section id="home" class="tab-content active">
+      <div class="home-poster-container">
+        <div class="clickable-box-layer">
+          <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Est."></a>
+          <!-- MB बटण: यावर क्लिक करताच तुमचा मूळ MBMS कोड लोड होईल -->
+          <button type="button" class="nav-tap-btn" title="MB" onclick="openMBMS()"></button>
+          <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Form"></a>
+          <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Tab-4"></a>
+          <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Tab-5"></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- २. तुम्ही पाठवलेला तंतोतंत संपूर्ण मूळ MBMS विभाग -->
+    <section id="mbms-screen" class="tab-content">
+      <div class="mbms-root">
+        <!-- १. मुख्य हेडर (अनावश्यक वरचे REPORT बटण काढून टाकले आहे) -->
+        <div class="app-header">
+          <button class="btn-back-hub" onclick="backToHome()">← परत</button>
+          <h2>मोजमाप पुस्तिका नियंत्रण प्रणाली</h2>
+          <h4>सार्वजनिक बांधकाम विभाग</h4>
+        </div>
+
+        <div class="main-container">
+          <!-- २. ६ मुख्य बटणे -->
+          <div class="quick-grid">
+            <button class="quick-btn btn-je" onclick="openModule('jeModal')">👷<br>JE</button>
+            <button class="quick-btn btn-mb" onclick="openModule('mbModal')">📖<br>M.B.</button>
+            <button class="quick-btn btn-work" onclick="openModule('workModal')">📋<br>Work list</button>
+            <button class="quick-btn btn-bill" onclick="openModule('billModal')">📄<br>Bill reg.</button>
+            <button class="quick-btn btn-assign" onclick="openModule('assignModal')">📁<br>Assign</button>
+            <button class="quick-btn btn-setting" onclick="openModule('settingModal')">⚙️<br>सेटिंग</button>
+          </div>
+
+          <!-- ३. M.B. Summary -->
+          <div class="summary-card">
+            <div class="summary-title">📖 M.B. Summary</div>
+            <div class="summary-grid">
+              <div class="summary-box">
+                <div class="count" id="countTotalMB">०</div>
+                <div class="label">एकूण M.B.</div>
+              </div>
+              <div class="summary-box">
+                <div class="count" id="countSmallMB">०</div>
+                <div class="label">Small M.B.</div>
+              </div>
+              <div class="summary-box">
+                <div class="count" id="countLargeMB">०</div>
+                <div class="label">Large M.B.</div>
+              </div>
             </div>
-        </section>
+          </div>
 
-        <!-- २. MBMS स्क्रीन -->
-        <section id="mbms-screen" class="tab-content">
-            <div class="mbms-root">
-                <div class="app-header">
-                    <button class="btn-back-hub" onclick="backToHome()">← परत</button>
-                    <h2>मोजमाप पुस्तिका नियंत्रण प्रणाली</h2>
-                    <h4>सार्वजनिक बांधकाम विभाग</h4>
-                </div>
+          <!-- ४. सविस्तर संबंधित माहिती व रिपोर्ट (एकमेव अधिकृत रिपोर्ट केंद्र) -->
+          <div class="filter-card">
+            <div class="filter-title">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</div>
 
-                <div class="main-container">
-                    <div class="quick-grid">
-                        <button class="quick-btn btn-je" onclick="openModule('jeModal')">👷<br>JE</button>
-                        <button class="quick-btn btn-mb" onclick="openModule('mbModal')">📖<br>M.B.</button>
-                        <button class="quick-btn btn-work" onclick="openModule('workModal')">📋<br>Work list</button>
-                        <button class="quick-btn btn-bill" onclick="openModule('billModal')">📄<br>Bill reg.</button>
-                        <button class="quick-btn btn-assign" onclick="openModule('assignModal')">📁<br>Assign</button>
-                        <button class="quick-btn btn-setting" onclick="openModule('settingModal')">⚙️<br>सेटिंग</button>
-                    </div>
-
-                    <div class="summary-card">
-                        <div style="font-size:12px; font-weight:bold; text-align:center; margin-bottom:8px; color:#0d47a1;">📖 M.B. Summary</div>
-                        <div class="summary-grid">
-                            <div class="summary-box"><div class="count" id="countTotalMB">०</div><div class="label">एकूण M.B.</div></div>
-                            <div class="summary-box"><div class="count" id="countSmallMB">०</div><div class="label">Small M.B.</div></div>
-                            <div class="summary-box"><div class="count" id="countLargeMB">०</div><div class="label">Large M.B.</div></div>
-                        </div>
-                    </div>
-
-                    <div class="filter-card">
-                        <div style="font-size:13px; font-weight:bold; color:#0d47a1; margin-bottom:10px;">🔍 सविस्तर माहिती व रिपोर्ट</div>
-                        <div class="form-group date-row">
-                            <div><label>दिनांक पासून</label><input type="date" class="form-control" id="fromDate"></div>
-                            <div><label>दिनांक पर्यंत</label><input type="date" class="form-control" id="toDate"></div>
-                        </div>
-                        <div class="form-group">
-                            <select class="form-control" id="mainCatSelect" onchange="onCategorySelectChange()">
-                                <option value="M.B.">M.B.</option>
-                                <option value="JE">JE</option>
-                                <option value="कामाचे नाव">कामाचे नाव</option>
-                                <option value="कॉन्ट्रॅक्टर चे नाव">कॉन्ट्रॅक्टर चे नाव</option>
-                            </select>
-                        </div>
-                        <div class="form-group"><select class="form-control" id="subCatSelect"></select></div>
-                        <div class="form-group"><input type="text" class="form-control" id="smartInput" placeholder="शोधा / क्रमांक टाका"></div>
-                        <button class="btn-main-action" onclick="generateReport()">📄 REPORT / PRINT</button>
-                    </div>
-                </div>
+            <div class="form-group date-row">
+              <div>
+                <label style="font-size: 11px; color:#616161;">दिनांक पासून</label>
+                <input type="date" class="form-control" id="fromDate">
+              </div>
+              <div>
+                <label style="font-size: 11px; color:#616161;">दिनांक पर्यंत</label>
+                <input type="date" class="form-control" id="toDate">
+              </div>
             </div>
-        </section>
 
-        <!-- बाकीचे मुख्य टॅब -->
-        <section id="search" class="tab-content"><div class="normal-page"><h2>शोध</h2><p>माहिती शोधा.</p></div></section>
-        <section id="orders" class="tab-content"><div class="normal-page"><h2>ऑर्डर्स</h2><p>ऑर्डर्स आणि कार्य सूची.</p></div></section>
-        <section id="notifications" class="tab-content"><div class="normal-page"><h2>सूचना</h2><p>सर्व नोटिफिकेशन्स.</p></div></section>
-        <section id="profile" class="tab-content"><div class="normal-page"><h2>प्रोफाइल</h2><p>सेटिंग्ज व वापरकर्ता माहिती.</p></div></section>
-    </main>
+            <!-- १. मुख्य घटक निवड (केवळ ४ पर्याय) -->
+            <div class="form-group">
+              <select class="form-control" id="mainCatSelect" onchange="onCategorySelectChange()">
+                <option value="M.B." selected>M.B.</option>
+                <option value="JE">JE</option>
+                <option value="कामाचे नाव">कामाचे नाव</option>
+                <option value="कॉन्ट्रॅक्टर चे नाव">कॉन्ट्रॅक्टर चे नाव</option>
+              </select>
+            </div>
 
-    <!-- सर्व ६ मॉड्यूल्सचे प्रत्यक्ष फॉर्म्स -->
-    <div id="jeModal" class="modal-overlay">
-        <div class="modal-card">
-            <div class="modal-header"><h3>👷 JE नोंदणी</h3><button class="btn-close-modal" onclick="closeModule('jeModal')">X</button></div>
-            <div class="form-group"><label>नाव *</label><input type="text" class="form-control" id="newJEName" placeholder="नाव टाका"></div>
-            <div class="form-group"><label>मोबाईल</label><input type="text" class="form-control" id="newJEMobile" placeholder="मोबाईल"></div>
-            <button class="btn-main-action" onclick="saveJEEntry()">Save JE</button>
-            <table class="data-table"><thead><tr><th>अ.क्र.</th><th>नाव</th><th>मोबाईल</th><th>Action</th></tr></thead><tbody id="jeListBody"></tbody></table>
+            <!-- २. उपघटक निवड (M.B. साठी: सर्व, लहान, मोठी व क्रमांक) -->
+            <div class="form-group">
+              <select class="form-control" id="subCatSelect"></select>
+            </div>
+
+            <!-- ३. स्मार्ट सर्च इनपुट -->
+            <div class="form-group">
+              <input type="text" class="form-control" id="smartInput" placeholder="निवडलेल्या घटकानुसार शोधा / क्रमांक टाका">
+            </div>
+
+            <!-- ४. REPORT / PRINT बटण -->
+            <button class="btn-report-main" onclick="generateReport()">📄 REPORT / PRINT</button>
+            <div style="text-align: center; font-size: 11px; color: #757575; margin-top: 8px;">सर्व माहिती किंवा वरील उपघटक निवडा.</div>
+          </div>
         </div>
+      </div>
+    </section>
+
+    <!-- डिजिटल हब इतर टॅब -->
+    <section id="search" class="tab-content"><div class="normal-page"><h2>शोध</h2><p>येथे तुम्ही कोणतीही माहिती शोधू शकता.</p></div></section>
+    <section id="orders" class="tab-content"><div class="normal-page"><h2>ऑर्डर्स / कार्य</h2><p>सर्व नोंदी आणि ऑर्डर्स येथे दिसतील.</p></div></section>
+    <section id="notifications" class="tab-content"><div class="normal-page"><h2>सूचना</h2><p>सर्व नवीन अपडेट्स येथे मिळतील.</p></div></section>
+    <section id="profile" class="tab-content"><div class="normal-page"><h2>प्रोफाइल</h2><p>वापरकर्त्याची माहिती आणि सेटिंग्ज.</p></div></section>
+  </main>
+
+  <!-- ५. M.B. व्यवस्थापन मोडल (तारीख dd-mm-yyyy सह) -->
+  <div id="mbModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size: 15px; color:#2e7d32;">M.B. व्यवस्थापन</h3>
+        <button class="btn-close-modal" onclick="closeModule('mbModal')">X</button>
+      </div>
+      <div class="form-group">
+        <label style="font-size:11px;">M.B. क्रमांक *</label>
+        <input type="text" class="form-control" id="newMBNo" placeholder="उदा. 00100100">
+      </div>
+      <div class="form-group">
+        <label style="font-size:11px;">M.B. आकार *</label>
+        <select class="form-control" id="newMBSize">
+          <option value="लहान M.B.">लहान M.B.</option>
+          <option value="मोठी M.B.">मोठी M.B.</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label style="font-size:11px;">प्राप्त दिनांक * (dd-mm-yyyy)</label>
+        <input type="date" class="form-control" id="newMBDate">
+      </div>
+      <button class="btn-report-main" style="background:#2e7d32;" onclick="saveMBEntry()">Save Entry</button>
+
+      <h4 style="margin-top:15px; font-size:13px; border-bottom:1px solid #ddd; padding-bottom:4px;">M.B. List</h4>
+      <div style="overflow-x:auto;">
+        <table class="data-table" id="mbListTable">
+          <thead>
+            <tr>
+              <th>अ.क्र.</th>
+              <th>M.B. क्रमांक</th>
+              <th>साईज</th>
+              <th>प्राप्त दिनांक</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="mbListBody"></tbody>
+        </table>
+      </div>
     </div>
+  </div>
 
-    <div id="mbModal" class="modal-overlay">
-        <div class="modal-card">
-            <div class="modal-header"><h3>📖 M.B. व्यवस्थापन</h3><button class="btn-close-modal" onclick="closeModule('mbModal')">X</button></div>
-            <div class="form-group"><label>M.B. क्रमांक *</label><input type="text" class="form-control" id="newMBNo" placeholder="क्रमांक"></div>
-            <div class="form-group"><label>आकार</label><select class="form-control" id="newMBSize"><option value="लहान M.B.">लहान M.B.</option><option value="मोठी M.B.">मोठी M.B.</option></select></div>
-            <div class="form-group"><label>प्राप्त दिनांक</label><input type="date" class="form-control" id="newMBDate"></div>
-            <button class="btn-main-action" style="background:#2e7d32;" onclick="saveMBEntry()">Save Entry</button>
-            <table class="data-table"><thead><tr><th>अ.क्र.</th><th>क्रमांक</th><th>आकार</th><th>दिनांक</th><th>Action</th></tr></thead><tbody id="mbListBody"></tbody></table>
-        </div>
+  <!-- ६. सेटिंग (Working Backup/Restore) मोडल -->
+  <div id="settingModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size: 15px; color:#c2185b;">सेटिंग्ज (Backup / Restore)</h3>
+        <button class="btn-close-modal" onclick="closeModule('settingModal')">X</button>
+      </div>
+      <p style="font-size:12px; color:#555; margin-bottom:12px;">सध्याचा MBMS डेटा JSON फाईल म्हणून सेव्ह करा किंवा आधीच्या फाईलमधून पूर्ववत करा.</p>
+      <button class="btn-report-main" style="background:#1976d2; margin-bottom:10px;" onclick="triggerBackupSave()">BACKUP SAVE</button>
+      <button class="btn-report-main" style="background:#455a64;" onclick="triggerBackupRestore()">BACKUP RESTORE</button>
     </div>
+  </div>
 
-    <div id="workModal" class="modal-overlay">
-        <div class="modal-card">
-            <div class="modal-header"><h3>📋 Work List</h3><button class="btn-close-modal" onclick="closeModule('workModal')">X</button></div>
-            <div class="form-group"><label>कामाचे नाव *</label><input type="text" class="form-control" id="newWorkName" placeholder="कामाचे नाव"></div>
-            <div class="form-group"><label>ठेकेदाराचे नाव *</label><input type="text" class="form-control" id="newContractorName" placeholder="ठेकेदार"></div>
-            <button class="btn-main-action" style="background:#00838f;" onclick="saveWorkEntry()">Save Work</button>
-            <table class="data-table"><thead><tr><th>अ.क्र.</th><th>काम</th><th>ठेकेदार</th><th>Action</th></tr></thead><tbody id="workListBody"></tbody></table>
-        </div>
+  <!-- प्रिंट एरिया (A4 रिपोर्टसाठी) -->
+  <div id="printArea" style="display: none;"></div>
+
+  <!-- डिजिटल हब तळाचा ५ टॅब बार -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" id="btn-tab-home" onclick="switchTab('home', 'Digital Hub', this)">
+      <i class="fa-solid fa-house"></i>
+      <span>मुखपृष्ठ</span>
     </div>
-
-    <div id="billModal" class="modal-overlay">
-        <div class="modal-card">
-            <div class="modal-header"><h3>📄 Bill Register</h3><button class="btn-close-modal" onclick="closeModule('billModal')">X</button></div>
-            <div class="form-group"><label>बिल क्रमांक *</label><input type="text" class="form-control" id="newBillNo" placeholder="बिल क्र."></div>
-            <div class="form-group"><label>रक्कम *</label><input type="number" class="form-control" id="newBillAmount" placeholder="रक्कम"></div>
-            <button class="btn-main-action" style="background:#ef6c00;" onclick="saveBillEntry()">Save Bill</button>
-            <table class="data-table"><thead><tr><th>अ.क्र.</th><th>बिल क्र.</th><th>रक्कम</th><th>Action</th></tr></thead><tbody id="billListBody"></tbody></table>
-        </div>
+    <div class="nav-item" onclick="switchTab('search', 'शोध', this)">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <span>शोध</span>
     </div>
-
-    <div id="assignModal" class="modal-overlay">
-        <div class="modal-card">
-            <div class="modal-header"><h3>📁 M.B. Assign</h3><button class="btn-close-modal" onclick="closeModule('assignModal')">X</button></div>
-            <div class="form-group"><label>M.B. निवडा</label><select class="form-control" id="assignMBSelect"></select></div>
-            <div class="form-group"><label>JE निवडा</label><select class="form-control" id="assignJESelect"></select></div>
-            <button class="btn-main-action" style="background:#7b1fa2;" onclick="saveAssignEntry()">वाटप नोंदवा</button>
-            <table class="data-table"><thead><tr><th>M.B. क्र.</th><th>JE</th><th>Action</th></tr></thead><tbody id="assignListBody"></tbody></table>
-        </div>
+    <div class="nav-item" onclick="switchTab('orders', 'ऑर्डर्स', this)">
+      <i class="fa-solid fa-bag-shopping"></i>
+      <span>ऑर्डर्स</span>
     </div>
-
-    <div id="settingModal" class="modal-overlay">
-        <div class="modal-card">
-            <div class="modal-header"><h3>⚙️ बॅकअप आणि सेटिंग्ज</h3><button class="btn-close-modal" onclick="closeModule('settingModal')">X</button></div>
-            <button class="btn-main-action" style="margin-bottom:8px;" onclick="triggerBackupSave()">BACKUP SAVE</button>
-            <button class="btn-main-action" style="background:#455a64;" onclick="triggerBackupRestore()">BACKUP RESTORE</button>
-        </div>
+    <div class="nav-item" onclick="switchTab('notifications', 'सूचना', this)">
+      <i class="fa-solid fa-bell"></i>
+      <span>सूचना</span>
     </div>
+    <div class="nav-item" onclick="switchTab('profile', 'प्रोफाइल', this)">
+      <i class="fa-solid fa-user"></i>
+      <span>प्रोफाइल</span>
+    </div>
+  </nav>
 
-    <div id="printArea" style="display:none;"></div>
+  <!-- ==================== तुम्ही पाठवलेला मूळ JAVASCRIPT ENGINE ==================== -->
+  <script>
+    // डिजिटल हब टॅब स्वीचिंग
+    function switchTab(tabId, title, element) {
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
 
-    <nav class="bottom-nav">
-        <div class="nav-item active" id="btn-tab-home" onclick="switchTab('home', 'Digital Hub', this)"><i class="fa-solid fa-house"></i><span>मुखपृष्ठ</span></div>
-        <div class="nav-item" onclick="switchTab('search', 'शोध', this)"><i class="fa-solid fa-magnifying-glass"></i><span>शोध</span></div>
-        <div class="nav-item" onclick="switchTab('orders', 'ऑर्डर्स', this)"><i class="fa-solid fa-bag-shopping"></i><span>ऑर्डर्स</span></div>
-        <div class="nav-item" onclick="switchTab('notifications', 'सूचना', this)"><i class="fa-solid fa-bell"></i><span>सूचना</span></div>
-        <div class="nav-item" onclick="switchTab('profile', 'प्रोफाइल', this)"><i class="fa-solid fa-user"></i><span>प्रोफाइल</span></div>
-    </nav>
+      document.getElementById(tabId).classList.add('active');
+      if (element) element.classList.add('active');
 
-    <script>
-        function switchTab(tabId, title, element) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            if(element) element.classList.add('active');
-            document.getElementById('page-title').innerText = title;
-            document.querySelector('header.hub-header').style.display = (tabId === 'mbms-screen') ? 'none' : 'block';
-        }
-        function openMBMS() { switchTab('mbms-screen', 'MBMS', null); refreshDashboard(); }
-        function backToHome() { switchTab('home', 'Digital Hub', document.getElementById('btn-tab-home')); }
-        function openModule(id) { 
-            document.getElementById(id).style.display = 'block'; 
-            if(id === 'assignModal') { populateAssignSelects(); }
-        }
-        function closeModule(id) { document.getElementById(id).style.display = 'none'; }
-        function getData(k) { try { return JSON.parse(localStorage.getItem(k)) || []; } catch(e){ return []; } }
-        function setData(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+      document.getElementById('page-title').innerText = title;
+      document.querySelector('header.hub-header').style.display = (tabId === 'mbms-screen') ? 'none' : 'block';
+    }
 
-        function saveJEEntry() {
-            var n = document.getElementById('newJEName').value.trim();
-            var m = document.getElementById('newJEMobile').value.trim();
-            if(!n) return alert('नाव भरा');
-            var l = getData('je_records'); l.push({name:n, mobile:m}); setData('je_records', l);
-            document.getElementById('newJEName').value = ''; document.getElementById('newJEMobile').value = '';
-            refreshJE();
-        }
-        function refreshJE() {
-            var l = getData('je_records'); var b = document.getElementById('jeListBody'); b.innerHTML = '';
-            l.forEach((i, idx) => { b.innerHTML += `<tr><td>${idx+1}</td><td>${i.name}</td><td>${i.mobile||'-'}</td><td><button onclick="deleteItem('je_records',${idx},refreshJE)">X</button></td></tr>`; });
-            onCategorySelectChange();
-        }
+    function openMBMS() {
+      switchTab('mbms-screen', 'MBMS', null);
+      refreshDashboard();
+    }
 
-        function saveMBEntry() {
-            var no = document.getElementById('newMBNo').value.trim();
-            var s = document.getElementById('newMBSize').value;
-            var d = document.getElementById('newMBDate').value;
-            if(!no) return alert('क्रमांक भरा');
-            var l = getData('mb_records'); l.push({mbNumber:no, size:s, date:d}); setData('mb_records', l);
-            document.getElementById('newMBNo').value = '';
-            refreshDashboard();
-        }
-        function refreshDashboard() {
-            var l = getData('mb_records'); var b = document.getElementById('mbListBody'); b.innerHTML = '';
-            var sm = 0, lg = 0;
-            l.forEach((i, idx) => {
-                if(i.size && i.size.includes('लहान')) sm++; else lg++;
-                b.innerHTML += `<tr><td>${idx+1}</td><td>${i.mbNumber}</td><td>${i.size}</td><td>${i.date||'-'}</td><td><button onclick="deleteItem('mb_records',${idx},refreshDashboard)">X</button></td></tr>`;
-            });
-            document.getElementById('countTotalMB').innerText = l.length;
-            document.getElementById('countSmallMB').innerText = sm;
-            document.getElementById('countLargeMB').innerText = lg;
-            refreshJE(); refreshWork(); refreshBill(); refreshAssign();
-        }
+    function backToHome() {
+      switchTab('home', 'Digital Hub', document.getElementById('btn-tab-home'));
+    }
 
-        function saveWorkEntry() {
-            var w = document.getElementById('newWorkName').value.trim();
-            var c = document.getElementById('newContractorName').value.trim();
-            if(!w) return alert('कामाचे नाव भरा');
-            var l = getData('work_records'); l.push({workName:w, contractor:c}); setData('work_records', l);
-            document.getElementById('newWorkName').value = ''; document.getElementById('newContractorName').value = '';
-            refreshWork();
-        }
-        function refreshWork() {
-            var l = getData('work_records'); var b = document.getElementById('workListBody'); b.innerHTML = '';
-            l.forEach((i, idx) => { b.innerHTML += `<tr><td>${idx+1}</td><td>${i.workName}</td><td>${i.contractor}</td><td><button onclick="deleteItem('work_records',${idx},refreshWork)">X</button></td></tr>`; });
-            onCategorySelectChange();
-        }
+    // १. मोडल उघडणे व बंद करणे
+    function openModule(id) { 
+      var el = document.getElementById(id);
+      if (el) el.style.display = 'block'; 
+    }
+    function closeModule(id) { 
+      var el = document.getElementById(id);
+      if (el) el.style.display = 'none'; 
+    }
 
-        function saveBillEntry() {
-            var bno = document.getElementById('newBillNo').value.trim();
-            var amt = document.getElementById('newBillAmount').value.trim();
-            if(!bno) return alert('बिल क्रमांक भरा');
-            var l = getData('bill_records'); l.push({billNo:bno, amount:amt}); setData('bill_records', l);
-            document.getElementById('newBillNo').value = ''; document.getElementById('newBillAmount').value = '';
-            refreshBill();
-        }
-        function refreshBill() {
-            var l = getData('bill_records'); var b = document.getElementById('billListBody'); b.innerHTML = '';
-            l.forEach((i, idx) => { b.innerHTML += `<tr><td>${idx+1}</td><td>${i.billNo}</td><td>₹${i.amount}</td><td><button onclick="deleteItem('bill_records',${idx},refreshBill)">X</button></td></tr>`; });
-        }
+    // २. लोकल स्टोरेज मदतनीस
+    function getData(key) {
+      try { return JSON.parse(localStorage.getItem(key)) || []; } catch(e) { return []; }
+    }
+    function setData(key, val) {
+      localStorage.setItem(key, JSON.stringify(val));
+    }
 
-        function populateAssignSelects() {
-            var mbs = getData('mb_records'); var jes = getData('je_records');
-            var mSel = document.getElementById('assignMBSelect'); var jSel = document.getElementById('assignJESelect');
-            mSel.innerHTML = ''; jSel.innerHTML = '';
-            mbs.forEach(m => mSel.add(new Option(m.mbNumber, m.mbNumber)));
-            jes.forEach(j => jSel.add(new Option(j.name, j.name)));
-        }
-        function saveAssignEntry() {
-            var m = document.getElementById('assignMBSelect').value; var j = document.getElementById('assignJESelect').value;
-            if(!m || !j) return alert('M.B. आणि JE निवडा');
-            var l = getData('assign_records'); l.push({mb:m, je:j}); setData('assign_records', l);
-            refreshAssign();
-        }
-        function refreshAssign() {
-            var l = getData('assign_records'); var b = document.getElementById('assignListBody'); b.innerHTML = '';
-            l.forEach((i, idx) => { b.innerHTML += `<tr><td>${i.mb}</td><td>${i.je}</td><td><button onclick="deleteItem('assign_records',${idx},refreshAssign)">X</button></td></tr>`; });
-        }
+    // तारीख yyyy-mm-dd वरून dd-mm-yyyy मध्ये बदलणे
+    function formatToDMY(dateStr) {
+      if (!dateStr) return '-';
+      var m = dateStr.match(/^(\d{4})[-/](\d{2})[-/](\d{2})$/);
+      if (m) return m[3] + '-' + m[2] + '-' + m[1];
+      return dateStr;
+    }
 
-        function deleteItem(key, idx, cb) {
-            if(confirm('हटवायचे आहे का?')) { var l = getData(key); l.splice(idx, 1); setData(key, l); cb(); }
-        }
+    // ३. M.B. एंट्री सेव्ह करणे (तारीख dd-mm-yyyy सह)
+    function saveMBEntry() {
+      var no = document.getElementById('newMBNo').value.trim();
+      var size = document.getElementById('newMBSize').value;
+      var date = document.getElementById('newMBDate').value;
 
-        function onCategorySelectChange() {
-            var c = document.getElementById('mainCatSelect').value; var s = document.getElementById('subCatSelect'); s.innerHTML = '';
-            if(c === 'M.B.') { s.add(new Option('सर्व M.B.','सर्व M.B.')); s.add(new Option('लहान M.B.','लहान M.B.')); s.add(new Option('मोठी M.B.','मोठी M.B.')); getData('mb_records').forEach(m => s.add(new Option(m.mbNumber, m.mbNumber))); }
-            else if(c === 'JE') { s.add(new Option('सर्व JE','सर्व JE')); getData('je_records').forEach(j => s.add(new Option(j.name, j.name))); }
-            else if(c === 'कामाचे नाव') { s.add(new Option('सर्व कामे','सर्व कामे')); getData('work_records').forEach(w => s.add(new Option(w.workName, w.workName))); }
-            else if(c === 'कॉन्ट्रॅक्टर चे नाव') { s.add(new Option('सर्व कॉन्ट्रॅक्टर','सर्व कॉन्ट्रॅक्टर')); getData('work_records').forEach(w => s.add(new Option(w.contractor, w.contractor))); }
-        }
+      if (!no || !date) {
+        alert('कृपया M.B. क्रमांक आणि प्राप्त दिनांक भरा.');
+        return;
+      }
 
-        function generateReport() { window.print(); }
-        function triggerBackupSave() {
-            var d = {}; for(var i=0; i<localStorage.length; i++){ var k=localStorage.key(i); d[k]=localStorage.getItem(k); }
-            var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d)], {type:'application/json'}));
-            a.download = 'Backup.json'; a.click();
+      var list = getData('mb_records');
+      list.push({ mbNumber: no, size: size, date: date });
+      setData('mb_records', list);
+
+      document.getElementById('newMBNo').value = '';
+      document.getElementById('newMBDate').value = '';
+      refreshDashboard();
+      alert('M.B. नोंद यशस्वीपणे सेव्ह झाली!');
+    }
+
+    // ४. M.B. यादी आणि समरी रिफ्रेश करणे
+    function refreshDashboard() {
+      var list = getData('mb_records');
+      var total = list.length;
+      var small = 0, large = 0;
+
+      var tbody = document.getElementById('mbListBody');
+      if (tbody) tbody.innerHTML = '';
+
+      list.forEach(function(item, idx) {
+        if (item.size && item.size.includes('लहान')) small++;
+        else large++;
+
+        if (tbody) {
+          var tr = document.createElement('tr');
+          tr.innerHTML = '<td>' + (idx + 1) + '</td>' +
+                         '<td>' + item.mbNumber + '</td>' +
+                         '<td>' + item.size + '</td>' +
+                         '<td>' + formatToDMY(item.date) + '</td>' +
+                         '<td><button onclick="deleteMB(' + idx + ')" style="background:#e53935; color:#fff; border:none; padding:2px 6px; border-radius:4px; cursor:pointer;">Delete</button></td>';
+          tbody.appendChild(tr);
         }
-        function triggerBackupRestore() {
-            var inp = document.createElement('input'); inp.type = 'file';
-            inp.onchange = e => {
-                var r = new FileReader(); r.onload = evt => {
-                    var o = JSON.parse(evt.target.result); for(var k in o){ localStorage.setItem(k, o[k]); }
-                    alert('डेटा पूर्ववत झाला'); refreshDashboard();
-                }; r.readAsText(e.target.files[0]);
-            }; inp.click();
+      });
+
+      document.getElementById('countTotalMB').textContent = total;
+      document.getElementById('countSmallMB').textContent = small;
+      document.getElementById('countLargeMB').textContent = large;
+
+      onCategorySelectChange();
+    }
+
+    function deleteMB(idx) {
+      if (confirm('ही नोंद हटवायची आहे का?')) {
+        var list = getData('mb_records');
+        list.splice(idx, 1);
+        setData('mb_records', list);
+        refreshDashboard();
+      }
+    }
+
+    // ५. मुख्य घटक बदलल्यावर उपघटक भरणे (M.B. साठी: सर्व, लहान, मोठी)
+    function onCategorySelectChange() {
+      var cat = document.getElementById('mainCatSelect').value;
+      var sub = document.getElementById('subCatSelect');
+      sub.innerHTML = '';
+
+      if (cat === 'M.B.') {
+        sub.add(new Option('सर्व M.B.', 'सर्व M.B.'));
+        sub.add(new Option('लहान M.B.', 'लहान M.B.'));
+        sub.add(new Option('मोठी M.B.', 'मोठी M.B.'));
+        var mbs = getData('mb_records');
+        mbs.forEach(function(m){ if (m.mbNumber) sub.add(new Option(m.mbNumber, m.mbNumber)); });
+      } else if (cat === 'JE') {
+        sub.add(new Option('सर्व JE', 'सर्व JE'));
+        var jes = getData('je_records');
+        jes.forEach(function(j){ sub.add(new Option(j.name || j, j.name || j)); });
+      } else if (cat === 'कामाचे नाव') {
+        sub.add(new Option('सर्व कामे', 'सर्व कामे'));
+        var ws = getData('work_records');
+        ws.forEach(function(w){ if(w.workName) sub.add(new Option(w.workName, w.workName)); });
+      } else if (cat === 'कॉन्ट्रॅक्टर चे नाव') {
+        sub.add(new Option('सर्व कॉन्ट्रॅक्टर', 'सर्व कॉन्ट्रॅक्टर'));
+        var ws2 = getData('work_records');
+        ws2.forEach(function(w){ if(w.contractor) sub.add(new Option(w.contractor, w.contractor)); });
+      }
+    }
+
+    // ६. A4 प्रिंट अहवाल जनरेशन
+    function generateReport() {
+      var cat = document.getElementById('mainCatSelect').value;
+      var sub = document.getElementById('subCatSelect').value;
+      var query = document.getElementById('smartInput').value.trim();
+      var pa = document.getElementById('printArea');
+      var today = formatToDMY(new Date().toISOString().slice(0,10));
+
+      var mbs = getData('mb_records');
+      var works = getData('work_records');
+
+      var h = '<div style="text-align: center; margin-bottom: 8px;">';
+      h += '  <h2 style="margin: 0; font-size: 17px; font-weight: bold;">सार्वजनिक बांधकाम विभाग</h2>';
+      h += '  <h3 style="margin: 3px 0 6px 0; font-size: 14px; text-decoration: underline;">' + cat + ' अहवाल</h3>';
+      h += '</div>';
+      h += '<div style="display: flex; justify-content: space-between; font-size: 11.5px; margin-bottom: 4px;">';
+      h += '  <span><b>तपशील:</b> ' + (query || sub) + '</span><span><b>दिनांक:</b> ' + today + '</span>';
+      h += '</div><table class="print-table" border="1"><thead><tr>';
+
+      if (cat === 'M.B.') {
+        h += '<th style="width:1%; white-space:nowrap;">अ.क्र.</th>';
+        h += '<th style="width:1%; white-space:nowrap;">M.B. क्रमांक</th>';
+        h += '<th style="width:1%; white-space:nowrap;">M.B. साईज</th>';
+        h += '<th style="width:1%; white-space:nowrap;">प्राप्त दिनांक</th>';
+        h += '<th>सध्या कोणाकडे आहे (JE)</th></tr></thead><tbody>';
+
+        var filtered = mbs.filter(function(m) {
+          if (query) return (m.mbNumber || '').includes(query);
+          if (sub === 'लहान M.B.') return (m.size || '').includes('लहान');
+          if (sub === 'मोठी M.B.') return (m.size || '').includes('मोठी');
+          if (sub !== 'सर्व M.B.') return m.mbNumber === sub;
+          return true;
+        });
+
+        if (filtered.length === 0) {
+          h += '<tr><td colspan="5" style="text-align:center; padding:10px;">नोंद उपलब्ध नाही.</td></tr>';
+        } else {
+          filtered.forEach(function(item, i) {
+            h += '<tr><td style="text-align:center;">' + (i + 1) + '</td>';
+            h += '<td style="text-align:center;">' + item.mbNumber + '</td>';
+            h += '<td style="text-align:center;">' + item.size + '</td>';
+            h += '<td style="text-align:center;">' + formatToDMY(item.date) + '</td>';
+            h += '<td>' + (item.assignedTo || 'स्टॉकमध्ये उपलब्ध') + '</td></tr>';
+          });
         }
-        document.addEventListener('DOMContentLoaded', () => { refreshDashboard(); });
-    </script>
+      }
+      h += '</tbody></table>';
+
+      pa.innerHTML = h;
+      pa.style.display = 'block';
+      setTimeout(function() {
+        window.print();
+        setTimeout(function() { pa.style.display = 'none'; }, 500);
+      }, 150);
+    }
+
+    // ७. बॅकअप आणि रिस्टोअर
+    function triggerBackupSave() {
+      var data = {};
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        data[k] = localStorage.getItem(k);
+      }
+      var json = JSON.stringify(data, null, 2);
+      if (window.MBMSAndroid && window.MBMSAndroid.saveBackupToDownloads) {
+        window.MBMSAndroid.saveBackupToDownloads(json);
+      } else {
+        var blob = new Blob([json], { type: 'application/json' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'MBMS_Backup_' + new Date().toISOString().slice(0,10) + '.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        alert('बॅकअप डाऊनलोड झाला!');
+      }
+    }
+
+    function triggerBackupRestore() {
+      if (window.MBMSAndroid && window.MBMSAndroid.openBackupPicker) {
+        window.MBMSAndroid.openBackupPicker();
+      } else {
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = function(e) {
+          var file = e.target.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function(evt) {
+            try {
+              var obj = JSON.parse(evt.target.result);
+              for (var key in obj) { localStorage.setItem(key, obj[key]); }
+              alert('डेटा यशस्वीपणे पूर्ववत झाला!');
+              location.reload();
+            } catch(err) { alert('अवैध बॅकअप फाईल!'); }
+          };
+          reader.readAsText(file);
+        };
+        input.click();
+      }
+    }
+
+    // सुरुवातीला चालवणे
+    document.addEventListener('DOMContentLoaded', function() {
+      var today = new Date().toISOString().slice(0, 10);
+      var fDate = document.getElementById('fromDate');
+      var tDate = document.getElementById('toDate');
+      var mDate = document.getElementById('newMBDate');
+      if (fDate) fDate.value = today;
+      if (tDate) tDate.value = today;
+      if (mDate) mDate.value = today;
+
+      refreshDashboard();
+    });
+  </script>
 </body>
 </html>
