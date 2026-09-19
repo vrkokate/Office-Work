@@ -100,24 +100,26 @@
   </div>
 
   <div class="container">
+    <!-- लाईव्ह इन्स्टंट अपडेट होणारे सारांश कार्ड्स -->
     <div class="summary-box">
-      <div class="summary-title">📖 उपलब्ध एम बी</div>
+      <div class="summary-title">📖 मोजमाप पुस्तिका (M.B.) स्थिती</div>
       <div class="card-grid">
-        <div class="stat-card" onclick="generateStockReport('ALL')">
-          <div class="stat-num" id="countTotalMB">0</div>
-          <div class="stat-label">एकूण उपलब्ध एम बी</div>
+        <div class="stat-card" onclick="generateQuickReport('ALL_RCV')">
+          <div class="stat-num" id="countReceivedMB">0</div>
+          <div class="stat-label">मिळालेली एमबी</div>
         </div>
-        <div class="stat-card" onclick="generateStockReport('लहान M.B.')">
-          <div class="stat-num" id="countSmallMB">0</div>
-          <div class="stat-label">लहान M.B.</div>
+        <div class="stat-card" onclick="generateQuickReport('ALL_GIVEN')">
+          <div class="stat-num" id="countGivenMB">0</div>
+          <div class="stat-label">दिलेली एमबी</div>
         </div>
-        <div class="stat-card" onclick="generateStockReport('मोठी M.B.')">
-          <div class="stat-num" id="countLargeMB">0</div>
-          <div class="stat-label">मोठी M.B.</div>
+        <div class="stat-card" onclick="generateQuickReport('AVAILABLE')">
+          <div class="stat-num" id="countAvailableMB">0</div>
+          <div class="stat-label">उपलब्ध एम बी</div>
         </div>
       </div>
     </div>
 
+    <!-- अहवाल व शोध कार्ड -->
     <div class="filter-card">
       <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
       <div class="form-row">
@@ -414,9 +416,7 @@
     function formatDateToDMY(dateStr) {
       if (!dateStr) return '-';
       var parts = dateStr.split('-');
-      if (parts.length === 3) {
-        return parts[2] + '-' + parts[1] + '-' + parts[0];
-      }
+      if (parts.length === 3) return parts[2] + '-' + parts[1] + '-' + parts[0];
       return dateStr;
     }
 
@@ -431,6 +431,7 @@
       onCategoryChange();
     };
 
+    /* सर्व आकडे तात्काळ (Instant) रिफ्रेश करणारे मुख्य फंक्शन */
     function refreshAll() {
       refreshJEList();
       refreshMBDashboard();
@@ -440,8 +441,12 @@
     }
 
     function openModule(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModule(id) { document.getElementById(id).style.display = 'none'; }
+    function closeModule(id) { 
+      document.getElementById(id).style.display = 'none'; 
+      refreshMBDashboard(); // मोडल बंद करताच आकडे तात्काळ खात्रीने रिफ्रेश होणे
+    }
 
+    /* उपलब्ध एम बी काढणे */
     function getAvailableStock() {
       var allMBs = getData('mb_records');
       var stockMap = {};
@@ -459,19 +464,24 @@
 
       var available = [];
       for (var no in stockMap) {
-        if (stockMap[no].inStock) {
-          available.push(stockMap[no]);
-        }
+        if (stockMap[no].inStock) available.push(stockMap[no]);
       }
       return available;
     }
 
+    /* तात्काळ लाईव्ह आकडे अपडेट (Instant Auto-Update) */
     function refreshMBDashboard() {
       var list = getData('mb_records');
       var tbody = document.getElementById('mbListBody');
       tbody.innerHTML = '';
       
+      var rcvCount = 0;
+      var givenCount = 0;
+
       list.forEach(function(m, idx) {
+        if (m.actionType === 'मिळालेली एमबी') rcvCount++;
+        if (m.actionType === 'दिलेली एमबी') givenCount++;
+
         tbody.innerHTML += '<tr><td>' + (idx+1) + '</td><td>' + m.mbNumber + '</td><td>' + m.size + '</td><td>' + (m.receivedFrom || '-') + '</td>' +
           '<td class="action-cell">' +
             '<button class="btn-action" style="background:#2e7d32;" onclick="editMB(' + idx + ')">Edit</button>' +
@@ -480,14 +490,11 @@
       });
 
       var stock = getAvailableStock();
-      var sm = 0, lg = 0;
-      stock.forEach(function(s) {
-        if (s.size === 'लहान M.B.') sm++; else lg++;
-      });
 
-      document.getElementById('countTotalMB').innerText = stock.length;
-      document.getElementById('countSmallMB').innerText = sm;
-      document.getElementById('countLargeMB').innerText = lg;
+      // स्क्रीनवरील कार्ड्सचे आकडे तात्काळ बदलणे
+      document.getElementById('countReceivedMB').innerText = rcvCount;
+      document.getElementById('countGivenMB').innerText = givenCount;
+      document.getElementById('countAvailableMB').innerText = stock.length;
     }
 
     function onMBActionTypeChange() {
@@ -630,7 +637,7 @@
 
       setData('mb_records', list);
       cancelMBEdit();
-      refreshAll();
+      refreshAll(); // इन्स्टंट आकडे अपडेट
       alert('नोंद यशस्वीपणे जतन झाली!');
     }
 
@@ -671,11 +678,11 @@
     }
 
     function deleteMB(idx) {
-      if (confirm('ही नोंद हटवायची का? यामुळे ताळमेळ बदलू शकतो.')) {
+      if (confirm('ही नोंद हटवायची का?')) {
         var list = getData('mb_records');
         list.splice(idx, 1);
         setData('mb_records', list);
-        refreshAll();
+        refreshAll(); // इन्स्टंट आकडे अपडेट
       }
     }
 
@@ -918,7 +925,7 @@
     }
 
     function deleteAssign(idx) {
-      if (confirm('वाटप रद्द करायचे का? यामुळे ती उपलब्ध एम बी म्हणून दिसेल.')) {
+      if (confirm('वाटप रद्द करायचे का?')) {
         var assignList = getData('assign_records');
         var removed = assignList.splice(idx, 1)[0];
         setData('assign_records', assignList);
@@ -957,7 +964,6 @@
       getData('je_records').forEach(function(j){ jeSel.add(new Option(j.name, j.name)); });
     }
 
-    /* बदल: सर्व संबंधित ठिकाणी उपलब्ध एम बी, दिलेली एमबी, मिळालेली एमबी, सर्व एम बी असे पर्याय */
     function onCategoryChange() {
       var cat = document.getElementById('repMainCategory').value;
       var sub = document.getElementById('repSubCategory');
@@ -1018,6 +1024,12 @@
         generateWorkReport(fromDate, toDate);
         return;
       }
+    }
+
+    function generateQuickReport(type) {
+      if (type === 'ALL_RCV') generateMBReports('RECEIVED_MB', 'ALL', '', '');
+      else if (type === 'ALL_GIVEN') generateMBReports('GIVEN_MB', 'ALL', '', '');
+      else if (type === 'AVAILABLE') generateStockReport('ALL');
     }
 
     function generateStockReport(sizeFilter) {
