@@ -38,7 +38,6 @@
     .btn-tab4 { background: linear-gradient(180deg, #7c1fa2, #4a0072); border: 1.5px solid #e040fb; box-shadow: 0 0 12px rgba(224, 64, 251, 0.75), inset 0 0 6px rgba(224, 64, 251, 0.5); }
     .btn-tab5 { background: linear-gradient(180deg, #e50914, #8b0000); border: 1.5px solid #ff3d57; box-shadow: 0 0 12px rgba(255, 61, 87, 0.75), inset 0 0 6px rgba(255, 61, 87, 0.5); }
 
-    /* मध्यवर्ती भाग: मोठा नियॉन सर्कल आणि तुमचा फोटो */
     .center-stage {
       position: relative; text-align: center; padding: 5px 0; flex-grow: 1;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -53,19 +52,19 @@
       font-size: 11.5px; color: #8be4ff; line-height: 1.25; font-style: italic; background: rgba(0, 20, 50, 0.4);
     }
 
-    /* मोठा नियॉन सर्कल (छोटा सर्कल काढून टाकला आहे) */
+    /* गोल नियॉन वर्तुळ - यामध्ये फक्त तुमचा फोटो बसेल */
     .big-circle-container {
-      position: relative; width: 310px; height: 310px; margin: 15px auto 5px auto;
+      position: relative; width: 280px; height: 280px; margin: 15px auto 5px auto;
       display: flex; align-items: center; justify-content: center;
     }
     .main-large-ring {
-      position: absolute; width: 300px; height: 300px; border-radius: 50%;
-      border: 3.5px solid #00e5ff; box-shadow: 0 0 30px #00e5ff, inset 0 0 20px #00e5ff;
+      position: absolute; width: 270px; height: 270px; border-radius: 50%;
+      border: 3.5px solid #00e5ff; box-shadow: 0 0 28px #00e5ff, inset 0 0 18px #00e5ff;
       pointer-events: none; z-index: 3;
     }
     .main-photo-in-circle {
-      width: 290px; height: 290px; border-radius: 50%; object-fit: cover;
-      object-position: center 15%; z-index: 2; background-color: #000;
+      width: 260px; height: 260px; border-radius: 50%; object-fit: cover;
+      object-position: center 10%; z-index: 2; background-color: #000;
     }
 
     .stage-label { font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #90caf9; text-transform: uppercase; margin-top: 10px; }
@@ -186,16 +185,16 @@
       <div class="tab-card btn-tab5">Tab-5</div>
     </div>
 
-    <!-- मध्यवर्ती भाग: मोठा नियॉन सर्कल आणि थेट तुमचा फोटो -->
+    <!-- मध्यवर्ती भाग: मागे कोणतेही टॅब नाहीत, फक्त नियॉन वर्तुळात तुमचा ओरिजिनल फोटो -->
     <div class="center-stage">
       <div class="tag-left">Work<br>Today<br>Better<br>Tomorrow</div>
       <div class="tag-right">Ideas<br>Execution<br>Results</div>
 
       <div class="big-circle-container">
         <div class="main-large-ring"></div>
-        <!-- मोठा गोल सर्कल: तुमचा फोटो थेट मोठ्या रिंगमध्ये -->
-        <img src="home-bg.jpg" 
-             onerror="this.onerror=null; this.src='profile.png'; this.onerror=function(){this.src='1000320439.png';};" 
+        <!-- येथे फक्त तुमचा मूळ फोटो लोड होईल (मागे कोणतेही टॅब असणार नाहीत) -->
+        <img src="myphoto.png" 
+             onerror="this.onerror=null; this.src='1000320439.png'; this.onerror=function(){this.src='profile.png';};" 
              class="main-photo-in-circle" 
              alt="User Profile">
       </div>
@@ -1013,7 +1012,7 @@
       document.getElementById('btnCancelBill').style.display = 'none';
     }
     function deleteBill(idx) {
-      if (confirm('ही बिल नोंद हटवायची का?')) {
+      if (confirm('ही नोंद हटवायची का?')) {
         var list = getData('bill_records');
         list.splice(idx, 1);
         setData('bill_records', list);
