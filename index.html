@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digital Hub & M.B. Control System</title>
+  <title>Digital Hub & M.B. System</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
-    /* ==================== १. DIGITAL HUB मुख्य पृष्ठ ==================== */
+    /* ==================== विभाग १: DIGITAL HUB मुख्य पान ==================== */
     #digitalHubSection {
       background: radial-gradient(circle at 50% 25%, #051d3b 0%, #020b18 55%, #00050d 100%);
       color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; overflow-x: hidden;
@@ -18,13 +18,13 @@
     .hub-header .profile-icon { text-align: right; }
     .hub-title-box { text-align: center; }
     .hub-title-box h1 {
-      font-size: 23px; font-weight: 800; letter-spacing: 0.5px;
+      font-size: 24px; font-weight: 800; letter-spacing: 0.5px;
       background: linear-gradient(180deg, #ffffff 40%, #00e5ff 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-    .hub-title-box p { font-size: 8px; color: #7ce8ff; letter-spacing: 1.8px; margin-top: 1px; font-weight: 600; }
+    .hub-title-box p { font-size: 8.5px; color: #7ce8ff; letter-spacing: 1.8px; margin-top: 1px; font-weight: 600; }
 
-    .tabs-wrapper { display: flex; justify-content: center; gap: 7px; padding: 8px 10px; }
+    .tabs-wrapper { display: flex; justify-content: center; gap: 7px; padding: 8px 10px; z-index: 5; }
     .tab-card {
       flex: 1; max-width: 66px; height: 40px; border-radius: 9px;
       display: flex; align-items: center; justify-content: center;
@@ -38,52 +38,52 @@
     .btn-tab4 { background: linear-gradient(180deg, #7c1fa2, #4a0072); border: 1.5px solid #e040fb; box-shadow: 0 0 12px rgba(224, 64, 251, 0.75), inset 0 0 6px rgba(224, 64, 251, 0.5); }
     .btn-tab5 { background: linear-gradient(180deg, #e50914, #8b0000); border: 1.5px solid #ff3d57; box-shadow: 0 0 12px rgba(255, 61, 87, 0.75), inset 0 0 6px rgba(255, 61, 87, 0.5); }
 
-    .center-stage { position: relative; text-align: center; padding: 10px 0 5px 0; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    /* मध्यवर्ती भाग: मोठा नियॉन सर्कल आणि तुमचा फोटो */
+    .center-stage {
+      position: relative; text-align: center; padding: 5px 0; flex-grow: 1;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
     .tag-left {
-      position: absolute; left: 14px; top: 18px; font-family: 'Brush Script MT', cursive, sans-serif;
+      position: absolute; left: 14px; top: 12px; font-family: 'Brush Script MT', cursive, sans-serif;
       font-size: 15px; color: #00e5ff; line-height: 1.25; text-align: left; font-style: italic; text-shadow: 0 0 8px rgba(0,229,255,0.4);
     }
     .tag-right {
-      position: absolute; right: 14px; top: 18px; border: 1px solid rgba(0, 195, 255, 0.35);
+      position: absolute; right: 14px; top: 12px; border: 1px solid rgba(0, 195, 255, 0.35);
       border-radius: 9px; padding: 6px 9px; font-family: 'Brush Script MT', cursive, sans-serif;
       font-size: 11.5px; color: #8be4ff; line-height: 1.25; font-style: italic; background: rgba(0, 20, 50, 0.4);
     }
-    .stage-circle { position: relative; width: 260px; height: 260px; margin: 15px auto 5px auto; display: flex; align-items: center; justify-content: center; }
-    .outer-neon-ring {
-      position: absolute; width: 240px; height: 240px; border-radius: 50%;
-      border: 3px solid #00e5ff; box-shadow: 0 0 22px #00e5ff, inset 0 0 15px #00e5ff;
+
+    /* मोठा नियॉन सर्कल (छोटा सर्कल काढून टाकला आहे) */
+    .big-circle-container {
+      position: relative; width: 310px; height: 310px; margin: 15px auto 5px auto;
+      display: flex; align-items: center; justify-content: center;
     }
-    /* तुमचा फोटो व्यवस्थित बसण्यासाठी सुयोग्य आकार */
-    .avatar-photo {
-      position: relative; z-index: 2; width: 165px; height: 165px;
-      border-radius: 50%; object-fit: cover; object-position: center top;
-      border: 2.5px solid #00e5ff; box-shadow: 0 0 15px rgba(0, 229, 255, 0.5); background: #000;
+    .main-large-ring {
+      position: absolute; width: 300px; height: 300px; border-radius: 50%;
+      border: 3.5px solid #00e5ff; box-shadow: 0 0 30px #00e5ff, inset 0 0 20px #00e5ff;
+      pointer-events: none; z-index: 3;
     }
-    .stage-base {
-      position: absolute; bottom: 8px; width: 210px; height: 36px;
-      border-radius: 50%; background: radial-gradient(ellipse at center, #002244 0%, #000c1a 70%);
-      border: 2px solid #00e5ff; box-shadow: 0 0 20px #00e5ff, inset 0 0 10px #00e5ff; z-index: 1;
+    .main-photo-in-circle {
+      width: 290px; height: 290px; border-radius: 50%; object-fit: cover;
+      object-position: center 15%; z-index: 2; background-color: #000;
     }
-    .stage-label { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #90caf9; text-transform: uppercase; margin-top: 10px; }
+
+    .stage-label { font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #90caf9; text-transform: uppercase; margin-top: 10px; }
     .bottom-navbar { background: #010a14; border-top: 1px solid rgba(0, 195, 255, 0.2); display: flex; justify-content: space-around; padding: 7px 0; }
     .nav-btn { color: #718799; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 3px; cursor: pointer; }
     .nav-btn.active { color: #00e5ff; font-weight: 700; text-shadow: 0 0 6px rgba(0,229,255,0.6); }
     .nav-btn .icon { font-size: 17px; }
 
-    /* ==================== २. M.B. नियंत्रण प्रणाली ==================== */
+    /* ==================== विभाग २: M.B. नियंत्रण प्रणाली ==================== */
     #mbSystemSection { display: none; background: #f0f2f5; color: #212121; min-height: 100vh; padding-bottom: 20px; }
-    
-    /* मुखपृष्ठावर परत जाण्यासाठी स्पष्ट हेडर बार */
     .top-header { background: #0d47a1; color: #fff; text-align: center; padding: 12px 10px; position: relative; }
     .top-header h1 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
     .top-header p { font-size: 11px; opacity: 0.9; }
     
-    /* मुखपृष्ठावर जाण्यासाठी ठळक बटन */
     .btn-back-hub {
       position: absolute; left: 10px; top: 10px; background: #ff9800;
-      color: #000; border: none; border-radius: 6px;
-      padding: 6px 12px; font-size: 12px; cursor: pointer; font-weight: 800;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 4px;
+      color: #000; border: none; border-radius: 6px; padding: 6px 12px;
+      font-size: 12px; cursor: pointer; font-weight: 800; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
     .btn-back-hub:hover { background: #ffa726; }
 
@@ -128,14 +128,10 @@
       font-size: 13px; font-weight: 700; border-radius: 6px; cursor: pointer; margin-top: 6px;
     }
 
-    /* M.B. पृष्ठावरून थेट होमवर जाण्यासाठी खालील स्वतंत्र पट्टी */
-    .footer-home-btn {
-      text-align: center; margin: 15px 0;
-    }
+    .footer-home-btn { text-align: center; margin: 15px 0; }
     .btn-bottom-home {
       background: #0d47a1; color: #fff; border: none; border-radius: 20px;
       padding: 9px 24px; font-size: 12.5px; font-weight: 700; cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
     .modal-overlay {
@@ -184,26 +180,24 @@
     <!-- ५ रंगीत बटणे -->
     <div class="tabs-wrapper">
       <div class="tab-card btn-est">Est.</div>
-      <!-- MB वर क्लिक करताच मोजमाप प्रणाली उघडेल -->
       <div class="tab-card btn-mb" onclick="showMBSystem()">MB</div>
       <div class="tab-card btn-form">Form</div>
       <div class="tab-card btn-tab4">Tab-4</div>
       <div class="tab-card btn-tab5">Tab-5</div>
     </div>
 
-    <!-- मध्यवर्ती भाग: तुमचा फोटो -->
+    <!-- मध्यवर्ती भाग: मोठा नियॉन सर्कल आणि थेट तुमचा फोटो -->
     <div class="center-stage">
       <div class="tag-left">Work<br>Today<br>Better<br>Tomorrow</div>
       <div class="tag-right">Ideas<br>Execution<br>Results</div>
 
-      <div class="stage-circle">
-        <div class="outer-neon-ring"></div>
-        <!-- फोटो शोधण्याचा क्रम: home-bg.jpg -> profile.png -> 1000320439.png -->
+      <div class="big-circle-container">
+        <div class="main-large-ring"></div>
+        <!-- मोठा गोल सर्कल: तुमचा फोटो थेट मोठ्या रिंगमध्ये -->
         <img src="home-bg.jpg" 
              onerror="this.onerror=null; this.src='profile.png'; this.onerror=function(){this.src='1000320439.png';};" 
-             class="avatar-photo" 
+             class="main-photo-in-circle" 
              alt="User Profile">
-        <div class="stage-base"></div>
       </div>
 
       <div class="stage-label">SMART TOOLS</div>
@@ -221,7 +215,6 @@
   <!-- ==================== २. M.B. सिस्टीम ==================== -->
   <div id="mbSystemSection">
     <div class="top-header">
-      <!-- स्पष्ट आणि ठळक होम पेज बटन -->
       <button class="btn-back-hub" onclick="showDigitalHub()">🏠 मुखपृष्ठ</button>
       <h1>मोजमाप पुस्तिका नियंत्रण प्रणाली</h1>
       <p>सार्वजनिक बांधकाम विभाग</p>
@@ -300,7 +293,6 @@
         <button class="btn-report" onclick="generateGeneralReport()">📄 REPORT / PRINT</button>
       </div>
 
-      <!-- खाली सुद्धा मुखपृष्ठावर जाण्यासाठी सहज पर्याय -->
       <div class="footer-home-btn">
         <button class="btn-bottom-home" onclick="showDigitalHub()">🏠 मुख्य Digital Hub वर परत जा</button>
       </div>
@@ -561,7 +553,6 @@
       return dateStr;
     }
 
-    /* ==================== स्क्रीन टॉगलिंग (Zero 404 Error) ==================== */
     function showMBSystem() {
       document.getElementById('digitalHubSection').style.display = 'none';
       document.getElementById('mbSystemSection').style.display = 'block';
