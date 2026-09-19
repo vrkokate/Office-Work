@@ -52,10 +52,10 @@
       font-size: 11.5px; color: #8be4ff; line-height: 1.25; font-style: italic; background: rgba(0, 20, 50, 0.4);
     }
 
-    /* गोल नियॉन वर्तुळ - यामध्ये फक्त तुमचा फोटो बसेल */
+    /* मोठा नियॉन सर्कल आणि थेट फोटो */
     .big-circle-container {
       position: relative; width: 280px; height: 280px; margin: 15px auto 5px auto;
-      display: flex; align-items: center; justify-content: center;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
     }
     .main-large-ring {
       position: absolute; width: 270px; height: 270px; border-radius: 50%;
@@ -64,7 +64,13 @@
     }
     .main-photo-in-circle {
       width: 260px; height: 260px; border-radius: 50%; object-fit: cover;
-      object-position: center 10%; z-index: 2; background-color: #000;
+      object-position: center 10%; z-index: 2; background-color: #030d1a;
+      display: block;
+    }
+    .photo-hint-badge {
+      position: absolute; bottom: 8px; z-index: 4; background: rgba(0, 229, 255, 0.85);
+      color: #000; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5); pointer-events: none;
     }
 
     .stage-label { font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #90caf9; text-transform: uppercase; margin-top: 10px; }
@@ -185,19 +191,18 @@
       <div class="tab-card btn-tab5">Tab-5</div>
     </div>
 
-    <!-- मध्यवर्ती भाग: मागे कोणतेही टॅब नाहीत, फक्त नियॉन वर्तुळात तुमचा ओरिजिनल फोटो -->
+    <!-- मध्यवर्ती भाग: मोठा नियॉन सर्कल (क्लिक करून गॅलरीतून फोटो निवडण्याची सोय) -->
     <div class="center-stage">
       <div class="tag-left">Work<br>Today<br>Better<br>Tomorrow</div>
       <div class="tag-right">Ideas<br>Execution<br>Results</div>
 
-      <div class="big-circle-container">
+      <div class="big-circle-container" onclick="document.getElementById('profileImageInput').click()" title="फोटो बदलण्यासाठी क्लिक करा">
         <div class="main-large-ring"></div>
-        <!-- येथे फक्त तुमचा मूळ फोटो लोड होईल (मागे कोणतेही टॅब असणार नाहीत) -->
-        <img src="myphoto.png" 
-             onerror="this.onerror=null; this.src='1000320439.png'; this.onerror=function(){this.src='profile.png';};" 
-             class="main-photo-in-circle" 
-             alt="User Profile">
+        <img id="userDisplayPhoto" src="1000320439.png" onerror="loadFallbackPhoto(this)" class="main-photo-in-circle" alt="User Photo">
+        <div class="photo-hint-badge">📷 फोटो बदला</div>
       </div>
+      <!-- छुपे फाईल इनपुट -->
+      <input type="file" id="profileImageInput" style="display:none;" accept="image/*" onchange="uploadCustomPhoto(event)">
 
       <div class="stage-label">SMART TOOLS</div>
     </div>
@@ -270,12 +275,12 @@
           </select>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" id="filterSizeGroup">
           <label>उपघटक (Sub Category)</label>
           <select class="form-control" id="repSubCategory"></select>
         </div>
 
-        <div class="form-group" id="filterSizeGroup">
+        <div class="form-group">
           <label>M.B. आकार निवडा (Filter Size)</label>
           <select class="form-control" id="repSizeFilter">
             <option value="ALL">सर्व आकार (लहान व मोठी M.B.)</option>
@@ -552,6 +557,35 @@
       return dateStr;
     }
 
+    /* ==================== फोटो लोड आणि बदलण्याचे लॉजिक ==================== */
+    function loadSavedPhoto() {
+      var saved = localStorage.getItem('hub_user_profile_img');
+      var img = document.getElementById('userDisplayPhoto');
+      if (saved) {
+        img.src = saved;
+      }
+    }
+
+    function uploadCustomPhoto(event) {
+      var file = event.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var base64 = e.target.result;
+        document.getElementById('userDisplayPhoto').src = base64;
+        localStorage.setItem('hub_user_profile_img', base64);
+        alert('तुमचा फोटो यशस्वीपणे सेव्ह झाला आहे!');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function loadFallbackPhoto(img) {
+      if (!img.dataset.tried) {
+        img.dataset.tried = '1';
+        img.src = 'myphoto.png';
+      }
+    }
+
     function showMBSystem() {
       document.getElementById('digitalHubSection').style.display = 'none';
       document.getElementById('mbSystemSection').style.display = 'block';
@@ -574,6 +608,7 @@
       initBillTypes();
       refreshAll();
       onCategoryChange();
+      loadSavedPhoto();
     };
 
     function refreshAll() {
@@ -1012,7 +1047,7 @@
       document.getElementById('btnCancelBill').style.display = 'none';
     }
     function deleteBill(idx) {
-      if (confirm('ही नोंद हटवायची का?')) {
+      if (confirm('ही बिल नोंद हटवायची का?')) {
         var list = getData('bill_records');
         list.splice(idx, 1);
         setData('bill_records', list);
