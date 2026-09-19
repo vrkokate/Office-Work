@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>माझे ॲप</title>
-    <!-- Font Awesome आयकॉन्स -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -34,7 +33,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* ५ बॉक्सची आडवी पट्टी (Scrollable Box Row) */
+        /* वरचे ५ बॉक्स */
         .top-box-row {
             display: flex;
             gap: 10px;
@@ -46,12 +45,10 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* स्क्रोलबार लपवण्यासाठी */
         .top-box-row::-webkit-scrollbar {
             display: none;
         }
 
-        /* वैयक्तिक बॉक्स */
         .action-box {
             flex: 0 0 calc(20% - 8px);
             min-width: 68px;
@@ -80,12 +77,12 @@
             font-weight: 500;
         }
 
-        .action-box:hover, .action-box:active {
+        .action-box:active {
             background-color: #e7f1ff;
             border-color: #007bff;
         }
 
-        /* मुख्य माहिती भाग */
+        /* मुख्य कंटेंट */
         main {
             flex: 1;
             padding: 20px;
@@ -110,7 +107,7 @@
             color: #007bff;
         }
 
-        /* तळातील ५ मुख्य टॅब */
+        /* तळाचा नॅव्हिगेशन बार */
         nav.bottom-nav {
             position: fixed;
             bottom: 0;
@@ -157,36 +154,34 @@
 </head>
 <body>
 
-    <!-- वरचे हेडर -->
-    <header id="page-title">प्रोफाइल</header>
+    <header id="page-title">मुखपृष्ठ</header>
 
-    <!-- तुम्ही मागितलेले वरचे ५ बॉक्स -->
+    <!-- वरचे ५ बॉक्स (आता हे कायम सर्वांना दिसतील) -->
     <div class="top-box-row">
-        <div class="action-box" onclick="alert('बॉक्स १ निवडला')">
+        <div class="action-box" onclick="alert('बॉक्स १')">
             <i class="fa-solid fa-id-card"></i>
             <span>माहिती</span>
         </div>
-        <div class="action-box" onclick="alert('बॉक्स २ निवडला')">
+        <div class="action-box" onclick="alert('बॉक्स २')">
             <i class="fa-solid fa-gear"></i>
             <span>सेटिंग</span>
         </div>
-        <div class="action-box" onclick="alert('बॉक्स ३ निवडला')">
+        <div class="action-box" onclick="alert('बॉक्स ३')">
             <i class="fa-solid fa-wallet"></i>
             <span>खाते</span>
         </div>
-        <div class="action-box" onclick="alert('बॉक्स ४ निवडला')">
+        <div class="action-box" onclick="alert('बॉक्स ४')">
             <i class="fa-solid fa-clock-rotate-left"></i>
             <span>इतिहास</span>
         </div>
-        <div class="action-box" onclick="alert('बॉक्स ५ निवडला')">
+        <div class="action-box" onclick="alert('बॉक्स ५')">
             <i class="fa-solid fa-circle-question"></i>
             <span>मदत</span>
         </div>
     </div>
 
-    <!-- मुख्य कंटेंट -->
     <main>
-        <section id="home" class="tab-content">
+        <section id="home" class="tab-content active">
             <h2>मुखपृष्ठ</h2>
             <p>हे ॲपचे मुख्य पान (Home Screen) आहे.</p>
         </section>
@@ -206,15 +201,14 @@
             <p>सर्व महत्त्वाच्या अपडेट्स आणि नोटिफिकेशन्स येथे येतील.</p>
         </section>
 
-        <section id="profile" class="tab-content active">
+        <section id="profile" class="tab-content">
             <h2>प्रोफाइल</h2>
             <p>वापरकर्त्याची माहिती आणि सेटिंग्ज येथे बदला.</p>
         </section>
     </main>
 
-    <!-- तळाचा नॅव्हिगेशन बार -->
     <nav class="bottom-nav">
-        <div class="nav-item" onclick="switchTab('home', 'मुखपृष्ठ', this)">
+        <div class="nav-item active" onclick="switchTab('home', 'मुखपृष्ठ', this)">
             <i class="fa-solid fa-house"></i>
             <span>मुखपृष्ठ</span>
         </div>
@@ -230,7 +224,7 @@
             <i class="fa-solid fa-bell"></i>
             <span>सूचना</span>
         </div>
-        <div class="nav-item active" onclick="switchTab('profile', 'प्रोफाइल', this)">
+        <div class="nav-item" onclick="switchTab('profile', 'प्रोफाइल', this)">
             <i class="fa-solid fa-user"></i>
             <span>प्रोफाइल</span>
         </div>
