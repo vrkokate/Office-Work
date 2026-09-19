@@ -13,7 +13,7 @@
     .top-header h1 { font-size: 17px; font-weight: 700; margin-bottom: 2px; }
     .top-header p { font-size: 12px; opacity: 0.9; }
 
-    /* मुख्य नेव्हिगेशन बटणे (६ कॉलम्स पूर्ववत) */
+    /* मुख्य नेव्हिगेशन बटणे */
     .action-grid {
       display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;
       padding: 10px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
@@ -43,7 +43,7 @@
     .stat-num { font-size: 18px; font-weight: 700; color: #0d47a1; }
     .stat-label { font-size: 11px; color: #555; margin-top: 2px; }
 
-    /* फिल्टर व अहवाल कार्ड */
+    /* अहवाल कार्ड */
     .filter-card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
     .form-group { margin-bottom: 10px; text-align: left; }
     .form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 4px; }
@@ -97,7 +97,7 @@
     <p>सार्वजनिक बांधकाम विभाग</p>
   </div>
 
-  <!-- नेव्हिगेशन बार (६ मुख्य बटणे) -->
+  <!-- नेव्हिगेशन बार -->
   <div class="action-grid">
     <button class="action-btn btn-je" onclick="openModule('jeModal')"><span>👷</span>JE</button>
     <button class="action-btn btn-mb" onclick="openModule('mbModal')"><span>📖</span>M.B.</button>
@@ -142,15 +142,20 @@
       </div>
       <div class="form-group">
         <label>मुख्य घटक</label>
-        <select class="form-control" id="repMainCategory">
-          <option value="Bill">देयक नोंदवही (Bill Register)</option>
+        <select class="form-control" id="repMainCategory" onchange="onCategoryChange()">
           <option value="M.B.">M.B.</option>
           <option value="JE">JE</option>
+          <option value="Bill">देयक नोंदवही (Bill Register)</option>
           <option value="Work">कामांची यादी</option>
         </select>
       </div>
       <div class="form-group">
-        <input type="text" class="form-control" id="smartSearchInput" placeholder="स्मार्ट शोध: M.B. क्रमांक किंवा नाव टाका">
+        <label>उपघटक (Sub Category)</label>
+        <select class="form-control" id="repSubCategory"></select>
+      </div>
+      <div class="form-group">
+        <label>स्मार्ट शोध (M.B. क्र., JE नाव किंवा कंत्राटदार)</label>
+        <input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका">
       </div>
       <button class="btn-report" onclick="generateGeneralReport()">📄 REPORT / PRINT</button>
     </div>
@@ -410,6 +415,7 @@
       });
       initBillTypes();
       refreshAll();
+      onCategoryChange();
     };
 
     function refreshAll() {
@@ -423,7 +429,35 @@
     function openModule(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModule(id) { document.getElementById(id).style.display = 'none'; }
 
-    /* JE व्यवस्थापन */
+    /* ==================== मुख्य घटक बदलल्यावर उपघटक लोड करणे ==================== */
+    function onCategoryChange() {
+      var cat = document.getElementById('repMainCategory').value;
+      var sub = document.getElementById('repSubCategory');
+      sub.innerHTML = '';
+
+      if (cat === 'M.B.') {
+        sub.add(new Option('सर्व M.B. (एकत्रित नोंदवही)', 'ALL_MB'));
+        sub.add(new Option('M.B. मिळाली (आवक नोंदवही)', 'RECEIVED_MB'));
+        sub.add(new Option('M.B. दिली (जावक / वाटप नोंदवही)', 'GIVEN_MB'));
+        sub.add(new Option('उपलब्ध शिल्लक M.B. साठा', 'AVAILABLE_MB'));
+      } else if (cat === 'JE') {
+        sub.add(new Option('सर्व कनिष्ठ अभियंते (All JE Combined)', 'ALL_JE'));
+        var jes = getData('je_records');
+        jes.forEach(function(j) {
+          sub.add(new Option(j.name + ' (स्वतंत्र अहवाल)', j.name));
+        });
+      } else if (cat === 'Bill') {
+        sub.add(new Option('सर्व देयक नोंदी (Master Bill Register)', 'ALL_BILLS'));
+        var jes = getData('je_records');
+        jes.forEach(function(j) {
+          sub.add(new Option(j.name + ' - यांची बिले', 'JE_BILLS:' + j.name));
+        });
+      } else if (cat === 'Work') {
+        sub.add(new Option('सर्व नोंदवलेली कामे (All Works)', 'ALL_WORKS'));
+      }
+    }
+
+    /* ==================== JE व्यवस्थापन ==================== */
     function saveOrUpdateJE() {
       var name = document.getElementById('newJEName').value.trim();
       var idx = parseInt(document.getElementById('editJEIndex').value, 10);
@@ -434,6 +468,7 @@
       setData('je_records', list);
       cancelJEEdit();
       refreshAll();
+      onCategoryChange();
     }
     function editJE(idx) {
       var item = getData('je_records')[idx];
@@ -454,6 +489,7 @@
         list.splice(idx, 1);
         setData('je_records', list);
         refreshAll();
+        onCategoryChange();
       }
     }
     function refreshJEList() {
@@ -469,7 +505,7 @@
       });
     }
 
-    /* M.B. नोंद व्यवस्थापन */
+    /* ==================== M.B. नोंद ==================== */
     function onMBActionTypeChange() {
       var actionType = document.getElementById('mbActionType').value;
       var lblParty = document.getElementById('lblMBParty');
@@ -492,8 +528,7 @@
     }
 
     function onMBSizeChange() {
-      var actionType = document.getElementById('mbActionType').value;
-      if (actionType === 'M.B. दिली') {
+      if (document.getElementById('mbActionType').value === 'M.B. दिली') {
         populateAvailableMBs();
       }
     }
@@ -546,14 +581,7 @@
     function saveOrUpdateMB() {
       var actionType = document.getElementById('mbActionType').value;
       var size = document.getElementById('newMBSize').value;
-      var no = '';
-
-      if (actionType === 'M.B. दिली') {
-        no = document.getElementById('selectAvailableMB').value;
-      } else {
-        no = document.getElementById('newMBNo').value.trim();
-      }
-
+      var no = (actionType === 'M.B. दिली') ? document.getElementById('selectAvailableMB').value : document.getElementById('newMBNo').value.trim();
       var src = document.getElementById('mbReceivedFromSource').value;
       var date = document.getElementById('newMBDate').value;
       var idx = parseInt(document.getElementById('editMBIndex').value, 10);
@@ -587,29 +615,15 @@
       }
 
       if (idx === -1) {
-        list.push({ 
-          actionType: actionType, 
-          mbNumber: no, 
-          size: size, 
-          receivedSource: src, 
-          receivedDetail: sub, 
-          receivedFrom: displayParty, 
-          date: date 
-        });
-        
+        list.push({ actionType: actionType, mbNumber: no, size: size, receivedSource: src, receivedDetail: sub, receivedFrom: displayParty, date: date });
         if (actionType === 'M.B. दिली' && src === 'JE' && sub) {
           var assigns = getData('assign_records');
           assigns.push({ mbNo: no, jeName: sub, assignDate: date });
           setData('assign_records', assigns);
         }
       } else {
-        list[idx].actionType = actionType;
-        list[idx].mbNumber = no;
-        list[idx].size = size;
-        list[idx].receivedSource = src;
-        list[idx].receivedDetail = sub;
-        list[idx].receivedFrom = displayParty;
-        list[idx].date = date;
+        list[idx].actionType = actionType; list[idx].mbNumber = no; list[idx].size = size;
+        list[idx].receivedSource = src; list[idx].receivedDetail = sub; list[idx].receivedFrom = displayParty; list[idx].date = date;
       }
 
       setData('mb_records', list);
@@ -622,7 +636,6 @@
       var item = getData('mb_records')[idx];
       document.getElementById('mbActionType').value = item.actionType || 'M.B. मिळाली';
       onMBActionTypeChange();
-
       document.getElementById('newMBSize').value = item.size;
       if (item.actionType === 'M.B. दिली') {
         populateAvailableMBs();
@@ -630,7 +643,6 @@
       } else {
         document.getElementById('newMBNo').value = item.mbNumber;
       }
-
       document.getElementById('mbReceivedFromSource').value = item.receivedSource;
       onMBReceivedSourceChange();
       if (item.receivedDetail) document.getElementById('receivedSubSelect').value = item.receivedDetail;
@@ -678,7 +690,7 @@
       document.getElementById('countLargeMB').innerText = lg;
     }
 
-    /* कामांची यादी */
+    /* ==================== कामांची यादी ==================== */
     function onWorkJEChange() {
       var je = document.getElementById('workJE').value;
       var mbSel = document.getElementById('workMB');
@@ -700,11 +712,8 @@
       if (!name || !je || !con || !mb) return alert('कृपया सर्व माहिती भरा.');
 
       var list = getData('work_records');
-      if (idx === -1) {
-        list.push({ name: name, je: je, contractor: con, mbNo: mb });
-      } else {
-        list[idx] = { name: name, je: je, contractor: con, mbNo: mb };
-      }
+      if (idx === -1) list.push({ name: name, je: je, contractor: con, mbNo: mb });
+      else list[idx] = { name: name, je: je, contractor: con, mbNo: mb };
       setData('work_records', list);
       cancelWorkEdit();
       refreshAll();
@@ -752,7 +761,7 @@
       getData('je_records').forEach(function(j){ wJE.add(new Option(j.name, j.name)); });
     }
 
-    /* देयक नोंदवही */
+    /* ==================== देयक नोंदवही ==================== */
     function initBillTypes() {
       var sel = document.getElementById('billType');
       sel.innerHTML = '';
@@ -794,11 +803,8 @@
       if (!je || !mb || !amt) return alert('कृपया सर्व माहिती भरा.');
 
       var list = getData('bill_records');
-      if (idx === -1) {
-        list.push({ je: je, mb: mb, contractor: con, work: work, billType: type, amount: amt, date: dt });
-      } else {
-        list[idx] = { je: je, mb: mb, contractor: con, work: work, billType: type, amount: amt, date: dt };
-      }
+      if (idx === -1) list.push({ je: je, mb: mb, contractor: con, work: work, billType: type, amount: amt, date: dt });
+      else list[idx] = { je: je, mb: mb, contractor: con, work: work, billType: type, amount: amt, date: dt };
       setData('bill_records', list);
       cancelBillEdit();
       refreshAll();
@@ -848,7 +854,7 @@
       getData('je_records').forEach(function(j){ bJE.add(new Option(j.name, j.name)); });
     }
 
-    /* Assign व्यवस्थापन */
+    /* ==================== M.B. वाटप (Assign) ==================== */
     function saveAssign() {
       var mb = document.getElementById('assignMBSelect').value;
       var je = document.getElementById('assignJESelect').value;
@@ -886,22 +892,115 @@
       getData('je_records').forEach(function(j){ jeSel.add(new Option(j.name, j.name)); });
     }
 
-    /* अहवाल व A4 प्रिंट */
-    function generateTotalMBReport() {
-      var assigns = getData('assign_records');
-      var mbList = getData('mb_records');
+    /* ==================== परिपूर्ण अहवाल व A4 प्रिंट जनरेटर ==================== */
+    function generateGeneralReport() {
+      var cat = document.getElementById('repMainCategory').value;
+      var sub = document.getElementById('repSubCategory').value;
+      var fromDate = document.getElementById('repFromDate').value;
+      var toDate = document.getElementById('repToDate').value;
+      var searchTxt = document.getElementById('smartSearchInput').value.trim().toLowerCase();
 
-      var reportData = assigns.map(function(a) {
-        var found = mbList.find(function(m){ return m.mbNumber === a.mbNo; });
-        return {
-          jeName: a.jeName,
-          mbNo: a.mbNo,
-          size: found ? found.size : 'लहान M.B.',
-          date: a.assignDate
-        };
+      /* १. थेट स्मार्ट शोध वापरल्यास (Direct Smart Search) */
+      if (searchTxt) {
+        generateSmartSearchReport(searchTxt, fromDate, toDate);
+        return;
+      }
+
+      /* २. M.B. चे अहवाल (स्वतंत्र / एकत्रित) */
+      if (cat === 'M.B.') {
+        generateMBReports(sub, fromDate, toDate);
+        return;
+      }
+
+      /* ३. JE चे अहवाल (सर्व किंवा विशिष्ट JE) */
+      if (cat === 'JE') {
+        generateJEReports(sub, fromDate, toDate);
+        return;
+      }
+
+      /* ४. देयक नोंदवही (Bill Register) अहवाल */
+      if (cat === 'Bill') {
+        generateBillReports(sub, fromDate, toDate);
+        return;
+      }
+
+      /* ५. कामांची यादी अहवाल */
+      if (cat === 'Work') {
+        generateWorkReport(fromDate, toDate);
+        return;
+      }
+    }
+
+    /* स्मार्ट सर्च अहवाल */
+    function generateSmartSearchReport(query, fDate, tDate) {
+      var bills = getData('bill_records');
+      var mbs = getData('mb_records');
+      var matchedBills = bills.filter(function(b) {
+        return (b.mb && b.mb.toLowerCase().includes(query)) ||
+               (b.je && b.je.toLowerCase().includes(query)) ||
+               (b.contractor && b.contractor.toLowerCase().includes(query)) ||
+               (b.work && b.work.toLowerCase().includes(query));
       });
 
-      reportData.sort(function(a, b) {
+      var matchedMBs = mbs.filter(function(m) {
+        return (m.mbNumber && m.mbNumber.toLowerCase().includes(query)) ||
+               (m.receivedFrom && m.receivedFrom.toLowerCase().includes(query));
+      });
+
+      if (matchedBills.length === 0 && matchedMBs.length === 0) {
+        return alert('शोध संज्ञा "' + query + '" साठी कोणतीही माहिती आढळली नाही.');
+      }
+
+      var html = '<div style="text-align:center; margin-bottom:8px;">' +
+                   '<h2 style="font-size:15px; margin:0;">सार्वजनिक बांधकाम विभाग</h2>' +
+                   '<h3 style="font-size:13px; margin:2px 0;">स्मार्ट शोध सविस्तर अहवाल (शोध: "' + query + '")</h3>' +
+                 '</div>';
+
+      if (matchedMBs.length > 0) {
+        html += '<h4 style="font-size:11.5px; margin:6px 0 3px 0;">📖 संबंधित M.B. नोंदी:</h4>' +
+                '<table class="print-table" style="margin-bottom:8px;"><thead><tr>' +
+                '<th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>नोंद तपशील</th><th>दिनांक</th></tr></thead><tbody>';
+        matchedMBs.forEach(function(m, i) {
+          html += '<tr><td>' + (i+1) + '</td><td>' + m.mbNumber + '</td><td>' + m.size + '</td><td>' + m.receivedFrom + '</td><td>' + m.date + '</td></tr>';
+        });
+        html += '</tbody></table>';
+      }
+
+      if (matchedBills.length > 0) {
+        html += '<h4 style="font-size:11.5px; margin:6px 0 3px 0;">📄 संबंधित देयक (Bill) नोंदी:</h4>';
+        renderBillTableHTML(matchedBills, html, 'स्मार्ट शोध देयक तपशील');
+        return;
+      }
+      printA4Document(html);
+    }
+
+    /* M.B. स्वतंत्र व एकत्रित अहवाल */
+    function generateMBReports(subType, fDate, tDate) {
+      var list = getData('mb_records').filter(function(m) {
+        if (fDate && m.date < fDate) return false;
+        if (tDate && m.date > tDate) return false;
+        return true;
+      });
+
+      var title = '';
+      if (subType === 'RECEIVED_MB') {
+        list = list.filter(function(m){ return m.actionType === 'M.B. मिळाली'; });
+        title = 'M.B. आवक नोंदवही अहवाल (M.B. Received)';
+      } else if (subType === 'GIVEN_MB') {
+        list = list.filter(function(m){ return m.actionType === 'M.B. दिली'; });
+        title = 'M.B. जावक / वाटप नोंदवही अहवाल (M.B. Issued)';
+      } else if (subType === 'AVAILABLE_MB') {
+        var givenNos = getData('mb_records').filter(function(m){ return m.actionType === 'M.B. दिली'; }).map(function(m){ return m.mbNumber; });
+        list = list.filter(function(m){ return m.actionType === 'M.B. मिळाली' && !givenNos.includes(m.mbNumber); });
+        title = 'कार्यालयातील उपलब्ध शिल्लक M.B. साठा अहवाल';
+      } else {
+        title = 'सर्व M.B. एकत्रित मास्टर नोंदवही अहवाल';
+      }
+
+      if (list.length === 0) return alert('निवडलेल्या पर्यायासाठी कोणतीही नोंद आढळली नाही.');
+
+      // क्रमवारी: प्रथम मोठी M.B. नंतर लहान M.B.
+      list.sort(function(a, b) {
         if (a.size === 'मोठी M.B.' && b.size !== 'मोठी M.B.') return -1;
         if (a.size !== 'मोठी M.B.' && b.size === 'मोठी M.B.') return 1;
         return 0;
@@ -909,8 +1008,67 @@
 
       var html = '<div style="text-align:center; margin-bottom:10px;">' +
                    '<h2 style="font-size:15px; margin:0;">सार्वजनिक बांधकाम विभाग</h2>' +
-                   '<h3 style="font-size:13px; margin:3px 0;">कनिष्ठ अभियंता (JE) निहाय मोजमाप पुस्तिका वाटप अहवाल</h3>' +
-                   '<p style="font-size:10.5px; color:#555;">(मोठी M.B. व लहान M.B. क्रमवारीनुसार)</p>' +
+                   '<h3 style="font-size:13px; margin:3px 0;">' + title + '</h3>' +
+                   '<p style="font-size:10px; color:#555;">कालावधी: ' + (fDate || 'आरंभापासून') + ' ते ' + (tDate || 'आजपर्यंत') + '</p>' +
+                 '</div>' +
+                 '<table class="print-table">' +
+                   '<thead><tr>' +
+                     '<th style="width:6%; text-align:center;">अ.क्र.</th>' +
+                     '<th style="width:18%;">M.B. क्रमांक</th>' +
+                     '<th style="width:16%;">M.B. आकार</th>' +
+                     '<th>व्यवहार / कोणाकडून मिळाली किंवा दिली</th>' +
+                     '<th style="width:15%; text-align:center;">दिनांक</th>' +
+                   '</tr></thead><tbody>';
+
+      list.forEach(function(m, i) {
+        html += '<tr>' +
+                  '<td style="text-align:center;">' + (i+1) + '</td>' +
+                  '<td>' + m.mbNumber + '</td>' +
+                  '<td><strong>' + m.size + '</strong></td>' +
+                  '<td>' + (m.receivedFrom || '-') + '</td>' +
+                  '<td style="text-align:center;">' + m.date + '</td>' +
+                '</tr>';
+      });
+      html += '</tbody></table>';
+      printA4Document(html);
+    }
+
+    /* JE अहवाल (सर्व किंवा विशिष्ट) */
+    function generateJEReports(subType, fDate, tDate) {
+      var assigns = getData('assign_records').filter(function(a) {
+        if (fDate && a.assignDate < fDate) return false;
+        if (tDate && a.assignDate > tDate) return false;
+        return true;
+      });
+
+      var mbList = getData('mb_records');
+      var reportTitle = '';
+
+      if (subType === 'ALL_JE') {
+        reportTitle = 'सर्व कनिष्ठ अभियंता (JE) निहाय मोजमाप पुस्तिका अहवाल';
+      } else {
+        assigns = assigns.filter(function(a){ return a.jeName === subType; });
+        reportTitle = subType + ' - मोजमाप पुस्तिका वाटप अहवाल';
+      }
+
+      if (assigns.length === 0) return alert('कोणतीही M.B. वाटप नोंद आढळली नाही.');
+
+      var mapped = assigns.map(function(a) {
+        var found = mbList.find(function(m){ return m.mbNumber === a.mbNo; });
+        return { jeName: a.jeName, mbNo: a.mbNo, size: found ? found.size : 'लहान M.B.', date: a.assignDate };
+      });
+
+      // क्रमवारी: प्रथम मोठी M.B., नंतर लहान M.B.
+      mapped.sort(function(a, b) {
+        if (a.size === 'मोठी M.B.' && b.size !== 'मोठी M.B.') return -1;
+        if (a.size !== 'मोठी M.B.' && b.size === 'मोठी M.B.') return 1;
+        return 0;
+      });
+
+      var html = '<div style="text-align:center; margin-bottom:10px;">' +
+                   '<h2 style="font-size:15px; margin:0;">सार्वजनिक बांधकाम विभाग</h2>' +
+                   '<h3 style="font-size:13px; margin:3px 0;">' + reportTitle + '</h3>' +
+                   '<p style="font-size:10px; color:#555;">(मोठी M.B. व लहान M.B. क्रमवारीनुसार)</p>' +
                  '</div>' +
                  '<table class="print-table">' +
                    '<thead><tr>' +
@@ -921,61 +1079,46 @@
                      '<th style="text-align:center;">वाटप दिनांक</th>' +
                    '</tr></thead><tbody>';
 
-      if (reportData.length === 0) {
-        html += '<tr><td colspan="5" style="text-align:center;">कोणतीही M.B. वाटप केलेली नाही.</td></tr>';
-      } else {
-        reportData.forEach(function(r, i) {
-          html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + r.jeName + '</td><td style="text-align:center;">' + r.mbNo + '</td><td style="text-align:center;"><strong>' + r.size + '</strong></td><td style="text-align:center;">' + r.date + '</td></tr>';
-        });
-      }
-      html += '</tbody></table>';
-      printA4Document(html);
-    }
-
-    function filterMBList(sizeFilter) {
-      var mbList = getData('mb_records').filter(function(m){ return m.size === sizeFilter; });
-      var html = '<div style="text-align:center; margin-bottom:10px;">' +
-                   '<h2 style="font-size:15px; margin:0;">सार्वजनिक बांधकाम विभाग</h2>' +
-                   '<h3 style="font-size:13px; margin:3px 0;">' + sizeFilter + ' साठा अहवाल</h3>' +
-                 '</div>' +
-                 '<table class="print-table">' +
-                   '<thead><tr>' +
-                     '<th style="width:7%; text-align:center;">अ.क्र.</th><th>M.B. क्रमांक</th><th>आकार</th><th>कोणाकडून मिळाली / दिली</th><th style="text-align:center;">प्राप्त दिनांक</th>' +
-                   '</tr></thead><tbody>';
-
-      mbList.forEach(function(m, i) {
-        html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + m.mbNumber + '</td><td>' + m.size + '</td><td>' + (m.receivedFrom || '-') + '</td><td style="text-align:center;">' + m.date + '</td></tr>';
+      mapped.forEach(function(r, i) {
+        html += '<tr>' +
+                  '<td style="text-align:center;">' + (i+1) + '</td>' +
+                  '<td>' + r.jeName + '</td>' +
+                  '<td style="text-align:center;">' + r.mbNo + '</td>' +
+                  '<td style="text-align:center;"><strong>' + r.size + '</strong></td>' +
+                  '<td style="text-align:center;">' + r.date + '</td>' +
+                '</tr>';
       });
       html += '</tbody></table>';
       printA4Document(html);
     }
 
-    function generateGeneralReport() {
-      var bills = getData('bill_records');
-      var fromDate = document.getElementById('repFromDate').value;
-      var toDate = document.getElementById('repToDate').value;
-      var searchTxt = document.getElementById('smartSearchInput').value.trim().toLowerCase();
-
-      var filtered = bills.filter(function(b) {
-        if (fromDate && b.date < fromDate) return false;
-        if (toDate && b.date > toDate) return false;
-        if (searchTxt) {
-          var match = (b.mb && b.mb.toLowerCase().includes(searchTxt)) ||
-                      (b.je && b.je.toLowerCase().includes(searchTxt)) ||
-                      (b.contractor && b.contractor.toLowerCase().includes(searchTxt)) ||
-                      (b.work && b.work.toLowerCase().includes(searchTxt));
-          if (!match) return false;
-        }
+    /* देयक नोंदवही अहवाल */
+    function generateBillReports(subType, fDate, tDate) {
+      var bills = getData('bill_records').filter(function(b) {
+        if (fDate && b.date < fDate) return false;
+        if (tDate && b.date > tDate) return false;
         return true;
       });
 
-      if (filtered.length === 0) return alert('कोणतीही नोंद आढळली नाही.');
+      var repTitle = 'देयक नोंदवही व खर्च अहवाल (Bill Register Report)';
+      if (subType.startsWith('JE_BILLS:')) {
+        var targetJE = subType.split(':')[1];
+        bills = bills.filter(function(b){ return b.je === targetJE; });
+        repTitle = targetJE + ' - यांच्या कामांचा देयक अहवाल';
+      }
 
+      if (bills.length === 0) return alert('कोणतीही देयक नोंद आढळली नाही.');
+      renderBillTableHTML(bills, '', repTitle);
+    }
+
+    function renderBillTableHTML(billsList, preHTML, title) {
+      var fromDate = document.getElementById('repFromDate').value;
+      var toDate = document.getElementById('repToDate').value;
       var billTypeTotals = {};
       var grandTotal = 0;
       var tableRows = '';
 
-      filtered.forEach(function(b, idx) {
+      billsList.forEach(function(b, idx) {
         var amt = parseFloat(b.amount) || 0;
         grandTotal += amt;
         billTypeTotals[b.billType] = (billTypeTotals[b.billType] || 0) + amt;
@@ -1002,9 +1145,10 @@
         typeCount++;
       }
 
-      var html = '<div style="text-align:center; margin-bottom:8px;">' +
+      var html = preHTML +
+                 '<div style="text-align:center; margin-bottom:8px;">' +
                    '<h2 style="font-size:15px; margin:0;">सार्वजनिक बांधकाम विभाग</h2>' +
-                   '<h3 style="font-size:13px; margin:2px 0;">देयक नोंदवही व कामनिहाय खर्च अहवाल (A4 Report)</h3>' +
+                   '<h3 style="font-size:13px; margin:2px 0;">' + title + '</h3>' +
                    '<p style="font-size:10px; color:#555;">कालावधी: ' + (fromDate || 'आरंभापासून') + ' ते ' + (toDate || 'आजपर्यंत') + '</p>' +
                  '</div>' +
                  '<table class="print-table" style="margin-bottom:10px;">' +
@@ -1033,6 +1177,60 @@
       printA4Document(html);
     }
 
+    /* कामांचा अहवाल */
+    function generateWorkReport(fDate, tDate) {
+      var works = getData('work_records');
+      if (works.length === 0) return alert('कोणतेही काम नोंदवलेले नाही.');
+
+      var html = '<div style="text-align:center; margin-bottom:10px;">' +
+                   '<h2 style="font-size:15px; margin:0;">सार्वजनिक बांधकाम विभाग</h2>' +
+                   '<h3 style="font-size:13px; margin:3px 0;">नोंदवलेल्या कामांची यादी (Work Register)</h3>' +
+                 '</div>' +
+                 '<table class="print-table">' +
+                   '<thead><tr>' +
+                     '<th style="width:6%; text-align:center;">अ.क्र.</th>' +
+                     '<th style="width:34%;">कामाचे नाव</th>' +
+                     '<th style="width:22%;">कनिष्ठ अभियंता (JE) चे नाव</th>' +
+                     '<th style="width:24%;">कंत्राटदार / एजन्सी</th>' +
+                     '<th style="width:14%; text-align:center;">M.B. क्रमांक</th>' +
+                   '</tr></thead><tbody>';
+
+      works.forEach(function(w, i) {
+        html += '<tr>' +
+                  '<td style="text-align:center;">' + (i+1) + '</td>' +
+                  '<td>' + w.name + '</td>' +
+                  '<td>' + w.je + '</td>' +
+                  '<td>' + w.contractor + '</td>' +
+                  '<td style="text-align:center;">' + w.mbNo + '</td>' +
+                '</tr>';
+      });
+      html += '</tbody></table>';
+      printA4Document(html);
+    }
+
+    /* कार्ड क्लिक अहवाल */
+    function generateTotalMBReport() {
+      generateJEReports('ALL_JE', '', '');
+    }
+
+    function filterMBList(sizeFilter) {
+      var mbList = getData('mb_records').filter(function(m){ return m.size === sizeFilter; });
+      var html = '<div style="text-align:center; margin-bottom:10px;">' +
+                   '<h2 style="font-size:15px; margin:0;">सार्वजनिक बांधकाम विभाग</h2>' +
+                   '<h3 style="font-size:13px; margin:3px 0;">' + sizeFilter + ' साठा अहवाल</h3>' +
+                 '</div>' +
+                 '<table class="print-table">' +
+                   '<thead><tr>' +
+                     '<th style="width:7%; text-align:center;">अ.क्र.</th><th>M.B. क्रमांक</th><th>आकार</th><th>कोणाकडून मिळाली / दिली</th><th style="text-align:center;">प्राप्त दिनांक</th>' +
+                   '</tr></thead><tbody>';
+
+      mbList.forEach(function(m, i) {
+        html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + m.mbNumber + '</td><td>' + m.size + '</td><td>' + (m.receivedFrom || '-') + '</td><td style="text-align:center;">' + m.date + '</td></tr>';
+      });
+      html += '</tbody></table>';
+      printA4Document(html);
+    }
+
     function printA4Document(content) {
       var p = document.getElementById('printableArea');
       p.innerHTML = content;
@@ -1041,7 +1239,7 @@
       p.style.display = 'none';
     }
 
-    /* सेटिंग्ज */
+    /* ==================== सेटिंग्ज ==================== */
     function downloadBackup() {
       var allData = {
         je_records: getData('je_records'),
@@ -1069,6 +1267,7 @@
           });
           alert('डेटा पूर्ववत (Restore) यशस्वी झाला!');
           refreshAll();
+          onCategoryChange();
           closeModule('settingsModal');
         } catch(err) { alert('चुकीची फाईल निवडली आहे.'); }
       };
@@ -1088,6 +1287,7 @@
         selected.forEach(function(key){ localStorage.removeItem(key); });
         alert('निवडलेला डेटा हटवला!');
         refreshAll();
+        onCategoryChange();
         closeModule('settingsModal');
       }
     }
