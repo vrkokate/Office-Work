@@ -7,7 +7,7 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
-    /* ==================== विभाग १: DIGITAL HUB मुख्य पृष्ठ ==================== */
+    /* ==================== १. DIGITAL HUB मुख्य पृष्ठ ==================== */
     #digitalHubSection {
       background: radial-gradient(circle at 50% 25%, #051d3b 0%, #020b18 55%, #00050d 100%);
       color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; overflow-x: hidden;
@@ -48,18 +48,19 @@
       border-radius: 9px; padding: 6px 9px; font-family: 'Brush Script MT', cursive, sans-serif;
       font-size: 11.5px; color: #8be4ff; line-height: 1.25; font-style: italic; background: rgba(0, 20, 50, 0.4);
     }
-    .stage-circle { position: relative; width: 280px; height: 280px; margin: 15px auto 5px auto; display: flex; align-items: center; justify-content: center; }
+    .stage-circle { position: relative; width: 260px; height: 260px; margin: 15px auto 5px auto; display: flex; align-items: center; justify-content: center; }
     .outer-neon-ring {
-      position: absolute; width: 250px; height: 250px; border-radius: 50%;
-      border: 3px solid #00e5ff; box-shadow: 0 0 25px #00e5ff, inset 0 0 18px #00e5ff;
+      position: absolute; width: 240px; height: 240px; border-radius: 50%;
+      border: 3px solid #00e5ff; box-shadow: 0 0 22px #00e5ff, inset 0 0 15px #00e5ff;
     }
+    /* तुमचा फोटो व्यवस्थित बसण्यासाठी सुयोग्य आकार */
     .avatar-photo {
-      position: relative; z-index: 2; width: 175px; height: 175px;
+      position: relative; z-index: 2; width: 165px; height: 165px;
       border-radius: 50%; object-fit: cover; object-position: center top;
       border: 2.5px solid #00e5ff; box-shadow: 0 0 15px rgba(0, 229, 255, 0.5); background: #000;
     }
     .stage-base {
-      position: absolute; bottom: 8px; width: 220px; height: 38px;
+      position: absolute; bottom: 8px; width: 210px; height: 36px;
       border-radius: 50%; background: radial-gradient(ellipse at center, #002244 0%, #000c1a 70%);
       border: 2px solid #00e5ff; box-shadow: 0 0 20px #00e5ff, inset 0 0 10px #00e5ff; z-index: 1;
     }
@@ -69,16 +70,23 @@
     .nav-btn.active { color: #00e5ff; font-weight: 700; text-shadow: 0 0 6px rgba(0,229,255,0.6); }
     .nav-btn .icon { font-size: 17px; }
 
-    /* ==================== विभाग २: M.B. नियंत्रण प्रणाली ==================== */
-    #mbSystemSection { display: none; background: #f0f2f5; color: #212121; min-height: 100vh; }
+    /* ==================== २. M.B. नियंत्रण प्रणाली ==================== */
+    #mbSystemSection { display: none; background: #f0f2f5; color: #212121; min-height: 100vh; padding-bottom: 20px; }
+    
+    /* मुखपृष्ठावर परत जाण्यासाठी स्पष्ट हेडर बार */
     .top-header { background: #0d47a1; color: #fff; text-align: center; padding: 12px 10px; position: relative; }
     .top-header h1 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
     .top-header p { font-size: 11px; opacity: 0.9; }
+    
+    /* मुखपृष्ठावर जाण्यासाठी ठळक बटन */
     .btn-back-hub {
-      position: absolute; left: 8px; top: 10px; background: rgba(255,255,255,0.2);
-      color: #fff; border: 1px solid rgba(255,255,255,0.4); border-radius: 4px;
-      padding: 5px 9px; font-size: 11px; cursor: pointer; text-decoration: none; font-weight: 700;
+      position: absolute; left: 10px; top: 10px; background: #ff9800;
+      color: #000; border: none; border-radius: 6px;
+      padding: 6px 12px; font-size: 12px; cursor: pointer; font-weight: 800;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 4px;
     }
+    .btn-back-hub:hover { background: #ffa726; }
+
     .action-grid {
       display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;
       padding: 10px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
@@ -118,6 +126,16 @@
     .btn-report {
       width: 100%; background: #0d47a1; color: #fff; border: none; padding: 10px;
       font-size: 13px; font-weight: 700; border-radius: 6px; cursor: pointer; margin-top: 6px;
+    }
+
+    /* M.B. पृष्ठावरून थेट होमवर जाण्यासाठी खालील स्वतंत्र पट्टी */
+    .footer-home-btn {
+      text-align: center; margin: 15px 0;
+    }
+    .btn-bottom-home {
+      background: #0d47a1; color: #fff; border: none; border-radius: 20px;
+      padding: 9px 24px; font-size: 12.5px; font-weight: 700; cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
     .modal-overlay {
@@ -166,21 +184,25 @@
     <!-- ५ रंगीत बटणे -->
     <div class="tabs-wrapper">
       <div class="tab-card btn-est">Est.</div>
-      <!-- MB वर क्लिक करताच M.B. सिस्टीम उघडेल (No 404 Error) -->
+      <!-- MB वर क्लिक करताच मोजमाप प्रणाली उघडेल -->
       <div class="tab-card btn-mb" onclick="showMBSystem()">MB</div>
       <div class="tab-card btn-form">Form</div>
       <div class="tab-card btn-tab4">Tab-4</div>
       <div class="tab-card btn-tab5">Tab-5</div>
     </div>
 
-    <!-- मध्यवर्ती भाग: तुमचा फोटो योग्य लहान आकारात -->
+    <!-- मध्यवर्ती भाग: तुमचा फोटो -->
     <div class="center-stage">
       <div class="tag-left">Work<br>Today<br>Better<br>Tomorrow</div>
       <div class="tag-right">Ideas<br>Execution<br>Results</div>
 
       <div class="stage-circle">
         <div class="outer-neon-ring"></div>
-        <img src="profile.png" onerror="this.onerror=null; this.src='1000320439.png';" class="avatar-photo" alt="Profile">
+        <!-- फोटो शोधण्याचा क्रम: home-bg.jpg -> profile.png -> 1000320439.png -->
+        <img src="home-bg.jpg" 
+             onerror="this.onerror=null; this.src='profile.png'; this.onerror=function(){this.src='1000320439.png';};" 
+             class="avatar-photo" 
+             alt="User Profile">
         <div class="stage-base"></div>
       </div>
 
@@ -199,7 +221,8 @@
   <!-- ==================== २. M.B. सिस्टीम ==================== -->
   <div id="mbSystemSection">
     <div class="top-header">
-      <button class="btn-back-hub" onclick="showDigitalHub()">← मुखपृष्ठ</button>
+      <!-- स्पष्ट आणि ठळक होम पेज बटन -->
+      <button class="btn-back-hub" onclick="showDigitalHub()">🏠 मुखपृष्ठ</button>
       <h1>मोजमाप पुस्तिका नियंत्रण प्रणाली</h1>
       <p>सार्वजनिक बांधकाम विभाग</p>
     </div>
@@ -275,6 +298,11 @@
         </div>
         
         <button class="btn-report" onclick="generateGeneralReport()">📄 REPORT / PRINT</button>
+      </div>
+
+      <!-- खाली सुद्धा मुखपृष्ठावर जाण्यासाठी सहज पर्याय -->
+      <div class="footer-home-btn">
+        <button class="btn-bottom-home" onclick="showDigitalHub()">🏠 मुख्य Digital Hub वर परत जा</button>
       </div>
     </div>
 
@@ -533,7 +561,7 @@
       return dateStr;
     }
 
-    /* स्क्रीन टॉगलिंग (Zero 404 Error) */
+    /* ==================== स्क्रीन टॉगलिंग (Zero 404 Error) ==================== */
     function showMBSystem() {
       document.getElementById('digitalHubSection').style.display = 'none';
       document.getElementById('mbSystemSection').style.display = 'block';
@@ -1047,7 +1075,7 @@
     }
 
     function deleteAssign(idx) {
-      if (confirm('वाटप रद्द करायचे का? यामुळे ती उपलब्ध एम बी म्हणून दिसेल.')) {
+      if (confirm('वाटप रद्द करायचे का?')) {
         var assignList = getData('assign_records');
         var removed = assignList.splice(idx, 1)[0];
         setData('assign_records', assignList);
