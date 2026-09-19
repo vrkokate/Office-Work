@@ -2,8 +2,9 @@
 <html lang="mr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>माझे ॲप</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Digital Hub</title>
+    <!-- आयकॉन्ससाठी Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -15,111 +16,120 @@
         }
 
         body {
-            background-color: #f4f6f9;
-            color: #333;
+            background-color: #030a16;
+            color: #ffffff;
             display: flex;
             flex-direction: column;
             height: 100vh;
+            overflow: hidden;
         }
 
         /* ॲप हेडर */
         header {
-            background-color: #007bff;
+            background-color: rgba(3, 10, 22, 0.95);
+            backdrop-filter: blur(10px);
             color: white;
             text-align: center;
-            padding: 16px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 14px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(0, 195, 255, 0.2);
+            z-index: 10;
         }
 
-        /* वरचे ५ बॉक्स */
-        .top-box-row {
-            display: flex;
-            gap: 10px;
-            padding: 12px;
-            background-color: #ffffff;
-            border-bottom: 1px solid #e0e0e0;
-            overflow-x: auto;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .top-box-row::-webkit-scrollbar {
-            display: none;
-        }
-
-        .action-box {
-            flex: 0 0 calc(20% - 8px);
-            min-width: 68px;
-            background-color: #f8f9fa;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 10px 4px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .action-box i {
-            font-size: 1.2rem;
-            color: #007bff;
-            margin-bottom: 5px;
-        }
-
-        .action-box span {
-            font-size: 0.72rem;
-            color: #444;
-            font-weight: 500;
-        }
-
-        .action-box:active {
-            background-color: #e7f1ff;
-            border-color: #007bff;
-        }
-
-        /* मुख्य कंटेंट */
+        /* मुख्य कंटेंट स्क्रीन */
         main {
             flex: 1;
-            padding: 20px;
+            position: relative;
             overflow-y: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
         }
 
         .tab-content {
             display: none;
-            animation: fadeIn 0.3s ease-in-out;
+            height: 100%;
         }
 
         .tab-content.active {
             display: block;
         }
 
-        .tab-content h2 {
-            margin-bottom: 10px;
-            color: #007bff;
+        /* होम पेज पोस्टर डिझाइन */
+        .home-poster-container {
+            position: relative;
+            width: 100%;
+            min-height: 100%;
+            background-image: url('home-bg.jpg');
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* तळाचा नॅव्हिगेशन बार */
+        /* फोटोवरील ५ बॉक्सेसवर अचूक बसणारी क्लिकेबल लेयर */
+        .clickable-box-layer {
+            position: absolute;
+            top: 13.8%; /* फोटोतील ५ बॉक्सचे अचूक स्थान */
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-evenly;
+            padding: 0 10px;
+            z-index: 5;
+        }
+
+        /* वैयक्तिक क्लिकेबल लिंक बॉक्स */
+        .nav-tap-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 18%;
+            height: 52px;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.15s ease;
+            background: transparent;
+        }
+
+        /* बटण दाबल्यावर ३D ग्लो इफेक्ट */
+        .nav-tap-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+        }
+
+        /* इतर टॅब्ससाठी साधे पेज */
+        .normal-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 20px;
+            color: #d1d5db;
+        }
+
+        .normal-page h2 {
+            color: #00d2ff;
+            margin-bottom: 8px;
+        }
+
+        /* तळाचा ५ टॅबचा बॉटम बार */
         nav.bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 65px;
-            background-color: #ffffff;
+            height: 60px;
+            background-color: rgba(6, 15, 30, 0.95);
+            backdrop-filter: blur(8px);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
-            border-top: 1px solid #e0e0e0;
+            border-top: 1px solid rgba(0, 195, 255, 0.2);
+            z-index: 10;
         }
 
         .nav-item {
@@ -127,88 +137,92 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            text-decoration: none;
-            color: #888888;
-            font-size: 0.75rem;
+            color: #8da2c0;
+            font-size: 0.72rem;
             flex: 1;
             height: 100%;
             cursor: pointer;
+            text-decoration: none;
             transition: color 0.2s ease;
         }
 
         .nav-item i {
-            font-size: 1.3rem;
-            margin-bottom: 4px;
+            font-size: 1.25rem;
+            margin-bottom: 3px;
         }
 
         .nav-item.active {
-            color: #007bff;
-            font-weight: bold;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+            color: #00d2ff;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
         }
     </style>
 </head>
 <body>
 
-    <header id="page-title">मुखपृष्ठ</header>
-
-    <!-- वरचे ५ बॉक्स (आता हे कायम सर्वांना दिसतील) -->
-    <div class="top-box-row">
-        <div class="action-box" onclick="alert('बॉक्स १')">
-            <i class="fa-solid fa-id-card"></i>
-            <span>माहिती</span>
-        </div>
-        <div class="action-box" onclick="alert('बॉक्स २')">
-            <i class="fa-solid fa-gear"></i>
-            <span>सेटिंग</span>
-        </div>
-        <div class="action-box" onclick="alert('बॉक्स ३')">
-            <i class="fa-solid fa-wallet"></i>
-            <span>खाते</span>
-        </div>
-        <div class="action-box" onclick="alert('बॉक्स ४')">
-            <i class="fa-solid fa-clock-rotate-left"></i>
-            <span>इतिहास</span>
-        </div>
-        <div class="action-box" onclick="alert('बॉक्स ५')">
-            <i class="fa-solid fa-circle-question"></i>
-            <span>मदत</span>
-        </div>
-    </div>
+    <!-- हेडर -->
+    <header id="page-title">Digital Hub</header>
 
     <main>
+        <!-- होम स्क्रीन (फोटो आणि लिंक्स) -->
         <section id="home" class="tab-content active">
-            <h2>मुखपृष्ठ</h2>
-            <p>हे ॲपचे मुख्य पान (Home Screen) आहे.</p>
+            <div class="home-poster-container">
+                <!-- फोटोतील ५ बॉक्सवर ठेवलेल्या ५ थेट लिंक्स -->
+                <div class="clickable-box-layer">
+                    <!-- १. Est. लिंक -->
+                    <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Est."></a>
+                    
+                    <!-- २. MB लिंक -->
+                    <a href="https://google.com" target="_blank" class="nav-tap-btn" title="MB"></a>
+                    
+                    <!-- ३. Form लिंक -->
+                    <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Form"></a>
+                    
+                    <!-- ४. Tab-4 लिंक -->
+                    <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Tab-4"></a>
+                    
+                    <!-- ५. Tab-5 लिंक -->
+                    <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Tab-5"></a>
+                </div>
+            </div>
         </section>
 
+        <!-- शोध टॅब -->
         <section id="search" class="tab-content">
-            <h2>शोध</h2>
-            <p>येथे तुम्ही माहिती शोधू शकता.</p>
+            <div class="normal-page">
+                <h2>शोध</h2>
+                <p>येथे तुम्ही माहिती शोधू शकता.</p>
+            </div>
         </section>
 
+        <!-- ऑर्डर्स टॅब -->
         <section id="orders" class="tab-content">
-            <h2>ऑर्डर्स / कार्य</h2>
-            <p>तुमच्या सर्व नोंदी किंवा ऑर्डर्स येथे दिसतील.</p>
+            <div class="normal-page">
+                <h2>ऑर्डर्स / कार्य</h2>
+                <p>तुमच्या सर्व नोंदी आणि ऑर्डर्स येथे दिसतील.</p>
+            </div>
         </section>
 
+        <!-- सूचना टॅब -->
         <section id="notifications" class="tab-content">
-            <h2>सूचना</h2>
-            <p>सर्व महत्त्वाच्या अपडेट्स आणि नोटिफिकेशन्स येथे येतील.</p>
+            <div class="normal-page">
+                <h2>सूचना</h2>
+                <p>सर्व नवीन नोटिफिकेशन्स येथे येतील.</p>
+            </div>
         </section>
 
+        <!-- प्रोफाइल टॅब -->
         <section id="profile" class="tab-content">
-            <h2>प्रोफाइल</h2>
-            <p>वापरकर्त्याची माहिती आणि सेटिंग्ज येथे बदला.</p>
+            <div class="normal-page">
+                <h2>प्रोफाइल</h2>
+                <p>वापरकर्त्याची माहिती आणि सेटिंग्ज येथे बदला.</p>
+            </div>
         </section>
     </main>
 
+    <!-- तळाचा ५ टॅब असलेला नॅव्हिगेशन बार -->
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home', 'मुखपृष्ठ', this)">
+        <div class="nav-item active" onclick="switchTab('home', 'Digital Hub', this)">
             <i class="fa-solid fa-house"></i>
             <span>मुखपृष्ठ</span>
         </div>
@@ -230,6 +244,7 @@
         </div>
     </nav>
 
+    <!-- टॅब बदलण्यासाठी स्क्रिप्ट -->
     <script>
         function switchTab(tabId, title, element) {
             const contents = document.querySelectorAll('.tab-content');
