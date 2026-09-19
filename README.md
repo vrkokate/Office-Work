@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Digital Hub</title>
-    <!-- आयकॉन्ससाठी Font Awesome -->
+    <!-- Font Awesome आयकॉन्स -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -24,20 +24,21 @@
             overflow: hidden;
         }
 
-        /* ॲप हेडर */
+        /* वरचे हेडर */
         header {
             background-color: rgba(3, 10, 22, 0.95);
             backdrop-filter: blur(10px);
-            color: white;
+            color: #00d2ff;
             text-align: center;
             padding: 14px;
-            font-size: 1.15rem;
+            font-size: 1.2rem;
             font-weight: 700;
-            border-bottom: 1px solid rgba(0, 195, 255, 0.2);
+            border-bottom: 1px solid rgba(0, 195, 255, 0.25);
+            letter-spacing: 0.5px;
             z-index: 10;
         }
 
-        /* मुख्य कंटेंट स्क्रीन */
+        /* मुख्य भाग */
         main {
             flex: 1;
             position: relative;
@@ -53,11 +54,12 @@
             display: block;
         }
 
-        /* होम पेज पोस्टर डिझाइन */
+        /* होम पोस्टर स्क्रीन */
         .home-poster-container {
             position: relative;
             width: 100%;
             min-height: 100%;
+            background-color: #030a16;
             background-image: url('home-bg.jpg');
             background-size: cover;
             background-position: center top;
@@ -66,10 +68,10 @@
             flex-direction: column;
         }
 
-        /* फोटोवरील ५ बॉक्सेसवर अचूक बसणारी क्लिकेबल लेयर */
+        /* फोटोवरील ५ बॉक्सेसवर बसणारी लेयर */
         .clickable-box-layer {
             position: absolute;
-            top: 13.8%; /* फोटोतील ५ बॉक्सचे अचूक स्थान */
+            top: 13.8%;
             left: 0;
             right: 0;
             display: flex;
@@ -78,7 +80,7 @@
             z-index: 5;
         }
 
-        /* वैयक्तिक क्लिकेबल लिंक बॉक्स */
+        /* वैयक्तिक क्लिक होणारे टॅब */
         .nav-tap-btn {
             display: flex;
             flex-direction: column;
@@ -88,8 +90,8 @@
             height: 52px;
             text-decoration: none;
             border-radius: 12px;
-            transition: all 0.15s ease;
             background: transparent;
+            transition: all 0.15s ease;
         }
 
         /* बटण दाबल्यावर ३D ग्लो इफेक्ट */
@@ -99,7 +101,7 @@
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
         }
 
-        /* इतर टॅब्ससाठी साधे पेज */
+        /* इतर पानांची रचना */
         .normal-page {
             display: flex;
             flex-direction: column;
@@ -107,7 +109,7 @@
             justify-content: center;
             height: 100%;
             text-align: center;
-            padding: 20px;
+            padding: 24px;
             color: #d1d5db;
         }
 
@@ -116,7 +118,7 @@
             margin-bottom: 8px;
         }
 
-        /* तळाचा ५ टॅबचा बॉटम बार */
+        /* तळाचा ५ टॅब बार */
         nav.bottom-nav {
             position: fixed;
             bottom: 0;
@@ -160,50 +162,48 @@
 </head>
 <body>
 
-    <!-- हेडर -->
     <header id="page-title">Digital Hub</header>
 
     <main>
-        <!-- होम स्क्रीन (फोटो आणि लिंक्स) -->
+        <!-- होम स्क्रीन -->
         <section id="home" class="tab-content active">
             <div class="home-poster-container">
-                <!-- फोटोतील ५ बॉक्सवर ठेवलेल्या ५ थेट लिंक्स -->
                 <div class="clickable-box-layer">
-                    <!-- १. Est. लिंक -->
+                    <!-- १. Est. लिंक (हवी ती लिंक href मध्ये टाका) -->
                     <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Est."></a>
-                    
+
                     <!-- २. MB लिंक -->
                     <a href="https://google.com" target="_blank" class="nav-tap-btn" title="MB"></a>
-                    
+
                     <!-- ३. Form लिंक -->
                     <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Form"></a>
-                    
+
                     <!-- ४. Tab-4 लिंक -->
                     <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Tab-4"></a>
-                    
+
                     <!-- ५. Tab-5 लिंक -->
                     <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Tab-5"></a>
                 </div>
             </div>
         </section>
 
-        <!-- शोध टॅब -->
+        <!-- शोध स्क्रीन -->
         <section id="search" class="tab-content">
             <div class="normal-page">
                 <h2>शोध</h2>
-                <p>येथे तुम्ही माहिती शोधू शकता.</p>
+                <p>येथे तुम्ही कोणतीही माहिती शोधू शकता.</p>
             </div>
         </section>
 
-        <!-- ऑर्डर्स टॅब -->
+        <!-- ऑर्डर्स स्क्रीन -->
         <section id="orders" class="tab-content">
             <div class="normal-page">
                 <h2>ऑर्डर्स / कार्य</h2>
-                <p>तुमच्या सर्व नोंदी आणि ऑर्डर्स येथे दिसतील.</p>
+                <p>सर्व नोंदी आणि ऑर्डर्स येथे दिसतील.</p>
             </div>
         </section>
 
-        <!-- सूचना टॅब -->
+        <!-- सूचना स्क्रीन -->
         <section id="notifications" class="tab-content">
             <div class="normal-page">
                 <h2>सूचना</h2>
@@ -211,16 +211,16 @@
             </div>
         </section>
 
-        <!-- प्रोफाइल टॅब -->
+        <!-- प्रोफाइल स्क्रीन -->
         <section id="profile" class="tab-content">
             <div class="normal-page">
                 <h2>प्रोफाइल</h2>
-                <p>वापरकर्त्याची माहिती आणि सेटिंग्ज येथे बदला.</p>
+                <p>वापरकर्त्याची माहिती आणि सेटिंग्ज.</p>
             </div>
         </section>
     </main>
 
-    <!-- तळाचा ५ टॅब असलेला नॅव्हिगेशन बार -->
+    <!-- तळाचा बार -->
     <nav class="bottom-nav">
         <div class="nav-item active" onclick="switchTab('home', 'Digital Hub', this)">
             <i class="fa-solid fa-house"></i>
@@ -244,7 +244,6 @@
         </div>
     </nav>
 
-    <!-- टॅब बदलण्यासाठी स्क्रिप्ट -->
     <script>
         function switchTab(tabId, title, element) {
             const contents = document.querySelectorAll('.tab-content');
