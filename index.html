@@ -8,12 +8,10 @@
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
     body { background: #f0f2f5; color: #212121; }
 
-    /* शीर्षपट्टी */
     .top-header { background: #0d47a1; color: #fff; text-align: center; padding: 14px 10px; }
     .top-header h1 { font-size: 17px; font-weight: 700; margin-bottom: 2px; }
     .top-header p { font-size: 12px; opacity: 0.9; }
 
-    /* मुख्य नेव्हिगेशन बटणे (होम बटणासह ७ कॉलम्स) */
     .action-grid {
       display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
       padding: 10px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
@@ -31,7 +29,6 @@
     .btn-assign { background: #7b1fa2; }
     .btn-settings { background: #c2185b; }
 
-    /* कंटेनर व कार्ड्स */
     .container { padding: 10px; max-width: 800px; margin: auto; }
     .summary-box { background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
     .summary-title { font-size: 13px; font-weight: 700; text-align: center; color: #0d47a1; margin-bottom: 8px; }
@@ -44,7 +41,6 @@
     .stat-num { font-size: 18px; font-weight: 700; color: #0d47a1; }
     .stat-label { font-size: 11px; color: #555; margin-top: 2px; }
 
-    /* फिल्टर व अहवाल कार्ड */
     .filter-card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
     .form-group { margin-bottom: 10px; text-align: left; }
     .form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 4px; }
@@ -58,7 +54,6 @@
       font-size: 13px; font-weight: 700; border-radius: 6px; cursor: pointer; margin-top: 6px;
     }
 
-    /* मोडल पॉपअप */
     .modal-overlay {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.55); z-index: 999; justify-content: center; align-items: center; padding: 10px;
@@ -70,14 +65,12 @@
     .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px; }
     .btn-close { background: #e53935; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
 
-    /* तक्ता व बटणे */
     .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 11.5px; }
     .data-table th, .data-table td { border: 1px solid #ddd; padding: 6px; text-align: left; }
     .data-table th { background: #f5f5f5; font-weight: 600; }
     .action-cell { white-space: nowrap; text-align: center; display: flex; gap: 4px; justify-content: center; align-items: center; }
     .btn-action { border: none; padding: 4px 8px; border-radius: 3px; font-size: 11px; cursor: pointer; color: #fff; }
 
-    /* कॉम्पॅक्ट A4 प्रिंट लेआउट */
     @media print {
       body * { visibility: hidden; }
       #printableArea, #printableArea * { visibility: visible; }
@@ -98,9 +91,8 @@
     <p>सार्वजनिक बांधकाम विभाग</p>
   </div>
 
-  <!-- नेव्हिगेशन बार (होम बटणासह) -->
   <div class="action-grid">
-    <button class="action-btn btn-home" onclick="goHome()"><span>🏠</span>होम</button>
+    <button class="action-btn btn-home" onclick="goToDigitalHub()"><span>🏠</span>मुखपृष्ठ</button>
     <button class="action-btn btn-je" onclick="openModule('jeModal')"><span>👷</span>JE</button>
     <button class="action-btn btn-mb" onclick="openModule('mbModal')"><span>📖</span>M.B.</button>
     <button class="action-btn btn-work" onclick="openModule('workModal')"><span>📋</span>Work list</button>
@@ -110,7 +102,6 @@
   </div>
 
   <div class="container">
-    <!-- M.B. Summary कार्ड्स -->
     <div class="summary-box">
       <div class="summary-title">📖 M.B. Summary</div>
       <div class="card-grid">
@@ -129,7 +120,6 @@
       </div>
     </div>
 
-    <!-- अहवाल व शोध कार्ड -->
     <div class="filter-card">
       <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
       <div class="form-row">
@@ -158,7 +148,7 @@
     </div>
   </div>
 
-  <!-- ==================== १. JE व्यवस्थापन मोडल ==================== -->
+  <!-- १. JE मोडल -->
   <div id="jeModal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -181,7 +171,7 @@
     </div>
   </div>
 
-  <!-- ==================== २. M.B. नोंद मोडल ==================== -->
+  <!-- २. M.B. मोडल -->
   <div id="mbModal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -206,13 +196,11 @@
         </select>
       </div>
 
-      <!-- मिळालेल्या M.B. साठी इनपुट -->
       <div class="form-group" id="groupMBInput">
         <label>M.B. क्रमांक *</label>
         <input type="text" class="form-control" id="newMBNo" placeholder="उदा. MB-1001">
       </div>
 
-      <!-- दिलेल्या M.B. साठी शिल्लक वह्यांची लिस्ट -->
       <div class="form-group" id="groupMBSelect" style="display:none;">
         <label>उपलब्ध शिल्लक M.B. निवडा *</label>
         <select class="form-control" id="selectAvailableMB"></select>
@@ -258,7 +246,7 @@
     </div>
   </div>
 
-  <!-- ==================== ३. कामांची यादी (Work list) मोडल ==================== -->
+  <!-- ३. Work List मोडल -->
   <div id="workModal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -297,7 +285,7 @@
     </div>
   </div>
 
-  <!-- ==================== ४. देयक नोंदवही (Bill Reg.) मोडल ==================== -->
+  <!-- ४. Bill Reg. मोडल -->
   <div id="billModal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -348,7 +336,7 @@
     </div>
   </div>
 
-  <!-- ==================== ५. M.B. वाटप (Assign) मोडल ==================== -->
+  <!-- ५. Assign मोडल -->
   <div id="assignModal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -375,7 +363,7 @@
     </div>
   </div>
 
-  <!-- ==================== ६. सेटिंग्स मोडल ==================== -->
+  <!-- ६. सेटिंग्स मोडल -->
   <div id="settingsModal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -427,14 +415,12 @@
     function openModule(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModule(id) { document.getElementById(id).style.display = 'none'; }
 
-    /* होम पेजवर जाण्यासाठी फंक्शन */
-    function goHome() {
-      var modals = document.querySelectorAll('.modal-overlay');
-      modals.forEach(function(m) { m.style.display = 'none'; });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    /* मूळ मुख्य Digital Hub स्क्रीनवर परत जाणे */
+    function goToDigitalHub() {
+      window.location.href = "index.html";
     }
 
-    /* ==================== JE व्यवस्थापन ==================== */
+    /* JE व्यवस्थापन */
     function saveOrUpdateJE() {
       var name = document.getElementById('newJEName').value.trim();
       var idx = parseInt(document.getElementById('editJEIndex').value, 10);
@@ -480,7 +466,7 @@
       });
     }
 
-    /* ==================== M.B. नोंद व्यवस्थापन ==================== */
+    /* M.B. नोंद व्यवस्थापन */
     function onMBActionTypeChange() {
       var actionType = document.getElementById('mbActionType').value;
       var lblParty = document.getElementById('lblMBParty');
@@ -577,7 +563,6 @@
 
       var list = getData('mb_records');
 
-      // दुबार नोंद तपासणी (Duplicate Check)
       if (idx === -1) {
         if (actionType === 'M.B. मिळाली') {
           var alreadyReceived = list.find(function(m) {
@@ -690,7 +675,7 @@
       document.getElementById('countLargeMB').innerText = lg;
     }
 
-    /* ==================== कामांची यादी ==================== */
+    /* कामांची यादी */
     function onWorkJEChange() {
       var je = document.getElementById('workJE').value;
       var mbSel = document.getElementById('workMB');
@@ -764,7 +749,7 @@
       getData('je_records').forEach(function(j){ wJE.add(new Option(j.name, j.name)); });
     }
 
-    /* ==================== देयक नोंदवही ==================== */
+    /* देयक नोंदवही */
     function initBillTypes() {
       var sel = document.getElementById('billType');
       sel.innerHTML = '';
@@ -860,7 +845,7 @@
       getData('je_records').forEach(function(j){ bJE.add(new Option(j.name, j.name)); });
     }
 
-    /* ==================== M.B. वाटप (Assign) ==================== */
+    /* Assign व्यवस्थापन */
     function saveAssign() {
       var mb = document.getElementById('assignMBSelect').value;
       var je = document.getElementById('assignJESelect').value;
@@ -898,7 +883,7 @@
       getData('je_records').forEach(function(j){ jeSel.add(new Option(j.name, j.name)); });
     }
 
-    /* ==================== अहवाल व A4 प्रिंट ==================== */
+    /* अहवाल व A4 प्रिंट */
     function generateTotalMBReport() {
       var assigns = getData('assign_records');
       var mbList = getData('mb_records');
@@ -1053,7 +1038,7 @@
       p.style.display = 'none';
     }
 
-    /* ==================== सेटिंग्ज ==================== */
+    /* सेटिंग्ज */
     function downloadBackup() {
       var allData = {
         je_records: getData('je_records'),
