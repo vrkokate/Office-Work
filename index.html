@@ -69,13 +69,14 @@
     .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px; }
     .btn-close { background: #e53935; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
 
-    /* तक्ता */
+    /* तक्ता व बटणे */
     .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 11.5px; }
     .data-table th, .data-table td { border: 1px solid #ddd; padding: 6px; text-align: left; }
     .data-table th { background: #f5f5f5; font-weight: 600; }
-    .btn-action { border: none; padding: 3px 7px; border-radius: 3px; font-size: 10.5px; cursor: pointer; color: #fff; margin-right: 3px; }
+    .action-cell { white-space: nowrap; text-align: center; display: flex; gap: 4px; justify-content: center; align-items: center; }
+    .btn-action { border: none; padding: 4px 8px; border-radius: 3px; font-size: 11px; cursor: pointer; color: #fff; }
 
-    /* A4 प्रिंट लेआउट */
+    /* कॉम्पॅक्ट A4 प्रिंट लेआउट */
     @media print {
       body * { visibility: hidden; }
       #printableArea, #printableArea * { visibility: visible; }
@@ -126,7 +127,7 @@
       </div>
     </div>
 
-    <!-- अहवाल कार्ड -->
+    <!-- अहवाल व शोध कार्ड -->
     <div class="filter-card">
       <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
       <div class="form-row">
@@ -172,7 +173,7 @@
         <button id="btnCancelJE" class="btn-report" style="background:#757575; width:80px; display:none;" onclick="cancelJEEdit()">रद्द करा</button>
       </div>
       <table class="data-table">
-        <thead><tr><th>अ.क्र.</th><th>कनिष्ठ अभियंता चे नाव</th><th style="width:30%;">Action</th></tr></thead>
+        <thead><tr><th>अ.क्र.</th><th>कनिष्ठ अभियंता चे नाव</th><th style="width:25%; text-align:center;">Action</th></tr></thead>
         <tbody id="jeListBody"></tbody>
       </table>
     </div>
@@ -196,16 +197,23 @@
       </div>
 
       <div class="form-group">
+        <label>M.B. आकार *</label>
+        <select class="form-control" id="newMBSize" onchange="onMBSizeChange()">
+          <option value="लहान M.B.">लहान M.B.</option>
+          <option value="मोठी M.B.">मोठी M.B.</option>
+        </select>
+      </div>
+
+      <!-- M.B. मिळाली असताना टाईप करण्यासाठी -->
+      <div class="form-group" id="groupMBInput">
         <label>M.B. क्रमांक *</label>
         <input type="text" class="form-control" id="newMBNo" placeholder="उदा. MB-1001">
       </div>
 
-      <div class="form-group">
-        <label>M.B. आकार *</label>
-        <select class="form-control" id="newMBSize">
-          <option value="लहान M.B.">लहान M.B.</option>
-          <option value="मोठी M.B.">मोठी M.B.</option>
-        </select>
+      <!-- M.B. दिली असताना उपलब्ध वह्यांची ड्रॉपडाऊन लिस्ट -->
+      <div class="form-group" id="groupMBSelect" style="display:none;">
+        <label>उपलब्ध M.B. निवडा *</label>
+        <select class="form-control" id="selectAvailableMB"></select>
       </div>
 
       <div class="form-group">
@@ -240,7 +248,7 @@
             <th>M.B. क्र.</th>
             <th>साईज</th>
             <th>व्यवहार / पार्टी</th>
-            <th style="width:25%;">Action</th>
+            <th style="width:25%; text-align:center;">Action</th>
           </tr>
         </thead>
         <tbody id="mbListBody"></tbody>
@@ -281,7 +289,7 @@
         <button id="btnCancelWork" class="btn-report" style="background:#757575; width:80px; display:none;" onclick="cancelWorkEdit()">रद्द करा</button>
       </div>
       <table class="data-table">
-        <thead><tr><th>अ.क्र.</th><th>काम</th><th>JE</th><th>M.B.</th><th style="width:25%;">Action</th></tr></thead>
+        <thead><tr><th>अ.क्र.</th><th>काम</th><th>JE</th><th>M.B.</th><th style="width:25%; text-align:center;">Action</th></tr></thead>
         <tbody id="workListBody"></tbody>
       </table>
     </div>
@@ -332,7 +340,7 @@
         <button id="btnCancelBill" class="btn-report" style="background:#757575; width:80px; display:none;" onclick="cancelBillEdit()">रद्द करा</button>
       </div>
       <table class="data-table">
-        <thead><tr><th>अ.क्र.</th><th>काम</th><th>बिल प्रकार</th><th>रक्कम (₹)</th><th style="width:25%;">Action</th></tr></thead>
+        <thead><tr><th>अ.क्र.</th><th>काम</th><th>बिल प्रकार</th><th>रक्कम (₹)</th><th style="width:25%; text-align:center;">Action</th></tr></thead>
         <tbody id="billListBody"></tbody>
       </table>
     </div>
@@ -359,7 +367,7 @@
       </div>
       <button class="btn-report" style="background:#7b1fa2;" onclick="saveAssign()">Assign M.B.</button>
       <table class="data-table">
-        <thead><tr><th>M.B.</th><th>JE</th><th>वाटप दिनांक</th><th>Action</th></tr></thead>
+        <thead><tr><th>M.B.</th><th>JE</th><th>वाटप दिनांक</th><th style="width:20%; text-align:center;">Action</th></tr></thead>
         <tbody id="assignListBody"></tbody>
       </table>
     </div>
@@ -443,7 +451,7 @@
       document.getElementById('btnCancelJE').style.display = 'none';
     }
     function deleteJE(idx) {
-      if (confirm('नाव हटवायचे का?')) {
+      if (confirm('हे नाव कायमचे हटवायचे का?')) {
         var list = getData('je_records');
         list.splice(idx, 1);
         setData('je_records', list);
@@ -455,9 +463,11 @@
       var tbody = document.getElementById('jeListBody');
       tbody.innerHTML = '';
       list.forEach(function(item, idx) {
-        tbody.innerHTML += '<tr><td>' + (idx+1) + '</td><td>' + item.name + '</td><td>' +
-          '<button class="btn-action" style="background:#2e7d32;" onclick="editJE(' + idx + ')">Edit</button>' +
-          '<button class="btn-action" style="background:#d32f2f;" onclick="deleteJE(' + idx + ')">Delete</button></td></tr>';
+        tbody.innerHTML += '<tr><td>' + (idx+1) + '</td><td>' + item.name + '</td>' +
+          '<td class="action-cell">' +
+            '<button class="btn-action" style="background:#2e7d32;" onclick="editJE(' + idx + ')">Edit</button>' +
+            '<button class="btn-action" style="background:#d32f2f;" onclick="deleteJE(' + idx + ')">Delete</button>' +
+          '</td></tr>';
       });
     }
 
@@ -466,12 +476,46 @@
       var actionType = document.getElementById('mbActionType').value;
       var lblParty = document.getElementById('lblMBParty');
       var lblDate = document.getElementById('lblMBDate');
+      var grpInp = document.getElementById('groupMBInput');
+      var grpSel = document.getElementById('groupMBSelect');
+
       if (actionType === 'M.B. दिली') {
         lblParty.innerText = 'M.B. कोणाला दिली? *';
         lblDate.innerText = 'दिल्याचा दिनांक *';
+        grpInp.style.display = 'none';
+        grpSel.style.display = 'block';
+        populateAvailableMBs();
       } else {
         lblParty.innerText = 'M.B. कोणाकडून मिळाली? *';
         lblDate.innerText = 'प्राप्त दिनांक *';
+        grpInp.style.display = 'block';
+        grpSel.style.display = 'none';
+      }
+    }
+
+    function onMBSizeChange() {
+      var actionType = document.getElementById('mbActionType').value;
+      if (actionType === 'M.B. दिली') {
+        populateAvailableMBs();
+      }
+    }
+
+    function populateAvailableMBs() {
+      var size = document.getElementById('newMBSize').value;
+      var sel = document.getElementById('selectAvailableMB');
+      sel.innerHTML = '<option value="">-- M.B. निवडा --</option>';
+
+      // केवळ मिळालेल्या वह्यांमधून संबंधित आकाराच्या M.B. शोधणे
+      var list = getData('mb_records').filter(function(m) {
+        return m.actionType === 'M.B. मिळाली' && m.size === size;
+      });
+
+      if (list.length === 0) {
+        sel.add(new Option('या आकारात कोणतीही M.B. उपलब्ध नाही', ''));
+      } else {
+        list.forEach(function(m) {
+          sel.add(new Option(m.mbNumber, m.mbNumber));
+        });
       }
     }
 
@@ -495,8 +539,15 @@
 
     function saveOrUpdateMB() {
       var actionType = document.getElementById('mbActionType').value;
-      var no = document.getElementById('newMBNo').value.trim();
       var size = document.getElementById('newMBSize').value;
+      var no = '';
+
+      if (actionType === 'M.B. दिली') {
+        no = document.getElementById('selectAvailableMB').value;
+      } else {
+        no = document.getElementById('newMBNo').value.trim();
+      }
+
       var src = document.getElementById('mbReceivedFromSource').value;
       var date = document.getElementById('newMBDate').value;
       var idx = parseInt(document.getElementById('editMBIndex').value, 10);
@@ -509,6 +560,13 @@
       var list = getData('mb_records');
       if (idx === -1) {
         list.push({ actionType: actionType, mbNumber: no, size: size, receivedSource: src, receivedDetail: sub, receivedFrom: displayParty, date: date });
+        
+        // जर M.B. दिली आणि ती JE ला दिली असेल, तर थेट Assign मध्ये नोंद करणे
+        if (actionType === 'M.B. दिली' && src === 'JE' && sub) {
+          var assigns = getData('assign_records');
+          assigns.push({ mbNo: no, jeName: sub, assignDate: date });
+          setData('assign_records', assigns);
+        }
       } else {
         list[idx].actionType = actionType;
         list[idx].mbNumber = no;
@@ -527,8 +585,15 @@
       var item = getData('mb_records')[idx];
       document.getElementById('mbActionType').value = item.actionType || 'M.B. मिळाली';
       onMBActionTypeChange();
-      document.getElementById('newMBNo').value = item.mbNumber;
+
       document.getElementById('newMBSize').value = item.size;
+      if (item.actionType === 'M.B. दिली') {
+        populateAvailableMBs();
+        document.getElementById('selectAvailableMB').value = item.mbNumber;
+      } else {
+        document.getElementById('newMBNo').value = item.mbNumber;
+      }
+
       document.getElementById('mbReceivedFromSource').value = item.receivedSource;
       onMBReceivedSourceChange();
       if (item.receivedDetail) document.getElementById('receivedSubSelect').value = item.receivedDetail;
@@ -550,7 +615,7 @@
     }
 
     function deleteMB(idx) {
-      if (confirm('ही M.B. हटवायची का?')) {
+      if (confirm('ही M.B. कायमची हटवायची का?')) {
         var list = getData('mb_records');
         list.splice(idx, 1);
         setData('mb_records', list);
@@ -565,9 +630,11 @@
       tbody.innerHTML = '';
       list.forEach(function(m, idx) {
         if (m.size === 'लहान M.B.') sm++; else lg++;
-        tbody.innerHTML += '<tr><td>' + (idx+1) + '</td><td>' + m.mbNumber + '</td><td>' + m.size + '</td><td>' + (m.receivedFrom || '-') + '</td><td>' +
-          '<button class="btn-action" style="background:#2e7d32;" onclick="editMB(' + idx + ')">Edit</button>' +
-          '<button class="btn-action" style="background:#d32f2f;" onclick="deleteMB(' + idx + ')">Delete</button></td></tr>';
+        tbody.innerHTML += '<tr><td>' + (idx+1) + '</td><td>' + m.mbNumber + '</td><td>' + m.size + '</td><td>' + (m.receivedFrom || '-') + '</td>' +
+          '<td class="action-cell">' +
+            '<button class="btn-action" style="background:#2e7d32;" onclick="editMB(' + idx + ')">Edit</button>' +
+            '<button class="btn-action" style="background:#d32f2f;" onclick="deleteMB(' + idx + ')">Delete</button>' +
+          '</td></tr>';
       });
       document.getElementById('countTotalMB').innerText = list.length;
       document.getElementById('countSmallMB').innerText = sm;
@@ -637,9 +704,11 @@
       var tbody = document.getElementById('workListBody');
       tbody.innerHTML = '';
       list.forEach(function(w, idx) {
-        tbody.innerHTML += '<tr><td>' + (idx+1) + '</td><td>' + w.name + '</td><td>' + w.je + '</td><td>' + w.mbNo + '</td><td>' +
-          '<button class="btn-action" style="background:#2e7d32;" onclick="editWork(' + idx + ')">Edit</button>' +
-          '<button class="btn-action" style="background:#d32f2f;" onclick="deleteWork(' + idx + ')">Delete</button></td></tr>';
+        tbody.innerHTML += '<tr><td>' + (idx+1) + '</td><td>' + w.name + '</td><td>' + w.je + '</td><td>' + w.mbNo + '</td>' +
+          '<td class="action-cell">' +
+            '<button class="btn-action" style="background:#2e7d32;" onclick="editWork(' + idx + ')">Edit</button>' +
+            '<button class="btn-action" style="background:#d32f2f;" onclick="deleteWork(' + idx + ')">Delete</button>' +
+          '</td></tr>';
       });
       var wJE = document.getElementById('workJE');
       wJE.innerHTML = '<option value="">-- JE निवडा --</option>';
@@ -731,9 +800,11 @@
       var tbody = document.getElementById('billListBody');
       tbody.innerHTML = '';
       list.forEach(function(b, idx) {
-        tbody.innerHTML += '<tr><td>' + (idx+1) + '</td><td>' + b.work + '</td><td>' + b.billType + '</td><td>₹ ' + parseFloat(b.amount).toLocaleString('en-IN') + '</td><td>' +
-          '<button class="btn-action" style="background:#2e7d32;" onclick="editBill(' + idx + ')">Edit</button>' +
-          '<button class="btn-action" style="background:#d32f2f;" onclick="deleteBill(' + idx + ')">Delete</button></td></tr>';
+        tbody.innerHTML += '<tr><td>' + (idx+1) + '</td><td>' + b.work + '</td><td>' + b.billType + '</td><td>₹ ' + parseFloat(b.amount).toLocaleString('en-IN') + '</td>' +
+          '<td class="action-cell">' +
+            '<button class="btn-action" style="background:#2e7d32;" onclick="editBill(' + idx + ')">Edit</button>' +
+            '<button class="btn-action" style="background:#d32f2f;" onclick="deleteBill(' + idx + ')">Delete</button>' +
+          '</td></tr>';
       });
       var bJE = document.getElementById('billJE');
       bJE.innerHTML = '<option value="">-- JE निवडा --</option>';
@@ -765,8 +836,10 @@
       var tbody = document.getElementById('assignListBody');
       tbody.innerHTML = '';
       list.forEach(function(a, idx) {
-        tbody.innerHTML += '<tr><td>' + a.mbNo + '</td><td>' + a.jeName + '</td><td>' + a.assignDate + '</td><td>' +
-          '<button class="btn-action" style="background:#d32f2f;" onclick="deleteAssign(' + idx + ')">रद्द करा</button></td></tr>';
+        tbody.innerHTML += '<tr><td>' + a.mbNo + '</td><td>' + a.jeName + '</td><td>' + a.assignDate + '</td>' +
+          '<td class="action-cell">' +
+            '<button class="btn-action" style="background:#d32f2f;" onclick="deleteAssign(' + idx + ')">रद्द करा</button>' +
+          '</td></tr>';
       });
       var mbSel = document.getElementById('assignMBSelect');
       mbSel.innerHTML = '<option value="">-- उपलब्ध M.B. --</option>';
