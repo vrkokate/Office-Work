@@ -7,77 +7,105 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
-    /* ==================== विभाग १: DIGITAL HUB मुख्य पान ==================== */
+    /* ==================== १. DIGITAL HUB मुख्य पान ==================== */
     #digitalHubSection {
       background: radial-gradient(circle at 50% 25%, #051d3b 0%, #020b18 55%, #00050d 100%);
-      color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; overflow-x: hidden;
+      color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; overflow-x: hidden; padding-bottom: 25px;
     }
-    .top-mini-bar { text-align: center; padding: 6px 0 2px 0; font-size: 13px; font-weight: 700; color: #00e5ff; letter-spacing: 0.5px; }
-    .hub-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; }
-    .hub-header .menu-icon, .hub-header .profile-icon { font-size: 22px; color: #ffffff; cursor: pointer; width: 30px; }
-    .hub-header .profile-icon { text-align: right; }
+
+    /* मुख्य हेडर */
+    .hub-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; margin-top: 5px; }
+    .hub-header .menu-icon { font-size: 24px; color: #ffffff; cursor: pointer; }
+    .hub-header .profile-icon { font-size: 24px; color: #ffffff; }
     .hub-title-box { text-align: center; }
     .hub-title-box h1 {
-      font-size: 24px; font-weight: 800; letter-spacing: 0.5px;
+      font-size: 26px; font-weight: 800; letter-spacing: 0.5px;
       background: linear-gradient(180deg, #ffffff 40%, #00e5ff 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
-    .hub-title-box p { font-size: 8.5px; color: #7ce8ff; letter-spacing: 1.8px; margin-top: 1px; font-weight: 600; }
+    .hub-title-box p { font-size: 9px; color: #7ce8ff; letter-spacing: 1.8px; margin-top: 2px; font-weight: 600; }
 
-    .tabs-wrapper { display: flex; justify-content: center; gap: 7px; padding: 8px 10px; z-index: 5; }
+    /* ५ रंगीत टॅब बटणे (पहिल्या स्क्रीनशॉट प्रमाणे) */
+    .tabs-wrapper { display: flex; justify-content: center; gap: 6px; padding: 6px 10px; z-index: 5; }
     .tab-card {
-      flex: 1; max-width: 66px; height: 40px; border-radius: 9px;
+      flex: 1; max-width: 70px; height: 42px; border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 11.5px; font-weight: 700; color: #ffffff; text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; text-shadow: 0 1px 2px rgba(0,0,0,0.7);
+      font-size: 12px; font-weight: 700; color: #ffffff; text-decoration: none;
+      cursor: pointer; text-shadow: 0 1px 2px rgba(0,0,0,0.7);
     }
     .tab-card:hover { transform: translateY(-2px); }
-    .btn-est { background: linear-gradient(180deg, #0051ff, #002b99); border: 1.5px solid #00d2ff; box-shadow: 0 0 12px rgba(0, 210, 255, 0.75), inset 0 0 6px rgba(0, 210, 255, 0.5); }
-    .btn-mb { background: linear-gradient(180deg, #00a843, #006626); border: 1.5px solid #00ff6a; box-shadow: 0 0 12px rgba(0, 255, 106, 0.75), inset 0 0 6px rgba(0, 255, 106, 0.5); }
-    .btn-form { background: linear-gradient(180deg, #ff7b00, #b34700); border: 1.5px solid #ffaa00; box-shadow: 0 0 12px rgba(255, 170, 0, 0.75), inset 0 0 6px rgba(255, 170, 0, 0.5); }
-    .btn-tab4 { background: linear-gradient(180deg, #7c1fa2, #4a0072); border: 1.5px solid #e040fb; box-shadow: 0 0 12px rgba(224, 64, 251, 0.75), inset 0 0 6px rgba(224, 64, 251, 0.5); }
-    .btn-tab5 { background: linear-gradient(180deg, #e50914, #8b0000); border: 1.5px solid #ff3d57; box-shadow: 0 0 12px rgba(255, 61, 87, 0.75), inset 0 0 6px rgba(255, 61, 87, 0.5); }
+    .btn-est { background: linear-gradient(180deg, #0051ff, #002b99); border: 1.5px solid #00d2ff; box-shadow: 0 0 12px rgba(0, 210, 255, 0.75); }
+    .btn-mb { background: linear-gradient(180deg, #00a843, #006626); border: 1.5px solid #00ff6a; box-shadow: 0 0 12px rgba(0, 255, 106, 0.75); }
+    .btn-form { background: linear-gradient(180deg, #ff7b00, #b34700); border: 1.5px solid #ffaa00; box-shadow: 0 0 12px rgba(255, 170, 0, 0.75); }
+    .btn-tab4 { background: linear-gradient(180deg, #7c1fa2, #4a0072); border: 1.5px solid #e040fb; box-shadow: 0 0 12px rgba(224, 64, 251, 0.75); }
+    .btn-tab5 { background: linear-gradient(180deg, #e50914, #8b0000); border: 1.5px solid #ff3d57; box-shadow: 0 0 12px rgba(255, 61, 87, 0.75); }
 
+    /* मध्यवर्ती पोडियम आणि निळ्या प्रकाशझोताची डिझाइन */
     .center-stage {
-      position: relative; text-align: center; padding: 5px 0; flex-grow: 1;
+      position: relative; text-align: center; padding: 10px 0; flex-grow: 1;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
     .tag-left {
-      position: absolute; left: 14px; top: 12px; font-family: 'Brush Script MT', cursive, sans-serif;
-      font-size: 15px; color: #00e5ff; line-height: 1.25; text-align: left; font-style: italic; text-shadow: 0 0 8px rgba(0,229,255,0.4);
+      position: absolute; left: 16px; top: 15px; font-family: 'Brush Script MT', cursive, sans-serif;
+      font-size: 14.5px; color: #00e5ff; line-height: 1.25; text-align: left; font-style: italic; text-shadow: 0 0 8px rgba(0,229,255,0.4);
     }
     .tag-right {
-      position: absolute; right: 14px; top: 12px; border: 1px solid rgba(0, 195, 255, 0.35);
+      position: absolute; right: 16px; top: 15px; border: 1px solid rgba(0, 195, 255, 0.35);
       border-radius: 9px; padding: 6px 9px; font-family: 'Brush Script MT', cursive, sans-serif;
-      font-size: 11.5px; color: #8be4ff; line-height: 1.25; font-style: italic; background: rgba(0, 20, 50, 0.4);
+      font-size: 11px; color: #8be4ff; line-height: 1.25; font-style: italic; background: rgba(0, 20, 50, 0.4);
     }
 
-    /* मोठा नियॉन सर्कल आणि थेट फोटो */
-    .big-circle-container {
-      position: relative; width: 280px; height: 280px; margin: 15px auto 5px auto;
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
+    /* पोडियम आणि निळ्या रेषा असलेली स्टेज रचना */
+    .podium-stage-box {
+      position: relative; width: 320px; height: 350px; margin: 10px auto 0 auto;
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
     }
-    .main-large-ring {
-      position: absolute; width: 270px; height: 270px; border-radius: 50%;
-      border: 3.5px solid #00e5ff; box-shadow: 0 0 28px #00e5ff, inset 0 0 18px #00e5ff;
-      pointer-events: none; z-index: 3;
+    /* पार्श्वभूमीतील निळ्या प्रकाशाच्या रेषा */
+    .neon-light-beams {
+      position: absolute; top: 10px; width: 1005; height: 260px; display: flex; justify-content: space-around; pointer-events: none; z-index: 1; opacity: 0.8;
     }
-    .main-photo-in-circle {
-      width: 260px; height: 260px; border-radius: 50%; object-fit: cover;
-      object-position: center 10%; z-index: 2; background-color: #030d1a;
-      display: block;
-    }
-    .photo-hint-badge {
-      position: absolute; bottom: 8px; z-index: 4; background: rgba(0, 229, 255, 0.85);
-      color: #000; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.5); pointer-events: none;
+    .beam-left, .beam-right { position: absolute; width: 3px; height: 180px; background: #00e5ff; box-shadow: 0 0 15px #00e5ff; top: 30px; }
+    .beam-left { left: 30px; }
+    .beam-right { right: 30px; }
+    
+    .ring-glow-bg {
+      position: absolute; top: 25px; width: 230px; height: 230px; border-radius: 50%;
+      border: 2px solid rgba(0, 229, 255, 0.4); box-shadow: 0 0 40px rgba(0, 229, 255, 0.25); z-index: 1;
     }
 
-    .stage-label { font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #90caf9; text-transform: uppercase; margin-top: 10px; }
-    .bottom-navbar { background: #010a14; border-top: 1px solid rgba(0, 195, 255, 0.2); display: flex; justify-content: space-around; padding: 7px 0; }
-    .nav-btn { color: #718799; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 10px; gap: 3px; cursor: pointer; }
-    .nav-btn.active { color: #00e5ff; font-weight: 700; text-shadow: 0 0 6px rgba(0,229,255,0.6); }
-    .nav-btn .icon { font-size: 17px; }
+    /* प्रोफाईल फोटो (क्लिक करून बदलता येईल) */
+    .avatar-on-podium {
+      position: relative; z-index: 3; width: 190px; height: 190px;
+      border-radius: 50%; object-fit: cover; object-position: center 10%;
+      border: 3px solid #00e5ff; box-shadow: 0 0 20px #00e5ff; background: #010a14;
+      cursor: pointer; margin-bottom: -15px;
+    }
+    .photo-change-btn {
+      position: relative; z-index: 4; background: rgba(0, 180, 255, 0.9); color: #000;
+      font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 12px;
+      cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.5); margin-bottom: 5px;
+    }
+
+    /* पायऱ्यांचे पोडियम */
+    .podium-base-layer {
+      position: relative; z-index: 2; width: 290px; height: 60px;
+      background: radial-gradient(ellipse at center, #002b5c 0%, #000c1a 75%);
+      border: 2px solid #00e5ff; border-radius: 50%;
+      box-shadow: 0 0 25px #00e5ff, inset 0 0 12px #00e5ff;
+    }
+
+    /* खालील मजकूर (दुसऱ्या स्क्रीनशॉट प्रमाणे) */
+    .stage-bottom-text {
+      text-align: center; margin-top: 12px; line-height: 1.4;
+    }
+    .text-smart-strong {
+      font-size: 12.5px; font-weight: 800; letter-spacing: 2.5px;
+      color: #ffffff; text-transform: uppercase;
+    }
+    .text-smart-strong span { color: #00e5ff; }
+    .text-created-by {
+      font-size: 10.5px; color: #8be4ff; margin-top: 6px; font-weight: 600; letter-spacing: 0.5px;
+    }
 
     /* ==================== विभाग २: M.B. नियंत्रण प्रणाली ==================== */
     #mbSystemSection { display: none; background: #f0f2f5; color: #212121; min-height: 100vh; padding-bottom: 20px; }
@@ -171,7 +199,6 @@
 
   <!-- ==================== १. DIGITAL HUB ==================== -->
   <div id="digitalHubSection">
-    <div class="top-mini-bar">Digital Hub</div>
     
     <div class="hub-header">
       <div class="menu-icon">☰</div>
@@ -182,7 +209,7 @@
       <div class="profile-icon">👤</div>
     </div>
 
-    <!-- ५ रंगीत बटणे -->
+    <!-- ५ रंगीत टॅब बटणे -->
     <div class="tabs-wrapper">
       <div class="tab-card btn-est">Est.</div>
       <div class="tab-card btn-mb" onclick="showMBSystem()">MB</div>
@@ -191,28 +218,31 @@
       <div class="tab-card btn-tab5">Tab-5</div>
     </div>
 
-    <!-- मध्यवर्ती भाग: मोठा नियॉन सर्कल (क्लिक करून गॅलरीतून फोटो निवडण्याची सोय) -->
+    <!-- मध्यवर्ती स्टेज आणि पोडियम रचना -->
     <div class="center-stage">
       <div class="tag-left">Work<br>Today<br>Better<br>Tomorrow</div>
       <div class="tag-right">Ideas<br>Execution<br>Results</div>
 
-      <div class="big-circle-container" onclick="document.getElementById('profileImageInput').click()" title="फोटो बदलण्यासाठी क्लिक करा">
-        <div class="main-large-ring"></div>
-        <img id="userDisplayPhoto" src="1000320439.png" onerror="loadFallbackPhoto(this)" class="main-photo-in-circle" alt="User Photo">
-        <div class="photo-hint-badge">📷 फोटो बदला</div>
+      <div class="podium-stage-box">
+        <div class="beam-left"></div>
+        <div class="beam-right"></div>
+        <div class="ring-glow-bg"></div>
+
+        <!-- प्रोफाईल फोटो (क्लिक करून किंवा खालील बटनाने गॅलरीतून बदलता येईल) -->
+        <img id="userDisplayPhoto" src="1000320439_2.png" onerror="loadFallbackPhoto(this)" class="avatar-on-podium" alt="User Photo" onclick="document.getElementById('profileImageInput').click()">
+        <div class="photo-change-btn" onclick="document.getElementById('profileImageInput').click()">📷 फोटो बदला</div>
+        
+        <div class="podium-base-layer"></div>
       </div>
+      
       <!-- छुपे फाईल इनपुट -->
       <input type="file" id="profileImageInput" style="display:none;" accept="image/*" onchange="uploadCustomPhoto(event)">
 
-      <div class="stage-label">SMART TOOLS</div>
-    </div>
-
-    <div class="bottom-navbar">
-      <div class="nav-btn active"><span class="icon">🏠</span><span>मुखपृष्ठ</span></div>
-      <div class="nav-btn"><span class="icon">🔍</span><span>शोध</span></div>
-      <div class="nav-btn"><span class="icon">🛍️</span><span>ऑर्डर्स</span></div>
-      <div class="nav-btn"><span class="icon">🔔</span><span>सूचना</span></div>
-      <div class="nav-btn"><span class="icon">👤</span><span>प्रोफाईल</span></div>
+      <!-- खालील मजकूर -->
+      <div class="stage-bottom-text">
+        <div class="text-smart-strong">SMART TOOLS <span>STRONGER</span> WORK</div>
+        <div class="text-created-by">Created by Vitthal Kokate Patil</div>
+      </div>
     </div>
   </div>
 
@@ -275,12 +305,12 @@
           </select>
         </div>
 
-        <div class="form-group" id="filterSizeGroup">
+        <div class="form-group">
           <label>उपघटक (Sub Category)</label>
           <select class="form-control" id="repSubCategory"></select>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" id="filterSizeGroup">
           <label>M.B. आकार निवडा (Filter Size)</label>
           <select class="form-control" id="repSizeFilter">
             <option value="ALL">सर्व आकार (लहान व मोठी M.B.)</option>
@@ -557,7 +587,6 @@
       return dateStr;
     }
 
-    /* ==================== फोटो लोड आणि बदलण्याचे लॉजिक ==================== */
     function loadSavedPhoto() {
       var saved = localStorage.getItem('hub_user_profile_img');
       var img = document.getElementById('userDisplayPhoto');
@@ -574,7 +603,7 @@
         var base64 = e.target.result;
         document.getElementById('userDisplayPhoto').src = base64;
         localStorage.setItem('hub_user_profile_img', base64);
-        alert('तुमचा फोटो यशस्वीपणे सेव्ह झाला आहे!');
+        alert('फोटो यशस्वीपणे सेव्ह झाला आहे!');
       };
       reader.readAsDataURL(file);
     }
@@ -582,7 +611,7 @@
     function loadFallbackPhoto(img) {
       if (!img.dataset.tried) {
         img.dataset.tried = '1';
-        img.src = 'myphoto.png';
+        img.src = '1000320439_2.png';
       }
     }
 
