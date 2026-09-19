@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>माझे ॲप</title>
-    <!-- आयकॉन्ससाठी Font Awesome -->
+    <!-- Font Awesome आयकॉन्स -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -34,7 +34,58 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* मुख्य कंटेंट भाग */
+        /* ५ बॉक्सची आडवी पट्टी (Scrollable Box Row) */
+        .top-box-row {
+            display: flex;
+            gap: 10px;
+            padding: 12px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* स्क्रोलबार लपवण्यासाठी */
+        .top-box-row::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* वैयक्तिक बॉक्स */
+        .action-box {
+            flex: 0 0 calc(20% - 8px);
+            min-width: 68px;
+            background-color: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-box i {
+            font-size: 1.2rem;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+
+        .action-box span {
+            font-size: 0.72rem;
+            color: #444;
+            font-weight: 500;
+        }
+
+        .action-box:hover, .action-box:active {
+            background-color: #e7f1ff;
+            border-color: #007bff;
+        }
+
+        /* मुख्य माहिती भाग */
         main {
             flex: 1;
             padding: 20px;
@@ -59,7 +110,7 @@
             color: #007bff;
         }
 
-        /* तळातील ५ टॅबचा नॅव्हिगेशन बार */
+        /* तळातील ५ मुख्य टॅब */
         nav.bottom-nav {
             position: fixed;
             bottom: 0;
@@ -74,7 +125,6 @@
             border-top: 1px solid #e0e0e0;
         }
 
-        /* वैयक्तिक टॅब बटन */
         .nav-item {
             display: flex;
             flex-direction: column;
@@ -94,7 +144,6 @@
             margin-bottom: 4px;
         }
 
-        /* ॲक्टिव्ह टॅबचा रंग */
         .nav-item.active {
             color: #007bff;
             font-weight: bold;
@@ -109,11 +158,35 @@
 <body>
 
     <!-- वरचे हेडर -->
-    <header id="page-title">मुखपृष्ठ</header>
+    <header id="page-title">प्रोफाइल</header>
 
-    <!-- ५ टॅबचे वेगवेगळे कंटेंट -->
+    <!-- तुम्ही मागितलेले वरचे ५ बॉक्स -->
+    <div class="top-box-row">
+        <div class="action-box" onclick="alert('बॉक्स १ निवडला')">
+            <i class="fa-solid fa-id-card"></i>
+            <span>माहिती</span>
+        </div>
+        <div class="action-box" onclick="alert('बॉक्स २ निवडला')">
+            <i class="fa-solid fa-gear"></i>
+            <span>सेटिंग</span>
+        </div>
+        <div class="action-box" onclick="alert('बॉक्स ३ निवडला')">
+            <i class="fa-solid fa-wallet"></i>
+            <span>खाते</span>
+        </div>
+        <div class="action-box" onclick="alert('बॉक्स ४ निवडला')">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <span>इतिहास</span>
+        </div>
+        <div class="action-box" onclick="alert('बॉक्स ५ निवडला')">
+            <i class="fa-solid fa-circle-question"></i>
+            <span>मदत</span>
+        </div>
+    </div>
+
+    <!-- मुख्य कंटेंट -->
     <main>
-        <section id="home" class="tab-content active">
+        <section id="home" class="tab-content">
             <h2>मुखपृष्ठ</h2>
             <p>हे ॲपचे मुख्य पान (Home Screen) आहे.</p>
         </section>
@@ -133,15 +206,15 @@
             <p>सर्व महत्त्वाच्या अपडेट्स आणि नोटिफिकेशन्स येथे येतील.</p>
         </section>
 
-        <section id="profile" class="tab-content">
+        <section id="profile" class="tab-content active">
             <h2>प्रोफाइल</h2>
             <p>वापरकर्त्याची माहिती आणि सेटिंग्ज येथे बदला.</p>
         </section>
     </main>
 
-    <!-- ५ टॅब असलेला बॉटम बार -->
+    <!-- तळाचा नॅव्हिगेशन बार -->
     <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home', 'मुखपृष्ठ', this)">
+        <div class="nav-item" onclick="switchTab('home', 'मुखपृष्ठ', this)">
             <i class="fa-solid fa-house"></i>
             <span>मुखपृष्ठ</span>
         </div>
@@ -157,28 +230,23 @@
             <i class="fa-solid fa-bell"></i>
             <span>सूचना</span>
         </div>
-        <div class="nav-item" onclick="switchTab('profile', 'प्रोफाइल', this)">
+        <div class="nav-item active" onclick="switchTab('profile', 'प्रोफाइल', this)">
             <i class="fa-solid fa-user"></i>
             <span>प्रोफाइल</span>
         </div>
     </nav>
 
-    <!-- टॅब बदलण्यासाठी स्क्रिप्ट -->
     <script>
         function switchTab(tabId, title, element) {
-            // सर्व टॅब कंटेंट लपवा
             const contents = document.querySelectorAll('.tab-content');
             contents.forEach(content => content.classList.remove('active'));
 
-            // सर्व टॅब बटनांचे ॲक्टिव्ह स्टाइल काढा
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => item.classList.remove('active'));
 
-            // निवडलेला टॅब दाखवा आणि बटन ॲक्टिव्ह करा
             document.getElementById(tabId).classList.add('active');
             element.classList.add('active');
 
-            // हेडरचे नाव बदला
             document.getElementById('page-title').innerText = title;
         }
     </script>
