@@ -8,9 +8,14 @@
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 0; }
     body { background: #f0f2f5; color: #212121; }
 
-    .top-header { background: #0d47a1; color: #fff; text-align: center; padding: 14px 10px; }
-    .top-header h1 { font-size: 17px; font-weight: 700; margin-bottom: 2px; }
-    .top-header p { font-size: 12px; opacity: 0.9; }
+    .top-header { background: #0d47a1; color: #fff; text-align: center; padding: 12px 10px; position: relative; }
+    .top-header h1 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+    .top-header p { font-size: 11px; opacity: 0.9; }
+    .btn-back-hub {
+      position: absolute; left: 8px; top: 12px; background: rgba(255,255,255,0.2);
+      color: #fff; border: 1px solid rgba(255,255,255,0.4); border-radius: 4px;
+      padding: 5px 8px; font-size: 11px; cursor: pointer; text-decoration: none; font-weight: 600;
+    }
 
     .action-grid {
       display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;
@@ -86,6 +91,7 @@
 <body>
 
   <div class="top-header">
+    <a href="index.html" class="btn-back-hub">← मुखपृष्ठ</a>
     <h1>मोजमाप पुस्तिका नियंत्रण प्रणाली</h1>
     <p>सार्वजनिक बांधकाम विभाग</p>
   </div>
@@ -100,7 +106,6 @@
   </div>
 
   <div class="container">
-    <!-- लाईव्ह इन्स्टंट अपडेट होणारे सारांश कार्ड्स -->
     <div class="summary-box">
       <div class="summary-title">📖 मोजमाप पुस्तिका (M.B.) स्थिती</div>
       <div class="card-grid">
@@ -119,7 +124,6 @@
       </div>
     </div>
 
-    <!-- अहवाल व शोध कार्ड -->
     <div class="filter-card">
       <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
       <div class="form-row">
@@ -431,7 +435,6 @@
       onCategoryChange();
     };
 
-    /* सर्व आकडे तात्काळ (Instant) रिफ्रेश करणारे मुख्य फंक्शन */
     function refreshAll() {
       refreshJEList();
       refreshMBDashboard();
@@ -443,10 +446,9 @@
     function openModule(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModule(id) { 
       document.getElementById(id).style.display = 'none'; 
-      refreshMBDashboard(); // मोडल बंद करताच आकडे तात्काळ खात्रीने रिफ्रेश होणे
+      refreshMBDashboard();
     }
 
-    /* उपलब्ध एम बी काढणे */
     function getAvailableStock() {
       var allMBs = getData('mb_records');
       var stockMap = {};
@@ -469,7 +471,6 @@
       return available;
     }
 
-    /* तात्काळ लाईव्ह आकडे अपडेट (Instant Auto-Update) */
     function refreshMBDashboard() {
       var list = getData('mb_records');
       var tbody = document.getElementById('mbListBody');
@@ -490,8 +491,6 @@
       });
 
       var stock = getAvailableStock();
-
-      // स्क्रीनवरील कार्ड्सचे आकडे तात्काळ बदलणे
       document.getElementById('countReceivedMB').innerText = rcvCount;
       document.getElementById('countGivenMB').innerText = givenCount;
       document.getElementById('countAvailableMB').innerText = stock.length;
@@ -637,7 +636,7 @@
 
       setData('mb_records', list);
       cancelMBEdit();
-      refreshAll(); // इन्स्टंट आकडे अपडेट
+      refreshAll();
       alert('नोंद यशस्वीपणे जतन झाली!');
     }
 
@@ -682,7 +681,7 @@
         var list = getData('mb_records');
         list.splice(idx, 1);
         setData('mb_records', list);
-        refreshAll(); // इन्स्टंट आकडे अपडेट
+        refreshAll();
       }
     }
 
@@ -925,7 +924,7 @@
     }
 
     function deleteAssign(idx) {
-      if (confirm('वाटप रद्द करायचे का?')) {
+      if (confirm('वाटप रद्द करायचे का? यामुळे ती उपलब्ध एम बी म्हणून दिसेल.')) {
         var assignList = getData('assign_records');
         var removed = assignList.splice(idx, 1)[0];
         setData('assign_records', assignList);
