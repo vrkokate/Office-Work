@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digital Hub & M.B. System</title>
+  <title>Digital Hub & M.B. Control System</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    
-    /* ==================== विभाग १: DIGITAL HUB होम पेज स्टाईल ==================== */
+
+    /* ==================== विभाग १: DIGITAL HUB मुख्य पृष्ठ ==================== */
     #digitalHubSection {
       background: radial-gradient(circle at 50% 25%, #051d3b 0%, #020b18 55%, #00050d 100%);
       color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; overflow-x: hidden;
@@ -53,11 +53,10 @@
       position: absolute; width: 250px; height: 250px; border-radius: 50%;
       border: 3px solid #00e5ff; box-shadow: 0 0 25px #00e5ff, inset 0 0 18px #00e5ff;
     }
-    /* फोटो योग्य आकारात आणि केंद्रित */
     .avatar-photo {
       position: relative; z-index: 2; width: 175px; height: 175px;
-      border-radius: 50%; object-fit: cover; border: 2.5px solid #00e5ff;
-      box-shadow: 0 0 15px rgba(0, 229, 255, 0.5); background-color: #000;
+      border-radius: 50%; object-fit: cover; object-position: center top;
+      border: 2.5px solid #00e5ff; box-shadow: 0 0 15px rgba(0, 229, 255, 0.5); background: #000;
     }
     .stage-base {
       position: absolute; bottom: 8px; width: 220px; height: 38px;
@@ -70,7 +69,7 @@
     .nav-btn.active { color: #00e5ff; font-weight: 700; text-shadow: 0 0 6px rgba(0,229,255,0.6); }
     .nav-btn .icon { font-size: 17px; }
 
-    /* ==================== विभाग २: M.B. सिस्टीम स्टाईल ==================== */
+    /* ==================== विभाग २: M.B. नियंत्रण प्रणाली ==================== */
     #mbSystemSection { display: none; background: #f0f2f5; color: #212121; min-height: 100vh; }
     .top-header { background: #0d47a1; color: #fff; text-align: center; padding: 12px 10px; position: relative; }
     .top-header h1 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
@@ -151,7 +150,7 @@
 </head>
 <body>
 
-  <!-- ==================== १. DIGITAL HUB मुख्य पान ==================== -->
+  <!-- ==================== १. DIGITAL HUB ==================== -->
   <div id="digitalHubSection">
     <div class="top-mini-bar">Digital Hub</div>
     
@@ -167,29 +166,27 @@
     <!-- ५ रंगीत बटणे -->
     <div class="tabs-wrapper">
       <div class="tab-card btn-est">Est.</div>
-      <!-- MB वर क्लिक केल्यावर M.B. सिस्टीम उघडणे -->
+      <!-- MB वर क्लिक करताच M.B. सिस्टीम उघडेल (No 404 Error) -->
       <div class="tab-card btn-mb" onclick="showMBSystem()">MB</div>
       <div class="tab-card btn-form">Form</div>
       <div class="tab-card btn-tab4">Tab-4</div>
       <div class="tab-card btn-tab5">Tab-5</div>
     </div>
 
-    <!-- मध्यवर्ती प्रोफाईल व रिंग -->
+    <!-- मध्यवर्ती भाग: तुमचा फोटो योग्य लहान आकारात -->
     <div class="center-stage">
       <div class="tag-left">Work<br>Today<br>Better<br>Tomorrow</div>
       <div class="tag-right">Ideas<br>Execution<br>Results</div>
 
       <div class="stage-circle">
         <div class="outer-neon-ring"></div>
-        <!-- तुमचा पाठवलेला फोटो (गिटहबवर profile.png नावाने अपलोड करा किंवा फाईलचे मूळ नाव द्या) -->
-        <img src="profile.png" onerror="this.src='1000320439.png'" class="avatar-photo" alt="User Profile">
+        <img src="profile.png" onerror="this.onerror=null; this.src='1000320439.png';" class="avatar-photo" alt="Profile">
         <div class="stage-base"></div>
       </div>
 
       <div class="stage-label">SMART TOOLS</div>
     </div>
 
-    <!-- तळाचा नेव्हिगेशन मेनू -->
     <div class="bottom-navbar">
       <div class="nav-btn active"><span class="icon">🏠</span><span>मुखपृष्ठ</span></div>
       <div class="nav-btn"><span class="icon">🔍</span><span>शोध</span></div>
@@ -199,7 +196,7 @@
     </div>
   </div>
 
-  <!-- ==================== २. M.B. सिस्टीम विभाग ==================== -->
+  <!-- ==================== २. M.B. सिस्टीम ==================== -->
   <div id="mbSystemSection">
     <div class="top-header">
       <button class="btn-back-hub" onclick="showDigitalHub()">← मुखपृष्ठ</button>
@@ -536,7 +533,7 @@
       return dateStr;
     }
 
-    /* ==================== स्क्रीन टॉगलिंग (Zero 404 Error) ==================== */
+    /* स्क्रीन टॉगलिंग (Zero 404 Error) */
     function showMBSystem() {
       document.getElementById('digitalHubSection').style.display = 'none';
       document.getElementById('mbSystemSection').style.display = 'block';
