@@ -14,8 +14,10 @@
     }
 
     .hub-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; margin-top: 5px; }
-    .hub-header .menu-icon { font-size: 24px; color: #ffffff; cursor: pointer; }
-    .hub-header .profile-icon { font-size: 24px; color: #ffffff; }
+    .hub-header .header-space { width: 30px; }
+    .hub-header .profile-icon { font-size: 26px; color: #00e5ff; cursor: pointer; text-shadow: 0 0 10px rgba(0,229,255,0.6); transition: transform 0.2s; }
+    .hub-header .profile-icon:hover { transform: scale(1.1); }
+    
     .hub-title-box { text-align: center; }
     .hub-title-box h1 {
       font-size: 26px; font-weight: 800; letter-spacing: 0.5px;
@@ -42,47 +44,104 @@
       position: relative; text-align: center; padding: 10px 0; flex-grow: 1;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
-    .tag-left {
-      position: absolute; left: 16px; top: 15px; font-family: 'Brush Script MT', cursive, sans-serif;
-      font-size: 14.5px; color: #00e5ff; line-height: 1.25; text-align: left; font-style: italic; text-shadow: 0 0 8px rgba(0,229,255,0.4);
+
+    /* ==================== आकर्षक मराठी सुविचार पट्टी (Ticker) ==================== */
+    .suvichar-ticker-container {
+      width: 90%; max-width: 420px; background: rgba(0, 15, 35, 0.75);
+      border: 1.5px solid #00e5ff; border-radius: 12px; padding: 8px 12px;
+      margin: 5px auto 12px auto; box-shadow: 0 0 18px rgba(0, 229, 255, 0.35);
+      overflow: hidden; white-space: nowrap; position: relative;
     }
-    .tag-right {
-      position: absolute; right: 16px; top: 15px; border: 1px solid rgba(0, 195, 255, 0.35);
-      border-radius: 9px; padding: 6px 9px; font-family: 'Brush Script MT', cursive, sans-serif;
-      font-size: 11px; color: #8be4ff; line-height: 1.25; font-style: italic; background: rgba(0, 20, 50, 0.4);
+    .suvichar-text {
+      display: inline-block; font-size: 13.5px; font-weight: 700;
+      letter-spacing: 0.5px; text-shadow: 0 0 8px rgba(255,255,255,0.5);
+      animation: colorShift 6s infinite alternate;
+    }
+    @keyframes colorShift {
+      0% { color: #00e5ff; }
+      33% { color: #ffeb3b; }
+      66% { color: #00ff6a; }
+      100% { color: #ff4081; }
     }
 
     .podium-stage-box {
-      position: relative; width: 320px; height: 330px; margin: 10px auto 0 auto;
+      position: relative; width: 320px; height: 310px; margin: 5px auto 0 auto;
       display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
     }
-    .beam-left, .beam-right { position: absolute; width: 3px; height: 180px; background: #00e5ff; box-shadow: 0 0 15px #00e5ff; top: 30px; pointer-events: none; }
+    .beam-left, .beam-right { position: absolute; width: 3px; height: 160px; background: #00e5ff; box-shadow: 0 0 15px #00e5ff; top: 20px; pointer-events: none; }
     .beam-left { left: 30px; }
     .beam-right { right: 30px; }
     
     .ring-glow-bg {
-      position: absolute; top: 25px; width: 230px; height: 230px; border-radius: 50%;
+      position: absolute; top: 15px; width: 220px; height: 220px; border-radius: 50%;
       border: 2px solid rgba(0, 229, 255, 0.4); box-shadow: 0 0 40px rgba(0, 229, 255, 0.25); z-index: 1; pointer-events: none;
     }
 
     .avatar-on-podium {
-      position: relative; z-index: 3; width: 190px; height: 190px;
+      position: relative; z-index: 3; width: 180px; height: 180px;
       border-radius: 50%; object-fit: cover; object-position: center 10%;
       border: 3px solid #00e5ff; box-shadow: 0 0 20px #00e5ff; background: #010a14;
       margin-bottom: -15px;
     }
 
     .podium-base-layer {
-      position: relative; z-index: 2; width: 290px; height: 60px;
+      position: relative; z-index: 2; width: 280px; height: 55px;
       background: radial-gradient(ellipse at center, #002b5c 0%, #000c1a 75%);
       border: 2px solid #00e5ff; border-radius: 50%;
       box-shadow: 0 0 25px #00e5ff, inset 0 0 12px #00e5ff;
     }
 
-    .stage-bottom-text { text-align: center; margin-top: 15px; line-height: 1.4; }
+    .stage-bottom-text { text-align: center; margin-top: 12px; line-height: 1.4; }
     .text-smart-strong { font-size: 12.5px; font-weight: 800; letter-spacing: 2.5px; color: #ffffff; text-transform: uppercase; }
     .text-smart-strong span { color: #00e5ff; }
-    .text-created-by { font-size: 10.5px; color: #8be4ff; margin-top: 6px; font-weight: 600; letter-spacing: 0.5px; }
+    .text-created-by { font-size: 10.5px; color: #8be4ff; margin-top: 5px; font-weight: 600; letter-spacing: 0.5px; }
+
+    /* ==================== प्रोफाईल व संपर्क मोडल ==================== */
+    .profile-modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 5, 15, 0.85); backdrop-filter: blur(5px); z-index: 1000;
+      justify-content: center; align-items: center; padding: 15px;
+    }
+    .profile-card {
+      background: linear-gradient(135deg, #051d3b 0%, #020b18 100%);
+      border: 2px solid #00e5ff; border-radius: 18px; width: 100%; max-width: 380px;
+      padding: 24px 20px; text-align: center; position: relative;
+      box-shadow: 0 0 35px rgba(0, 229, 255, 0.4), inset 0 0 15px rgba(0, 229, 255, 0.2);
+    }
+    .profile-card-close {
+      position: absolute; right: 12px; top: 12px; background: rgba(255, 61, 87, 0.2);
+      color: #ff3d57; border: 1.5px solid #ff3d57; border-radius: 50%; width: 30px; height: 30px;
+      font-size: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.2s;
+    }
+    .profile-card-close:hover { background: #ff3d57; color: #fff; }
+    
+    .profile-avatar-small {
+      width: 90px; height: 90px; border-radius: 50%; object-fit: cover; object-position: center 10%;
+      border: 2.5px solid #00e5ff; box-shadow: 0 0 15px #00e5ff; margin: 0 auto 12px auto;
+    }
+    .profile-name { font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 4px; letter-spacing: 0.5px; }
+    .profile-title-tag { font-size: 11px; color: #00e5ff; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 15px; }
+    
+    .profile-info-box {
+      background: rgba(0, 20, 45, 0.6); border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 10px; padding: 12px; margin-bottom: 18px; text-align: left;
+    }
+    .profile-info-row { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #e0f7fa; margin-bottom: 6px; }
+    .profile-info-row:last-child { margin-bottom: 0; }
+    .profile-info-row span.label { font-weight: 700; color: #7ce8ff; min-width: 60px; }
+
+    .profile-social-grid { display: flex; flex-direction: column; gap: 10px; }
+    .social-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px; border-radius: 10px; font-size: 13.5px; font-weight: 700;
+      text-decoration: none; color: #fff; transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .social-btn:hover { transform: translateY(-2px); }
+    .btn-whatsapp { background: linear-gradient(135deg, #25d366, #128c7e); border: 1px solid #4ade80; }
+    .btn-instagram { background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045); border: 1px solid #f472b6; }
+    .btn-call { background: linear-gradient(135deg, #1976d2, #0d47a1); border: 1px solid #60a5fa; }
 
     /* ==================== विभाग २: M.B. नियंत्रण प्रणाली ==================== */
     #mbSystemSection { display: none; background: #f0f2f5; color: #212121; min-height: 100vh; padding-bottom: 20px; }
@@ -176,16 +235,16 @@
 </head>
 <body>
 
-  <!-- ==================== १. DIGITAL HUB ==================== -->
+  <!-- ==================== १. DIGITAL HUB मुख्य पान ==================== -->
   <div id="digitalHubSection">
     
     <div class="hub-header">
-      <div class="menu-icon">☰</div>
+      <div class="header-space"></div>
       <div class="hub-title-box">
         <h1>Digital Hub</h1>
         <p>ONE PLATFORM | MANY SOLUTIONS</p>
       </div>
-      <div class="profile-icon">👤</div>
+      <div class="profile-icon" onclick="openProfileModal()" title="माहिती व संपर्क">👤</div>
     </div>
 
     <!-- ५ रंगीत टॅब बटणे -->
@@ -197,17 +256,21 @@
       <div class="tab-card btn-tab5">Tab-5</div>
     </div>
 
-    <!-- मध्यवर्ती स्टेज आणि पोडियम रचना -->
+    <!-- मध्यवर्ती स्टेज आणि सुविचार पट्टी -->
     <div class="center-stage">
-      <div class="tag-left">Work<br>Today<br>Better<br>Tomorrow</div>
-      <div class="tag-right">Ideas<br>Execution<br>Results</div>
+      
+      <!-- स्वयंचलित फिरणारी मराठी सुविचार पट्टी -->
+      <div class="suvichar-ticker-container">
+        <marquee behavior="scroll" direction="left" scrollamount="4" scrolldelay="0">
+          <span class="suvichar-text" id="dynamicSuvichar">✨ कष्टाशिवाय यशाला मोल नाही, सातत्य आणि प्रामाणिकपणा हीच यशाची खरी गुरुकिल्ली आहे! ✨</span>
+        </marquee>
+      </div>
 
       <div class="podium-stage-box">
         <div class="beam-left"></div>
         <div class="beam-right"></div>
         <div class="ring-glow-bg"></div>
 
-        <!-- आपोआप GitHub वरील home-bg.jpg लोड होईल -->
         <img src="home-bg.jpg" onerror="this.onerror=null; this.src='1000320439_2.png';" class="avatar-on-podium" alt="User Photo">
         
         <div class="podium-base-layer"></div>
@@ -221,7 +284,39 @@
     </div>
   </div>
 
-  <!-- ==================== २. M.B. सिस्टीम ==================== -->
+  <!-- ==================== प्रोफाईल व संपर्क मोडल ==================== -->
+  <div id="profileModal" class="profile-modal-overlay">
+    <div class="profile-card">
+      <div class="profile-card-close" onclick="closeProfileModal()">✕</div>
+      
+      <img src="home-bg.jpg" onerror="this.onerror=null; this.src='1000320439_2.png';" class="profile-avatar-small" alt="Profile Photo">
+      <div class="profile-name">विठ्ठल रघुनाथ कोकाटे</div>
+      <div class="profile-title-tag">सार्वजनिक बांधकाम विभाग</div>
+
+      <div class="profile-info-box">
+        <div class="profile-info-row">
+          <span class="label">नाव:</span> <span>विठ्ठल रघुनाथ कोकाटे</span>
+        </div>
+        <div class="profile-info-row">
+          <span class="label">मोबाईल:</span> <span>8446556141</span>
+        </div>
+      </div>
+
+      <div class="profile-social-grid">
+        <a href="https://wa.me/message/P4JXAKSDU4CBH1" target="_blank" class="social-btn btn-whatsapp">
+          💬 WhatsApp वर थेट मेसेज पाठवा
+        </a>
+        <a href="https://www.instagram.com/vitthal_kokate?stkn=MTh2Zm9ndG1zZjloZg==" target="_blank" class="social-btn btn-instagram">
+          📷 Instagram प्रोफाईल पहा
+        </a>
+        <a href="tel:8446556141" class="social-btn btn-call">
+          📞 थेट कॉल करा (8446556141)
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== २. M.B. नियंत्रण प्रणाली ==================== -->
   <div id="mbSystemSection">
     <div class="top-header">
       <button class="btn-back-hub" onclick="showDigitalHub()">🏠 मुखपृष्ठ</button>
@@ -552,8 +647,35 @@
   </div>
 
   <script>
+    /* दर तासाला किंवा लोड होताच नवीन सुविचार बदलण्याची व्यवस्था */
+    const marathiSuvicharList = [
+      "✨ कष्टाशिवाय यशाला मोल नाही, सातत्य आणि प्रामाणिकपणा हीच यशाची खरी गुरुकिल्ली आहे! ✨",
+      "🌟 यश हे एका रात्रीत मिळत नाही, त्यासाठी दररोज घेतलेली मेहनत महत्त्वाची असते! 🌟",
+      "💡 स्वप्न ती नाहीत जी झोपेत पाहतात, स्वप्न ती आहेत जी झोपू देत नाहीत - डॉ. एपीजे अब्दुल कलाम 💡",
+      "🚀 कठीण परिश्रमाचा कोणताही पर्याय नसतो, जिद्द आणि चिकाटी माणसाला नक्कीच यशस्वी बनवते! 🚀",
+      "🔥 यशाचा मार्ग हा नेहमी संघर्षातून जातो, अपयशाने खचून न जाता अधिक जोमाने प्रयत्न करा! 🔥",
+      "🎯 ध्येय निश्चित असेल आणि मेहनत प्रामाणिक असेल, तर यशाला गवसणी घालणे अशक्य नाही! 🎯"
+    ];
+
+    function updateHourlySuvichar() {
+      const now = new Date();
+      // तासाच्या आधारे सुविचार बदलण्याची पद्धत
+      const hourIndex = now.getHours() % marathiSuvicharList.length;
+      const suvicharEl = document.getElementById('dynamicSuvichar');
+      if (suvicharEl) {
+        suvicharEl.innerText = marathiSuvicharList[hourIndex];
+      }
+    }
+
     function getData(key) { return JSON.parse(localStorage.getItem(key) || '[]'); }
     function setData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+
+    function openProfileModal() {
+      document.getElementById('profileModal').style.display = 'flex';
+    }
+    function closeProfileModal() {
+      document.getElementById('profileModal').style.display = 'none';
+    }
 
     function formatDateToDMY(dateStr) {
       if (!dateStr) return '-';
@@ -584,6 +706,7 @@
       initBillTypes();
       refreshAll();
       onCategoryChange();
+      updateHourlySuvichar();
     };
 
     function refreshAll() {
