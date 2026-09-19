@@ -100,7 +100,6 @@
   </div>
 
   <div class="container">
-    <!-- M.B. Summary कार्ड्स (थेट शिल्लक साठ्याचा ताळमेळ) -->
     <div class="summary-box">
       <div class="summary-title">📖 कार्यालयातील उपलब्ध शिल्लक M.B. साठा</div>
       <div class="card-grid">
@@ -119,7 +118,6 @@
       </div>
     </div>
 
-    <!-- अहवाल व शोध कार्ड -->
     <div class="filter-card">
       <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
       <div class="form-row">
@@ -206,7 +204,6 @@
         </select>
       </div>
 
-      <!-- M.B. मिळाली असताना आकार निवडणे -->
       <div class="form-group" id="groupMBSizeSelect">
         <label>M.B. आकार *</label>
         <select class="form-control" id="newMBSize" onchange="onMBSizeChange()">
@@ -215,13 +212,11 @@
         </select>
       </div>
 
-      <!-- M.B. मिळाली असताना स्वतः नवीन नंबर टाईप करणे -->
       <div class="form-group" id="groupMBInput">
         <label>नवीन M.B. क्रमांक *</label>
         <input type="text" class="form-control" id="newMBNo" placeholder="उदा. MB-1001">
       </div>
 
-      <!-- M.B. दिली असताना केवळ उपलब्ध वह्यांचा ड्रॉपडाऊन -->
       <div class="form-group" id="groupMBSelect" style="display:none;">
         <label>उपलब्ध शिल्लक साठ्यातील M.B. निवडा *</label>
         <select class="form-control" id="selectAvailableMB" onchange="onSelectAvailableMBChange()"></select>
@@ -237,9 +232,11 @@
         </select>
       </div>
 
+      <!-- JE असल्यास ड्रॉपडाऊन आणि विभागीय कार्यालय असल्यास हाताने टाईप करण्यासाठी इनपुट -->
       <div class="form-group" id="receivedSubGroup" style="display:none;">
         <label id="receivedSubLabel">तपशील निवडा *</label>
         <select class="form-control" id="receivedSubSelect"></select>
+        <input type="text" class="form-control" id="receivedSubInput" style="display:none;" placeholder="उदा. भांडारपाल किंवा पद / नाव टाईप करा">
       </div>
 
       <div class="form-group">
@@ -437,11 +434,10 @@
     function openModule(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModule(id) { document.getElementById(id).style.display = 'none'; }
 
-    /* ==================== ताळमेळ व इन्व्हेंटरी लॉजिक (Stock Balance) ==================== */
-    // कार्यालयात प्रत्यक्ष शिल्लक असलेल्या वह्यांची यादी काढणे
+    /* ==================== ताळमेळ व इन्व्हेंटरी लॉजिक ==================== */
     function getAvailableStock() {
       var allMBs = getData('mb_records');
-      var stockMap = {}; // { mbNo: { mbNumber, size, lastAction } }
+      var stockMap = {};
 
       allMBs.forEach(function(m) {
         var no = m.mbNumber;
@@ -449,7 +445,7 @@
           stockMap[no] = { mbNumber: no, size: m.size, date: m.date, inStock: true };
         } else if (m.actionType === 'M.B. दिली') {
           if (stockMap[no]) {
-            stockMap[no].inStock = false; // वाटप झाल्यावर शिल्लक राहत नाही
+            stockMap[no].inStock = false;
           }
         }
       });
@@ -463,7 +459,6 @@
       return available;
     }
 
-    /* डॅशबोर्डवरील कार्ड्सचे अचूक आकडे अपडेट करणे */
     function refreshMBDashboard() {
       var list = getData('mb_records');
       var tbody = document.getElementById('mbListBody');
@@ -477,7 +472,6 @@
           '</td></tr>';
       });
 
-      // प्रत्यक्ष शिल्लक वह्यांची आकडेवारी
       var stock = getAvailableStock();
       var sm = 0, lg = 0;
       stock.forEach(function(s) {
@@ -489,14 +483,12 @@
       document.getElementById('countLargeMB').innerText = lg;
     }
 
-    /* M.B. प्रकार बदलल्यावर इनपुट व ड्रॉपडाऊन बदलणे */
     function onMBActionTypeChange() {
       var actionType = document.getElementById('mbActionType').value;
       var lblParty = document.getElementById('lblMBParty');
       var lblDate = document.getElementById('lblMBDate');
       var grpInp = document.getElementById('groupMBInput');
       var grpSel = document.getElementById('groupMBSelect');
-      var sizeGroup = document.getElementById('groupMBSizeSelect');
 
       if (actionType === 'M.B. दिली') {
         lblParty.innerText = 'M.B. कोणाला दिली? *';
@@ -510,6 +502,7 @@
         grpInp.style.display = 'block';
         grpSel.style.display = 'none';
       }
+      onMBReceivedSourceChange();
     }
 
     function onMBSizeChange() {
@@ -518,7 +511,6 @@
       }
     }
 
-    /* केवळ उपलब्ध शिल्लक वह्यांची यादी भरणे */
     function populateAvailableMBs() {
       var selectedSize = document.getElementById('newMBSize').value;
       var sel = document.getElementById('selectAvailableMB');
@@ -538,7 +530,6 @@
     }
 
     function onSelectAvailableMBChange() {
-      // निवडलेल्या M.B. चा आकार आपोआप ओळखणे
       var no = document.getElementById('selectAvailableMB').value;
       var stock = getAvailableStock().find(function(s){ return s.mbNumber === no; });
       if (stock) {
@@ -546,25 +537,33 @@
       }
     }
 
+    /* बदल: विभागीय कार्यालय निवडल्यास हाताने टाईप करण्याचा टेक्स्ट बॉक्स उघडणे */
     function onMBReceivedSourceChange() {
       var src = document.getElementById('mbReceivedFromSource').value;
       var grp = document.getElementById('receivedSubGroup');
       var sel = document.getElementById('receivedSubSelect');
+      var inp = document.getElementById('receivedSubInput');
+      var lbl = document.getElementById('receivedSubLabel');
+      
       sel.innerHTML = '';
       if (src === 'JE') {
         grp.style.display = 'block';
-        document.getElementById('receivedSubLabel').innerText = 'कनिष्ठ अभियंता (JE) निवडा *';
+        lbl.innerText = 'कनिष्ठ अभियंता (JE) निवडा *';
+        sel.style.display = 'block';
+        inp.style.display = 'none';
         getData('je_records').forEach(function(j){ sel.add(new Option(j.name, j.name)); });
       } else if (src === 'विभागीय कार्यालय') {
         grp.style.display = 'block';
-        document.getElementById('receivedSubLabel').innerText = 'कार्यालयीन पद निवडा *';
-        sel.add(new Option('भांडारपाल', 'भांडारपाल'));
+        lbl.innerText = 'कार्यालयीन पद / व्यक्तीचे नाव टाईप करा *';
+        sel.style.display = 'none';
+        inp.style.display = 'block'; // हाताने टाईप करण्यासाठी इनपुट बॉक्स
       } else {
         grp.style.display = 'none';
+        sel.style.display = 'none';
+        inp.style.display = 'none';
       }
     }
 
-    /* M.B. नोंद सेव्ह करताना कडक ताळमेळ तपासणी */
     function saveOrUpdateMB() {
       var actionType = document.getElementById('mbActionType').value;
       var size = document.getElementById('newMBSize').value;
@@ -584,7 +583,14 @@
       
       if (!src) return alert('कृपया संबंधित व्यक्ती किंवा कार्यालय निवडा.');
 
-      var sub = (src === 'JE' || src === 'विभागीय कार्यालय') ? document.getElementById('receivedSubSelect').value : '';
+      // बदल: विभागीय कार्यालय असेल तर हाताने टाईप केलेला मजकूर घेणे
+      var sub = '';
+      if (src === 'JE') {
+        sub = document.getElementById('receivedSubSelect').value;
+      } else if (src === 'विभागीय कार्यालय') {
+        sub = document.getElementById('receivedSubInput').value.trim();
+      }
+
       var partyDetail = src === 'चार्ज नुसार' ? 'चार्ज नुसार' : (src + (sub ? ' (' + sub + ')' : ''));
       var displayParty = actionType + ' : ' + partyDetail;
 
@@ -592,13 +598,11 @@
 
       if (idx === -1) {
         if (actionType === 'M.B. मिळाली') {
-          // कार्यालयात ती M.B. आधीच शिल्लक असताना पुन्हा नव्याने मिळाली म्हणून घेता येणार नाही
           var stock = getAvailableStock().find(function(s){ return s.mbNumber.toLowerCase() === no.toLowerCase(); });
           if (stock) {
             return alert('⚠️ ताळमेळ चूक: M.B. क्रमांक "' + no + '" आधीपासूनच कार्यालयात शिल्लक आहे!');
           }
         } else if (actionType === 'M.B. दिली') {
-          // कार्यालयात उपलब्ध असल्याशिवाय देता येणार नाही
           var isAvailable = getAvailableStock().some(function(s){ return s.mbNumber === no; });
           if (!isAvailable) {
             return alert('⚠️ ताळमेळ चूक: M.B. क्रमांक "' + no + '" कार्यालयात शिल्लक नाही किंवा आधीच वाटप केलेली आहे!');
@@ -609,7 +613,6 @@
       if (idx === -1) {
         list.push({ actionType: actionType, mbNumber: no, size: size, receivedSource: src, receivedDetail: sub, receivedFrom: displayParty, date: date });
         
-        // जर M.B. JE ला दिली असेल, तर थेट Assign मध्ये वाटप नोंद करणे
         if (actionType === 'M.B. दिली' && src === 'JE' && sub) {
           var assigns = getData('assign_records');
           assigns.push({ mbNo: no, jeName: sub, assignDate: date });
@@ -639,7 +642,11 @@
       }
       document.getElementById('mbReceivedFromSource').value = item.receivedSource;
       onMBReceivedSourceChange();
-      if (item.receivedDetail) document.getElementById('receivedSubSelect').value = item.receivedDetail;
+      if (item.receivedSource === 'JE') {
+        document.getElementById('receivedSubSelect').value = item.receivedDetail || '';
+      } else if (item.receivedSource === 'विभागीय कार्यालय') {
+        document.getElementById('receivedSubInput').value = item.receivedDetail || '';
+      }
       document.getElementById('newMBDate').value = item.date;
       document.getElementById('editMBIndex').value = idx;
       document.getElementById('btnSaveMB').textContent = 'Update Entry';
@@ -652,6 +659,7 @@
       document.getElementById('newMBNo').value = '';
       document.getElementById('mbReceivedFromSource').value = '';
       document.getElementById('receivedSubGroup').style.display = 'none';
+      document.getElementById('receivedSubInput').value = '';
       document.getElementById('editMBIndex').value = '-1';
       document.getElementById('btnSaveMB').textContent = 'Save Entry';
       document.getElementById('btnCancelMB').style.display = 'none';
@@ -885,7 +893,6 @@
       var dt = document.getElementById('assignDate').value;
       if (!mb || !je) return alert('M.B. आणि JE निवडा.');
 
-      // साठ्यातून वाटप (Assign) करताना 'M.B. दिली' अशी नोंद mb_records मध्येही करणे
       var stockMB = getAvailableStock().find(function(s){ return s.mbNumber === mb; });
       var mbSize = stockMB ? stockMB.size : 'लहान M.B.';
 
@@ -915,7 +922,6 @@
         var removed = assignList.splice(idx, 1)[0];
         setData('assign_records', assignList);
 
-        // mb_records मधील 'M.B. दिली' नोंद रद्द करणे
         var mbList = getData('mb_records');
         for (var i = mbList.length - 1; i >= 0; i--) {
           if (mbList[i].actionType === 'M.B. दिली' && mbList[i].mbNumber === removed.mbNo && mbList[i].receivedDetail === removed.jeName) {
@@ -939,7 +945,6 @@
           '</td></tr>';
       });
 
-      // केवळ उपलब्ध शिल्लक वह्याच Assign साठी दिसतील
       var mbSel = document.getElementById('assignMBSelect');
       mbSel.innerHTML = '<option value="">-- उपलब्ध शिल्लक M.B. --</option>';
       getAvailableStock().forEach(function(m){ 
@@ -1015,7 +1020,6 @@
       }
     }
 
-    /* थेट कार्ड क्लिकवरून शिल्लक साठ्याचा अहवाल */
     function generateStockReport(sizeFilter) {
       var stock = getAvailableStock();
       if (sizeFilter !== 'ALL') {
@@ -1024,7 +1028,6 @@
 
       if (stock.length === 0) return alert('निवडलेल्या आकारात कार्यालयात एकही M.B. शिल्लक नाही.');
 
-      // क्रमवारी: प्रथम मोठी M.B. नंतर लहान M.B.
       stock.sort(function(a, b) {
         if (a.size === 'मोठी M.B.' && b.size !== 'मोठी M.B.') return -1;
         if (a.size !== 'मोठी M.B.' && b.size === 'मोठी M.B.') return 1;
@@ -1056,7 +1059,6 @@
       printA4Document(html);
     }
 
-    /* M.B. अहवाल (लहान/मोठी/सर्व आकार व ताळमेळ) */
     function generateMBReports(subType, sizeFilter, fDate, tDate) {
       if (subType === 'AVAILABLE_MB') {
         generateStockReport(sizeFilter);
@@ -1084,7 +1086,6 @@
       var sizeLabel = sizeFilter === 'ALL' ? 'सर्व आकार' : sizeFilter;
       if (list.length === 0) return alert('निवडलेल्या कालावधीत कोणतीही नोंद आढळली नाही.');
 
-      // क्रमवारी: प्रथम मोठी M.B. नंतर लहान M.B.
       list.sort(function(a, b) {
         if (a.size === 'मोठी M.B.' && b.size !== 'मोठी M.B.') return -1;
         if (a.size !== 'मोठी M.B.' && b.size === 'मोठी M.B.') return 1;
@@ -1118,7 +1119,6 @@
       printA4Document(html);
     }
 
-    /* JE अहवाल */
     function generateJEReports(subType, sizeFilter, fDate, tDate) {
       var assigns = getData('assign_records').filter(function(a) {
         if (fDate && a.assignDate < fDate) return false;
@@ -1144,7 +1144,6 @@
 
       if (mapped.length === 0) return alert('कोणतीही नोंद आढळली नाही.');
 
-      // क्रमवारी: प्रथम मोठी M.B. नंतर लहान M.B.
       mapped.sort(function(a, b) {
         if (a.size === 'मोठी M.B.' && b.size !== 'मोठी M.B.') return -1;
         if (a.size !== 'मोठी M.B.' && b.size === 'मोठी M.B.') return 1;
@@ -1178,7 +1177,6 @@
       printA4Document(html);
     }
 
-    /* स्मार्ट शोध अहवाल */
     function generateSmartSearchReport(query, fDate, tDate) {
       var bills = getData('bill_records');
       var mbs = getData('mb_records');
@@ -1221,7 +1219,6 @@
       printA4Document(html);
     }
 
-    /* देयक नोंदवही अहवाल */
     function generateBillReports(subType, fDate, tDate) {
       var bills = getData('bill_records').filter(function(b) {
         if (fDate && b.date < fDate) return false;
@@ -1306,7 +1303,6 @@
       printA4Document(html);
     }
 
-    /* कामांचा अहवाल */
     function generateWorkReport(fDate, tDate) {
       var works = getData('work_records');
       if (works.length === 0) return alert('कोणतेही काम नोंदवलेले नाही.');
