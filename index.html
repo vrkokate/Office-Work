@@ -140,6 +140,7 @@
           <input type="date" class="form-control" id="repToDate">
         </div>
       </div>
+      
       <div class="form-group">
         <label>मुख्य घटक</label>
         <select class="form-control" id="repMainCategory" onchange="onCategoryChange()">
@@ -149,14 +150,27 @@
           <option value="Work">कामांची यादी</option>
         </select>
       </div>
+
       <div class="form-group">
         <label>उपघटक (Sub Category)</label>
         <select class="form-control" id="repSubCategory"></select>
       </div>
+
+      <!-- सुधारित: M.B. आकार निवडण्यासाठी स्वतंत्र पर्याय -->
+      <div class="form-group" id="filterSizeGroup">
+        <label>M.B. आकार निवडा (Filter Size)</label>
+        <select class="form-control" id="repSizeFilter">
+          <option value="ALL">सर्व आकार (लहान व मोठी M.B.)</option>
+          <option value="लहान M.B.">केवळ लहान M.B.</option>
+          <option value="मोठी M.B.">केवळ मोठी M.B.</option>
+        </select>
+      </div>
+
       <div class="form-group">
         <label>स्मार्ट शोध (M.B. क्र., JE नाव किंवा कंत्राटदार)</label>
         <input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका">
       </div>
+      
       <button class="btn-report" onclick="generateGeneralReport()">📄 REPORT / PRINT</button>
     </div>
   </div>
@@ -429,30 +443,35 @@
     function openModule(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModule(id) { document.getElementById(id).style.display = 'none'; }
 
-    /* ==================== मुख्य घटक बदलल्यावर उपघटक लोड करणे ==================== */
+    /* ==================== मुख्य घटक बदलल्यावर उपघटक आणि आकार पर्याय ==================== */
     function onCategoryChange() {
       var cat = document.getElementById('repMainCategory').value;
       var sub = document.getElementById('repSubCategory');
+      var sizeFilterGrp = document.getElementById('filterSizeGroup');
       sub.innerHTML = '';
 
       if (cat === 'M.B.') {
+        sizeFilterGrp.style.display = 'block';
         sub.add(new Option('सर्व M.B. (एकत्रित नोंदवही)', 'ALL_MB'));
         sub.add(new Option('M.B. मिळाली (आवक नोंदवही)', 'RECEIVED_MB'));
         sub.add(new Option('M.B. दिली (जावक / वाटप नोंदवही)', 'GIVEN_MB'));
         sub.add(new Option('उपलब्ध शिल्लक M.B. साठा', 'AVAILABLE_MB'));
       } else if (cat === 'JE') {
+        sizeFilterGrp.style.display = 'block'; // JE अहवालात सुद्धा लहान/मोठी निवडता येईल
         sub.add(new Option('सर्व कनिष्ठ अभियंते (All JE Combined)', 'ALL_JE'));
         var jes = getData('je_records');
         jes.forEach(function(j) {
           sub.add(new Option(j.name + ' (स्वतंत्र अहवाल)', j.name));
         });
       } else if (cat === 'Bill') {
+        sizeFilterGrp.style.display = 'none';
         sub.add(new Option('सर्व देयक नोंदी (Master Bill Register)', 'ALL_BILLS'));
         var jes = getData('je_records');
         jes.forEach(function(j) {
           sub.add(new Option(j.name + ' - यांची बिले', 'JE_BILLS:' + j.name));
         });
       } else if (cat === 'Work') {
+        sizeFilterGrp.style.display = 'none';
         sub.add(new Option('सर्व नोंदवलेली कामे (All Works)', 'ALL_WORKS'));
       }
     }
@@ -896,29 +915,30 @@
     function generateGeneralReport() {
       var cat = document.getElementById('repMainCategory').value;
       var sub = document.getElementById('repSubCategory').value;
+      var sizeFilter = document.getElementById('repSizeFilter').value;
       var fromDate = document.getElementById('repFromDate').value;
       var toDate = document.getElementById('repToDate').value;
       var searchTxt = document.getElementById('smartSearchInput').value.trim().toLowerCase();
 
-      /* १. थेट स्मार्ट शोध वापरल्यास (Direct Smart Search) */
+      /* १. स्मार्ट शोध */
       if (searchTxt) {
         generateSmartSearchReport(searchTxt, fromDate, toDate);
         return;
       }
 
-      /* २. M.B. चे अहवाल (स्वतंत्र / एकत्रित) */
+      /* २. M.B. चे अहवाल (आकार फिल्टरसह) */
       if (cat === 'M.B.') {
-        generateMBReports(sub, fromDate, toDate);
+        generateMBReports(sub, sizeFilter, fromDate, toDate);
         return;
       }
 
-      /* ३. JE चे अहवाल (सर्व किंवा विशिष्ट JE) */
+      /* ३. JE चे अहवाल */
       if (cat === 'JE') {
-        generateJEReports(sub, fromDate, toDate);
+        generateJEReports(sub, sizeFilter, fromDate, toDate);
         return;
       }
 
-      /* ४. देयक नोंदवही (Bill Register) अहवाल */
+      /* ४. देयक नोंदवही अहवाल */
       if (cat === 'Bill') {
         generateBillReports(sub, fromDate, toDate);
         return;
@@ -931,7 +951,7 @@
       }
     }
 
-    /* स्मार्ट सर्च अहवाल */
+    /* स्मार्ट शोध अहवाल */
     function generateSmartSearchReport(query, fDate, tDate) {
       var bills = getData('bill_records');
       var mbs = getData('mb_records');
@@ -974,11 +994,12 @@
       printA4Document(html);
     }
 
-    /* M.B. स्वतंत्र व एकत्रित अहवाल */
-    function generateMBReports(subType, fDate, tDate) {
+    /* M.B. अहवाल (लहान/मोठी/सर्व आकार निवडीसह) */
+    function generateMBReports(subType, sizeFilter, fDate, tDate) {
       var list = getData('mb_records').filter(function(m) {
         if (fDate && m.date < fDate) return false;
         if (tDate && m.date > tDate) return false;
+        if (sizeFilter !== 'ALL' && m.size !== sizeFilter) return false;
         return true;
       });
 
@@ -992,12 +1013,14 @@
       } else if (subType === 'AVAILABLE_MB') {
         var givenNos = getData('mb_records').filter(function(m){ return m.actionType === 'M.B. दिली'; }).map(function(m){ return m.mbNumber; });
         list = list.filter(function(m){ return m.actionType === 'M.B. मिळाली' && !givenNos.includes(m.mbNumber); });
-        title = 'कार्यालयातील उपलब्ध शिल्लक M.B. साठा अहवाल';
+        title = 'उपलब्ध शिल्लक M.B. साठा अहवाल';
       } else {
-        title = 'सर्व M.B. एकत्रित मास्टर नोंदवही अहवाल';
+        title = 'सर्व M.B. एकत्रित नोंदवही अहवाल';
       }
 
-      if (list.length === 0) return alert('निवडलेल्या पर्यायासाठी कोणतीही नोंद आढळली नाही.');
+      var sizeLabel = sizeFilter === 'ALL' ? 'सर्व आकार' : sizeFilter;
+
+      if (list.length === 0) return alert('निवडलेल्या पर्यायासाठी (' + sizeLabel + ') कोणतीही नोंद आढळली नाही.');
 
       // क्रमवारी: प्रथम मोठी M.B. नंतर लहान M.B.
       list.sort(function(a, b) {
@@ -1008,7 +1031,7 @@
 
       var html = '<div style="text-align:center; margin-bottom:10px;">' +
                    '<h2 style="font-size:15px; margin:0;">सार्वजनिक बांधकाम विभाग</h2>' +
-                   '<h3 style="font-size:13px; margin:3px 0;">' + title + '</h3>' +
+                   '<h3 style="font-size:13px; margin:3px 0;">' + title + ' (' + sizeLabel + ')</h3>' +
                    '<p style="font-size:10px; color:#555;">कालावधी: ' + (fDate || 'आरंभापासून') + ' ते ' + (tDate || 'आजपर्यंत') + '</p>' +
                  '</div>' +
                  '<table class="print-table">' +
@@ -1033,8 +1056,8 @@
       printA4Document(html);
     }
 
-    /* JE अहवाल (सर्व किंवा विशिष्ट) */
-    function generateJEReports(subType, fDate, tDate) {
+    /* JE अहवाल (आकार फिल्टरसह) */
+    function generateJEReports(subType, sizeFilter, fDate, tDate) {
       var assigns = getData('assign_records').filter(function(a) {
         if (fDate && a.assignDate < fDate) return false;
         if (tDate && a.assignDate > tDate) return false;
@@ -1051,12 +1074,16 @@
         reportTitle = subType + ' - मोजमाप पुस्तिका वाटप अहवाल';
       }
 
-      if (assigns.length === 0) return alert('कोणतीही M.B. वाटप नोंद आढळली नाही.');
-
       var mapped = assigns.map(function(a) {
         var found = mbList.find(function(m){ return m.mbNumber === a.mbNo; });
         return { jeName: a.jeName, mbNo: a.mbNo, size: found ? found.size : 'लहान M.B.', date: a.assignDate };
       });
+
+      if (sizeFilter !== 'ALL') {
+        mapped = mapped.filter(function(m){ return m.size === sizeFilter; });
+      }
+
+      if (mapped.length === 0) return alert('कोणतीही नोंद आढळली नाही.');
 
       // क्रमवारी: प्रथम मोठी M.B., नंतर लहान M.B.
       mapped.sort(function(a, b) {
@@ -1067,7 +1094,7 @@
 
       var html = '<div style="text-align:center; margin-bottom:10px;">' +
                    '<h2 style="font-size:15px; margin:0;">सार्वजनिक बांधकाम विभाग</h2>' +
-                   '<h3 style="font-size:13px; margin:3px 0;">' + reportTitle + '</h3>' +
+                   '<h3 style="font-size:13px; margin:3px 0;">' + reportTitle + ' (' + (sizeFilter === 'ALL' ? 'सर्व आकार' : sizeFilter) + ')</h3>' +
                    '<p style="font-size:10px; color:#555;">(मोठी M.B. व लहान M.B. क्रमवारीनुसार)</p>' +
                  '</div>' +
                  '<table class="print-table">' +
@@ -1210,25 +1237,11 @@
 
     /* कार्ड क्लिक अहवाल */
     function generateTotalMBReport() {
-      generateJEReports('ALL_JE', '', '');
+      generateJEReports('ALL_JE', 'ALL', '', '');
     }
 
     function filterMBList(sizeFilter) {
-      var mbList = getData('mb_records').filter(function(m){ return m.size === sizeFilter; });
-      var html = '<div style="text-align:center; margin-bottom:10px;">' +
-                   '<h2 style="font-size:15px; margin:0;">सार्वजनिक बांधकाम विभाग</h2>' +
-                   '<h3 style="font-size:13px; margin:3px 0;">' + sizeFilter + ' साठा अहवाल</h3>' +
-                 '</div>' +
-                 '<table class="print-table">' +
-                   '<thead><tr>' +
-                     '<th style="width:7%; text-align:center;">अ.क्र.</th><th>M.B. क्रमांक</th><th>आकार</th><th>कोणाकडून मिळाली / दिली</th><th style="text-align:center;">प्राप्त दिनांक</th>' +
-                   '</tr></thead><tbody>';
-
-      mbList.forEach(function(m, i) {
-        html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + m.mbNumber + '</td><td>' + m.size + '</td><td>' + (m.receivedFrom || '-') + '</td><td style="text-align:center;">' + m.date + '</td></tr>';
-      });
-      html += '</tbody></table>';
-      printA4Document(html);
+      generateMBReports('ALL_MB', sizeFilter, '', '');
     }
 
     function printA4Document(content) {
