@@ -13,16 +13,17 @@
     .top-header h1 { font-size: 17px; font-weight: 700; margin-bottom: 2px; }
     .top-header p { font-size: 12px; opacity: 0.9; }
 
-    /* मुख्य नेव्हिगेशन बटणे */
+    /* मुख्य नेव्हिगेशन बटणे (होम बटणासह ७ कॉलम्स) */
     .action-grid {
-      display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
       padding: 10px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
     .action-btn {
-      border: none; border-radius: 8px; color: #fff; padding: 10px 4px;
+      border: none; border-radius: 8px; color: #fff; padding: 10px 2px;
       font-size: 11px; font-weight: 600; cursor: pointer; text-align: center;
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
     }
+    .btn-home { background: #37474f; }
     .btn-je { background: #1976d2; }
     .btn-mb { background: #2e7d32; }
     .btn-work { background: #00897b; }
@@ -97,8 +98,9 @@
     <p>सार्वजनिक बांधकाम विभाग</p>
   </div>
 
-  <!-- नेव्हिगेशन बार -->
+  <!-- नेव्हिगेशन बार (होम बटणासह) -->
   <div class="action-grid">
+    <button class="action-btn btn-home" onclick="goHome()"><span>🏠</span>होम</button>
     <button class="action-btn btn-je" onclick="openModule('jeModal')"><span>👷</span>JE</button>
     <button class="action-btn btn-mb" onclick="openModule('mbModal')"><span>📖</span>M.B.</button>
     <button class="action-btn btn-work" onclick="openModule('workModal')"><span>📋</span>Work list</button>
@@ -424,6 +426,13 @@
 
     function openModule(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModule(id) { document.getElementById(id).style.display = 'none'; }
+
+    /* होम पेजवर जाण्यासाठी फंक्शन */
+    function goHome() {
+      var modals = document.querySelectorAll('.modal-overlay');
+      modals.forEach(function(m) { m.style.display = 'none'; });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     /* ==================== JE व्यवस्थापन ==================== */
     function saveOrUpdateJE() {
