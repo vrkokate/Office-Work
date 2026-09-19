@@ -141,7 +141,7 @@
     .nav-item i { font-size: 1.25rem; margin-bottom: 3px; }
     .nav-item.active { color: #00d2ff; font-weight: 700; }
 
-    /* ==================== तुम्ही पाठवलेली तंतोतंत मूळ MBMS CSS ==================== */
+    /* ==================== मूळ MBMS STYLES ==================== */
     .mbms-root {
       background-color: #f0f4f8;
       color: #333;
@@ -149,7 +149,6 @@
       min-height: 100%;
     }
 
-    /* १. हेडर पट्टी */
     .app-header {
       background: linear-gradient(135deg, #0d47a1, #1565c0);
       color: #ffffff;
@@ -180,7 +179,6 @@
       margin: 0 auto;
     }
 
-    /* २. ६ मुख्य रंगीत बटने */
     .quick-grid {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
@@ -207,7 +205,6 @@
     .btn-assign { background-color: #7b1fa2; }
     .btn-setting { background-color: #c2185b; }
 
-    /* ३. M.B. Summary कार्ड */
     .summary-card {
       background: #ffffff;
       border-radius: 12px;
@@ -233,11 +230,16 @@
       text-align: center;
       padding: 8px 4px;
       background: #fafbfc;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.2s;
+    }
+    .summary-box:active {
+      transform: scale(0.96);
+      background: #eef3f8;
     }
     .summary-box .count { font-size: 20px; font-weight: bold; color: #0d47a1; }
     .summary-box .label { font-size: 11px; color: #616161; margin-top: 2px; }
 
-    /* ४. सविस्तर माहिती व रिपोर्ट कार्ड */
     .filter-card {
       background: #ffffff;
       border-radius: 12px;
@@ -288,9 +290,9 @@
     .modal-overlay {
       display: none;
       position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 2000;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.6);
+      z-index: 99999;
       overflow-y: auto;
       padding: 15px;
     }
@@ -299,9 +301,9 @@
       color: #333;
       border-radius: 12px;
       max-width: 550px;
-      margin: 20px auto;
+      margin: 25px auto;
       padding: 16px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
     }
     .modal-header {
       display: flex;
@@ -316,12 +318,12 @@
       color: #fff;
       border: none;
       border-radius: 4px;
-      padding: 4px 10px;
+      padding: 5px 12px;
       font-weight: bold;
+      font-size: 14px;
       cursor: pointer;
     }
 
-    /* M.B. List टेबल रचना */
     .data-table {
       width: 100%;
       border-collapse: collapse;
@@ -335,7 +337,6 @@
     }
     .data-table th { background-color: #f5f5f5; font-weight: bold; }
 
-    /* A4 प्रिंट स्टाईल्स */
     @media print {
       @page { size: A4 portrait; margin: 8mm !important; }
       body { background: #fff !important; color: #000 !important; }
@@ -361,12 +362,11 @@
   <header class="hub-header" id="page-title">Digital Hub</header>
 
   <main>
-    <!-- १. डिजिटल हब मुख्य होम स्क्रीन -->
+    <!-- १. डिजिटल हब होम स्क्रीन -->
     <section id="home" class="tab-content active">
       <div class="home-poster-container">
         <div class="clickable-box-layer">
           <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Est."></a>
-          <!-- MB बटण: यावर क्लिक करताच तुमचा मूळ MBMS कोड लोड होईल -->
           <button type="button" class="nav-tap-btn" title="MB" onclick="openMBMS()"></button>
           <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Form"></a>
           <a href="https://google.com" target="_blank" class="nav-tap-btn" title="Tab-4"></a>
@@ -375,10 +375,9 @@
       </div>
     </section>
 
-    <!-- २. तुम्ही पाठवलेला तंतोतंत संपूर्ण मूळ MBMS विभाग -->
+    <!-- २. मूळ MBMS विभाग -->
     <section id="mbms-screen" class="tab-content">
       <div class="mbms-root">
-        <!-- १. मुख्य हेडर (अनावश्यक वरचे REPORT बटण काढून टाकले आहे) -->
         <div class="app-header">
           <button class="btn-back-hub" onclick="backToHome()">← परत</button>
           <h2>मोजमाप पुस्तिका नियंत्रण प्रणाली</h2>
@@ -386,36 +385,36 @@
         </div>
 
         <div class="main-container">
-          <!-- २. ६ मुख्य बटणे -->
+          <!-- ६ मुख्य बटणे -->
           <div class="quick-grid">
             <button class="quick-btn btn-je" onclick="openModule('jeModal')">👷<br>JE</button>
-            <button class="quick-btn btn-mb" onclick="openModule('mbModal')">📖<br>M.B.</button>
+            <button class="quick-btn btn-mb" onclick="openMBWithFilter('सर्व')">📖<br>M.B.</button>
             <button class="quick-btn btn-work" onclick="openModule('workModal')">📋<br>Work list</button>
             <button class="quick-btn btn-bill" onclick="openModule('billModal')">📄<br>Bill reg.</button>
             <button class="quick-btn btn-assign" onclick="openModule('assignModal')">📁<br>Assign</button>
             <button class="quick-btn btn-setting" onclick="openModule('settingModal')">⚙️<br>सेटिंग</button>
           </div>
 
-          <!-- ३. M.B. Summary -->
+          <!-- M.B. Summary (क्लिकेबल बनवले आहे) -->
           <div class="summary-card">
             <div class="summary-title">📖 M.B. Summary</div>
             <div class="summary-grid">
-              <div class="summary-box">
+              <div class="summary-box" onclick="openMBWithFilter('सर्व')" title="सर्व M.B. यादी उघडा">
                 <div class="count" id="countTotalMB">०</div>
                 <div class="label">एकूण M.B.</div>
               </div>
-              <div class="summary-box">
+              <div class="summary-box" onclick="openMBWithFilter('लहान M.B.')" title="Small M.B. यादी उघडा">
                 <div class="count" id="countSmallMB">०</div>
                 <div class="label">Small M.B.</div>
               </div>
-              <div class="summary-box">
+              <div class="summary-box" onclick="openMBWithFilter('मोठी M.B.')" title="Large M.B. यादी उघडा">
                 <div class="count" id="countLargeMB">०</div>
                 <div class="label">Large M.B.</div>
               </div>
             </div>
           </div>
 
-          <!-- ४. सविस्तर संबंधित माहिती व रिपोर्ट (एकमेव अधिकृत रिपोर्ट केंद्र) -->
+          <!-- सविस्तर संबंधित माहिती व रिपोर्ट केंद्र -->
           <div class="filter-card">
             <div class="filter-title">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</div>
 
@@ -430,7 +429,6 @@
               </div>
             </div>
 
-            <!-- १. मुख्य घटक निवड (केवळ ४ पर्याय) -->
             <div class="form-group">
               <select class="form-control" id="mainCatSelect" onchange="onCategorySelectChange()">
                 <option value="M.B." selected>M.B.</option>
@@ -440,17 +438,14 @@
               </select>
             </div>
 
-            <!-- २. उपघटक निवड (M.B. साठी: सर्व, लहान, मोठी व क्रमांक) -->
             <div class="form-group">
               <select class="form-control" id="subCatSelect"></select>
             </div>
 
-            <!-- ३. स्मार्ट सर्च इनपुट -->
             <div class="form-group">
               <input type="text" class="form-control" id="smartInput" placeholder="निवडलेल्या घटकानुसार शोधा / क्रमांक टाका">
             </div>
 
-            <!-- ४. REPORT / PRINT बटण -->
             <button class="btn-report-main" onclick="generateReport()">📄 REPORT / PRINT</button>
             <div style="text-align: center; font-size: 11px; color: #757575; margin-top: 8px;">सर्व माहिती किंवा वरील उपघटक निवडा.</div>
           </div>
@@ -458,18 +453,18 @@
       </div>
     </section>
 
-    <!-- डिजिटल हब इतर टॅब -->
+    <!-- इतर टॅब -->
     <section id="search" class="tab-content"><div class="normal-page"><h2>शोध</h2><p>येथे तुम्ही कोणतीही माहिती शोधू शकता.</p></div></section>
     <section id="orders" class="tab-content"><div class="normal-page"><h2>ऑर्डर्स / कार्य</h2><p>सर्व नोंदी आणि ऑर्डर्स येथे दिसतील.</p></div></section>
     <section id="notifications" class="tab-content"><div class="normal-page"><h2>सूचना</h2><p>सर्व नवीन अपडेट्स येथे मिळतील.</p></div></section>
     <section id="profile" class="tab-content"><div class="normal-page"><h2>प्रोफाइल</h2><p>वापरकर्त्याची माहिती आणि सेटिंग्ज.</p></div></section>
   </main>
 
-  <!-- ५. M.B. व्यवस्थापन मोडल (तारीख dd-mm-yyyy सह) -->
+  <!-- M.B. व्यवस्थापन मोडल -->
   <div id="mbModal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 style="font-size: 15px; color:#2e7d32;">M.B. व्यवस्थापन</h3>
+        <h3 id="mbModalTitle" style="font-size: 15px; color:#2e7d32;">M.B. व्यवस्थापन</h3>
         <button class="btn-close-modal" onclick="closeModule('mbModal')">X</button>
       </div>
       <div class="form-group">
@@ -489,7 +484,7 @@
       </div>
       <button class="btn-report-main" style="background:#2e7d32;" onclick="saveMBEntry()">Save Entry</button>
 
-      <h4 style="margin-top:15px; font-size:13px; border-bottom:1px solid #ddd; padding-bottom:4px;">M.B. List</h4>
+      <h4 id="mbListHeading" style="margin-top:15px; font-size:13px; border-bottom:1px solid #ddd; padding-bottom:4px;">M.B. List</h4>
       <div style="overflow-x:auto;">
         <table class="data-table" id="mbListTable">
           <thead>
@@ -507,7 +502,7 @@
     </div>
   </div>
 
-  <!-- ६. सेटिंग (Working Backup/Restore) मोडल -->
+  <!-- सेटिंग मोडल -->
   <div id="settingModal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -520,10 +515,16 @@
     </div>
   </div>
 
-  <!-- प्रिंट एरिया (A4 रिपोर्टसाठी) -->
+  <!-- इतर मोडल्स (प्लेसहोल्डर) -->
+  <div id="jeModal" class="modal-overlay"><div class="modal-card"><div class="modal-header"><h3>JE नोंद</h3><button class="btn-close-modal" onclick="closeModule('jeModal')">X</button></div><p style="color:#666;">JE मॉड्यूल</p></div></div>
+  <div id="workModal" class="modal-overlay"><div class="modal-card"><div class="modal-header"><h3>Work List</h3><button class="btn-close-modal" onclick="closeModule('workModal')">X</button></div><p style="color:#666;">कामांची यादी</p></div></div>
+  <div id="billModal" class="modal-overlay"><div class="modal-card"><div class="modal-header"><h3>Bill Register</h3><button class="btn-close-modal" onclick="closeModule('billModal')">X</button></div><p style="color:#666;">बिल रजिस्टर</p></div></div>
+  <div id="assignModal" class="modal-overlay"><div class="modal-card"><div class="modal-header"><h3>Assign M.B.</h3><button class="btn-close-modal" onclick="closeModule('assignModal')">X</button></div><p style="color:#666;">Assign मॉड्यूल</p></div></div>
+
+  <!-- प्रिंट एरिया -->
   <div id="printArea" style="display: none;"></div>
 
-  <!-- डिजिटल हब तळाचा ५ टॅब बार -->
+  <!-- तळाचा ५ टॅब बार -->
   <nav class="bottom-nav">
     <div class="nav-item active" id="btn-tab-home" onclick="switchTab('home', 'Digital Hub', this)">
       <i class="fa-solid fa-house"></i>
@@ -547,9 +548,10 @@
     </div>
   </nav>
 
-  <!-- ==================== तुम्ही पाठवलेला मूळ JAVASCRIPT ENGINE ==================== -->
+  <!-- जावास्क्रिप्ट इंजिन -->
   <script>
-    // डिजिटल हब टॅब स्वीचिंग
+    var currentMBFilter = 'सर्व';
+
     function switchTab(tabId, title, element) {
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -570,25 +572,48 @@
       switchTab('home', 'Digital Hub', document.getElementById('btn-tab-home'));
     }
 
-    // १. मोडल उघडणे व बंद करणे
     function openModule(id) { 
       var el = document.getElementById(id);
       if (el) el.style.display = 'block'; 
     }
+
     function closeModule(id) { 
       var el = document.getElementById(id);
       if (el) el.style.display = 'none'; 
     }
 
-    // २. लोकल स्टोरेज मदतनीस
+    /* Small M.B., Large M.B. किंवा सर्व M.B. उघडण्यासाठी फंक्शन */
+    function openMBWithFilter(filterType) {
+      currentMBFilter = filterType;
+      var titleEl = document.getElementById('mbModalTitle');
+      var headingEl = document.getElementById('mbListHeading');
+      var sizeSelect = document.getElementById('newMBSize');
+
+      if (filterType === 'लहान M.B.') {
+        titleEl.textContent = '📖 Small M.B. व्यवस्थापन';
+        headingEl.textContent = 'Small M.B. List';
+        if (sizeSelect) sizeSelect.value = 'लहान M.B.';
+      } else if (filterType === 'मोठी M.B.') {
+        titleEl.textContent = '📖 Large M.B. व्यवस्थापन';
+        headingEl.textContent = 'Large M.B. List';
+        if (sizeSelect) sizeSelect.value = 'मोठी M.B.';
+      } else {
+        titleEl.textContent = '📖 M.B. व्यवस्थापन (सर्व)';
+        headingEl.textContent = 'M.B. List';
+      }
+
+      refreshDashboard();
+      openModule('mbModal');
+    }
+
     function getData(key) {
       try { return JSON.parse(localStorage.getItem(key)) || []; } catch(e) { return []; }
     }
+
     function setData(key, val) {
       localStorage.setItem(key, JSON.stringify(val));
     }
 
-    // तारीख yyyy-mm-dd वरून dd-mm-yyyy मध्ये बदलणे
     function formatToDMY(dateStr) {
       if (!dateStr) return '-';
       var m = dateStr.match(/^(\d{4})[-/](\d{2})[-/](\d{2})$/);
@@ -596,7 +621,6 @@
       return dateStr;
     }
 
-    // ३. M.B. एंट्री सेव्ह करणे (तारीख dd-mm-yyyy सह)
     function saveMBEntry() {
       var no = document.getElementById('newMBNo').value.trim();
       var size = document.getElementById('newMBSize').value;
@@ -612,12 +636,10 @@
       setData('mb_records', list);
 
       document.getElementById('newMBNo').value = '';
-      document.getElementById('newMBDate').value = '';
       refreshDashboard();
       alert('M.B. नोंद यशस्वीपणे सेव्ह झाली!');
     }
 
-    // ४. M.B. यादी आणि समरी रिफ्रेश करणे
     function refreshDashboard() {
       var list = getData('mb_records');
       var total = list.length;
@@ -626,18 +648,27 @@
       var tbody = document.getElementById('mbListBody');
       if (tbody) tbody.innerHTML = '';
 
+      var countIndex = 1;
       list.forEach(function(item, idx) {
-        if (item.size && item.size.includes('लहान')) small++;
+        var isSmall = item.size && (item.size.includes('लहान') || item.size.toLowerCase().includes('small'));
+        if (isSmall) small++;
         else large++;
 
-        if (tbody) {
+        // फिल्टरनुसार टेबलमध्ये दाखवणे
+        var showInTable = false;
+        if (currentMBFilter === 'सर्व') showInTable = true;
+        else if (currentMBFilter === 'लहान M.B.' && isSmall) showInTable = true;
+        else if (currentMBFilter === 'मोठी M.B.' && !isSmall) showInTable = true;
+
+        if (showInTable && tbody) {
           var tr = document.createElement('tr');
-          tr.innerHTML = '<td>' + (idx + 1) + '</td>' +
+          tr.innerHTML = '<td>' + countIndex + '</td>' +
                          '<td>' + item.mbNumber + '</td>' +
                          '<td>' + item.size + '</td>' +
                          '<td>' + formatToDMY(item.date) + '</td>' +
                          '<td><button onclick="deleteMB(' + idx + ')" style="background:#e53935; color:#fff; border:none; padding:2px 6px; border-radius:4px; cursor:pointer;">Delete</button></td>';
           tbody.appendChild(tr);
+          countIndex++;
         }
       });
 
@@ -657,7 +688,6 @@
       }
     }
 
-    // ५. मुख्य घटक बदलल्यावर उपघटक भरणे (M.B. साठी: सर्व, लहान, मोठी)
     function onCategorySelectChange() {
       var cat = document.getElementById('mainCatSelect').value;
       var sub = document.getElementById('subCatSelect');
@@ -684,7 +714,6 @@
       }
     }
 
-    // ६. A4 प्रिंट अहवाल जनरेशन
     function generateReport() {
       var cat = document.getElementById('mainCatSelect').value;
       var sub = document.getElementById('subCatSelect').value;
@@ -693,7 +722,6 @@
       var today = formatToDMY(new Date().toISOString().slice(0,10));
 
       var mbs = getData('mb_records');
-      var works = getData('work_records');
 
       var h = '<div style="text-align: center; margin-bottom: 8px;">';
       h += '  <h2 style="margin: 0; font-size: 17px; font-weight: bold;">सार्वजनिक बांधकाम विभाग</h2>';
@@ -740,7 +768,6 @@
       }, 150);
     }
 
-    // ७. बॅकअप आणि रिस्टोअर
     function triggerBackupSave() {
       var data = {};
       for (var i = 0; i < localStorage.length; i++) {
@@ -787,7 +814,6 @@
       }
     }
 
-    // सुरुवातीला चालवणे
     document.addEventListener('DOMContentLoaded', function() {
       var today = new Date().toISOString().slice(0, 10);
       var fDate = document.getElementById('fromDate');
