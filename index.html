@@ -295,7 +295,7 @@
     </div>
   </div>
 
-  <!-- ==================== विभाग २: M.B. नियंत्रण प्रणाली ==================== -->
+  <!-- ==================== २. M.B. नियंत्रण प्रणाली ==================== -->
   <div id="mbSystemSection">
     <div class="top-header">
       <button class="btn-back-hub" onclick="showDigitalHub()">🏠 मुखपृष्ठ</button>
@@ -421,7 +421,7 @@
       </div>
     </div>
 
-    <!-- 2. M.B. नोंद मोडल (सुधारित आणि अचूक फॉर्म लॉजिक) -->
+    <!-- 2. M.B. नोंद मोडल -->
     <div id="mbModal" class="modal-overlay">
       <div class="modal-card">
         <div class="modal-header">
@@ -448,7 +448,7 @@
           </select>
         </div>
 
-        <!-- नवीन M.B. क्रमांक 입력 (मिळालेली एमबी साठी) -->
+        <!-- नवीन M.B. क्रमांक (मिळालेली एमबी साठी) -->
         <div class="form-group" id="groupMBInput" style="display:none;">
           <label>नवीन M.B. क्रमांक *</label>
           <input type="text" class="form-control" id="newMBNo" placeholder="उदा. MB-1001">
@@ -457,7 +457,9 @@
         <!-- उपलब्ध एम बी निवडा (दिलेली एमबी साठी) -->
         <div class="form-group" id="groupMBSelect" style="display:none;">
           <label>उपलब्ध एम बी निवडा *</label>
-          <select class="form-control" id="selectAvailableMB" onchange="onSelectAvailableMBChange()"></select>
+          <select class="form-control" id="selectAvailableMB" onchange="onSelectAvailableMBChange()">
+            <option value="">-- उपलब्ध एम बी निवडा --</option>
+          </select>
         </div>
 
         <!-- कोणाला दिली? (JE किंवा विभागीय कार्यालय) -->
@@ -473,7 +475,9 @@
         <!-- JE ड्रॉपडाऊन -->
         <div class="form-group" id="givenJEGroup" style="display:none;">
           <label>कनिष्ठ अभियंता (JE) निवडा *</label>
-          <select class="form-control" id="selectGivenJE"></select>
+          <select class="form-control" id="selectGivenJE">
+            <option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option>
+          </select>
         </div>
 
         <!-- विभागीय कार्यालय नाव टाईप करण्यासाठी -->
@@ -509,7 +513,9 @@
 
         <div class="form-group" id="receivedSubGroup" style="display:none;">
           <label id="receivedSubLabel">तपशील निवडा *</label>
-          <select class="form-control" id="receivedSubSelect" style="display:none;"></select>
+          <select class="form-control" id="receivedSubSelect" style="display:none;">
+            <option value="">-- कनिष्ठ अभियंता निवडा --</option>
+          </select>
           <input type="text" class="form-control" id="receivedSubInput" style="display:none;" placeholder="उदा. पद / व्यक्तीचे नाव टाईप करा">
         </div>
 
@@ -538,7 +544,7 @@
       </div>
     </div>
 
-    <!-- 3. Work List मोडल -->
+    <!-- 3. Work List मोडल (सुधारित आणि क्लिअर होणारी रचना) -->
     <div id="workModal" class="modal-overlay">
       <div class="modal-card">
         <div class="modal-header">
@@ -803,7 +809,6 @@
       var jeGrp = document.getElementById('givenJEGroup');
       var officeGrp = document.getElementById('givenOfficeGroup');
 
-      // सर्व रीसेट करणे
       sizeGrp.style.display = 'none';
       grpInp.style.display = 'none';
       grpSel.style.display = 'none';
@@ -912,6 +917,7 @@
         subGrp.style.display = 'block';
         lbl.innerText = 'कनिष्ठ अभियंता (JE) निवडा *';
         sel.style.display = 'block';
+        sel.innerHTML = '<option value="">-- कनिष्ठ अभियंता निवडा --</option>';
         getData('je_records').forEach(function(j){ sel.add(new Option(j.name, j.name)); });
       } else if (chalooSrc === 'विभागीय कार्यालय' || chalooSrc === 'चार्ज नुसार') {
         subGrp.style.display = 'block';
@@ -1058,6 +1064,33 @@
         setData('mb_records', list);
         refreshAll();
       }
+    }
+
+    /* ==================== कामांची यादी (Work List) सेव्ह झाल्यावर क्लिअर होणे ==================== */
+    function saveOrUpdateWork() {
+      var name = document.getElementById('workName').value.trim();
+      var je = document.getElementById('workJE').value;
+      var con = document.getElementById('workContractor').value.trim();
+      var mb = document.getElementById('workMB').value;
+      var idx = parseInt(document.getElementById('editWorkIndex').value, 10);
+      
+      if (!name || !je || !con || !mb) return alert('कृपया सर्व माहिती भरा.');
+      
+      var list = getData('work_records');
+      if (idx === -1) list.push({ name: name, je: je, contractor: con, mbNo: mb });
+      else list[idx] = { name: name, je: je, contractor: con, mbNo: mb };
+      
+      setData('work_records', list);
+      
+      // सेव्ह झाल्यावर फॉर्म पूर्णपणे क्लिअर (Reset) करणे
+      document.getElementById('workName').value = '';
+      document.getElementById('workJE').value = '';
+      document.getElementById('workContractor').value = '';
+      document.getElementById('workMB').innerHTML = '<option value="">-- आधी JE निवडा --</option>';
+
+      cancelWorkEdit();
+      refreshAll();
+      alert('काम यशस्वीपणे जतन झाले!');
     }
 
     /* ==================== रिपोर्ट आणि कास्केडिंग लॉजिक ==================== */
@@ -1444,32 +1477,7 @@
       if (!je) return;
       getData('assign_records').filter(function(a){ return a.jeName === je; }).forEach(function(a){ mbSel.add(new Option(a.mbNo, a.mbNo)); });
     }
-    function saveOrUpdateWork() {
-      var name = document.getElementById('workName').value.trim();
-      var je = document.getElementById('workJE').value;
-      var con = document.getElementById('workContractor').value.trim();
-      var mb = document.getElementById('workMB').value;
-      var idx = parseInt(document.getElementById('editWorkIndex').value, 10);
-      if (!name || !je || !con || !mb) return alert('सर्व माहिती भरा.');
-      var list = getData('work_records');
-      if (idx === -1) list.push({ name: name, je: je, contractor: con, mbNo: mb });
-      else list[idx] = { name: name, je: je, contractor: con, mbNo: mb };
-      setData('work_records', list);
-      cancelWorkEdit();
-      refreshAll();
-      alert('जतन झाले!');
-    }
-    function editWork(idx) {
-      var item = getData('work_records')[idx];
-      document.getElementById('workName').value = item.name;
-      document.getElementById('workJE').value = item.je;
-      onWorkJEChange();
-      document.getElementById('workContractor').value = item.contractor;
-      document.getElementById('workMB').value = item.mbNo;
-      document.getElementById('editWorkIndex').value = idx;
-      document.getElementById('btnSaveWork').textContent = 'Update Work';
-      document.getElementById('btnCancelWork').style.display = 'block';
-    }
+    
     function cancelWorkEdit() {
       document.getElementById('workName').value = '';
       document.getElementById('workContractor').value = '';
