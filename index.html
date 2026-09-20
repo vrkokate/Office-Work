@@ -332,7 +332,7 @@
         </div>
       </div>
 
-      <!-- सविस्तर रिपोर्ट फिल्टर कार्ड (नवीन प्लेसहोलर डिझाईनसह) -->
+      <!-- सविस्तर रिपोर्ट फिल्टर कार्ड -->
       <div class="filter-card">
         <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
         
@@ -372,7 +372,7 @@
           <select class="form-control" id="repDynamicSelect2" onchange="onDynamicSelect2Change()"></select>
         </div>
 
-        <!-- स्टेप ३: वाटप कोणाला केले (फक्त कनिष्ठ अभियंता आणि विभागीय कार्यालय) -->
+        <!-- स्टेप ३: वाटप कोणाला केले -->
         <div class="form-group" id="dynamicOptionGroup3" style="display:none;">
           <label id="lblDynamic3">वाटप कोणाला केले?</label>
           <select class="form-control" id="repDynamicSelect3" onchange="onDynamicSelect3Change()">
@@ -823,7 +823,7 @@
     }
 
     function onDynamicSelect3Change() {
-      var targetType = document.getElementById('repDynamicSelect3').value; // JE किंवा Office
+      var targetType = document.getElementById('repDynamicSelect3').value;
       var inputGrp = document.getElementById('dynamicInputGroup');
       var jeListSel = document.getElementById('repDynamicJEList');
       var lblInput = document.getElementById('lblDynamicInput');
@@ -850,6 +850,8 @@
       var tDate = document.getElementById('repToDate').value;
       var searchTxt = document.getElementById('smartSearchInput').value.trim().toLowerCase();
 
+      if (!mainCat) return alert('कृपया मुख्य घटक निवडा.');
+
       if (searchTxt) {
         generateSmartSearchReport(searchTxt, fDate, tDate);
         return;
@@ -858,7 +860,8 @@
       if (mainCat === 'M.B.') {
         var sizeChoice = document.getElementById('repDynamicSelect1').value;
         var finalType = document.getElementById('repDynamicSelect2').value;
-        if (!sizeChoice || !finalType) return alert('कृपया सर्व आवश्यक पर्याय निवडा.');
+        if (!sizeChoice) return alert('कृपया M.B. प्रकार निवडा.');
+        if (!finalType) return alert('कृपया एम.बी. सविस्तर स्थिती निवडा.');
 
         var givenSubTarget = '', givenSubValue = '';
         if (finalType === 'GIVEN') {
@@ -937,7 +940,7 @@
       var rawName = subVal ? subVal.replace(/^श्री\.?\s*/i, '') : "";
       var personHeaderName = rawName ? "श्री. " + rawName : "";
 
-      // अंतिम सुधारित रिपोर्ट लेआउट (अनावश्‍यक दुसरे पेज टाळण्यासाठी strict CSS व structure)
+      // अंतिम सुधारित रिपोर्ट लेआउट (शीर्षक स्वच्छ ठेवले आहे आणि शेवटच्या कॉलममध्ये "यांच्याकडे आहे" असा उल्लेख केला आहे)
       var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
                    '<div style="text-align:center; margin-bottom:4px;">' +
                      '<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
@@ -961,7 +964,7 @@
         var size = item.size || 'लहान M.B.';
         
         var personCleanName = subVal ? subVal.replace(/^श्री\.?\s*/i, '') : (item.receivedDetail || 'संबंधित');
-        var currentStatus = "श्री. " + personCleanName + " यांच्या M.B. कडे आहे";
+        var currentStatus = "श्री. " + personCleanName + " यांच्याकडे आहे";
 
         html += '<tr>' +
                   '<td style="text-align:center;">' + (idx + 1) + '</td>' +
