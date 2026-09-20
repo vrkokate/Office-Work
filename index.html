@@ -37,6 +37,23 @@
     .text-smart-strong span { color: #00e5ff; }
     .text-created-by { font-size: 10px; color: #8be4ff; margin-top: 4px; font-weight: 600; }
 
+    /* प्रोफाईल पॉपअप डिझाईन व ब्रँड आयकॉन्स */
+    .profile-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 5, 15, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
+    .profile-card { background: #051d3b; border: 2px solid #00e5ff; border-radius: 18px; width: 100%; max-width: 340px; padding: 22px 18px; text-align: center; position: relative; box-shadow: 0 5px 25px rgba(0,229,255,0.4); }
+    .profile-card-close { position: absolute; right: 12px; top: 12px; color: #ff3d57; font-weight: 800; cursor: pointer; border: 1.5px solid #ff3d57; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+    .profile-avatar-small { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid #00e5ff; margin-bottom: 8px; box-shadow: 0 0 12px rgba(0,229,255,0.5); }
+    .profile-name { font-size: 18px; font-weight: 800; color: #ffffff; margin-bottom: 2px; }
+    .profile-title-tag { font-size: 10.5px; color: #00e5ff; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
+    .profile-info-box { background: rgba(0, 229, 255, 0.08); border-radius: 8px; padding: 8px; margin-bottom: 12px; font-size: 12px; color: #e0f7fa; display: flex; flex-direction: column; gap: 4px; text-align: left; }
+    .profile-info-row { display: flex; justify-content: space-between; }
+    .profile-info-row .label { opacity: 0.8; font-weight: 600; }
+    
+    .profile-social-icons-row { display: flex; justify-content: center; gap: 12px; margin-top: 6px; }
+    .brand-icon-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 3px 8px rgba(0,0,0,0.3); transition: 0.2s; }
+    .brand-icon-btn svg { width: 22px; height: 22px; fill: #ffffff; }
+    .btn-call-brand { background: #00c853; }
+    .btn-wa-brand { background: #25d366; }
+
     #mbSystemSection { display: none; background: #f0f2f5; color: #212121; min-height: 100vh; padding-bottom: 20px; }
     .top-header { background: #0d47a1; color: #fff; text-align: center; padding: 12px 15px; position: relative; }
     .top-header h1 { font-size: 15px; font-weight: 700; margin-left: 70px; text-align: left; }
@@ -219,13 +236,21 @@
     </div>
   </div>
 
-  <!-- प्रोफाईल पॉपअप -->
-  <div id="profileModal" class="profile-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,5,15,0.85); z-index:2000; justify-content:center; align-items:center; padding:15px;">
-    <div class="profile-card" style="background:#051d3b; border:2px solid #00e5ff; border-radius:18px; width:100%; max-width:380px; padding:24px 20px; text-align:center; position:relative;">
-      <div class="profile-card-close" onclick="closeProfileModal()" style="position:absolute; right:12px; top:12px; color:#ff3d57; font-weight:800; cursor:pointer; border:1px solid #ff3d57; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center;">✕</div>
-      <div class="profile-name" style="font-size:20px; font-weight:800; color:#ffffff; margin-bottom:2px;">विठ्ठल रघुनाथ कोकाटे</div>
-      <div class="profile-title-tag" style="font-size:11px; color:#00e5ff; font-weight:700; text-transform:uppercase; margin-bottom:12px;">सार्वजनिक बांधकाम विभाग</div>
-      <div style="font-size:13px; color:#e0f7fa;"><b>मोबाईल:</b> 8446556141</div>
+  <!-- प्रोफाईल पॉपअप (व्हाट्सएप आणि कॉल आयकॉन्ससह) -->
+  <div id="profileModal" class="profile-modal-overlay">
+    <div class="profile-card">
+      <div class="profile-card-close" onclick="closeProfileModal()">✕</div>
+      <img src="home-bg.jpg" onerror="this.onerror=null; this.src='1000320439_2.png';" class="profile-avatar-small" alt="Profile Photo">
+      <div class="profile-name">विठ्ठल रघुनाथ कोकाटे</div>
+      <div class="profile-title-tag">सार्वजनिक बांधकाम विभाग</div>
+      <div class="profile-info-box">
+        <div class="profile-info-row"><span class="label">नाव:</span> <span>विठ्ठल रघुनाथ कोकाटे</span></div>
+        <div class="profile-info-row"><span class="label">मोबाईल:</span> <span>8446556141</span></div>
+      </div>
+      <div class="profile-social-icons-row">
+        <a href="tel:8446556141" class="brand-icon-btn btn-call-brand" title="थेट कॉल करा"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></a>
+        <a href="https://wa.me/message/P4JXAKSDU4CBH1" target="_blank" class="brand-icon-btn btn-wa-brand" title="WhatsApp मेसेज पाठवा"><svg viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01C17.18 3.03 14.69 2 12.04 2zM12.04 20.1c-1.42 0-2.81-.38-4.03-1.11l-.29-.17-3.04.8.81-2.96-.19-.31c-.81-1.31-1.23-2.83-1.23-4.38 0-4.55 3.7-8.25 8.25-8.25 2.2 0 4.27.86 5.82 2.42 1.56 1.56 2.42 3.63 2.42 5.82 0 4.55-3.7 8.25-8.25 8.25zm4.52-6.16c-.25-.13-1.47-.73-1.7-.81-.23-.08-.4-.13-.57.13-.17.25-.66.81-.81.98-.15.17-.3.19-.55.06-.25-.13-1.05-.39-2-1.24-.74-.66-1.24-1.48-1.39-1.73-.15-.25-.02-.39.11-.52.12-.12.25-.3.38-.45.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.45-.06-.13-.57-1.38-.78-1.89-.2-.48-.41-.42-.57-.43h-.49c-.17 0-.45.06-.69.32-.24.25-.92.9-.92 2.19 0 1.29.94 2.53 1.07 2.71.13.18 1.85 2.82 4.48 3.95.63.27 1.12.43 1.5.55.63.2 1.21.17 1.66.1.51-.08 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.16-.48-.29z"/></svg></a>
+      </div>
     </div>
   </div>
 
@@ -465,7 +490,7 @@
       <div class="wizard-buttons"><button class="btn-wizard btn-next" onclick="goToStep(2)">पुढील ➔</button></div>
     </div>
 
-    <!-- स्टेप २: कपात व हिशोब (टक्केवारीनुसार अचूक ऑटो-कॅल्क्युलेशन आणि स्वच्छ नावे) -->
+    <!-- स्टेप २: कपात व हिशोब (टक्केवारीनुसार अचूक इन्स्टंट ऑटो-कॅल्क्युलेशन आणि स्वच्छ लेबल्स) -->
     <div class="wizard-step" id="step2" style="display:none;">
       <h4 style="font-size:13px; color:#0d47a1; margin-bottom:6px; border-bottom:1.5px solid #0d47a1; padding-bottom:2px;">Deduction (कपात तपशील)</h4>
       
@@ -1657,20 +1682,19 @@
       if(step === 3) renderPreview();
     }
 
-    /* छायाचित्रातील टक्केवारीनुसार अचूक ऑटो-कॅल्क्युलेशन */
+    /* वास्तविक टक्केवारीनुसार (उदा. १० लाखाच्या २% = २०,०००) अचूक रियल-टाइम ऑटो-कॅल्क्युलेशन आणि योग्य लेबल्स */
     function autoCalculateDeductions() {
       var passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
-      var itInput = document.getElementById('dedIT');
-      if (itInput && parseFloat(itInput.value) === 0 && passed > 0) {
-        document.getElementById('dedIT').value = Math.round(passed * 0.02);        // Income Tax 2%
-        document.getElementById('dedSD').value = 10000;                            // Security Deposit (Fixed / Custom)
-        document.getElementById('dedMaint').value = Math.round(passed * 0.03);     // Maintenance 3%
-        document.getElementById('dedRoyalty').value = 28000;                       // Royalty Charges (Fixed / Custom)
-        document.getElementById('dedGovt').value = Math.round(passed * 0.01);      // Govt. Ins. Scheme 1%
-        document.getElementById('dedUpkar').value = Math.round(passed * 0.01);     // Upkar W.C. 1%
-        document.getElementById('dedCGST').value = Math.round(passed * 0.01);      // CGST 1%
-        document.getElementById('dedSGST').value = Math.round(passed * 0.01);      // SGST 1%
-      }
+      
+      // प्रत्येक कपातीच्या टक्केवारीनुसार अचूक रक्कम (उदा. 2% म्हणजे passed * 0.02)
+      document.getElementById('dedIT').value = Math.round(passed * 0.02);        // Income Tax 2%
+      document.getElementById('dedSD').value = 10000;                            // Security Deposit (Fixed / Custom)
+      document.getElementById('dedMaint').value = Math.round(passed * 0.03);     // Maintenance 3%
+      document.getElementById('dedRoyalty').value = 28000;                       // Royalty Charges (Fixed / Custom)
+      document.getElementById('dedGovt').value = Math.round(passed * 0.01);      // Govt. Ins. Scheme 1%
+      document.getElementById('dedUpkar').value = Math.round(passed * 0.01);     // Upkar W.C. 1%
+      document.getElementById('dedCGST').value = Math.round(passed * 0.01);      // CGST 1%
+      document.getElementById('dedSGST').value = Math.round(passed * 0.01);      // SGST 1%
 
       var totalDed = 0;
       var dedInputs = document.querySelectorAll('.calc-ded');
