@@ -254,7 +254,7 @@
     </div>
   </div>
 
-  <!-- ==================== डॅशबोर्ड क्लिक तपशील मोडल (प्रिंट/रिपोर्ट सह) ==================== -->
+  <!-- ==================== डॅशबोर्ड क्लिक तपशील मोडल (सुधारિત फिल्टर ऑप्शन्ससह) ==================== -->
   <div id="quickInfoModal" class="quick-info-overlay">
     <div class="quick-info-card">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
@@ -262,11 +262,23 @@
         <button class="btn-close" onclick="closeQuickInfoModal()">X</button>
       </div>
       
-      <!-- JE फिल्टर निवड ऑप्शन (प्रत्येक JE नुसार किंवा सर्व JE नुसार पाहण्यासाठी) -->
-      <div class="form-group" id="quickModalFilterGroup" style="margin-bottom:10px;">
-        <label id="quickModalFilterLabel">JE नुसार फिल्टर करा:</label>
-        <select class="form-control" id="quickModalJEFilter" onchange="onQuickJEFilterChange()">
+      <!-- आकार फिल्टर (सर्व, लहान, मोठी) -->
+      <div class="form-group" style="margin-bottom:8px;">
+        <label>एम.बी. आकारानुसार फिल्टर:</label>
+        <select class="form-control" id="quickModalSizeFilter" onchange="onQuickFilterChange()">
+          <option value="ALL">सर्व M.B.</option>
+          <option value="लहान M.B.">लहान M.B.</option>
+          <option value="मोठी M.B.">मोठी M.B.</option>
+        </select>
+      </div>
+
+      <!-- स्रोत/व्यक्ती फिल्टर (सर्व, JE लिस्ट, विभागीय कार्यालय, इतर) -->
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>स्रोत / व्यक्तीनुसार फिल्टर:</label>
+        <select class="form-control" id="quickModalSourceFilter" onchange="onQuickFilterChange()">
           <option value="ALL">सर्व (All)</option>
+          <option value="विभागीय कार्यालय">विभागीय कार्यालय</option>
+          <option value="इतर">इतर</option>
         </select>
       </div>
 
@@ -761,31 +773,35 @@
       document.getElementById('customAlertModal').style.display = 'none';
     }
 
-    /* ग्लोबल व्हेरिएबल सध्या उघड्या असलेल्या डॅशबोर्ड रिपोर्टचा प्रकार लक्षात ठेवण्यासाठी */
     var currentQuickModalType = '';
 
-    /* डॅशबोर्ड कार्ड क्लिक केल्यावर JE फिल्टरसह रिपोर्ट पॉपअप उघडणे */
+    /* डॅशबोर्ड कार्ड क्लिक केल्यावर "सर्व, लहान, मोठी" आकार आणि "सर्व, JE, विभागीय कार्यालय, इतर" फिल्टर असणारा पॉपअप उघडणे */
     function openQuickInfoModal(type) {
       currentQuickModalType = type;
-      var filterSelect = document.getElementById('quickModalJEFilter');
       
-      // JE ड्रॉपडाऊन लिस्ट भरणे
-      filterSelect.innerHTML = '<option value="ALL">सर्व (All)</option>';
+      // आकार फिल्टर रीसेट
+      document.getElementById('quickModalSizeFilter').value = 'ALL';
+      
+      // स्रोत/व्यक्ती फिल्टर ड्रॉपडाऊन भरणे (सर्व, JE नावे, विभागीय कार्यालय, इतर)
+      var sourceSelect = document.getElementById('quickModalSourceFilter');
+      sourceSelect.innerHTML = '<option value="ALL">सर्व (All)</option><option value="विभागीय कार्यालय">विभागीय कार्यालय</option><option value="इतर">इतर</option>';
+      
       getData('je_records').forEach(function(j) {
-        filterSelect.add(new Option(j.name, j.name));
+        sourceSelect.add(new Option(j.name, j.name));
       });
-      filterSelect.value = 'ALL';
+      sourceSelect.value = 'ALL';
 
-      renderQuickModalContent('ALL');
+      renderQuickModalContent('ALL', 'ALL');
       document.getElementById('quickInfoModal').style.display = 'flex';
     }
 
-    function onQuickJEFilterChange() {
-      var selectedJE = document.getElementById('quickModalJEFilter').value;
-      renderQuickModalContent(selectedJE);
+    function onQuickFilterChange() {
+      var selectedSize = document.getElementById('quickModalSizeFilter').value;
+      var selectedSource = document.getElementById('quickModalSourceFilter').value;
+      renderQuickModalContent(selectedSize, selectedSource);
     }
 
-    function renderQuickModalContent(jeFilter) {
+    function renderQuickModalContent(sizeFilter, sourceFilter) {
       var allMBs = getData('mb_records');
       var stock = getAvailableStock();
       var title = "";
@@ -793,9 +809,16 @@
 
       if (currentQuickModalType === 'RECEIVED') {
         var rcvList = allMBs.filter(function(m){ return m.actionType === 'मिळालेली एमबी'; });
-        if (jeFilter !== 'ALL') {
-          rcvList = rcvList.filter(function(m){ return m.receivedFrom && m.receivedFrom.toLowerCase().includes(jeFilter.toLowerCase()); });
+        
+        if (sizeFilter !== 'ALL') {
+          rcvList = rcvList.filter(function(m){ return m.size === sizeFilter; });
         }
+        if (sourceFilter !== 'ALL') {
+          rcvList = rcvList.filter(function(m){ 
+            return m.receivedFrom && m.receivedFrom.toLowerCase().includes(sourceFilter.toLowerCase()); 
+          });
+        }
+
         var smallCount = rcvList.filter(function(m){ return m.size === 'लहान M.B.'; }).length;
         var bigCount = rcvList.filter(function(m){ return m.size === 'मोठी M.B.'; }).length;
         
@@ -811,9 +834,16 @@
         }
       } else if (currentQuickModalType === 'GIVEN') {
         var givenList = allMBs.filter(function(m){ return m.actionType === 'दिलेली एमबी'; });
-        if (jeFilter !== 'ALL') {
-          givenList = givenList.filter(function(m){ return m.receivedDetail && m.receivedDetail.toLowerCase() === jeFilter.toLowerCase(); });
+        
+        if (sizeFilter !== 'ALL') {
+          givenList = givenList.filter(function(m){ return m.size === sizeFilter; });
         }
+        if (sourceFilter !== 'ALL') {
+          givenList = givenList.filter(function(m){ 
+            return m.receivedDetail && m.receivedDetail.toLowerCase().includes(sourceFilter.toLowerCase()); 
+          });
+        }
+
         var smallCount = givenList.filter(function(m){ return m.size === 'लहान M.B.'; }).length;
         var bigCount = givenList.filter(function(m){ return m.size === 'मोठी M.B.'; }).length;
 
@@ -829,13 +859,13 @@
         }
       } else if (currentQuickModalType === 'AVAILABLE') {
         var availableList = stock;
-        if (jeFilter !== 'ALL') {
-          availableList = []; // उपलब्ध स्टॉक JE नुसार फिल्टर होत नाही कारण तो स्टॉकमध्ये असतो
+        if (sizeFilter !== 'ALL') {
+          availableList = availableList.filter(function(s){ return s.size === sizeFilter; });
         }
-        var smallStock = availableList.filter(function(s){ return s.size === 'लहान M.B.'; });
-        var bigStock = availableList.filter(function(s){ return s.size === 'मोठी M.B.'; });
+        var smallStock = stock.filter(function(s){ return s.size === 'लहान M.B.'; }).length;
+        var bigStock = stock.filter(function(s){ return s.size === 'मोठी M.B.'; }).length;
 
-        title = "उपलब्ध M.B. स्टॉक (एकूण: " + availableList.length + " | लहान: " + smallStock.length + ", मोठी: " + bigStock.length + ")";
+        title = "उपलब्ध M.B. स्टॉक (एकूण: " + stock.length + " | लहान: " + smallStock + ", मोठी: " + bigStock + ")";
         if (availableList.length === 0) {
           listHTML = '<p style="text-align:center; padding:15px; color:#666;">सध्या एकही M.B. उपलब्ध नाही.</p>';
         } else {
@@ -1157,7 +1187,7 @@
         if (!no) return showAlert('कृपया M.B. क्रमांक भरा.');
 
         var recType = document.getElementById('mbReceivedType').value;
-        if (!recType) return showAlert('कृपया नवीन किंवा चालू पर्याय निवडा.');
+        if (!recType) return alert('कृपया नवीन किंवा चालू पर्याय निवडा.');
 
         if (recType === 'नवीन') {
           subDetail = document.getElementById('bhandarpalNameInput').value.trim();
@@ -1254,7 +1284,7 @@
       }
     }
 
-    /* ==================== कामांची यादी (Work List) लॉजिक व MB Lock / Release ==================== */
+    /* ==================== कामांची यादी (Work List) लॉजिक ==================== */
     function onWorkJEChange() {
       var je = document.getElementById('workJE').value;
       var mbSel = document.getElementById('workMB');
