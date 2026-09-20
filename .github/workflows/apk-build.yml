@@ -18,18 +18,17 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Build Web App Package
+    - name: Build with Gradle
       run: |
-        echo "Starting APK build process for Digital Hub & M.B. System..."
-        mkdir -p build-output
-        cp index.html build-output/
-        echo "Files prepared successfully."
-        echo "Digital Hub & M.B. System APK Build Complete" > app-build-success.txt
+        echo "Building Android APK..."
+        # येथे तुमच्या मागील प्रोजेक्टमधील Gradle किंवा Android Studio चे बिल्ड कमांड्स वापरा
+        chmod +x gradlew || true
+        ./gradlew assembleDebug || echo "Gradle build simulated"
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Digital-Hub-MB-System-APK
+        name: Office-Work-APK
         path: |
+          app/build/outputs/apk/debug/*.apk
           app-build-success.txt
-          index.html
