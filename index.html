@@ -82,22 +82,23 @@
 </head>
 <body>
 
-  <div id="customAlertModal" class="custom-alert-overlay">
-    <div class="custom-alert-card">
-      <div class="custom-alert-msg" id="customAlertText">मेसेज येथे येईल</div>
-      <button class="custom-alert-btn" onclick="closeCustomAlert()">OK</button>
+  <!-- कस्टम अलर्ट बॉक्स -->
+  <div id="customAlertModal" class="custom-alert-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:3000; justify-content:center; align-items:center; padding:15px;">
+    <div class="custom-alert-card" style="background:#fff; border-radius:10px; width:100%; max-width:320px; padding:20px; text-align:center;">
+      <div class="custom-alert-msg" id="customAlertText" style="font-size:14px; font-weight:700; margin-bottom:18px;">मेसेज येथे येईल</div>
+      <button class="custom-alert-btn" style="background:#0d47a1; color:#fff; border:none; border-radius:5px; padding:8px 25px; font-weight:700; cursor:pointer;" onclick="closeCustomAlert()">OK</button>
     </div>
   </div>
 
   <!-- DIGITAL HUB मुख्य पान -->
   <div id="digitalHubSection">
     <div class="hub-header">
-      <div class="header-space"></div>
+      <div class="header-space" style="width:30px;"></div>
       <div class="hub-title-box">
         <h1>Digital Hub</h1>
-        <p>ONE PLATFORM | MANY SOLUTIONS</p>
+        <p style="font-size:9px; color:#7ce8ff; letter-spacing:1.8px; font-weight:600;">ONE PLATFORM | MANY SOLUTIONS</p>
       </div>
-      <div class="profile-icon" onclick="openProfileModal()">👤</div>
+      <div class="profile-icon" onclick="openProfileModal()" style="font-size:26px; color:#00e5ff; cursor:pointer;">👤</div>
     </div>
 
     <div class="tabs-wrapper">
@@ -109,19 +110,28 @@
     </div>
 
     <div class="center-stage">
-      <div class="suvichar-running-box">
+      <div class="suvichar-running-box" style="width:100%; margin:2px 0 8px 0; overflow:hidden; white-space:nowrap;">
         <marquee behavior="scroll" direction="left" scrollamount="4">
-          <span class="suvichar-text">✨ कष्टाशिवाय यशाला मोल नाही, सातत्य आणि प्रामाणिकपणा हीच यशाची खरी गुरुकिल्ली आहे! ✨</span>
+          <span class="suvichar-text" style="color:#00e5ff; font-weight:800; font-size:14px;">✨ कष्टाशिवाय यशाला मोल नाही, सातत्य आणि प्रामाणिकपणा हीच यशाची खरी गुरुकिल्ली आहे! ✨</span>
         </marquee>
       </div>
       <div class="podium-stage-box">
         <img src="home-bg.jpg" onerror="this.onerror=null; this.src='1000320439_2.png';" class="avatar-on-podium" alt="User Photo">
         <div class="podium-base-layer"></div>
       </div>
-      <div class="stage-bottom-text">
-        <div class="text-smart-strong">SMART TOOLS <span>STRONGER</span> WORK</div>
-        <div class="text-created-by">Created by Vitthal Kokate Patil</div>
+      <div class="stage-bottom-text" style="text-align:center; margin-top:10px;">
+        <div class="text-smart-strong" style="font-size:12.5px; font-weight:800; letter-spacing:2.5px; color:#fff;">SMART TOOLS <span style="color:#00e5ff;">STRONGER</span> WORK</div>
+        <div class="text-created-by" style="font-size:10.5px; color:#8be4ff; margin-top:5px; font-weight:600;">Created by Vitthal Kokate Patil</div>
       </div>
+    </div>
+  </div>
+
+  <!-- प्रोफाईल पॉपअप -->
+  <div id="profileModal" class="profile-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,5,15,0.85); z-index:1000; justify-content:center; align-items:center; padding:15px;">
+    <div class="profile-card" style="background:#051d3b; border:2px solid #00e5ff; border-radius:18px; width:100%; max-width:380px; padding:24px 20px; text-align:center; position:relative;">
+      <div class="profile-card-close" onclick="closeProfileModal()" style="position:absolute; right:12px; top:12px; color:#ff3d57; font-weight:800; cursor:pointer;">✕</div>
+      <div class="profile-name" style="font-size:20px; font-weight:800; color:#ffffff; margin-bottom:2px;">विठ्ठल रघुनाथ कोकाटे</div>
+      <div class="profile-title-tag" style="font-size:11px; color:#00e5ff; font-weight:700; text-transform:uppercase; margin-bottom:12px;">सार्वजनिक बांधकाम विभाग</div>
     </div>
   </div>
 
@@ -156,7 +166,10 @@
     <!-- 1. JE मॉडेल -->
     <div id="jeModal" class="modal-overlay"><div class="modal-card">
       <div class="modal-header"><h3 style="font-size: 14px; color:#1976d2;">👷 कनिष्ठ अभियंता (JE) व्यवस्थापन</h3><button class="btn-close" onclick="closeModule('jeModal')">X</button></div>
-      <table class="data-table"><thead><tr><th>अ.क्र.</th><th>नाव</th></tr></thead><tbody id="jeListBody"></tbody></table>
+      <input type="hidden" id="editJEIndex" value="-1">
+      <div class="form-group"><label>कनिष्ठ अभियंत्याचे पूर्ण नाव *</label><input type="text" class="form-control" id="newJEName" placeholder="उदा. श्री. ए. बी. पाटील"></div>
+      <div style="display:flex; gap:6px;"><button id="btnSaveJE" class="btn-report" style="background:#1976d2; flex:1;" onclick="saveOrUpdateJE()">Save JE</button><button id="btnCancelJE" class="btn-report" style="background:#757575; width:80px; display:none;" onclick="cancelJEEdit()">रद्द करा</button></div>
+      <table class="data-table"><thead><tr><th>अ.क्र.</th><th>नाव</th><th style="width:25%; text-align:center;">Action</th></tr></thead><tbody id="jeListBody"></tbody></table>
     </div></div>
 
     <!-- 2. M.B. नोंद मॉडेल -->
@@ -189,6 +202,7 @@
     <!-- 5. Assign मॉडेल -->
     <div id="assignModal" class="modal-overlay"><div class="modal-card">
       <div class="modal-header"><h3 style="font-size: 14px; color:#7b1fa2;">📁 M.B. वाटप (Assign)</h3><button class="btn-close" onclick="closeModule('assignModal')">X</button></div>
+      <table class="data-table"><thead><tr><th>M.B.</th><th>JE</th><th>दिनांक</th></tr></thead><tbody id="assignListBody"></tbody></table>
     </div></div>
 
     <!-- 6. सेटिंग्स मॉडेल -->
