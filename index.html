@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Digital Hub & M.B. System</title>
-<!-- html2pdf लायब्ररी (थेट PDF डाऊनलोड करण्यासाठी) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 ​#digitalHubSection {
@@ -121,6 +119,15 @@ min-width: 450px;
 .preview-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #eee; }
 ​.sum-card-clickable { background: #fff; border: 1px solid #bbdefb; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
 .sum-card-clickable:hover { background: #e3f2fd; }
+​@media print {
+body * { visibility: hidden; }
+#printableArea, #printableArea * { visibility: visible; }
+#printableArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 2mm; }
+@page { size: A4 portrait; margin: 4mm; }
+.print-table { width: 100%; border-collapse: collapse; font-size: 10pt; page-break-inside: avoid; }
+.print-table th, .print-table td { border: 1px solid #222; padding: 4px 5px; text-align: left; }
+.print-table th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+}
 </style>
 </head>
 <body>
@@ -184,7 +191,6 @@ min-width: 450px;
 <div class="tab-card btn-tab5">Tab-5</div>
 </div>
 ​<div class="center-stage">
-<!-- फिरता सुविचार बॉक्स -->
 <div class="suvichar-running-box">
 <marquee behavior="scroll" direction="left" scrollamount="4" scrolldelay="0">
 <span class="suvichar-text" id="dynamicSuvichar">✨ कष्टाशिवाय यशाला मोल नाही, सातत्य आणि प्रामाणिकपणा हीच यशाची खरी गुरुकिल्ली आहे! ✨</span>
@@ -375,6 +381,7 @@ min-width: 450px;
 </div>
 <button class="btn-report" style="background:#d32f2f; margin-top:10px;" onclick="deleteSelectedData()">निवडलेली माहिती कायमची हटवा</button>
 </div></div>
+​<div id="printableArea" style="display:none;"></div>
 </div>
 ​<!-- बिल विझार्ड मॉडेल (4-Step) -->
 <div id="wizardModal" class="wizard-overlay"><div class="wizard-card">
@@ -594,8 +601,8 @@ document.getElementById('quickModalBody').innerHTML = listHTML;
 var contentTitle = document.getElementById('quickModalTitle').innerText;
 var tableHTML = document.getElementById('quickModalBody').innerHTML;
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-var html = '<div style="padding:15px; font-family:Arial,sans-serif;"><div style="text-align:center; margin-bottom:10px;"><h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:13px; font-weight:700; margin:4px 0;">' + contentTitle + '</h2></div><div style="text-align:right; font-size:11px; margin-bottom:10px;">अहवाल दिनांक: ' + todayStr + '</div>' + tableHTML + '</div>';
-generatePDFFromHTML(html, contentTitle + '.pdf');
+var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; padding-bottom:6px;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + contentTitle + '</h2></div><div style="text-align:right; font-size:11.5px;">अहवाल दिनांक: ' + todayStr + '</div></div>' + tableHTML;
+printA4Document(html);
 }
 ​const marathiSuvicharList = [
 "✨ कष्टाशिवाय यशाला मोल नाही, सातत्य आणि प्रामाणिकपणा हीच यशाची खरी गुरुकिल्ली आहे! ✨",
@@ -1214,18 +1221,38 @@ return 0;
 ​var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var rawName = (subVal && subVal !== 'सर्व') ? subVal.replace(/^श्री.?\s*/i, '') : "";
 var personHeaderName = rawName ? "श्री. " + rawName : "";
-​var html = '<div style="padding:15px; font-family:Arial,sans-serif;"><div style="text-align:center; margin-bottom:10px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:13px; font-weight:700; margin:4px 0;">' + reportTitle + '</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-bottom:10px;"><div>' + (personHeaderName ? '<strong style="font-size:11.5px;">' + personHeaderName + '</strong>
-' : '') + 'अहवाल दिनांक: ' + todayStr + '</div></div><table border="1" style="width:100%; border-collapse:collapse; font-size:11px;"><thead><tr style="background:#f5f5f5;"><th style="width:10%; text-align:center; padding:6px;">अ.क्र.</th><th style="width:30%; padding:6px;">मोजमाप पुस्तिका क्रमांक</th><th style="width:25%; text-align:center; padding:6px;">प्रकार (आकार)</th><th style="width:35%; padding:6px;">सध्यस्थिती</th></tr></thead><tbody>';
+​var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;">' +
+'<div style="text-align:center; margin-bottom:4px;">' +
+'<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
+'<h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + reportTitle + '</h2>' +
+'</div>' +
+'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
+'<div>' + (personHeaderName ? '<strong style="font-size:11.5px;">' + personHeaderName + '</strong>
+' : '') + 'अहवाल दिनांक: ' + todayStr + '</div>' +
+'</div>' +
+'</div>' +
+'<table class="print-table">' +
+'<thead><tr>' +
+'<th style="width:10%; text-align:center;">अ.क्र.</th>' +
+'<th style="width:30%;">मोजमाप पुस्तिका क्रमांक</th>' +
+'<th style="width:25%; text-align:center;">प्रकार (आकार)</th>' +
+'<th style="width:35%;">सध्यस्थिती</th>' +
+'</tr></thead><tbody>';
 ​filtered.forEach(function(item, idx) {
 var mbNo = item.mbNumber || item.mbNo;
 var size = item.size || 'लहान M.B.';
 var assignedPerson = item.receivedDetail || item.receivedSource || 'संबंधित';
 var cleanPersonName = assignedPerson.replace(/^श्री.?\s*/i, '');
 var currentStatus = "श्री. " + cleanPersonName + " यांच्याकडे आहे";
-​html += '<tr><td style="text-align:center; padding:6px;">' + (idx + 1) + '</td><td style="padding:6px;"><strong>' + mbNo + '</strong></td><td style="text-align:center; padding:6px;">' + size + '</td><td style="padding:6px;">' + currentStatus + '</td></tr>';
+​html += '<tr>' +
+'<td style="text-align:center;">' + (idx + 1) + '</td>' +
+'<td><strong>' + mbNo + '</strong></td>' +
+'<td style="text-align:center;">' + size + '</td>' +
+'<td>' + currentStatus + '</td>' +
+'</tr>';
 });
-​html += '</tbody></table></div>';
-generatePDFFromHTML(html, reportTitle + '.pdf');
+​html += '</tbody></table>';
+printA4Document(html);
 }
 ​function generateJEReports(subType, sizeFilter, fDate, tDate) {
 var jeList = getData('je_records');
@@ -1233,13 +1260,22 @@ var targetJEList = (subType === 'ALL_JE') ? jeList.map(function(j){ return j.nam
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var rawName = (subType !== 'ALL_JE') ? subType.replace(/^श्री.?\s*/i, '') : "";
 var personHeaderName = rawName ? "श्री. " + rawName : "सर्व कनिष्ठ अभियंता";
-​var html = '<div style="padding:15px; font-family:Arial,sans-serif;"><div style="text-align:center; margin-bottom:10px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:13px; font-weight:700; margin:4px 0;">कनिष्ठ अभियंता यादी व अहवाल</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-bottom:10px;"><div><strong style="font-size:11.5px;">' + personHeaderName + '</strong>
-अहवाल दिनांक: ' + todayStr + '</div></div><table border="1" style="width:100%; border-collapse:collapse; font-size:11px;"><thead><tr style="background:#f5f5f5;"><th style="text-align:center; width:15%; padding:6px;">अ.क्र.</th><th style="padding:6px;">कनिष्ठ अभियंता (JE) यांचे नाव</th></tr></thead><tbody>';
+​var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;">' +
+'<div style="text-align:center; margin-bottom:4px;">' +
+'<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
+'<h2 style="font-size:12px; font-weight:700; margin:2px 0;">कनिष्ठ अभियंता यादी व अहवाल</h2>' +
+'</div>' +
+'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
+'<div><strong style="font-size:11.5px;">' + personHeaderName + '</strong>
+अहवाल दिनांक: ' + todayStr + '</div>' +
+'</div>' +
+'</div>' +
+'<table class="print-table"><thead><tr><th style="text-align:center; width:15%;">अ.क्र.</th><th>कनिष्ठ अभियंता (JE) यांचे नाव</th></tr></thead><tbody>';
 ​targetJEList.forEach(function(name, i) {
-html += '<tr><td style="text-align:center; padding:6px;">' + (i+1) + '</td><td style="padding:6px;"><strong>' + name + '</strong></td></tr>';
+html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td><strong>' + name + '</strong></td></tr>';
 });
-​html += '</tbody></table></div>';
-generatePDFFromHTML(html, 'JE_Report.pdf');
+​html += '</tbody></table>';
+printA4Document(html);
 }
 ​function generateBillReports(subType, fDate, tDate) {
 var bills = getData('dmbms_bills');
@@ -1251,27 +1287,45 @@ renderBillTableHTML(bills, '', 'देयक नोंदवही अहवा�
 }
 ​function renderBillTableHTML(billsList, preHTML, title) {
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-var html = preHTML + '<div style="padding:15px; font-family:Arial,sans-serif;"><div style="text-align:center; margin-bottom:10px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:13px; font-weight:700; margin:4px 0;">' + title + '</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-bottom:10px;"><div><strong style="font-size:11.5px;">देयक नोंदवही</strong>
-अहवाल दिनांक: ' + todayStr + '</div></div><table border="1" style="width:100%; border-collapse:collapse; font-size:11px;"><thead><tr style="background:#f5f5f5;"><th style="text-align:center; padding:6px;">अ.क्र.</th><th style="padding:6px;">कंत्राटदार</th><th style="padding:6px;">कामाचे नाव</th><th style="padding:6px;">JE</th><th style="text-align:center; padding:6px;">M.B.</th><th style="padding:6px;">बिल प्रकार</th><th style="text-align:right; padding:6px;">रक्कम (₹)</th></tr></thead><tbody>';
+var html = preHTML + '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;">' +
+'<div style="text-align:center; margin-bottom:4px;">' +
+'<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
+'<h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + title + '</h2>' +
+'</div>' +
+'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
+'<div><strong style="font-size:11.5px;">देयक नोंदवही</strong>
+अहवाल दिनांक: ' + todayStr + '</div>' +
+'</div>' +
+'</div>' +
+'<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>कंत्राटदार</th><th>कामाचे नाव</th><th>JE</th><th style="text-align:center;">M.B.</th><th>बिल प्रकार</th><th style="text-align:right;">रक्कम (₹)</th></tr></thead><tbody>';
 var total = 0;
 billsList.forEach(function(b, i) {
 var amt = parseFloat(b.amount) || parseFloat(b.passedAmt) || 0;
 total += amt;
-html += '<tr><td style="text-align:center; padding:6px;">' + (i+1) + '</td><td style="padding:6px;">' + b.contractor + '</td><td style="padding:6px;">' + (b.workName || b.work || '-') + '</td><td style="padding:6px;">' + b.je + '</td><td style="text-align:center; padding:6px;">' + (b.mbNo || b.mb || '-') + '</td><td style="padding:6px;">' + b.billType + '</td><td style="text-align:right; padding:6px;">₹ ' + amt.toLocaleString('en-IN') + '</td></tr>';
+html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + b.contractor + '</td><td>' + (b.workName || b.work || '-') + '</td><td>' + b.je + '</td><td style="text-align:center;">' + (b.mbNo || b.mb || '-') + '</td><td>' + b.billType + '</td><td style="text-align:right;">₹ ' + amt.toLocaleString('en-IN') + '</td></tr>';
 });
-html += '<tr style="font-weight:750; background:#eee;"><td colspan="6" style="text-align:right; padding:6px;">एकूण रक्कम:</td><td style="text-align:right; padding:6px;">₹ ' + total.toLocaleString('en-IN') + '</td></tr></tbody></table></div>';
-generatePDFFromHTML(html, 'Bill_Register_Report.pdf');
+html += '<tr style="font-weight:750; background:#eee;"><td colspan="6" style="text-align:right;">एकूण रक्कम:</td><td style="text-align:right;">₹ ' + total.toLocaleString('en-IN') + '</td></tr></tbody></table>';
+printA4Document(html);
 }
 ​function generateWorkReport(fDate, tDate) {
 var works = getData('work_records');
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-var html = '<div style="padding:15px; font-family:Arial,sans-serif;"><div style="text-align:center; margin-bottom:10px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:13px; font-weight:700; margin:4px 0;">कामांची यादी (Work Register)</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-bottom:10px;"><div><strong style="font-size:11.5px;">कामांची यादी</strong>
-अहवाल दिनांक: ' + todayStr + '</div></div><table border="1" style="width:100%; border-collapse:collapse; font-size:11px;"><thead><tr style="background:#f5f5f5;"><th style="text-align:center; padding:6px;">अ.क्र.</th><th style="padding:6px;">कामाचे नाव</th><th style="padding:6px;">JE</th><th style="padding:6px;">कंत्राटदार</th><th style="padding:6px;">स्थिती</th><th style="text-align:center; padding:6px;">M.B. क्र.</th></tr></thead><tbody>';
+var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;">' +
+'<div style="text-align:center; margin-bottom:4px;">' +
+'<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
+'<h2 style="font-size:12px; font-weight:700; margin:2px 0;">कामांची यादी (Work Register)</h2>' +
+'</div>' +
+'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
+'<div><strong style="font-size:11.5px;">कामांची यादी</strong>
+अहवाल दिनांक: ' + todayStr + '</div>' +
+'</div>' +
+'</div>' +
+'<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>कामाचे नाव</th><th>JE</th><th>कंत्राटदार</th><th>स्थिती</th><th style="text-align:center;">M.B. क्र.</th></tr></thead><tbody>';
 works.forEach(function(w, i) {
-html += '<tr><td style="text-align:center; padding:6px;">' + (i+1) + '</td><td style="padding:6px;">' + w.name + '</td><td style="padding:6px;">' + w.je + '</td><td style="padding:6px;">' + w.contractor + '</td><td style="padding:6px;">' + (w.status || 'अपूर्ण') + '</td><td style="text-align:center; padding:6px;">' + w.mbNo + '</td></tr>';
+html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + w.name + '</td><td>' + w.je + '</td><td>' + w.contractor + '</td><td>' + (w.status || 'अपूर्ण') + '</td><td style="text-align:center;">' + w.mbNo + '</td></tr>';
 });
-html += '</tbody></table></div>';
-generatePDFFromHTML(html, 'Work_List_Report.pdf');
+html += '</tbody></table>';
+printA4Document(html);
 }
 ​function generateSmartSearchReport(query, fDate, tDate) {
 var bills = getData('dmbms_bills').filter(function(b) {
@@ -1279,18 +1333,12 @@ return (b.mbNo && b.mbNo.toLowerCase().includes(query)) || (b.je && b.je.toLower
 });
 renderBillTableHTML(bills, '', 'स्मार्ट शोध अहवाल (शोध: ' + query + ')');
 }
-​/* html2pdf लायब्ररी वापरून थेट PDF डाऊनलोड करण्याचे अचूक फंक्शन */
-function generatePDFFromHTML(htmlContent, fileName) {
-var element = document.createElement('div');
-element.innerHTML = htmlContent;
-​var opt = {
-margin:       5,
-filename:     fileName || 'Office_Report.pdf',
-image:        { type: 'jpeg', quality: 0.98 },
-html2canvas:  { scale: 2, useCORS: true },
-jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-};
-​html2pdf().from(element).set(opt).save();
+​function printA4Document(content) {
+var p = document.getElementById('printableArea');
+p.innerHTML = content;
+p.style.display = 'block';
+window.print();
+p.style.display = 'none';
 }
 ​function saveOrUpdateJE() {
 var name = document.getElementById('newJEName').value.trim();
