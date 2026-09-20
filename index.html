@@ -332,7 +332,7 @@
         </div>
       </div>
 
-      <!-- सविस्तर रिपोर्ट फिल्टर कार्ड -->
+      <!-- सविस्तर रिपोर्ट फिल्टर कार्ड (पूर्णपणे सुधारित प्लेसहोलर रचना) -->
       <div class="filter-card">
         <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
         
@@ -372,7 +372,7 @@
           <select class="form-control" id="repDynamicSelect2" onchange="onDynamicSelect2Change()"></select>
         </div>
 
-        <!-- स्टेप ३: वाटप कोणाला केले -->
+        <!-- स्टेप ३: वाटप कोणाला केले (फक्त कनिष्ठ अभियंता आणि विभागीय कार्यालय) -->
         <div class="form-group" id="dynamicOptionGroup3" style="display:none;">
           <label id="lblDynamic3">वाटप कोणाला केले?</label>
           <select class="form-control" id="repDynamicSelect3" onchange="onDynamicSelect3Change()">
@@ -940,7 +940,6 @@
       var rawName = subVal ? subVal.replace(/^श्री\.?\s*/i, '') : "";
       var personHeaderName = rawName ? "श्री. " + rawName : "";
 
-      // अंतिम सुधारित रिपोर्ट लेआउट (शीर्षक स्वच्छ ठेवले आहे आणि शेवटच्या कॉलममध्ये "यांच्याकडे आहे" असा उल्लेख केला आहे)
       var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
                    '<div style="text-align:center; margin-bottom:4px;">' +
                      '<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
@@ -981,30 +980,35 @@
     function generateJEReports(subType, sizeFilter, fDate, tDate) {
       var assigns = getData('assign_records');
       var mbList = getData('mb_records');
-      if (subType !== 'ALL_JE') assigns = assigns.filter(function(a){ return a.jeName === subType; });
+      var jeList = getData('je_records');
 
-      var mapped = assigns.map(function(a) {
-        var found = mbList.find(function(m){ return m.mbNumber === a.mbNo; });
-        return { jeName: a.jeName, mbNo: a.mbNo, size: found ? found.size : 'लहान M.B.', date: a.assignDate };
-      });
+      // जेव्हा "सर्व कनिष्ठ अभियंते (All JE Combined)" निवडले जाईल, तेव्हा सर्व JE ची यादी दाखवणे
+      var targetJEList = [];
+      if (subType === 'ALL_JE') {
+        targetJEList = jeList.map(function(j){ return j.name; });
+      } else {
+        targetJEList = [subType];
+      }
 
       var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-      var rawName = subType !== 'ALL_JE' ? subType.replace(/^श्री\.?\s*/i, '') : "";
-      var personHeaderName = rawName ? "श्री. " + rawName : "सर्व कनिष्ठ अभियंता";
+      var rawName = (subType !== 'ALL_JE') ? subType.replace(/^श्री\.?\s*/i, '') : "";
+      var personHeaderName = rawName ? "श्री. " + rawName : "कनिष्ठ अभियंता सूची";
 
       var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
                    '<div style="text-align:center; margin-bottom:4px;">' +
                      '<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
-                     '<h2 style="font-size:12px; font-weight:700; margin:2px 0;">कनिष्ठ अभियंता (JE) निहाय वाटप अहवाल</h2>' +
+                     '<h2 style="font-size:12px; font-weight:700; margin:2px 0;">कनिष्ठ अभियंता यादी व अहवाल</h2>' +
                    '</div>' +
                    '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
                      '<div><strong style="font-size:11.5px;">' + personHeaderName + '</strong><br>अहवाल दिनांक: ' + todayStr + '</div>' +
                    '</div>' +
                  '</div>' +
-                 '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>JE चे नाव</th><th>M.B. क्र.</th><th>आकार</th><th style="text-align:center;">दिनांक</th></tr></thead><tbody>';
-      mapped.forEach(function(r, i) {
-        html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + r.jeName + '</td><td>' + r.mbNo + '</td><td>' + r.size + '</td><td style="text-align:center;">' + formatDateToDMY(r.date) + '</td></tr>';
+                 '<table class="print-table"><thead><tr><th style="text-align:center; width:15%;">अ.क्र.</th><th>कनिष्ठ अभियंता (JE) यांचे नाव</th></tr></thead><tbody>';
+      
+      targetJEList.forEach(function(name, i) {
+        html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td><strong>' + name + '</strong></td></tr>';
       });
+
       html += '</tbody></table>';
       printA4Document(html);
     }
