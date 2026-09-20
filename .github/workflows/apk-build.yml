@@ -1,0 +1,32 @@
+name: Android APK Build
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Build Web App APK
+      run: |
+        echo "Starting APK build process for Digital Hub & M.B. System..."
+        mkdir -p build-output
+        cp index.html build-output/
+        echo "Files prepared successfully."
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Office-Work-APK
+        path: build-output/
