@@ -332,7 +332,7 @@
         </div>
       </div>
 
-      <!-- सविस्तर रिपोर्ट फिल्टर कार्ड -->
+      <!-- सविस्तर रिपोर्ट फिल्टर कार्ड (नवीन प्लेसहोलर डिझाईनसह) -->
       <div class="filter-card">
         <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
         
@@ -351,6 +351,7 @@
         <div class="form-group">
           <label>मुख्य घटक</label>
           <select class="form-control" id="repMainCategory" onchange="onMainCategoryChange()">
+            <option value="">-- मुख्य घटक निवडा --</option>
             <option value="M.B.">M.B.</option>
             <option value="J.E.">J.E.</option>
             <option value="Bill">Bill</option>
@@ -371,10 +372,11 @@
           <select class="form-control" id="repDynamicSelect2" onchange="onDynamicSelect2Change()"></select>
         </div>
 
-        <!-- स्टेप ३: वाटप कोणाला केले (फक्त कनिष्ठ अभियंता आणि विभागीय कार्यालय, 'इतर' काढून टाकले) -->
+        <!-- स्टेप ३: वाटप कोणाला केले (फक्त कनिष्ठ अभियंता आणि विभागीय कार्यालय) -->
         <div class="form-group" id="dynamicOptionGroup3" style="display:none;">
           <label id="lblDynamic3">वाटप कोणाला केले?</label>
           <select class="form-control" id="repDynamicSelect3" onchange="onDynamicSelect3Change()">
+            <option value="">-- वाटप कोणाला केले निवडा --</option>
             <option value="JE">कनिष्ठ अभियंता</option>
             <option value="Office">विभागीय कार्यालय</option>
           </select>
@@ -765,21 +767,21 @@
       if (mainCat === 'M.B.') {
         grp1.style.display = 'block';
         document.getElementById('lblDynamic1').innerText = 'M.B. प्रकार निवडा';
-        sel1.add(new Option('All M.B.', 'All M.B.'));
-        sel1.add(new Option('Small M.B.', 'Small M.B.'));
-        sel1.add(new Option('Big M.B.', 'Big M.B.'));
-        onDynamicSelect1Change();
+        sel1.innerHTML = '<option value="">-- M.B. प्रकार निवडा --</option>' +
+                         '<option value="All M.B.">All M.B.</option>' +
+                         '<option value="Small M.B.">Small M.B.</option>' +
+                         '<option value="Big M.B.">Big M.B.</option>';
       } else if (mainCat === 'J.E.') {
         grp1.style.display = 'block';
         document.getElementById('lblDynamic1').innerText = 'कनिष्ठ अभियंता निवडा';
-        sel1.add(new Option('सर्व कनिष्ठ अभियंते (All JE Combined)', 'ALL_JE'));
+        sel1.innerHTML = '<option value="">-- कनिष्ठ अभियंता निवडा --</option><option value="ALL_JE">सर्व कनिष्ठ अभियंते (All JE Combined)</option>';
         getData('je_records').forEach(function(j) {
           sel1.add(new Option(j.name, j.name));
         });
       } else if (mainCat === 'Bill') {
         grp1.style.display = 'block';
         document.getElementById('lblDynamic1').innerText = 'देयक प्रकार निवडा';
-        sel1.add(new Option('सर्व देयक नोंदी (Master Bill Register)', 'ALL_BILLS'));
+        sel1.innerHTML = '<option value="">-- देयक प्रकार निवडा --</option><option value="ALL_BILLS">सर्व देयक नोंदी (Master Bill Register)</option>';
         getData('je_records').forEach(function(j) {
           sel1.add(new Option(j.name + ' - बिले', 'JE_BILLS:' + j.name));
         });
@@ -790,16 +792,16 @@
       var mainCat = document.getElementById('repMainCategory').value;
       var grp2 = document.getElementById('dynamicOptionGroup2');
       var sel2 = document.getElementById('repDynamicSelect2');
+      var val1 = document.getElementById('repDynamicSelect1').value;
 
-      if (mainCat === 'M.B.') {
+      if (mainCat === 'M.B.' && val1 !== '') {
         grp2.style.display = 'block';
         document.getElementById('lblDynamic2').innerText = 'एम.बी. सविस्तर स्थिती';
-        sel2.innerHTML = '';
-        sel2.add(new Option('सर्व M.B. (All M.B.)', 'ALL'));
-        sel2.add(new Option('उपलब्ध M.B. (Available)', 'AVAILABLE'));
-        sel2.add(new Option('वाटप केलेली M.B. (Given)', 'GIVEN'));
-        sel2.add(new Option('मिळालेली M.B. (Received)', 'RECEIVED'));
-        onDynamicSelect2Change();
+        sel2.innerHTML = '<option value="">-- एम.बी. सविस्तर स्थिती निवडा --</option>' +
+                         '<option value="ALL">सर्व M.B. (All M.B.)</option>' +
+                         '<option value="AVAILABLE">उपलब्ध M.B. (Available)</option>' +
+                         '<option value="GIVEN">वाटप केलेली M.B. (Given)</option>' +
+                         '<option value="RECEIVED">मिळालेली M.B. (Received)</option>';
       } else {
         grp2.style.display = 'none';
       }
@@ -812,7 +814,8 @@
 
       if (mainCat === 'M.B.' && sel2Val === 'GIVEN') {
         grp3.style.display = 'block';
-        onDynamicSelect3Change();
+        document.getElementById('repDynamicSelect3').value = "";
+        document.getElementById('dynamicInputGroup').style.display = 'none';
       } else {
         grp3.style.display = 'none';
         document.getElementById('dynamicInputGroup').style.display = 'none';
@@ -832,12 +835,12 @@
         inputGrp.style.display = 'block';
         lblInput.innerText = 'कनिष्ठ अभियंता (JE) निवडा';
         jeListSel.style.display = 'block';
-        jeListSel.innerHTML = '<option value="">-- सर्व JE --</option>';
+        jeListSel.innerHTML = '<option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option>';
         getData('je_records').forEach(function(j) {
           jeListSel.add(new Option(j.name, j.name));
         });
       } else if (targetType === 'Office') {
-        inputGrp.style.display = 'none'; // विभागीय कार्यालय निवडल्यास अतिरिक्त बॉक्स नाही
+        inputGrp.style.display = 'none';
       }
     }
 
@@ -855,12 +858,15 @@
       if (mainCat === 'M.B.') {
         var sizeChoice = document.getElementById('repDynamicSelect1').value;
         var finalType = document.getElementById('repDynamicSelect2').value;
-        var givenSubTarget = '', givenSubValue = '';
+        if (!sizeChoice || !finalType) return alert('कृपया सर्व आवश्यक पर्याय निवडा.');
 
+        var givenSubTarget = '', givenSubValue = '';
         if (finalType === 'GIVEN') {
           givenSubTarget = document.getElementById('repDynamicSelect3').value;
+          if (!givenSubTarget) return alert('कृपया "वाटप कोणाला केले?" ते निवडा.');
           if (givenSubTarget === 'JE') {
             givenSubValue = document.getElementById('repDynamicJEList').value;
+            if (!givenSubValue) return alert('कृपया कनिष्ठ अभियंता (JE) निवडा.');
           } else if (givenSubTarget === 'Office') {
             givenSubValue = 'विभागीय कार्यालय';
           }
@@ -869,9 +875,11 @@
         generateAdvancedMBReport(sizeChoice, finalType, givenSubTarget, givenSubValue, fDate, tDate);
       } else if (mainCat === 'J.E.') {
         var sub = document.getElementById('repDynamicSelect1').value;
+        if (!sub) return alert('कृपया कनिष्ठ अभियंता निवडा.');
         generateJEReports(sub, 'ALL', fDate, tDate);
       } else if (mainCat === 'Bill') {
         var sub = document.getElementById('repDynamicSelect1').value;
+        if (!sub) return alert('कृपया देयक प्रकार निवडा.');
         generateBillReports(sub, fDate, tDate);
       } else if (mainCat === 'Contractor' || mainCat === 'Agency') {
         generateWorkReport(fDate, tDate);
@@ -908,7 +916,7 @@
           }
           return true;
         });
-        reportTitle = "दिलेली मोजमाप पुस्तिका अहवाल" + (subVal ? " (" + subVal + ")" : "");
+        reportTitle = "दिलेली मोजमाप पुस्तिका अहवाल";
       } else if (finalType === 'RECEIVED') {
         filtered = filtered.filter(function(m) { return m.actionType === 'मिळालेली एमबी'; });
         reportTitle = "मिळालेली मोजमाप पुस्तिका अहवाल";
@@ -926,15 +934,14 @@
 
       var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
       
-      // श्री. चे डुप्लिकेशन पूर्णपणे टाळून अचूक नाव दर्शवणे
       var rawName = subVal ? subVal.replace(/^श्री\.?\s*/i, '') : "";
       var personHeaderName = rawName ? "श्री. " + rawName : "";
 
-      // अंतिम सुधारित रिपोर्ट लेआउट (शीर्षक मध्यभागी, डाव्या बाजूला नाव आणि खाली दिनांक)
-      var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; padding-bottom:6px;">' +
+      // अंतिम सुधारित रिपोर्ट लेआउट (अनावश्‍यक दुसरे पेज टाळण्यासाठी strict CSS व structure)
+      var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
                    '<div style="text-align:center; margin-bottom:4px;">' +
                      '<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
-                     '<h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + reportTitle + ' (' + sizeChoice + ')</h2>' +
+                     '<h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + reportTitle + '</h2>' +
                    '</div>' +
                    '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
                      '<div>' + (personHeaderName ? '<strong style="font-size:11.5px;">' + personHeaderName + '</strong><br>' : '') + 'अहवाल दिनांक: ' + todayStr + '</div>' +
@@ -982,7 +989,7 @@
       var rawName = subType !== 'ALL_JE' ? subType.replace(/^श्री\.?\s*/i, '') : "";
       var personHeaderName = rawName ? "श्री. " + rawName : "सर्व कनिष्ठ अभियंता";
 
-      var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; padding-bottom:6px;">' +
+      var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
                    '<div style="text-align:center; margin-bottom:4px;">' +
                      '<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
                      '<h2 style="font-size:12px; font-weight:700; margin:2px 0;">कनिष्ठ अभियंता (JE) निहाय वाटप अहवाल</h2>' +
@@ -1010,7 +1017,7 @@
 
     function renderBillTableHTML(billsList, preHTML, title) {
       var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-      var html = preHTML + '<div style="margin-bottom:12px; border-bottom:2px solid #333; padding-bottom:6px;">' +
+      var html = preHTML + '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
                  '<div style="text-align:center; margin-bottom:4px;">' +
                    '<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
                    '<h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + title + '</h2>' +
@@ -1033,7 +1040,7 @@
     function generateWorkReport(fDate, tDate) {
       var works = getData('work_records');
       var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-      var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; padding-bottom:6px;">' +
+      var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
                  '<div style="text-align:center; margin-bottom:4px;">' +
                    '<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
                    '<h2 style="font-size:12px; font-weight:700; margin:2px 0;">कामांची यादी (Work Register)</h2>' +
