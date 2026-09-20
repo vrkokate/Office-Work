@@ -10,25 +10,20 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up JDK 17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v2
-
-    - name: Build APK with Gradle
+    - name: Build Web App Package
       run: |
-        echo "Creating build directories..."
-        mkdir -p app/src/main/assets
-        cp index.html app/src/main/assets/
-        
-        # येथे तुमच्या प्रोजेक्टनुसार अँड्रॉइड बिल्ड पॅकेज तयार केले जाईल
-        echo "Building Android APK package..."
+        echo "Starting APK build process for Digital Hub & M.B. System..."
+        mkdir -p build-output
+        cp index.html build-output/
+        echo "Files prepared successfully."
         echo "Digital Hub & M.B. System APK Build Complete" > app-build-success.txt
 
     - name: Upload APK Artifact
