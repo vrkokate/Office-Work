@@ -87,7 +87,7 @@
     /* ==================== कस्टम अलर्ट बॉक्स ==================== */
     .custom-alert-overlay {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.6); z-index: 2000; justify-content: center; align-items: center; padding: 15px;
+      background: rgba(0, 0, 0, 0.6); z-index: 3000; justify-content: center; align-items: center; padding: 15px;
     }
     .custom-alert-card {
       background: #ffffff; border-radius: 10px; width: 100%; max-width: 320px;
@@ -233,7 +233,7 @@
     .btn-action { border: none; padding: 4px 8px; border-radius: 3px; font-size: 11px; cursor: pointer; color: #fff; }
 
     /* विझार्ड डिझाइन */
-    .wizard-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 10px; }
+    .wizard-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2500; justify-content: center; align-items: center; padding: 10px; }
     .wizard-card { background: #fff; border-radius: 12px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; padding: 18px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
     .steps-indicator { display: flex; justify-content: space-between; margin-bottom: 18px; padding: 0 20px; }
     .step-dot { width: 28px; height: 28px; border-radius: 50%; background: #ccc; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
@@ -247,6 +247,11 @@
     
     .sum-card-clickable { background: #fff; border: 1px solid #bbdefb; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
     .sum-card-clickable:hover { background: #e3f2fd; }
+
+    .bill-item-card { background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
+    .bill-item-info h4 { font-size: 13.5px; color: #222; font-weight: 700; }
+    .bill-item-info p { font-size: 11.5px; color: #666; margin-top: 2px; }
+    .bill-item-amt { font-size: 14px; font-weight: 700; color: #2e7d32; text-align: right; }
 
     @media print {
       body * { visibility: hidden; }
@@ -440,7 +445,7 @@
       <table class="data-table"><thead><tr><th>अ.क्र.</th><th>काम</th><th>JE</th><th>M.B.</th><th>स्थिती</th><th style="width:20%; text-align:center;">Action</th></tr></thead><tbody id="workListBody"></tbody></table>
     </div></div>
 
-    <!-- 4. Bill Reg. मॉडेल (4-Step Wizard आणि कपात हिशोब सह) -->
+    <!-- 4. Bill Reg. मॉडेल -->
     <div id="billModal" class="modal-overlay"><div class="modal-card" style="max-width:480px;">
       <div class="modal-header"><h3 style="font-size: 14px; color:#f57c00;">📄 देयक नोंदवही (Bill Register)</h3><button class="btn-close" onclick="closeModule('billModal')">X</button></div>
       
@@ -631,8 +636,8 @@
       } else {
         bills.slice().reverse().forEach(function(b) {
           listHTML += '<div class="bill-item-card">' +
-                        '<div class="bill-item-info"><h4>' + b.workName + '</h4><p>' + b.billType + ' | ' + b.date + ' | M.B.: ' + b.mbNo + '</p></div>' +
-                        '<div class="bill-item-amt">₹ ' + parseFloat(b.netPay).toLocaleString('en-IN') + '</div>' +
+                        '<div class="bill-item-info"><h4>' + (b.workName || 'काम') + '</h4><p>' + (b.billType || '-') + ' | ' + (b.date || '-') + ' | M.B.: ' + (b.mbNo || '-') + '</p></div>' +
+                        '<div class="bill-item-amt">₹ ' + parseFloat(b.netPay || 0).toLocaleString('en-IN') + '</div>' +
                       '</div>';
         });
       }
@@ -651,6 +656,14 @@
     function closeWizard() { document.getElementById('wizardModal').style.display = 'none'; }
 
     function goToStep(step) {
+      if(step === 2) {
+        var passed = parseFloat(document.getElementById('wPassedAmt').value);
+        if(!passed || isNaN(passed)) {
+          document.getElementById('wPassedAmt').value = '1000000'; // डिफॉल्ट रक्कम
+        }
+        autoCalculateDeductions();
+      }
+
       document.getElementById('step1').style.display = (step === 1) ? 'block' : 'none';
       document.getElementById('step2').style.display = (step === 2) ? 'block' : 'none';
       document.getElementById('step3').style.display = (step === 3) ? 'block' : 'none';
@@ -738,17 +751,17 @@
         if(bills.length === 0) bodyHTML = '<p style="text-align:center;">कोणतीही नोंद नाही.</p>';
         else {
           bodyHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>काम</th><th>रक्कम</th></tr></thead><tbody>';
-          bills.forEach(function(b, i){ bodyHTML += '<tr><td>' + (i+1) + '</td><td>' + b.workName + '</td><td>₹ ' + b.netPay.toLocaleString('en-IN') + '</td></tr>'; });
+          bills.forEach(function(b, i){ bodyHTML += '<tr><td>' + (i+1) + '</td><td>' + b.workName + '</td><td>₹ ' + parseFloat(b.netPay || 0).toLocaleString('en-IN') + '</td></tr>'; });
           bodyHTML += '</tbody></table>';
         }
       } else if(type === 'TOTAL_AMOUNT') {
-        title = "एकूण पास रक्कम"; var sum = 0; bills.forEach(function(b){ sum += b.passedAmt; });
+        title = "एकूण पास रक्कम"; var sum = 0; bills.forEach(function(b){ sum += parseFloat(b.passedAmt || 0); });
         bodyHTML = '<p style="font-weight:700; color:#0d47a1; text-align:center; padding:10px;">₹ ' + sum.toLocaleString('en-IN') + '</p>';
       } else if(type === 'TOTAL_DEDUCTION') {
-        title = "एकूण कपात"; var sumDed = 0; bills.forEach(function(b){ sumDed += b.totalDed; });
+        title = "एकूण कपात"; var sumDed = 0; bills.forEach(function(b){ sumDed += parseFloat(b.totalDed || 0); });
         bodyHTML = '<p style="font-weight:700; color:#d32f2f; text-align:center; padding:10px;">₹ ' + sumDed.toLocaleString('en-IN') + '</p>';
       } else if(type === 'NET_PAYABLE') {
-        title = "प्रत्यक्षात अदा करायची रक्कम"; var sumNet = 0; bills.forEach(function(b){ sumNet += b.netPay; });
+        title = "प्रत्यक्षात अदा करायची रक्कम"; var sumNet = 0; bills.forEach(function(b){ sumNet += parseFloat(b.netPay || 0); });
         bodyHTML = '<p style="font-weight:700; color:#2e7d32; text-align:center; padding:10px;">₹ ' + sumNet.toLocaleString('en-IN') + '</p>';
       }
       document.getElementById('detailModalTitle').innerText = title;
