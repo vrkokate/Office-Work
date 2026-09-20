@@ -3,17 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DMBMS - Public Works Department</title>
+  <title>Digital Hub & M.B. System</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #f4f6f9; color: #333; }
+    body { background: #f0f2f5; color: #212121; }
 
-    /* शीर्ष header डिझाईन */
-    .app-header { background: #0d47a1; color: #fff; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
-    .app-header h1 { font-size: 16px; font-weight: 700; }
-    .app-header p { font-size: 11px; opacity: 0.85; }
+    /* टॉप हेडर */
+    .top-header { background: #0d47a1; color: #fff; text-align: center; padding: 12px 15px; position: relative; }
+    .top-header h1 { font-size: 15px; font-weight: 700; margin-left: 70px; margin-right: 10px; text-align: left; }
+    .top-header p { font-size: 11px; opacity: 0.9; margin-left: 70px; text-align: left; margin-top: 2px; }
+    
+    .btn-back-hub {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: #ff9800;
+      color: #000; border: none; border-radius: 6px; padding: 6px 10px;
+      font-size: 11.5px; cursor: pointer; font-weight: 800; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      white-space: nowrap; z-index: 5;
+    }
 
-    .container { padding: 12px; max-width: 600px; margin: auto; }
+    /* मॉड्यूल ग्रीड बटणे */
+    .action-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;
+      padding: 10px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .action-btn {
+      border: none; border-radius: 8px; color: #fff; padding: 10px 4px;
+      font-size: 11px; font-weight: 600; cursor: pointer; text-align: center;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    }
+    .btn-je { background: #1976d2; }
+    .btn-mb-act { background: #2e7d32; }
+    .btn-work { background: #00897b; }
+    .btn-bill { background: #f57c00; }
+    .btn-assign { background: #7b1fa2; }
+    .btn-settings { background: #c2185b; }
+
+    .container { padding: 12px; max-width: 800px; margin: auto; }
 
     /* समरी कार्ड्स */
     .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
@@ -22,34 +46,31 @@
     .sum-title { font-size: 11.5px; color: #666; font-weight: 600; }
     .sum-val { font-size: 18px; font-weight: 700; color: #0d47a1; margin-top: 4px; }
 
-    /* मुख्य बटन */
     .btn-primary-main {
-      width: 100%; background: #1976d2; color: #fff; border: none; border-radius: 8px;
+      width: 100%; background: #f57c00; color: #fff; border: none; border-radius: 8px;
       padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: 15px;
-      box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3); display: flex; align-items: center; justify-content: center; gap: 6px;
+      box-shadow: 0 2px 6px rgba(245, 124, 0, 0.3); display: flex; align-items: center; justify-content: center; gap: 6px;
     }
 
-    /* बिलांची यादी कार्ड्स */
+    /* बिलांची यादी */
     .bill-item-card { background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; justify-content: space-between; align-items: center; }
     .bill-item-info h4 { font-size: 13.5px; color: #222; font-weight: 700; }
     .bill-item-info p { font-size: 11.5px; color: #666; margin-top: 2px; }
     .bill-item-amt { font-size: 14px; font-weight: 700; color: #2e7d32; text-align: right; }
 
-    /* विझार्ड मॉडेल (4-Step Wizard Modal) */
+    /* विझार्ड मॉडेल */
     .wizard-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; padding: 10px; }
     .wizard-card { background: #fff; border-radius: 12px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; padding: 18px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
     
     .wizard-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 15px; }
-    .wizard-header h3 { font-size: 15px; color: #0d47a1; font-weight: 700; }
+    .wizard-header h3 { font-size: 15px; color: #f57c00; font-weight: 700; }
     .btn-close { background: #e53935; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
 
-    /* स्टेप्स प्रोग्रेस बार */
     .steps-indicator { display: flex; justify-content: space-between; margin-bottom: 18px; padding: 0 20px; }
     .step-dot { width: 28px; height: 28px; border-radius: 50%; background: #ccc; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
-    .step-dot.active { background: #ff7b00; box-shadow: 0 0 10px rgba(255,123,0,0.5); }
+    .step-dot.active { background: #f57c00; box-shadow: 0 0 10px rgba(245,124,0,0.5); }
     .step-dot.completed { background: #2e7d32; }
 
-    /* फॉर्म नियंत्रणे */
     .form-group { margin-bottom: 12px; text-align: left; }
     .form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 4px; }
     .form-control { width: 100%; padding: 8px 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 5px; outline: none; background: #fff; }
@@ -58,20 +79,17 @@
     .wizard-buttons { display: flex; gap: 8px; margin-top: 18px; }
     .btn-wizard { flex: 1; padding: 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; color: #fff; }
     .btn-back { background: #757575; }
-    .btn-next { background: #ff7b00; }
+    .btn-next { background: #f57c00; }
     .btn-submit { background: #2e7d32; }
 
-    /* पूर्वावलोकन तपशील बॉक्स */
     .preview-box { background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; padding: 10px; font-size: 12px; margin-bottom: 12px; }
     .preview-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #eee; }
     .preview-row:last-child { border-bottom: none; }
 
-    /* यशस्वी संदेश मॉडेल */
     .success-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
     .success-card { background: #fff; border-radius: 12px; width: 100%; max-width: 350px; padding: 24px; text-align: center; }
     .success-icon { font-size: 45px; color: #2e7d32; margin-bottom: 10px; }
 
-    /* तपशील पॉप-अप (Detail Popup) */
     .detail-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1500; justify-content: center; align-items: center; padding: 15px; }
     .detail-modal-card { background: #fff; border-radius: 10px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; padding: 16px; position: relative; }
     
@@ -82,12 +100,20 @@
 </head>
 <body>
 
-  <div class="app-header">
-    <div>
-      <h1>DMBMS</h1>
-      <p>Public Works Department</p>
-    </div>
-    <div style="font-size:13px; font-weight:700;">Bill Register</div>
+  <!-- मोजमाप पुस्तिका नियंत्रण प्रणाली मुख्य हेडर व टॅब ग्रिड -->
+  <div class="top-header">
+    <button class="btn-back-hub" onclick="alert('मुख्य डॅशबोर्डवर जात आहे')">🏠 मुखपृष्ठ</button>
+    <h1>देयक नोंदवही (Bill Register)</h1>
+    <p>सार्वजनिक बांधकाम विभाग</p>
+  </div>
+
+  <div class="action-grid">
+    <button class="action-btn btn-je" onclick="alert('JE मॉडेल')"><span>👷</span>JE</button>
+    <button class="action-btn btn-mb-act" onclick="alert('M.B. मॉडेल')"><span>📖</span>M.B.</button>
+    <button class="action-btn btn-work" onclick="alert('Work list मॉडेल')"><span>📋</span>Work list</button>
+    <button class="action-btn btn-bill" style="border: 2px solid #fff;" onclick="loadBillRegister()"><span>📄</span>Bill reg.</button>
+    <button class="action-btn btn-assign" onclick="alert('Assign मॉडेल')"><span>📁</span>Assign</button>
+    <button class="action-btn btn-settings" onclick="alert('सेटिंग मॉडेल')"><span>⚙️</span>सेटिंग</button>
   </div>
 
   <div class="container">
@@ -133,7 +159,6 @@
         <div class="step-dot" id="dot1">1</div>
         <div class="step-dot" id="dot2">2</div>
         <div class="step-dot" id="dot3">3</div>
-        <div class="step-dot" id="dot4">4</div>
       </div>
 
       <!-- स्टेप १: मुख्य माहिती -->
@@ -142,6 +167,8 @@
           <label>संबंधित कनिष्ठ अभियंता (JE) *</label>
           <select class="form-control" id="wJeSelect">
             <option value="">-- JE निवडा --</option>
+            <option value="श्री. पाटील साहेब">श्री. पाटील साहेब</option>
+            <option value="श्री. गोरनाळे रावसाहेब">श्री. गोरनाळे रावसाहेब</option>
           </select>
         </div>
         <div class="form-group">
@@ -181,23 +208,23 @@
           <input type="number" class="form-control" id="wPassedAmt" placeholder="उदा. 1000000" oninput="autoCalculateDeductions()">
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Income Tax (2%)</label><input type="number" class="form-control calc-ded" id="dedIT" value="0" oninput="autoCalculateDeductions()"></div>
+          <div class="form-group"><label>Income Tax</label><input type="number" class="form-control calc-ded" id="dedIT" value="0" oninput="autoCalculateDeductions()"></div>
           <div class="form-group"><label>Security Deposit</label><input type="number" class="form-control calc-ded" id="dedSD" value="0" oninput="autoCalculateDeductions()"></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Maintenance (5%)</label><input type="number" class="form-control calc-ded" id="dedMaint" value="0" oninput="autoCalculateDeductions()"></div>
+          <div class="form-group"><label>Maintenance</label><input type="number" class="form-control calc-ded" id="dedMaint" value="0" oninput="autoCalculateDeductions()"></div>
           <div class="form-group"><label>Royalty Charges</label><input type="number" class="form-control calc-ded" id="dedRoyalty" value="0" oninput="autoCalculateDeductions()"></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Govt. Ins. Scheme (1%)</label><input type="number" class="form-control calc-ded" id="dedGovt" value="0" oninput="autoCalculateDeductions()"></div>
-          <div class="form-group"><label>Upkar W.C. (1%)</label><input type="number" class="form-control calc-ded" id="dedUpkar" value="0" oninput="autoCalculateDeductions()"></div>
+          <div class="form-group"><label>Govt. Ins. Scheme</label><input type="number" class="form-control calc-ded" id="dedGovt" value="0" oninput="autoCalculateDeductions()"></div>
+          <div class="form-group"><label>Upkar (W.C.)</label><input type="number" class="form-control calc-ded" id="dedUpkar" value="0" oninput="autoCalculateDeductions()"></div>
         </div>
         <div class="form-row">
           <div class="form-group"><label>SGST 1%</label><input type="number" class="form-control calc-ded" id="dedSGST" value="0" oninput="autoCalculateDeductions()"></div>
           <div class="form-group"><label>CGST 1%</label><input type="number" class="form-control calc-ded" id="dedCGST" value="0" oninput="autoCalculateDeductions()"></div>
         </div>
 
-        <div style="background:#e3f2fd; padding:10px; border-radius:6px; margin-top:8px; font-size:12px;">
+        <div style="background:#fff3e0; padding:10px; border-radius:6px; margin-top:8px; font-size:12px;">
           <div><strong>एकूण कपात (Total Deduction):</strong> <span id="wLblTotalDed" style="color:#d32f2f; font-weight:700;">₹ 0</span></div>
           <div><strong>प्रत्यक्षात देय रक्कम (Net Payable):</strong> <span id="wLblNetPay" style="color:#2e7d32; font-weight:700;">₹ 0</span></div>
         </div>
@@ -208,7 +235,7 @@
         </div>
       </div>
 
-      <!-- स्टेप ३: पूर्वावलोकन (Preview) -->
+      <!-- स्टेप ३: पूर्वावलोकन (Preview) व जतन -->
       <div class="wizard-step" id="step3" style="display:none;">
         <div class="preview-box" id="previewContent"></div>
         <div class="wizard-buttons">
@@ -258,6 +285,11 @@
       refreshDashboard();
     };
 
+    function loadBillRegister() {
+      refreshDashboard();
+      alert('तुम्ही बिल रजिस्टर (Bill Reg.) टॅबवर आला आहात.');
+    }
+
     function refreshDashboard() {
       var bills = getData('dmbms_bills');
       var totalBills = bills.length;
@@ -276,7 +308,7 @@
 
       var listHTML = '';
       if(bills.length === 0) {
-        listHTML = '<p style="text-align:center; color:#77555; padding:15px; font-size:12px;">कोणतीही देयक नोंद उपलब्ध नाही.</p>';
+        listHTML = '<p style="text-align:center; color:#666; padding:15px; font-size:12px;">कोणतीही देयक नोंद उपलब्ध नाही.</p>';
       } else {
         bills.slice().reverse().forEach(function(b) {
           listHTML += '<div class="bill-item-card">' +
@@ -291,17 +323,8 @@
       document.getElementById('billListContainer').innerHTML = listHTML;
     }
 
-    /* 4-Step Wizard लॉजिक */
+    /* Wizard लॉजिक */
     function openWizard(step) {
-      // JE लिस्ट भरणे
-      var jeSel = document.getElementById('wJeSelect');
-      jeSel.innerHTML = '<option value="">-- JE निवडा --</option>';
-      var jeList = getData('je_records');
-      if(jeList.length === 0) {
-        jeList = [{name: 'श्री. पाटील साहेब'}, {name: 'श्री. गोरनाळे रावसाहेब'}];
-      }
-      jeList.forEach(function(j){ jeSel.add(new Option(j.name, j.name)); });
-
       document.getElementById('wizardModal').style.display = 'flex';
       goToStep(step);
     }
@@ -328,26 +351,25 @@
     function autoCalculateDeductions() {
       var passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
       
-      // उदाहरणार्थ टक्केवारीनुसार ऑटो कॅलक्युलेशन
-      var it = passed * 0.02;
-      var sd = 10000; // फिक्स किंवा मॅन्युअल
-      var maint = passed * 0.05;
-      var royalty = parseFloat(document.getElementById('dedRoyalty').value) || 23000;
-      var govt = passed * 0.01;
-      var upkar = passed * 0.01;
-      var sgst = passed * 0.01;
-      var cgst = passed * 0.01;
+      var it = passed * 0.016949;  // उदा. फोटोतील प्रमाणानुसार
+      var sd = 10000;
+      var maint = passed * 0.042373;
+      var royalty = 28000;
+      var govt = passed * 0.008475;
+      var upkar = passed * 0.008475;
+      var sgst = passed * 0.008475;
+      var cgst = passed * 0.008475;
 
-      document.getElementById('dedIT').value = it;
+      document.getElementById('dedIT').value = Math.round(it);
       document.getElementById('dedSD').value = sd;
-      document.getElementById('dedMaint').value = maint;
+      document.getElementById('dedMaint').value = Math.round(maint);
       document.getElementById('dedRoyalty').value = royalty;
-      document.getElementById('dedGovt').value = govt;
-      document.getElementById('dedUpkar').value = upkar;
-      document.getElementById('dedSGST').value = sgst;
-      document.getElementById('dedCGST').value = cgst;
+      document.getElementById('dedGovt').value = Math.round(govt);
+      document.getElementById('dedUpkar').value = Math.round(upkar);
+      document.getElementById('dedSGST').value = Math.round(sgst);
+      document.getElementById('dedCGST').value = Math.round(cgst);
 
-      var totalDed = it + sd + maint + royalty + govt + upkar + sgst + cgst;
+      var totalDed = Math.round(it) + sd + Math.round(maint) + royalty + Math.round(govt) + Math.round(upkar) + Math.round(sgst) + Math.round(cgst);
       var netPay = passed - totalDed;
 
       document.getElementById('wLblTotalDed').innerText = '₹ ' + totalDed.toLocaleString('en-IN');
@@ -360,7 +382,6 @@
       var con = document.getElementById('wContractor').value || '-';
       var work = document.getElementById('wWorkName').value || '-';
       var type = document.getElementById('wBillType').value || '-';
-      var date = document.getElementById('wBillDate').value || '-';
       var passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
       var totalDed = parseFloat(document.getElementById('wLblTotalDed').innerText.replace('₹ ','').replace(/,/g,'')) || 0;
       var netPay = passed - totalDed;
@@ -402,7 +423,6 @@
       setData('dmbms_bills', bills);
       closeWizard();
 
-      // यशस्वी मॉडेल दाखवणे
       document.getElementById('succBillNo').innerText = billNo;
       document.getElementById('succNetPay').innerText = '₹ ' + netPay.toLocaleString('en-IN');
       document.getElementById('succDate').innerText = date;
@@ -414,7 +434,7 @@
       document.getElementById('successModal').style.display = 'none';
     }
 
-    /* डॅशबोर्ड कार्ड क्लिक केल्यावर तपशील पॉप-अप */
+    /* समरी कार्ड्स क्लिक केल्यावर तपशील पॉप-अप */
     function openDetailPopup(type) {
       var bills = getData('dmbms_bills');
       var title = "";
