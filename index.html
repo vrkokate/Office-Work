@@ -398,7 +398,7 @@
       </div>
     </div>
 
-    <!-- 1. JE मोडल (नवीन/चालू आणि भंडारपाल, विभागीय कार्यालय, JE, चार्ज नुसार रचना) -->
+    <!-- 1. JE मोडल -->
     <div id="jeModal" class="modal-overlay">
       <div class="modal-card">
         <div class="modal-header">
@@ -421,7 +421,7 @@
       </div>
     </div>
 
-    <!-- 2. M.B. नोंद मोडल -->
+    <!-- 2. M.B. नोंद मोडल (दुरुस्त फॉर्म लॉजिक आणि डुप्लिकेट प्रतिबंध) -->
     <div id="mbModal" class="modal-overlay">
       <div class="modal-card">
         <div class="modal-header">
@@ -469,7 +469,7 @@
         <!-- 'नवीन' निवडल्यास भंडारपाल -->
         <div class="form-group" id="bhandarpalGroup" style="display:none;">
           <label>भंडारपाल *</label>
-          <input type="text" class="form-control" id="bhandarpalNameInput" placeholder="भंडारपाIचे नाव टाईप करा">
+          <input type="text" class="form-control" id="bhandarpalNameInput" placeholder="भंडारपाळाचे नाव टाईप करा">
         </div>
 
         <!-- 'चालू' निवडल्यास विभागीय कार्यालय, JE, चार्ज नुसार -->
@@ -486,7 +486,7 @@
         <!-- उप-तपशील (JE किंवा विभागीय कार्यालयातून कोणाकडून) -->
         <div class="form-group" id="receivedSubGroup" style="display:none;">
           <label id="receivedSubLabel">तपशील निवडा *</label>
-          <select class="form-control" id="receivedSubSelect"></select>
+          <select class="form-control" id="receivedSubSelect" style="display:none;"></select>
           <input type="text" class="form-control" id="receivedSubInput" style="display:none;" placeholder="उदा. पद / व्यक्तीचे नाव टाईप करा">
         </div>
 
@@ -766,7 +766,7 @@
       document.getElementById('countAvailableMB').innerText = stock.length;
     }
 
-    /* ==================== M.B. नोंद फॉर्ममधील नवीन/चालू लॉजिक ==================== */
+    /* ==================== M.B. नोंद फॉर्म लॉजिक (डुप्लिकेट प्रतिबंधक) ==================== */
     function onMBActionTypeChange() {
       var actionType = document.getElementById('mbActionType').value;
       var lblParty = document.getElementById('lblMBParty');
@@ -824,30 +824,29 @@
       var lbl = document.getElementById('receivedSubLabel');
       
       subGrp.style.display = 'none';
+      sel.style.display = 'none';
+      inp.style.display = 'none';
       sel.innerHTML = '';
 
       if (chalooSrc === 'JE') {
         subGrp.style.display = 'block';
         lbl.innerText = 'कनिष्ठ अभियंता (JE) निवडा *';
         sel.style.display = 'block';
-        inp.style.display = 'none';
         getData('je_records').forEach(function(j){ sel.add(new Option(j.name, j.name)); });
       } else if (chalooSrc === 'विभागीय कार्यालय') {
         subGrp.style.display = 'block';
-        lbl.innerText = 'पूर्वी कोणाकडे होती त्याचे नाव निवडा / टाईप करा *';
-        sel.style.display = 'none';
+        lbl.innerText = 'पूर्वी कोणाकडून मिळाले त्याचे नाव टाईप करा *';
         inp.style.display = 'block';
-        inp.placeholder = 'उदा. व्यक्तीचे किंवा कार्यालयाचे नाव टाईप करा';
+        inp.placeholder = 'उदा. व्यक्तीचे किंवा कार्यालयाचे नाव';
       } else if (chalooSrc === 'चार्ज नुसार') {
         subGrp.style.display = 'block';
         lbl.innerText = 'चार्ज तपशील टाईप करा *';
-        sel.style.display = 'none';
         inp.style.display = 'block';
         inp.placeholder = 'उदा. पद / चार्ज नाव';
       }
     }
 
-    function onMB0SizeChange() {
+    function onMBSizeChange() {
       if (document.getElementById('mbActionType').value === 'दिलेली एमबी') {
         populateAvailableMBs();
       }
@@ -871,18 +870,30 @@
       
       if (!no) return alert('कृपया M.B. क्रमांक भरा.');
 
+      // एकाच क्रमांकाच्या दोन एमबी नोंदवल्या जाण्यापासून संरक्षण (Duplicate Check)
+      var list = getData('mb_records');
+      if (idx === -1 && actionType === 'मिळालेली एमबी') {
+        var exists = list.some(function(m) {
+          return m.mbNumber.toLowerCase() === no.toLowerCase() && m.actionType === 'मिळालेली एमबी';
+        });
+        if (exists) {
+          return alert('⚠️ चूक: M.B. क्रमांक "' + no + '" ची नोंद आधीच झालेली आहे!');
+        }
+      }
+
       var srcText = "";
       var subDetail = "";
 
       if (actionType === 'दिलेली एमबी') {
         srcText = 'दिलेली एमबी';
+        subDetail = document.getElementById('selectAvailableMB').options[document.getElementById('selectAvailableMB').selectedIndex].text;
       } else {
         var recType = document.getElementById('mbReceivedType').value;
         if (!recType) return alert('कृपया नवीन किंवा चालू पर्याय निवडा.');
 
         if (recType === 'नवीन') {
           var bName = document.getElementById('bhandarpalNameInput').value.trim();
-          if (!bName) return alert('कृपया भंडारपाळचे नाव भरा.');
+          if (!bName) return alert('कृपया भंडारपाळाचे नाव भरा.');
           srcText = 'भंडारपाल (' + bName + ')';
           subDetail = bName;
         } else {
@@ -901,7 +912,6 @@
       }
 
       var displayParty = actionType + ' : ' + srcText;
-      var list = getData('mb_records');
 
       if (idx === -1) {
         list.push({ actionType: actionType, mbNumber: no, size: size, receivedSource: srcText, receivedDetail: subDetail, receivedFrom: displayParty, date: date });
@@ -955,7 +965,7 @@
       }
     }
 
-    /* ==================== अहवाल आणि कास्केडिंग फिल्टर लॉजिक ==================== */
+    /* ==================== रिपोर्ट आणि कास्केडिंग लॉजिक ==================== */
     function onMainCategoryChange() {
       var mainCat = document.getElementById('repMainCategory').value;
       var grp1 = document.getElementById('dynamicOptionGroup1');
