@@ -377,7 +377,7 @@
       </div>
     </div></div>
 
-    <!-- 3. Work List मोडल -->
+    <!-- 3. Work List मोडल (सुधारित Edit फंक्शनसह) -->
     <div id="workModal" class="modal-overlay"><div class="modal-card">
       <div class="modal-header"><h3 style="font-size: 14px; color:#00897b;">📋 कामांची यादी (Work List)</h3><button class="btn-close" onclick="closeModule('workModal')">X</button></div>
       <input type="hidden" id="editWorkIndex" value="-1">
@@ -386,7 +386,7 @@
       <div class="form-group"><label>कामाचे नाव *</label><input type="text" class="form-control" id="workName" placeholder="कामाचे नाव टाईप करा"></div>
       <div class="form-group"><label>कंत्राटदार / एजन्सी चे नाव *</label><input type="text" class="form-control" id="workContractor" placeholder="कंत्राटदाराचे नाव टाईप करा"></div>
       <div class="form-group"><label>कामाची स्थिती (Status) *</label><select class="form-control" id="workStatus"><option value="अपूर्ण">अपूर्ण (चालू काम)</option><option value="पूर्ण">पूर्ण</option></select></div>
-      <div style="display:flex; gap:6px;"><button id="btnSaveWork" class="btn-report" style="background:#00897b; flex:1;" onclick="saveOrUpdateWork()">Save Work</button><button id="btnCancelWork" class="btn-report" style="background:#757575; width:80px; display:none;" onclick="cancelWorkEdit()">रद्द करा</button></div>
+      <div style="display:flex; gap:6px;"><button id="btnSaveWork" class="btn-report" style="background:#00897b; flex:1;" onclick="saveOrUpdateWork()">Update Work</button><button id="btnCancelWork" class="btn-report" style="background:#757575; width:80px; display:none;" onclick="cancelWorkEdit()">रद्द करा</button></div>
       
       <div class="table-scroll-box">
         <table class="data-table"><thead><tr><th>अ.क्र.</th><th>काम</th><th>JE</th><th>M.B.</th><th>स्थिती</th><th style="width:20%; text-align:center;">Action</th></tr></thead><tbody id="workListBody"></tbody></table>
@@ -458,7 +458,7 @@
       <div class="step-dot" id="dot3">3</div>
     </div>
 
-    <!-- स्टेप १: मुख्य माहिती (प्रत्येक वेळी संपूर्ण युनिक आणि फिक्स लेटेस्ट ट्रान्झॅक्शननुसार युनिक M.B. स्टेटस रिपोर्ट लॉजिक) -->
+    <!-- स्टेप १: मुख्य माहिती -->
     <div class="wizard-step" id="step1">
       <div class="form-group"><label>संबंधित कनिष्ठ अभियंता (JE) *</label><select class="form-control" id="wJeSelect" onchange="onWizardJEChange()"><option value="">-- JE निवडा --</option></select></div>
       <div class="form-group"><label>वाटप केलेली M.B. क्रमांक *</label><select class="form-control" id="wMbSelect" onchange="onWizardMBChange()"><option value="">-- आधी JE निवडा --</option></select></div>
@@ -1055,7 +1055,7 @@
       }
     }
 
-    /* ==================== कामांची यादी (Work List) लॉजिक ==================== */
+    /* ==================== कामांची यादी (Work List) लॉजिक (सुधारित Edit फंक्शनसह) ==================== */
     function onWorkJEChange() {
       var je = document.getElementById('workJE').value;
       var mbSel = document.getElementById('workMB');
@@ -1119,7 +1119,20 @@
     function editWork(idx) {
       var item = getData('work_records')[idx];
       document.getElementById('workJE').value = item.je;
-      onWorkJEChange();
+      
+      // JE नुसार M.B. यादी लोड करून त्यात सध्याची M.B. समाविष्ट करणे
+      var mbSel = document.getElementById('workMB');
+      mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';
+      var assignedMBs = getData('assign_records').filter(function(a){ return a.jeName === item.je; });
+      var works = getData('work_records');
+      
+      assignedMBs.forEach(function(a) {
+        var activeWork = works.find(function(w){ return w.mbNo === a.mbNo && w.status === 'अपूर्ण'; });
+        if (!activeWork || a.mbNo === item.mbNo) {
+          mbSel.add(new Option(a.mbNo, a.mbNo));
+        }
+      });
+
       document.getElementById('workMB').value = item.mbNo;
       document.getElementById('workName').value = item.name;
       document.getElementById('workContractor').value = item.contractor;
@@ -1162,7 +1175,7 @@
       }
     }
 
-    /* ==================== रिपोर्ट आणि कास्केडिंग लॉजिक (प्रत्येक M.B. ची फक्त युनिक/लेटेस्ट सद्यस्थिती) ==================== */
+    /* ==================== रिपोर्ट आणि कास्केडिंग लॉजिक ==================== */
     function onMainCategoryChange() {
       var mainCat = document.getElementById('repMainCategory').value;
       var grp1 = document.getElementById('dynamicOptionGroup1');
@@ -1312,12 +1325,11 @@
       var allMBs = getData('mb_records');
       var stock = getAvailableStock();
 
-      // प्रत्येक M.B. क्रमांकाची फक्त सर्वात शेवटची (Latest) नोंद शोधण्यासाठी मॅप तयार करणे
       var latestMap = {};
       allMBs.forEach(function(m) {
         var no = m.mbNumber || m.mbNo;
         if (no) {
-          latestMap[no] = m; // नंतरची नोंद आधीच्या नोंदीवर ओव्हरराईट होईल
+          latestMap[no] = m;
         }
       });
       var uniqueMBs = [];
@@ -1649,7 +1661,6 @@
         getData('je_records').forEach(function(j){ jeSel.add(new Option(j.name, j.name)); });
       }
       
-      // सर्व फिल्ड्स पूर्णपणे ब्लँक/रिसेट करणे
       document.getElementById('wMbSelect').innerHTML = '<option value="">-- आधी JE निवडा --</option>';
       document.getElementById('wContractor').value = '';
       document.getElementById('wWorkName').value = '';
