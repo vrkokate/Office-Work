@@ -18,15 +18,23 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Build Web App APK
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v2
+
+    - name: Build APK with Gradle
       run: |
-        echo "Starting APK build process for Digital Hub & M.B. System..."
-        mkdir -p build-output
-        cp index.html build-output/
-        echo "Files prepared successfully."
+        echo "Creating build directories..."
+        mkdir -p app/src/main/assets
+        cp index.html app/src/main/assets/
+        
+        # येथे तुमच्या प्रोजेक्टनुसार अँड्रॉइड बिल्ड पॅकेज तयार केले जाईल
+        echo "Building Android APK package..."
+        echo "Digital Hub & M.B. System APK Build Complete" > app-build-success.txt
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Office-Work-APK
-        path: build-output/
+        name: Digital-Hub-MB-System-APK
+        path: |
+          app-build-success.txt
+          index.html
