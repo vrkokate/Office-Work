@@ -330,7 +330,7 @@
         </div>
       </div>
 
-      <!-- सविस्तर रिपोर्ट फिल्टर कार्ड (नवीन ऑटोमॅटिक कास्केडिंग रचना) -->
+      <!-- सविस्तर रिपोर्ट फिल्टर कार्ड (पूर्णपणे सुधारित डायनॅमिक रचना) -->
       <div class="filter-card">
         <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
         
@@ -357,15 +357,33 @@
           </select>
         </div>
 
-        <!-- डायनॅमिकली येणारे पुढील पर्याय (स्टेप बाय स्टेप) -->
+        <!-- स्टेप १: डायनॅमिक उपघटक (उदा. M.B. प्रकार / J.E. नावे) -->
         <div class="form-group" id="dynamicOptionGroup1" style="display:none;">
           <label id="lblDynamic1">पुढील पर्याय</label>
           <select class="form-control" id="repDynamicSelect1" onchange="onDynamicSelect1Change()"></select>
         </div>
 
+        <!-- स्टेप २: डायनॅमिक सविस्तर स्थिती (उदा. उपलब्ध, वाटप, मिळालेली) -->
         <div class="form-group" id="dynamicOptionGroup2" style="display:none;">
-          <label id="lblDynamic2">सविस्तर स्थिती</label>
-          <select class="form-control" id="repDynamicSelect2"></select>
+          <label id="lblDynamic2">एम.बी. सविस्तर स्थिती</label>
+          <select class="form-control" id="repDynamicSelect2" onchange="onDynamicSelect2Change()"></select>
+        </div>
+
+        <!-- स्टेप ३: वाटप केलेली एमबी निवडल्यावर येणारे अतिरिक्त पर्याय (कनिष्ठ अभियंता / विभागीय कार्यालय / इतर) -->
+        <div class="form-group" id="dynamicOptionGroup3" style="display:none;">
+          <label id="lblDynamic3">वाटप कोणाला केले?</label>
+          <select class="form-control" id="repDynamicSelect3" onchange="onDynamicSelect3Change()">
+            <option value="JE">कनिष्ठ अभियंता</option>
+            <option value="Office">विभागीय कार्यालय</option>
+            <option value="Other">इतर</option>
+          </select>
+        </div>
+
+        <!-- स्टेप ४: कनिष्ठ अभियंता ड्रॉपडाऊन किंवा हाताने टाईप करण्यासाठी इनपुट बॉक्स -->
+        <div class="form-group" id="dynamicInputGroup" style="display:none;">
+          <label id="lblDynamicInput">तपशील भरा</label>
+          <select class="form-control" id="repDynamicJEList" style="display:none;"></select>
+          <input type="text" class="form-control" id="repDynamicTextInput" style="display:none;" placeholder="येथे नाव किंवा तपशील टाईप करा">
         </div>
 
         <!-- स्मार्ट शोध -->
@@ -728,17 +746,21 @@
       document.getElementById('countAvailableMB').innerText = stock.length;
     }
 
-    /* ==================== ऑटोमॅटिक कास्केडिंग फिल्टर लॉजिक ==================== */
+    /* ==================== परिपूर्ण डायनॅमिक कास्केडिंग लॉजिक ==================== */
     function onMainCategoryChange() {
       var mainCat = document.getElementById('repMainCategory').value;
       var grp1 = document.getElementById('dynamicOptionGroup1');
       var grp2 = document.getElementById('dynamicOptionGroup2');
-      var sel1 = document.getElementById('repDynamicSelect1');
-      var sel2 = document.getElementById('repDynamicSelect2');
+      var grp3 = document.getElementById('dynamicOptionGroup3');
+      var inputGrp = document.getElementById('dynamicInputGroup');
       
-      sel1.innerHTML = '';
-      sel2.innerHTML = '';
+      grp1.style.display = 'none';
       grp2.style.display = 'none';
+      grp3.style.display = 'none';
+      inputGrp.style.display = 'none';
+
+      var sel1 = document.getElementById('repDynamicSelect1');
+      sel1.innerHTML = '';
 
       if (mainCat === 'M.B.') {
         grp1.style.display = 'block';
@@ -761,8 +783,6 @@
         getData('je_records').forEach(function(j) {
           sel1.add(new Option(j.name + ' - बिले', 'JE_BILLS:' + j.name));
         });
-      } else {
-        grp1.style.display = 'none';
       }
     }
 
@@ -779,8 +799,52 @@
         sel2.add(new Option('उपलब्ध M.B. (Available)', 'AVAILABLE'));
         sel2.add(new Option('वाटप केलेली M.B. (Given)', 'GIVEN'));
         sel2.add(new Option('मिळालेली M.B. (Received)', 'RECEIVED'));
+        onDynamicSelect2Change();
       } else {
         grp2.style.display = 'none';
+      }
+    }
+
+    function onDynamicSelect2Change() {
+      var mainCat = document.getElementById('repMainCategory').value;
+      var sel2Val = document.getElementById('repDynamicSelect2').value;
+      var grp3 = document.getElementById('dynamicOptionGroup3');
+
+      if (mainCat === 'M.B.' && sel2Val === 'GIVEN') {
+        grp3.style.display = 'block';
+        onDynamicSelect3Change();
+      } else {
+        grp3.style.display = 'none';
+        document.getElementById('dynamicInputGroup').style.display = 'none';
+      }
+    }
+
+    function onDynamicSelect3Change() {
+      var targetType = document.getElementById('repDynamicSelect3').value; // JE, Office, Other
+      var inputGrp = document.getElementById('dynamicInputGroup');
+      var jeListSel = document.getElementById('repDynamicJEList');
+      var textInp = document.getElementById('repDynamicTextInput');
+      var lblInput = document.getElementById('lblDynamicInput');
+
+      inputGrp.style.display = 'block';
+      jeListSel.style.display = 'none';
+      textInp.style.display = 'none';
+
+      if (targetType === 'JE') {
+        lblInput.innerText = 'कनिष्ठ अभियंता (JE) निवडा';
+        jeListSel.style.display = 'block';
+        jeListSel.innerHTML = '<option value="">-- सर्व JE --</option>';
+        getData('je_records').forEach(function(j) {
+          jeListSel.add(new Option(j.name, j.name));
+        });
+      } else if (targetType === 'Office') {
+        lblInput.innerText = 'विभागीय कार्यालय तपशील टाईप करा';
+        textInp.style.display = 'block';
+        textInp.placeholder = 'उदा. विभागीय कार्यालय नाव';
+      } else if (targetType === 'Other') {
+        lblInput.innerText = 'इतर तपशील टाईप करा';
+        textInp.style.display = 'block';
+        textInp.placeholder = 'उदा. व्यक्तीचे किंवा पदाचे नाव';
       }
     }
 
@@ -798,7 +862,15 @@
       if (mainCat === 'M.B.') {
         var sizeChoice = document.getElementById('repDynamicSelect1').value;
         var finalType = document.getElementById('repDynamicSelect2').value;
-        generateAdvancedMBReport(sizeChoice, finalType, fDate, tDate);
+        var givenSubTarget = '', givenSubValue = '';
+
+        if (finalType === 'GIVEN') {
+          givenSubTarget = document.getElementById('repDynamicSelect3').value;
+          if (givenSubTarget === 'JE') givenSubValue = document.getElementById('repDynamicJEList').value;
+          else givenSubValue = document.getElementById('repDynamicTextInput').value.trim();
+        }
+
+        generateAdvancedMBReport(sizeChoice, finalType, givenSubTarget, givenSubValue, fDate, tDate);
       } else if (mainCat === 'J.E.') {
         var sub = document.getElementById('repDynamicSelect1').value;
         generateJEReports(sub, 'ALL', fDate, tDate);
@@ -810,7 +882,7 @@
       }
     }
 
-    function generateAdvancedMBReport(sizeChoice, finalType, fDate, tDate) {
+    function generateAdvancedMBReport(sizeChoice, finalType, subTarget, subVal, fDate, tDate) {
       var allMBs = getData('mb_records');
       var stock = getAvailableStock();
 
@@ -831,8 +903,16 @@
         });
         reportTitle = "सर्व उपलब्ध मोजमाप पुस्तिका अहवाल";
       } else if (finalType === 'GIVEN') {
-        filtered = filtered.filter(function(m) { return m.actionType === 'दिलेली एमबी'; });
-        reportTitle = "दिलेली मोजमाप पुस्तिका अहवाल";
+        filtered = filtered.filter(function(m) {
+          if (m.actionType !== 'दिलेली एमबी') return false;
+          if (subTarget === 'JE' && subVal) {
+            return m.receivedDetail && m.receivedDetail.toLowerCase() === subVal.toLowerCase();
+          } else if ((subTarget === 'Office' || subTarget === 'Other') && subVal) {
+            return m.receivedFrom && m.receivedFrom.toLowerCase().includes(subVal.toLowerCase());
+          }
+          return true;
+        });
+        reportTitle = "वाटप केलेली (Given) मोजमाप पुस्तिका अहवाल" + (subVal ? " (" + subVal + ")" : "");
       } else if (finalType === 'RECEIVED') {
         filtered = filtered.filter(function(m) { return m.actionType === 'मिळालेली एमबी'; });
         reportTitle = "मिळालेली मोजमाप पुस्तिका अहवाल";
