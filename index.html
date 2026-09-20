@@ -421,7 +421,7 @@
       </div>
     </div>
 
-    <!-- 2. M.B. नोंद मोडल (दुरुस्त फॉर्म लॉजिक आणि डुप्लिकेट प्रतिबंध) -->
+    <!-- 2. M.B. नोंद मोडल -->
     <div id="mbModal" class="modal-overlay">
       <div class="modal-card">
         <div class="modal-header">
@@ -456,7 +456,7 @@
           <select class="form-control" id="selectAvailableMB"></select>
         </div>
 
-        <!-- M.B. कोणाकडून मिळाली? (नवीन / चालू पर्याय रचना) -->
+        <!-- M.B. कोणाकडून मिळाली? -->
         <div class="form-group" id="receivedMainGroup">
           <label>कोणाकडून मिळाली? *</label>
           <select class="form-control" id="mbReceivedType" onchange="onMBReceivedTypeChange()">
@@ -466,13 +466,11 @@
           </select>
         </div>
 
-        <!-- 'नवीन' निवडल्यास भंडारपाल -->
         <div class="form-group" id="bhandarpalGroup" style="display:none;">
           <label>भंडारपाल *</label>
           <input type="text" class="form-control" id="bhandarpalNameInput" placeholder="भंडारपाळाचे नाव टाईप करा">
         </div>
 
-        <!-- 'चालू' निवडल्यास विभागीय कार्यालय, JE, चार्ज नुसार -->
         <div class="form-group" id="chalooSourceGroup" style="display:none;">
           <label>चालू स्रोत निवडा *</label>
           <select class="form-control" id="mbChalooSource" onchange="onMBChalooSourceChange()">
@@ -483,7 +481,6 @@
           </select>
         </div>
 
-        <!-- उप-तपशील (JE किंवा विभागीय कार्यालयातून कोणाकडून) -->
         <div class="form-group" id="receivedSubGroup" style="display:none;">
           <label id="receivedSubLabel">तपशील निवडा *</label>
           <select class="form-control" id="receivedSubSelect" style="display:none;"></select>
@@ -766,10 +763,9 @@
       document.getElementById('countAvailableMB').innerText = stock.length;
     }
 
-    /* ==================== M.B. नोंद फॉर्म लॉजिक (डुप्लिकेट प्रतिबंधक) ==================== */
+    /* ==================== M.B. नोंद फॉर्म लॉजिक ==================== */
     function onMBActionTypeChange() {
       var actionType = document.getElementById('mbActionType').value;
-      var lblParty = document.getElementById('lblMBParty');
       var grpInp = document.getElementById('groupMBInput');
       var grpSel = document.getElementById('groupMBSelect');
       var mainGroup = document.getElementById('receivedMainGroup');
@@ -778,7 +774,6 @@
       var subGrp = document.getElementById('receivedSubGroup');
 
       if (actionType === 'दिलेली एमबी') {
-        lblParty.innerText = 'कोणाला दिली? *';
         grpInp.style.display = 'none';
         grpSel.style.display = 'block';
         mainGroup.style.display = 'none';
@@ -787,7 +782,6 @@
         subGrp.style.display = 'none';
         populateAvailableMBs();
       } else {
-        lblParty.innerText = 'कोणाकडून मिळाली? *';
         grpInp.style.display = 'block';
         grpSel.style.display = 'none';
         mainGroup.style.display = 'block';
@@ -833,16 +827,11 @@
         lbl.innerText = 'कनिष्ठ अभियंता (JE) निवडा *';
         sel.style.display = 'block';
         getData('je_records').forEach(function(j){ sel.add(new Option(j.name, j.name)); });
-      } else if (chalooSrc === 'विभागीय कार्यालय') {
+      } else if (chalooSrc === 'विभागीय कार्यालय' || chalooSrc === 'चार्ज नुसार') {
         subGrp.style.display = 'block';
-        lbl.innerText = 'पूर्वी कोणाकडून मिळाले त्याचे नाव टाईप करा *';
+        lbl.innerText = 'नाव टाईप करा *';
         inp.style.display = 'block';
         inp.placeholder = 'उदा. व्यक्तीचे किंवा कार्यालयाचे नाव';
-      } else if (chalooSrc === 'चार्ज नुसार') {
-        subGrp.style.display = 'block';
-        lbl.innerText = 'चार्ज तपशील टाईप करा *';
-        inp.style.display = 'block';
-        inp.placeholder = 'उदा. पद / चार्ज नाव';
       }
     }
 
@@ -870,9 +859,8 @@
       
       if (!no) return alert('कृपया M.B. क्रमांक भरा.');
 
-      // एकाच क्रमांकाच्या दोन एमबी नोंदवल्या जाण्यापासून संरक्षण (Duplicate Check)
       var list = getData('mb_records');
-      if (idx === -1 && actionType === 'मिळालेली एमबी') {
+      if (idx === -1) {
         var exists = list.some(function(m) {
           return m.mbNumber.toLowerCase() === no.toLowerCase() && m.actionType === 'मिळालेली एमबी';
         });
@@ -881,8 +869,7 @@
         }
       }
 
-      var srcText = "";
-      var subDetail = "";
+      var srcText = "", subDetail = "";
 
       if (actionType === 'दिलेली एमबी') {
         srcText = 'दिलेली एमबी';
@@ -925,6 +912,16 @@
       }
 
       setData('mb_records', list);
+      
+      // सेव्ह झाल्यानंतर फॉर्म पूर्णपणे क्लिअर (Reset) करणे
+      document.getElementById('newMBNo').value = '';
+      document.getElementById('bhandarpalNameInput').value = '';
+      document.getElementById('receivedSubInput').value = '';
+      document.getElementById('mbReceivedType').value = '';
+      document.getElementById('bhandarpalGroup').style.display = 'none';
+      document.getElementById('chalooSourceGroup').style.display = 'none';
+      document.getElementById('receivedSubGroup').style.display = 'none';
+
       cancelMBEdit();
       refreshAll();
       alert('नोंद यशस्वीपणे जतन झाली!');
