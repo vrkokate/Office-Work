@@ -457,7 +457,7 @@
       <div class="step-dot" id="dot3">3</div>
     </div>
 
-    <!-- स्टेप १: मुख्य माहिती (सर्व फिल्ड्स पूर्णपणे ब्लँक/रिसेट) -->
+    <!-- स्टेप १: मुख्य माहिती (दिनांक पूर्णपणे कोरा/ब्लँक) -->
     <div class="wizard-step" id="step1">
       <div class="form-group"><label>संबंधित कनिष्ठ अभियंता (JE) *</label><select class="form-control" id="wJeSelect" onchange="onWizardJEChange()"><option value="">-- JE निवडा --</option></select></div>
       <div class="form-group"><label>वाटप केलेली M.B. क्रमांक *</label><select class="form-control" id="wMbSelect" onchange="onWizardMBChange()"><option value="">-- आधी JE निवडा --</option></select></div>
@@ -727,11 +727,6 @@
     }
 
     window.onload = function() {
-      var today = new Date().toISOString().slice(0, 10);
-      ['newMBDate', 'repFromDate', 'repToDate', 'billDate', 'assignDate'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.value = today;
-      });
       refreshAll();
       onMainCategoryChange();
       updateHourlySuvichar();
@@ -749,10 +744,6 @@
       document.getElementById(id).style.display = 'flex'; 
       if(id === 'billModal') {
         refreshBillDashboard();
-      }
-      // नवीन देयक नोंदवा (Wizard) उघडताना सर्व फिल्ड्स पूर्णपणे ब्लँक/रिसेट राहतील
-      if(id === 'billModal') {
-        // clear wizard fields if needed
       }
     }
     
@@ -1643,11 +1634,13 @@
         jeSel.innerHTML = '<option value="">-- JE निवडा --</option>';
         getData('je_records').forEach(function(j){ jeSel.add(new Option(j.name, j.name)); });
       }
-      // स्टेप १ वरील सर्व फिल्ड्स आणि स्टेप २ मधील सर्व कपाती पूर्णपणे रिसेट (0 किंवा ब्लँक) करणे
+      
+      // नवीन एन्ट्री करताना सर्व फिल्ड्स पूर्णपणे ब्लँक/रिसेट करणे (दिनांकसुद्धा कोरा)
       document.getElementById('wMbSelect').innerHTML = '<option value="">-- आधी JE निवडा --</option>';
       document.getElementById('wContractor').value = '';
       document.getElementById('wWorkName').value = '';
       document.getElementById('wBillType').value = '';
+      document.getElementById('wBillDate').value = '';
       document.getElementById('wPassedAmt').value = '';
       
       var dedInputs = document.querySelectorAll('.calc-ded');
@@ -1706,14 +1699,14 @@
       if(step === 3) renderPreview();
     }
 
-    /* सर्व कपाती (Income Tax 2%, Security Deposit 0.5%, Maintenance 0.5%, Royalty, Govt Ins 1%, Upkar 1%, CGST 1%, SGST 1%) अचूक टक्केवारीनुसार रियल-टाइम कॅल्क्युलेशन */
+    /* वास्तविक टक्केवारीनुसार अचूक ऑटो-कॅल्क्युलेशन आणि इन्स्टंट अपडेट */
     function autoCalculateDeductions() {
       var passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
       
       document.getElementById('dedIT').value = Math.round(passed * 0.02);        // Income Tax 2%
       document.getElementById('dedSD').value = Math.round(passed * 0.005);       // Security Deposit 0.5%
       document.getElementById('dedMaint').value = Math.round(passed * 0.005);    // Maintenance 0.5%
-      document.getElementById('dedRoyalty').value = 0;                           // Royalty Charges (default 0 or as entered)
+      document.getElementById('dedRoyalty').value = Math.round(passed * 0.01);   // Royalty Charges 1%
       document.getElementById('dedGovt').value = Math.round(passed * 0.01);      // Govt. Ins. Scheme 1%
       document.getElementById('dedUpkar').value = Math.round(passed * 0.01);     // Upkar W.C. 1%
       document.getElementById('dedCGST').value = Math.round(passed * 0.01);      // CGST 1%
