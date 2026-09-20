@@ -458,7 +458,7 @@
       <div class="step-dot" id="dot3">3</div>
     </div>
 
-    <!-- स्टेप १: मुख्य माहिती -->
+    <!-- स्टेप १: मुख्य माहिती (एकाच M.B. साठी एकाच प्रकारच्या बिलाची दुबार एन्ट्री रोखण्याची सुविधा) -->
     <div class="wizard-step" id="step1">
       <div class="form-group"><label>संबंधित कनिष्ठ अभियंता (JE) *</label><select class="form-control" id="wJeSelect" onchange="onWizardJEChange()"><option value="">-- JE निवडा --</option></select></div>
       <div class="form-group"><label>वाटप केलेली M.B. क्रमांक *</label><select class="form-control" id="wMbSelect" onchange="onWizardMBChange()"><option value="">-- आधी JE निवडा --</option></select></div>
@@ -494,7 +494,7 @@
       </div>
 
       <div class="form-group"><label>बिलाचा दिनांक *</label><input type="date" class="form-control" id="wBillDate"></div>
-      <div class="wizard-buttons"><button class="btn-wizard btn-next" onclick="goToStep(2)">पुढील ➔</button></div>
+      <div class="wizard-buttons"><button class="btn-wizard btn-next" onclick="validateAndGoToStep2()">पुढील ➔</button></div>
     </div>
 
     <!-- स्टेप २: कपात व हिशोब -->
@@ -1055,7 +1055,7 @@
       }
     }
 
-    /* ==================== कामांची यादी (Work List) लॉजिक (सुधारित Syncing सह) ==================== */
+    /* ==================== कामांची यादी (Work List) लॉजिक ==================== */
     function onWorkJEChange() {
       var je = document.getElementById('workJE').value;
       var mbSel = document.getElementById('workMB');
@@ -1100,11 +1100,9 @@
       if (idx === -1) {
         works.push({ name: name, je: je, contractor: con, mbNo: mb, status: status });
       } else {
-        // जुने काम अपडेट करताना, जर कामाचे नाव बदलले तर Bill Register मधील संबंधित नोंदी देखील सिंक/अपडेट करणे
         var oldWork = works[idx];
         works[idx] = { name: name, je: je, contractor: con, mbNo: mb, status: status };
 
-        // Bill Register (dmbms_bills) मधील संबंधित कामाचे नाव आणि कंत्राटदार ऑटोमॅटिक सिंक करणे
         var bills = getData('dmbms_bills');
         var billUpdated = false;
         bills.forEach(function(b) {
@@ -1720,6 +1718,30 @@
         document.getElementById('wWorkName').value = 'काम नोंदवलेले नाही';
         document.getElementById('wContractor').value = '-';
       }
+    }
+
+    /* स्टेप १ वरून पुढे जाताना एकाच M.B. साठी तीच बिलाची दुबार एन्ट्री तपासणी */
+    function validateAndGoToStep2() {
+      var mbNo = document.getElementById('wMbSelect').value;
+      var billType = document.getElementById('wBillType').value;
+      var editIdx = parseInt(document.getElementById('editBillIndex').value, 10);
+
+      if (!document.getElementById('wJeSelect').value) return showAlert('कृपया कनिष्ठ अभियंता (JE) निवडा.');
+      if (!mbNo) return showAlert('कृपया M.B. क्रमांक निवडा.');
+      if (!billType) return showAlert('कृपया बिलाचा प्रकार निवडा.');
+      if (!document.getElementById('wBillDate').value) return showAlert('कृपया बिलाचा दिनांक निवडा.');
+
+      var bills = getData('dmbms_bills');
+      var duplicateExists = bills.some(function(b, i) {
+        if (editIdx !== -1 && i === editIdx) return false; // स्वतः एडिट करताना वजा करा
+        return b.mbNo === mbNo && b.billType === billType;
+      });
+
+      if (duplicateExists) {
+        return showAlert('सावधान! M.B. क्रमांक "' + mbNo + '" साठी "' + billType + '" ची नोंद आधीच झालेली आहे. पुन्हा तीच एन्ट्री करता येणार नाही!');
+      }
+
+      goToStep(2);
     }
 
     function goToStep(step) {
