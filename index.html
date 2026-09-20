@@ -206,7 +206,6 @@
     .action-cell { white-space: nowrap; text-align: center; display: flex; gap: 4px; justify-content: center; align-items: center; }
     .btn-action { border: none; padding: 4px 8px; border-radius: 3px; font-size: 11px; cursor: pointer; color: #fff; }
 
-    /* अचूक प्रिंटींग व अनावश्‍यक दुसरे पेज रोखण्यासाठीची रचना */
     @media print {
       body * { visibility: hidden; }
       #printableArea, #printableArea * { visibility: visible; }
@@ -372,7 +371,7 @@
           <select class="form-control" id="repDynamicSelect2" onchange="onDynamicSelect2Change()"></select>
         </div>
 
-        <!-- स्टेप ३: वाटप कोणाला केले (सर्व, कनिष्ठ अभियंता, विभागीय कार्यालय) -->
+        <!-- स्टेप ३: वाटप कोणाला केले -->
         <div class="form-group" id="dynamicOptionGroup3" style="display:none;">
           <label id="lblDynamic3">वाटप कोणाला केले?</label>
           <select class="form-control" id="repDynamicSelect3" onchange="onDynamicSelect3Change()">
@@ -399,7 +398,7 @@
       </div>
     </div>
 
-    <!-- 1. JE मोडल -->
+    <!-- 1. JE मोडल (नवीन/चालू आणि भंडारपाल, विभागीय कार्यालय, JE, चार्ज नुसार रचना) -->
     <div id="jeModal" class="modal-overlay">
       <div class="modal-card">
         <div class="modal-header">
@@ -457,16 +456,34 @@
           <select class="form-control" id="selectAvailableMB"></select>
         </div>
 
-        <div class="form-group">
-          <label id="lblMBParty">कोणाकडून मिळाली? *</label>
-          <select class="form-control" id="mbReceivedFromSource" onchange="onMBReceivedSourceChange()">
-            <option value="">-- निवडा --</option>
+        <!-- M.B. कोणाकडून मिळाली? (नवीन / चालू पर्याय रचना) -->
+        <div class="form-group" id="receivedMainGroup">
+          <label>कोणाकडून मिळाली? *</label>
+          <select class="form-control" id="mbReceivedType" onchange="onMBReceivedTypeChange()">
+            <option value="">-- नवीन / चालू निवडा --</option>
+            <option value="नवीन">नवीन</option>
+            <option value="चालू">चालू</option>
+          </select>
+        </div>
+
+        <!-- 'नवीन' निवडल्यास भंडारपाल -->
+        <div class="form-group" id="bhandarpalGroup" style="display:none;">
+          <label>भंडारपाल *</label>
+          <input type="text" class="form-control" id="bhandarpalNameInput" placeholder="भंडारपाIचे नाव टाईप करा">
+        </div>
+
+        <!-- 'चालू' निवडल्यास विभागीय कार्यालय, JE, चार्ज नुसार -->
+        <div class="form-group" id="chalooSourceGroup" style="display:none;">
+          <label>चालू स्रोत निवडा *</label>
+          <select class="form-control" id="mbChalooSource" onchange="onMBChalooSourceChange()">
+            <option value="">-- स्रोत निवडा --</option>
             <option value="विभागीय कार्यालय">विभागीय कार्यालय</option>
             <option value="JE">JE</option>
             <option value="चार्ज नुसार">चार्ज नुसार</option>
           </select>
         </div>
 
+        <!-- उप-तपशील (JE किंवा विभागीय कार्यालयातून कोणाकडून) -->
         <div class="form-group" id="receivedSubGroup" style="display:none;">
           <label id="receivedSubLabel">तपशील निवडा *</label>
           <select class="form-control" id="receivedSubSelect"></select>
@@ -749,7 +766,196 @@
       document.getElementById('countAvailableMB').innerText = stock.length;
     }
 
-    /* ==================== परिपूर्ण डायनॅमिक कास्केडिंग लॉजिक ==================== */
+    /* ==================== M.B. नोंद फॉर्ममधील नवीन/चालू लॉजिक ==================== */
+    function onMBActionTypeChange() {
+      var actionType = document.getElementById('mbActionType').value;
+      var lblParty = document.getElementById('lblMBParty');
+      var grpInp = document.getElementById('groupMBInput');
+      var grpSel = document.getElementById('groupMBSelect');
+      var mainGroup = document.getElementById('receivedMainGroup');
+      var bhandarpalGrp = document.getElementById('bhandarpalGroup');
+      var chalooGrp = document.getElementById('chalooSourceGroup');
+      var subGrp = document.getElementById('receivedSubGroup');
+
+      if (actionType === 'दिलेली एमबी') {
+        lblParty.innerText = 'कोणाला दिली? *';
+        grpInp.style.display = 'none';
+        grpSel.style.display = 'block';
+        mainGroup.style.display = 'none';
+        bhandarpalGrp.style.display = 'none';
+        chalooGrp.style.display = 'none';
+        subGrp.style.display = 'none';
+        populateAvailableMBs();
+      } else {
+        lblParty.innerText = 'कोणाकडून मिळाली? *';
+        grpInp.style.display = 'block';
+        grpSel.style.display = 'none';
+        mainGroup.style.display = 'block';
+        document.getElementById('mbReceivedType').value = "";
+        bhandarpalGrp.style.display = 'none';
+        chalooGrp.style.display = 'none';
+        subGrp.style.display = 'none';
+      }
+    }
+
+    function onMBReceivedTypeChange() {
+      var typeVal = document.getElementById('mbReceivedType').value;
+      var bhandarpalGrp = document.getElementById('bhandarpalGroup');
+      var chalooGrp = document.getElementById('chalooSourceGroup');
+      var subGrp = document.getElementById('receivedSubGroup');
+
+      bhandarpalGrp.style.display = 'none';
+      chalooGrp.style.display = 'none';
+      subGrp.style.display = 'none';
+
+      if (typeVal === 'नवीन') {
+        bhandarpalGrp.style.display = 'block';
+      } else if (typeVal === 'चालू') {
+        chalooGrp.style.display = 'block';
+        document.getElementById('mbChalooSource').value = "";
+      }
+    }
+
+    function onMBChalooSourceChange() {
+      var chalooSrc = document.getElementById('mbChalooSource').value;
+      var subGrp = document.getElementById('receivedSubGroup');
+      var sel = document.getElementById('receivedSubSelect');
+      var inp = document.getElementById('receivedSubInput');
+      var lbl = document.getElementById('receivedSubLabel');
+      
+      subGrp.style.display = 'none';
+      sel.innerHTML = '';
+
+      if (chalooSrc === 'JE') {
+        subGrp.style.display = 'block';
+        lbl.innerText = 'कनिष्ठ अभियंता (JE) निवडा *';
+        sel.style.display = 'block';
+        inp.style.display = 'none';
+        getData('je_records').forEach(function(j){ sel.add(new Option(j.name, j.name)); });
+      } else if (chalooSrc === 'विभागीय कार्यालय') {
+        subGrp.style.display = 'block';
+        lbl.innerText = 'पूर्वी कोणाकडे होती त्याचे नाव निवडा / टाईप करा *';
+        sel.style.display = 'none';
+        inp.style.display = 'block';
+        inp.placeholder = 'उदा. व्यक्तीचे किंवा कार्यालयाचे नाव टाईप करा';
+      } else if (chalooSrc === 'चार्ज नुसार') {
+        subGrp.style.display = 'block';
+        lbl.innerText = 'चार्ज तपशील टाईप करा *';
+        sel.style.display = 'none';
+        inp.style.display = 'block';
+        inp.placeholder = 'उदा. पद / चार्ज नाव';
+      }
+    }
+
+    function onMB0SizeChange() {
+      if (document.getElementById('mbActionType').value === 'दिलेली एमबी') {
+        populateAvailableMBs();
+      }
+    }
+
+    function populateAvailableMBs() {
+      var selectedSize = document.getElementById('newMBSize').value;
+      var sel = document.getElementById('selectAvailableMB');
+      sel.innerHTML = '<option value="">-- उपलब्ध एम बी निवडा --</option>';
+      getAvailableStock().filter(function(s){ return s.size === selectedSize; }).forEach(function(s) {
+        sel.add(new Option(s.mbNumber + ' (' + s.size + ')', s.mbNumber));
+      });
+    }
+
+    function saveOrUpdateMB() {
+      var actionType = document.getElementById('mbActionType').value;
+      var size = document.getElementById('newMBSize').value;
+      var no = actionType === 'दिलेली एमबी' ? document.getElementById('selectAvailableMB').value : document.getElementById('newMBNo').value.trim();
+      var date = document.getElementById('newMBDate').value;
+      var idx = parseInt(document.getElementById('editMBIndex').value, 10);
+      
+      if (!no) return alert('कृपया M.B. क्रमांक भरा.');
+
+      var srcText = "";
+      var subDetail = "";
+
+      if (actionType === 'दिलेली एमबी') {
+        srcText = 'दिलेली एमबी';
+      } else {
+        var recType = document.getElementById('mbReceivedType').value;
+        if (!recType) return alert('कृपया नवीन किंवा चालू पर्याय निवडा.');
+
+        if (recType === 'नवीन') {
+          var bName = document.getElementById('bhandarpalNameInput').value.trim();
+          if (!bName) return alert('कृपया भंडारपाळचे नाव भरा.');
+          srcText = 'भंडारपाल (' + bName + ')';
+          subDetail = bName;
+        } else {
+          var chalooSrc = document.getElementById('mbChalooSource').value;
+          if (!chalooSrc) return alert('कृपया चालू स्रोत निवडा.');
+          
+          if (chalooSrc === 'JE') {
+            subDetail = document.getElementById('receivedSubSelect').value;
+            if (!subDetail) return alert('कृपया कनिष्ठ अभियंता निवडा.');
+          } else {
+            subDetail = document.getElementById('receivedSubInput').value.trim();
+            if (!subDetail) return alert('कृपया नाव टाईप करा.');
+          }
+          srcText = chalooSrc + ' (' + subDetail + ')';
+        }
+      }
+
+      var displayParty = actionType + ' : ' + srcText;
+      var list = getData('mb_records');
+
+      if (idx === -1) {
+        list.push({ actionType: actionType, mbNumber: no, size: size, receivedSource: srcText, receivedDetail: subDetail, receivedFrom: displayParty, date: date });
+        if (actionType === 'दिलेली एमबी' && subDetail) {
+          var assigns = getData('assign_records');
+          assigns.push({ mbNo: no, jeName: subDetail, assignDate: date });
+          setData('assign_records', assigns);
+        }
+      } else {
+        list[idx] = { actionType: actionType, mbNumber: no, size: size, receivedSource: srcText, receivedDetail: subDetail, receivedFrom: displayParty, date: date };
+      }
+
+      setData('mb_records', list);
+      cancelMBEdit();
+      refreshAll();
+      alert('नोंद यशस्वीपणे जतन झाली!');
+    }
+
+    function editMB(idx) {
+      var item = getData('mb_records')[idx];
+      document.getElementById('mbActionType').value = item.actionType;
+      onMBActionTypeChange();
+      document.getElementById('newMBSize').value = item.size;
+      if (item.actionType === 'दिलेली एमबी') {
+        populateAvailableMBs();
+        document.getElementById('selectAvailableMB').value = item.mbNumber;
+      } else {
+        document.getElementById('newMBNo').value = item.mbNumber;
+      }
+      document.getElementById('newMBDate').value = item.date;
+      document.getElementById('editMBIndex').value = idx;
+      document.getElementById('btnSaveMB').textContent = 'Update Entry';
+      document.getElementById('btnCancelMB').style.display = 'block';
+    }
+
+    function cancelMBEdit() {
+      document.getElementById('mbActionType').value = 'मिळालेली एमबी';
+      onMBActionTypeChange();
+      document.getElementById('newMBNo').value = '';
+      document.getElementById('editMBIndex').value = '-1';
+      document.getElementById('btnSaveMB').textContent = 'Save Entry';
+      document.getElementById('btnCancelMB').style.display = 'none';
+    }
+
+    function deleteMB(idx) {
+      if (confirm('ही नोंद हटवायची का?')) {
+        var list = getData('mb_records');
+        list.splice(idx, 1);
+        setData('mb_records', list);
+        refreshAll();
+      }
+    }
+
+    /* ==================== अहवाल आणि कास्केडिंग फिल्टर लॉजिक ==================== */
     function onMainCategoryChange() {
       var mainCat = document.getElementById('repMainCategory').value;
       var grp1 = document.getElementById('dynamicOptionGroup1');
@@ -1082,135 +1288,6 @@
       p.style.display = 'block';
       window.print();
       p.style.display = 'none';
-    }
-
-    function onMBActionTypeChange() {
-      var actionType = document.getElementById('mbActionType').value;
-      var lblParty = document.getElementById('lblMBParty');
-      var grpInp = document.getElementById('groupMBInput');
-      var grpSel = document.getElementById('groupMBSelect');
-
-      if (actionType === 'दिलेली एमबी') {
-        lblParty.innerText = 'कोणाला दिली? *';
-        grpInp.style.display = 'none';
-        grpSel.style.display = 'block';
-        populateAvailableMBs();
-      } else {
-        lblParty.innerText = 'कोणाकडून मिळाली? *';
-        grpInp.style.display = 'block';
-        grpSel.style.display = 'none';
-      }
-      onMBReceivedSourceChange();
-    }
-
-    function onMBSizeChange() {
-      if (document.getElementById('mbActionType').value === 'दिलेली एमबी') {
-        populateAvailableMBs();
-      }
-    }
-
-    function populateAvailableMBs() {
-      var selectedSize = document.getElementById('newMBSize').value;
-      var sel = document.getElementById('selectAvailableMB');
-      sel.innerHTML = '<option value="">-- उपलब्ध एम बी निवडा --</option>';
-      getAvailableStock().filter(function(s){ return s.size === selectedSize; }).forEach(function(s) {
-        sel.add(new Option(s.mbNumber + ' (' + s.size + ')', s.mbNumber));
-      });
-    }
-
-    function onMBReceivedSourceChange() {
-      var src = document.getElementById('mbReceivedFromSource').value;
-      var grp = document.getElementById('receivedSubGroup');
-      var sel = document.getElementById('receivedSubSelect');
-      var inp = document.getElementById('receivedSubInput');
-      var lbl = document.getElementById('receivedSubLabel');
-      
-      sel.innerHTML = '';
-      if (src === 'JE') {
-        grp.style.display = 'block';
-        lbl.innerText = 'कनिष्ठ अभियंता (JE) निवडा *';
-        sel.style.display = 'block';
-        inp.style.display = 'none';
-        getData('je_records').forEach(function(j){ sel.add(new Option(j.name, j.name)); });
-      } else if (src === 'विभागीय कार्यालय' || src === 'इतर') {
-        grp.style.display = 'block';
-        lbl.innerText = 'पद / व्यक्तीचे नाव टाईप करा *';
-        sel.style.display = 'none';
-        inp.style.display = 'block';
-      } else {
-        grp.style.display = 'none';
-      }
-    }
-
-    function saveOrUpdateMB() {
-      var actionType = document.getElementById('mbActionType').value;
-      var size = document.getElementById('newMBSize').value;
-      var no = actionType === 'दिलेली एमबी' ? document.getElementById('selectAvailableMB').value : document.getElementById('newMBNo').value.trim();
-      var src = document.getElementById('mbReceivedFromSource').value;
-      var date = document.getElementById('newMBDate').value;
-      var idx = parseInt(document.getElementById('editMBIndex').value, 10);
-      
-      if (!no || !src) return alert('कृपया सर्व आवश्यक माहिती भरा.');
-
-      var sub = src === 'JE' ? document.getElementById('receivedSubSelect').value : document.getElementById('receivedSubInput').value.trim();
-      var partyDetail = src === 'चार्ज नुसार' ? 'चार्ज नुसार' : (src + (sub ? ' (' + sub + ')' : ''));
-      var displayParty = actionType + ' : ' + partyDetail;
-
-      var list = getData('mb_records');
-      if (idx === -1) {
-        list.push({ actionType: actionType, mbNumber: no, size: size, receivedSource: src, receivedDetail: sub, receivedFrom: displayParty, date: date });
-        if (actionType === 'दिलेली एमबी' && src === 'JE' && sub) {
-          var assigns = getData('assign_records');
-          assigns.push({ mbNo: no, jeName: sub, assignDate: date });
-          setData('assign_records', assigns);
-        }
-      } else {
-        list[idx] = { actionType: actionType, mbNumber: no, size: size, receivedSource: src, receivedDetail: sub, receivedFrom: displayParty, date: date };
-      }
-
-      setData('mb_records', list);
-      cancelMBEdit();
-      refreshAll();
-      alert('नोंद यशस्वीपणे जतन झाली!');
-    }
-
-    function editMB(idx) {
-      var item = getData('mb_records')[idx];
-      document.getElementById('mbActionType').value = item.actionType;
-      onMBActionTypeChange();
-      document.getElementById('newMBSize').value = item.size;
-      if (item.actionType === 'दिलेली एमबी') {
-        populateAvailableMBs();
-        document.getElementById('selectAvailableMB').value = item.mbNumber;
-      } else {
-        document.getElementById('newMBNo').value = item.mbNumber;
-      }
-      document.getElementById('mbReceivedFromSource').value = item.receivedSource;
-      onMBReceivedSourceChange();
-      if (item.receivedSource === 'JE') document.getElementById('receivedSubSelect').value = item.receivedDetail;
-      else document.getElementById('receivedSubInput').value = item.receivedDetail;
-      document.getElementById('newMBDate').value = item.date;
-      document.getElementById('editMBIndex').value = idx;
-      document.getElementById('btnSaveMB').textContent = 'Update Entry';
-      document.getElementById('btnCancelMB').style.display = 'block';
-    }
-
-    function cancelMBEdit() {
-      document.getElementById('mbActionType').value = 'मिळालेली एमबी';
-      onMBActionTypeChange();
-      document.getElementById('newMBNo').value = '';
-      document.getElementById('editMBIndex').value = '-1';
-      document.getElementById('btnSaveMB').textContent = 'Save Entry';
-      document.getElementById('btnCancelMB').style.display = 'none';
-    }
-
-    function deleteMB(idx) {
-      if (confirm('ही नोंद हटवायची का?')) {
-        var list = getData('mb_records');
-        list.splice(idx, 1);
-        setData('mb_records', list);
-        refreshAll();
-      }
     }
 
     function saveOrUpdateJE() {
