@@ -330,7 +330,7 @@
         </div>
       </div>
 
-      <!-- सविस्तर रिपोर्ट फिल्टर कार्ड (पूर्णपणे सुधारित डायनॅमिक कॅस्केडिंग रचना) -->
+      <!-- सविस्तर रिपोर्ट फिल्टर कार्ड -->
       <div class="filter-card">
         <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
         
@@ -357,33 +357,31 @@
           </select>
         </div>
 
-        <!-- स्टेप १: डायनॅमिक उपघटक (उदा. M.B. प्रकार / J.E. नावे) -->
+        <!-- स्टेप १ -->
         <div class="form-group" id="dynamicOptionGroup1" style="display:none;">
           <label id="lblDynamic1">पुढील पर्याय</label>
           <select class="form-control" id="repDynamicSelect1" onchange="onDynamicSelect1Change()"></select>
         </div>
 
-        <!-- स्टेप २: डायनॅमिक सविस्तर स्थिती (उदा. उपलब्ध, वाटप, मिळालेली) -->
+        <!-- स्टेप २ -->
         <div class="form-group" id="dynamicOptionGroup2" style="display:none;">
           <label id="lblDynamic2">एम.बी. सविस्तर स्थिती</label>
           <select class="form-control" id="repDynamicSelect2" onchange="onDynamicSelect2Change()"></select>
         </div>
 
-        <!-- स्टेप ३: वाटप केलेली (Given) निवडल्यावर येणारे अतिरिक्त पर्याय -->
+        <!-- स्टेप ३: वाटप कोणाला केले (इतर काढून टाकले, फक्त कनिष्ठ अभियंता आणि विभागीय कार्यालय) -->
         <div class="form-group" id="dynamicOptionGroup3" style="display:none;">
           <label id="lblDynamic3">वाटप कोणाला केले?</label>
           <select class="form-control" id="repDynamicSelect3" onchange="onDynamicSelect3Change()">
             <option value="JE">कनिष्ठ अभियंता</option>
             <option value="Office">विभागीय कार्यालय</option>
-            <option value="Other">इतर</option>
           </select>
         </div>
 
-        <!-- स्टेप ४: कनिष्ठ अभियंता ड्रॉपडाऊन किंवा हाताने टाईप करण्यासाठी इनपुट बॉक्स -->
+        <!-- स्टेप ४: कनिष्ठ अभियंता ड्रॉपडाऊन -->
         <div class="form-group" id="dynamicInputGroup" style="display:none;">
           <label id="lblDynamicInput">तपशील भरा</label>
           <select class="form-control" id="repDynamicJEList" style="display:none;"></select>
-          <input type="text" class="form-control" id="repDynamicTextInput" style="display:none;" placeholder="येथे नाव किंवा तपशील टाईप करा">
         </div>
 
         <!-- स्मार्ट शोध -->
@@ -820,17 +818,16 @@
     }
 
     function onDynamicSelect3Change() {
-      var targetType = document.getElementById('repDynamicSelect3').value; // JE, Office, Other
+      var targetType = document.getElementById('repDynamicSelect3').value; // JE किंवा Office
       var inputGrp = document.getElementById('dynamicInputGroup');
       var jeListSel = document.getElementById('repDynamicJEList');
-      var textInp = document.getElementById('repDynamicTextInput');
       var lblInput = document.getElementById('lblDynamicInput');
 
-      inputGrp.style.display = 'block';
+      inputGrp.style.display = 'none';
       jeListSel.style.display = 'none';
-      textInp.style.display = 'none';
 
       if (targetType === 'JE') {
+        inputGrp.style.display = 'block';
         lblInput.innerText = 'कनिष्ठ अभियंता (JE) निवडा';
         jeListSel.style.display = 'block';
         jeListSel.innerHTML = '<option value="">-- सर्व JE --</option>';
@@ -838,13 +835,7 @@
           jeListSel.add(new Option(j.name, j.name));
         });
       } else if (targetType === 'Office') {
-        lblInput.innerText = 'विभागीय कार्यालय तपशील टाईप करा';
-        textInp.style.display = 'block';
-        textInp.placeholder = 'उदा. विभागीय कार्यालय नाव';
-      } else if (targetType === 'Other') {
-        lblInput.innerText = 'इतर तपशील टाईप करा';
-        textInp.style.display = 'block';
-        textInp.placeholder = 'उदा. व्यक्तीचे किंवा पदाचे नाव';
+        inputGrp.style.display = 'none'; // विभागीय कार्यालय निवडल्यास अतिरिक्त बॉक्स नाही
       }
     }
 
@@ -866,8 +857,11 @@
 
         if (finalType === 'GIVEN') {
           givenSubTarget = document.getElementById('repDynamicSelect3').value;
-          if (givenSubTarget === 'JE') givenSubValue = document.getElementById('repDynamicJEList').value;
-          else givenSubValue = document.getElementById('repDynamicTextInput').value.trim();
+          if (givenSubTarget === 'JE') {
+            givenSubValue = document.getElementById('repDynamicJEList').value;
+          } else if (givenSubTarget === 'Office') {
+            givenSubValue = 'विभागीय कार्यालय';
+          }
         }
 
         generateAdvancedMBReport(sizeChoice, finalType, givenSubTarget, givenSubValue, fDate, tDate);
@@ -907,8 +901,8 @@
           if (m.actionType !== 'दिलेली एमबी') return false;
           if (subTarget === 'JE' && subVal) {
             return m.receivedDetail && m.receivedDetail.toLowerCase() === subVal.toLowerCase();
-          } else if ((subTarget === 'Office' || subTarget === 'Other') && subVal) {
-            return m.receivedFrom && m.receivedFrom.toLowerCase().includes(subVal.toLowerCase());
+          } else if (subTarget === 'Office') {
+            return m.receivedSource && m.receivedSource.includes('विभागीय कार्यालय');
           }
           return true;
         });
@@ -931,7 +925,6 @@
       var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
       var personHeaderName = subVal ? subVal : "सर्व संबंधित";
 
-      // नवीन डिझाईન रचनेनुसार हेडर्स (४ कॉलम: अनुक्रमांक, मोजमाप पुस्तिका क्रमांक, प्रकार, सध्यस्थिती)
       var html = '<div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #333; padding-bottom:6px; margin-bottom:12px;">' +
                    '<div style="font-size:12px; font-weight:700;">श्री ' + personHeaderName + '</div>' +
                    '<div style="text-align:center;">' +
@@ -952,7 +945,6 @@
         var mbNo = item.mbNumber || item.mbNo;
         var size = item.size || 'लहान M.B.';
         
-        // ५ व्या कॉलमसाठी फक्त नाव किंवा सध्यस्थिती दर्शवणे (उदा. गोरनाळे रावसाहेब)
         var currentStatus = "-";
         if (item.actionType === 'दिलेली एमबी') {
           currentStatus = item.receivedDetail || item.receivedFrom || 'दिलेली';
