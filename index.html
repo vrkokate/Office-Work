@@ -377,7 +377,7 @@
       </div>
     </div></div>
 
-    <!-- 3. Work List मोडल (सुधारित Edit फंक्शनसह) -->
+    <!-- 3. Work List मोडल -->
     <div id="workModal" class="modal-overlay"><div class="modal-card">
       <div class="modal-header"><h3 style="font-size: 14px; color:#00897b;">📋 कामांची यादी (Work List)</h3><button class="btn-close" onclick="closeModule('workModal')">X</button></div>
       <input type="hidden" id="editWorkIndex" value="-1">
@@ -386,7 +386,7 @@
       <div class="form-group"><label>कामाचे नाव *</label><input type="text" class="form-control" id="workName" placeholder="कामाचे नाव टाईप करा"></div>
       <div class="form-group"><label>कंत्राटदार / एजन्सी चे नाव *</label><input type="text" class="form-control" id="workContractor" placeholder="कंत्राटदाराचे नाव टाईप करा"></div>
       <div class="form-group"><label>कामाची स्थिती (Status) *</label><select class="form-control" id="workStatus"><option value="अपूर्ण">अपूर्ण (चालू काम)</option><option value="पूर्ण">पूर्ण</option></select></div>
-      <div style="display:flex; gap:6px;"><button id="btnSaveWork" class="btn-report" style="background:#00897b; flex:1;" onclick="saveOrUpdateWork()">Update Work</button><button id="btnCancelWork" class="btn-report" style="background:#757575; width:80px; display:none;" onclick="cancelWorkEdit()">रद्द करा</button></div>
+      <div style="display:flex; gap:6px;"><button id="btnSaveWork" class="btn-report" style="background:#00897b; flex:1;" onclick="saveOrUpdateWork()">Save Work</button><button id="btnCancelWork" class="btn-report" style="background:#757575; width:80px; display:none;" onclick="cancelWorkEdit()">रद्द करा</button></div>
       
       <div class="table-scroll-box">
         <table class="data-table"><thead><tr><th>अ.क्र.</th><th>काम</th><th>JE</th><th>M.B.</th><th>स्थिती</th><th style="width:20%; text-align:center;">Action</th></tr></thead><tbody id="workListBody"></tbody></table>
@@ -1055,7 +1055,7 @@
       }
     }
 
-    /* ==================== कामांची यादी (Work List) लॉजिक (सुधारित Edit फंक्शनसह) ==================== */
+    /* ==================== कामांची यादी (Work List) लॉजिक (सुधारित Syncing सह) ==================== */
     function onWorkJEChange() {
       var je = document.getElementById('workJE').value;
       var mbSel = document.getElementById('workMB');
@@ -1100,7 +1100,24 @@
       if (idx === -1) {
         works.push({ name: name, je: je, contractor: con, mbNo: mb, status: status });
       } else {
+        // जुने काम अपडेट करताना, जर कामाचे नाव बदलले तर Bill Register मधील संबंधित नोंदी देखील सिंक/अपडेट करणे
+        var oldWork = works[idx];
         works[idx] = { name: name, je: je, contractor: con, mbNo: mb, status: status };
+
+        // Bill Register (dmbms_bills) मधील संबंधित कामाचे नाव आणि कंत्राटदार ऑटोमॅटिक सिंक करणे
+        var bills = getData('dmbms_bills');
+        var billUpdated = false;
+        bills.forEach(function(b) {
+          if (b.mbNo === mb || b.workName === oldWork.name) {
+            b.workName = name;
+            b.contractor = con;
+            b.je = je;
+            billUpdated = true;
+          }
+        });
+        if (billUpdated) {
+          setData('dmbms_bills', bills);
+        }
       }
 
       setData('work_records', works);
@@ -1113,14 +1130,13 @@
 
       cancelWorkEdit();
       refreshAll();
-      showAlert('काम यशस्वीपणे जतन झाले!');
+      showAlert('काम यशस्वीपणे अपडेट व जतन झाले!');
     }
 
     function editWork(idx) {
       var item = getData('work_records')[idx];
       document.getElementById('workJE').value = item.je;
       
-      // JE नुसार M.B. यादी लोड करून त्यात सध्याची M.B. समाविष्ट करणे
       var mbSel = document.getElementById('workMB');
       mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';
       var assignedMBs = getData('assign_records').filter(function(a){ return a.jeName === item.je; });
