@@ -254,7 +254,7 @@
     </div>
   </div>
 
-  <!-- ==================== डॅशबोर्ड क्लिक तपशील मोडल ==================== -->
+  <!-- ==================== डॅशबोर्ड क्लिक तपशील मोडल (सुधारित मुख्य व उप-फिल्टर सह) ==================== -->
   <div id="quickInfoModal" class="quick-info-overlay">
     <div class="quick-info-card">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
@@ -262,9 +262,9 @@
         <button class="btn-close" onclick="closeQuickInfoModal()">X</button>
       </div>
       
-      <!-- आकार फिल्टर (फक्त "उपलब्ध एम बी" साठी 'सर्व mb', 'लहान mb', 'मोठी mb' आणि इतर कार्ड्ससाठी संपूर्ण फिल्टर) -->
+      <!-- आकार फिल्टर -->
       <div class="form-group" style="margin-bottom:8px;">
-        <label id="sizeFilterLabel">एम.बी. आकारानुसार फिल्टर:</label>
+        <label>एम.बी. आकारानुसार फिल्टर:</label>
         <select class="form-control" id="quickModalSizeFilter" onchange="onQuickFilterChange()">
           <option value="ALL">सर्व M.B.</option>
           <option value="लहान M.B.">लहान M.B.</option>
@@ -272,13 +272,22 @@
         </select>
       </div>
 
-      <!-- स्रोत/व्यक्तीनुसार फिल्टर (फक्त मिळाले/दिले कार्डसाठी, उपलब्धसाठी लपवला जाईल) -->
-      <div class="form-group" id="quickSourceGroup" style="margin-bottom:12px;">
-        <label>स्रोत / व्यक्तीनुसार फिल्टर:</label>
-        <select class="form-control" id="quickModalSourceFilter" onchange="onQuickFilterChange()">
+      <!-- मुख्य फिल्टर (सर्व, विभागीय कार्यालय, Je, इतर) -->
+      <div class="form-group" style="margin-bottom:8px;">
+        <label>स्रोत / व्यक्तीनुसार मुख्य फिल्टर:</label>
+        <select class="form-control" id="quickModalMainSource" onchange="onQuickMainSourceChange()">
           <option value="ALL">सर्व (All)</option>
           <option value="विभागीय कार्यालय">विभागीय कार्यालय</option>
+          <option value="JE">Je</option>
           <option value="इतर">इतर</option>
+        </select>
+      </div>
+
+      <!-- Je निवडल्यास उघडणारी कनिष्ठ अभियंता लिस्ट (All JE + वैयक्तिक JE) -->
+      <div class="form-group" id="quickModalJESubGroup" style="display:none; margin-bottom:12px;">
+        <label>कनिष्ठ अभियंता (JE) निवडा:</label>
+        <select class="form-control" id="quickModalJESubSelect" onchange="onQuickFilterChange()">
+          <option value="ALL_JE">all je (सर्व JE)</option>
         </select>
       </div>
 
@@ -781,32 +790,47 @@
       
       document.getElementById('quickModalSizeFilter').value = 'ALL';
       
-      var sourceGroup = document.getElementById('quickSourceGroup');
-      var sourceSelect = document.getElementById('quickModalSourceFilter');
+      var mainSourceSelect = document.getElementById('quickModalMainSource');
+      mainSourceSelect.innerHTML = '<option value="ALL">सर्व (All)</option>' +
+                                   '<option value="भंडारपाल">भंडारपाल</option>' +
+                                   '<option value="विभागीय कार्यालय">विभागीय कार्यालय</option>' +
+                                   '<option value="JE">Je</option>' +
+                                   '<option value="इतर">इतर</option>';
+      mainSourceSelect.value = 'ALL';
 
-      if (type === 'AVAILABLE') {
-        // "उपलब्ध एम बी" कार्डसाठी फक्त सर्व M.B., लहान M.B., मोठी M.B. हेच फिल्टर असतील, त्यामुळे स्रोत फिल्टर लपवला आहे
-        sourceGroup.style.display = 'none';
-      } else {
-        sourceGroup.style.display = 'block';
-        sourceSelect.innerHTML = '<option value="ALL">सर्व (All)</option><option value="भंडारपाल">भंडारपाल</option><option value="विभागीय कार्यालय">विभागीय कार्यालय</option><option value="इतर">इतर</option>';
+      document.getElementById('quickModalJESubGroup').style.display = 'none';
+      renderQuickModalContent('ALL', 'ALL', 'ALL_JE');
+      document.getElementById('quickInfoModal').style.display = 'flex';
+    }
+
+    function onQuickMainSourceChange() {
+      var mainVal = document.getElementById('quickModalMainSource').value;
+      var jeSubGroup = document.getElementById('quickModalJESubGroup');
+      var jeSubSelect = document.getElementById('quickModalJESubSelect');
+
+      jeSubGroup.style.display = 'none';
+      jeSubSelect.innerHTML = '<option value="ALL_JE">all je (सर्व JE)</option>';
+
+      if (mainVal === 'JE') {
+        jeSubGroup.style.display = 'block';
         getData('je_records').forEach(function(j) {
-          sourceSelect.add(new Option(j.name, j.name));
+          jeSubSelect.add(new Option(j.name, j.name));
         });
-        sourceSelect.value = 'ALL';
+        jeSubSelect.value = 'ALL_JE';
       }
 
-      renderQuickModalContent('ALL', 'ALL');
-      document.getElementById('quickInfoModal').style.display = 'flex';
+      onQuickFilterChange();
     }
 
     function onQuickFilterChange() {
       var selectedSize = document.getElementById('quickModalSizeFilter').value;
-      var selectedSource = document.getElementById('quickModalSourceFilter').value;
-      renderQuickModalContent(selectedSize, selectedSource);
+      var mainSource = document.getElementById('quickModalMainSource').value;
+      var jeSubVal = document.getElementById('quickModalJESubSelect').value;
+
+      renderQuickModalContent(selectedSize, mainSource, jeSubVal);
     }
 
-    function renderQuickModalContent(sizeFilter, sourceFilter) {
+    function renderQuickModalContent(sizeFilter, mainSource, jeSubVal) {
       var allMBs = getData('mb_records');
       var stock = getAvailableStock();
       var title = "";
@@ -818,10 +842,16 @@
         if (sizeFilter !== 'ALL') {
           rcvList = rcvList.filter(function(m){ return m.size === sizeFilter; });
         }
-        if (sourceFilter !== 'ALL') {
-          rcvList = rcvList.filter(function(m){ 
-            return m.receivedFrom && m.receivedFrom.toLowerCase().includes(sourceFilter.toLowerCase()); 
-          });
+        if (mainSource !== 'ALL') {
+          if (mainSource === 'JE') {
+            if (jeSubVal !== 'ALL_JE') {
+              rcvList = rcvList.filter(function(m){ return m.receivedFrom && m.receivedFrom.toLowerCase().includes(jeSubVal.toLowerCase()); });
+            } else {
+              rcvList = rcvList.filter(function(m){ return m.receivedFrom && (m.receivedFrom.includes('JE') || m.receivedFrom.includes('श्री')); });
+            }
+          } else {
+            rcvList = rcvList.filter(function(m){ return m.receivedFrom && m.receivedFrom.toLowerCase().includes(mainSource.toLowerCase()); });
+          }
         }
 
         var smallCount = rcvList.filter(function(m){ return m.size === 'लहान M.B.'; }).length;
@@ -843,10 +873,21 @@
         if (sizeFilter !== 'ALL') {
           givenList = givenList.filter(function(m){ return m.size === sizeFilter; });
         }
-        if (sourceFilter !== 'ALL') {
-          givenList = givenList.filter(function(m){ 
-            return m.receivedDetail && m.receivedDetail.toLowerCase().includes(sourceFilter.toLowerCase()); 
-          });
+        if (mainSource !== 'ALL') {
+          if (mainSource === 'JE') {
+            if (jeSubVal !== 'ALL_JE') {
+              givenList = givenList.filter(function(m){ return m.receivedDetail && m.receivedDetail.toLowerCase() === jeSubVal.toLowerCase(); });
+            } else {
+              var jeNames = getData('je_records').map(function(j){ return j.name.toLowerCase(); });
+              givenList = givenList.filter(function(m){ 
+                return m.receivedDetail && jeNames.some(function(name){ return m.receivedDetail.toLowerCase().includes(name); }); 
+              });
+            }
+          } else if (mainSource === 'विभागीय कार्यालय') {
+            givenList = givenList.filter(function(m){ return m.receivedSource && m.receivedSource.includes('विभागीय कार्यालय'); });
+          } else if (mainSource === 'इतर') {
+            givenList = givenList.filter(function(m){ return m.receivedSource && !m.receivedSource.includes('विभागीय कार्यालय') && !m.receivedSource.includes('JE'); });
+          }
         }
 
         var smallCount = givenList.filter(function(m){ return m.size === 'लहान M.B.'; }).length;
@@ -1903,6 +1944,7 @@
       getData('je_records').forEach(function(j){ jeSel.add(new Option(j.name, j.name)); });
     }
 
+    /* ==================== सेटिंग्स व बॅकअप लॉजिक ==================== */
     function downloadBackup() {
       var allData = { je_records: getData('je_records'), mb_records: getData('mb_records'), work_records: getData('work_records'), bill_records: getData('bill_records'), assign_records: getData('assign_records') };
       var blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
