@@ -57,11 +57,11 @@
     .stat-label { font-size: 11px; color: #555; margin-top: 2px; }
 
     .filter-card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-    .form-group { margin-bottom: 8px; text-align: left; }
-    .form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 2px; }
-    .form-control { width: 100%; padding: 6px 8px; font-size: 13px; border: 1px solid #ccc; border-radius: 5px; outline: none; background: #fff; display: block; }
+    .form-group { margin-bottom: 10px; text-align: left; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 4px; }
+    .form-control { width: 100%; padding: 8px 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 5px; outline: none; background: #fff; display: block; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 8px; }
     
-    /* कपातीच्या रकान्यांमधील अंतर कमी करण्यासाठी कॉम्पॅक्ट डिझाईन */
     .form-row-compact { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-items: center; margin-bottom: 5px; }
     .form-row-compact label { font-size: 11.5px; font-weight: 600; color: #333; margin: 0; }
     .form-row-compact input { padding: 5px 6px; font-size: 12px; height: 30px; }
@@ -86,8 +86,6 @@
 
     .wizard-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2500; justify-content: center; align-items: center; padding: 10px; }
     .wizard-card { background: #fff; border-radius: 12px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; padding: 18px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
-    
-    /* स्टेप २ मधील कपातीचा बॉक्स (कमी अंतर आणि स्क्रोलिंग) */
     .deduction-scroll-box { max-height: 260px; overflow-y: auto; padding-right: 4px; border: 1px solid #eee; border-radius: 6px; padding: 6px; margin-bottom: 6px; }
     
     .bill-scroll-container { 
@@ -467,7 +465,7 @@
       <div class="wizard-buttons"><button class="btn-wizard btn-next" onclick="goToStep(2)">पुढील ➔</button></div>
     </div>
 
-    <!-- स्टेप २: कपात व हिशोब (Upkar नंतर CGST 1% आणि SGST 1% जोडले, आणि अंतर कमी केले) -->
+    <!-- स्टेप २: कपात व हिशोब (टक्केवारीनुसार अचूक ऑटो-कॅल्क्युलेशन) -->
     <div class="wizard-step" id="step2" style="display:none;">
       <h4 style="font-size:13px; color:#0d47a1; margin-bottom:6px; border-bottom:1.5px solid #0d47a1; padding-bottom:2px;">Deduction (कपात तपशील)</h4>
       
@@ -477,17 +475,15 @@
       </div>
 
       <div class="deduction-scroll-box" id="deductionFieldsContainer">
-        <div class="form-row-compact"><label>Income Tax</label><input type="number" class="form-control calc-ded" id="dedIT" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-row-compact"><label>Income Tax (2%)</label><input type="number" class="form-control calc-ded" id="dedIT" value="0" oninput="autoCalculateDeductions()"></div>
         <div class="form-row-compact"><label>Security Deposit</label><input type="number" class="form-control calc-ded" id="dedSD" value="0" oninput="autoCalculateDeductions()"></div>
-        <div class="form-row-compact"><label>Maintenance</label><input type="number" class="form-control calc-ded" id="dedMaint" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-row-compact"><label>Maintenance (3%)</label><input type="number" class="form-control calc-ded" id="dedMaint" value="0" oninput="autoCalculateDeductions()"></div>
         <div class="form-row-compact"><label>Royalty Charges</label><input type="number" class="form-control calc-ded" id="dedRoyalty" value="0" oninput="autoCalculateDeductions()"></div>
-        <div class="form-row-compact"><label>Govt. Ins. Scheme</label><input type="number" class="form-control calc-ded" id="dedGovt" value="0" oninput="autoCalculateDeductions()"></div>
-        <div class="form-row-compact"><label>Upkar (W.C.)</label><input type="number" class="form-control calc-ded" id="dedUpkar" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-row-compact"><label>Govt. Ins. Scheme (1%)</label><input type="number" class="form-control calc-ded" id="dedGovt" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-row-compact"><label>Upkar (W.C. 1%)</label><input type="number" class="form-control calc-ded" id="dedUpkar" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-row-compact"><label>CGST (1%)</label><input type="number" class="form-control calc-ded" id="dedCGST" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-row-compact"><label>SGST (1%)</label><input type="number" class="form-control calc-ded" id="dedSGST" value="0" oninput="autoCalculateDeductions()"></div>
         
-        <!-- नवीन जोडलेले दोन रकाने -->
-        <div class="form-row-compact"><label>CGST 1%</label><input type="number" class="form-control calc-ded" id="dedCGST" value="0" oninput="autoCalculateDeductions()"></div>
-        <div class="form-row-compact"><label>SGST 1%</label><input type="number" class="form-control calc-ded" id="dedSGST" value="0" oninput="autoCalculateDeductions()"></div>
-
         <div class="form-row-compact" id="otherRow1">
           <div style="display:flex; align-items:center; justify-content:space-between;">
             <label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला">Other-1</span></label>
@@ -1661,18 +1657,19 @@
       if(step === 3) renderPreview();
     }
 
+    /* छायाचित्रातील नोंदीनुसार अचूक टक्केवारीचे ऑटो-कॅल्क्युलेशन आणि मॅन्युअल एडिट */
     function autoCalculateDeductions() {
       var passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
       var itInput = document.getElementById('dedIT');
       if (itInput && parseFloat(itInput.value) === 0 && passed > 0) {
-        document.getElementById('dedIT').value = Math.round(passed * 0.016949);
-        document.getElementById('dedSD').value = 10000;
-        document.getElementById('dedMaint').value = Math.round(passed * 0.042373);
-        document.getElementById('dedRoyalty').value = 28000;
-        document.getElementById('dedGovt').value = Math.round(passed * 0.008475);
-        document.getElementById('dedUpkar').value = Math.round(passed * 0.008475);
-        document.getElementById('dedCGST').value = Math.round(passed * 0.01);
-        document.getElementById('dedSGST').value = Math.round(passed * 0.01);
+        document.getElementById('dedIT').value = Math.round(passed * 0.02);        // Income Tax 2%
+        document.getElementById('dedSD').value = 10000;                            // Security Deposit (Fixed/Custom)
+        document.getElementById('dedMaint').value = Math.round(passed * 0.04);     // Maintenance 4%
+        document.getElementById('dedRoyalty').value = 28000;                       // Royalty Charges
+        document.getElementById('dedGovt').value = Math.round(passed * 0.01);      // Govt. Ins. Scheme 1%
+        document.getElementById('dedUpkar').value = Math.round(passed * 0.01);     // Upkar W.C. 1%
+        document.getElementById('dedCGST').value = Math.round(passed * 0.01);      // CGST 1%
+        document.getElementById('dedSGST').value = Math.round(passed * 0.01);      // SGST 1%
       }
 
       var totalDed = 0;
@@ -1777,7 +1774,7 @@
           var d = JSON.parse(e.target.result);
           ['je_records', 'mb_records', 'work_records', 'bill_records', 'assign_records'].forEach(function(k){ if (d[k]) setData(k, d[k]); });
           showAlert('डेटा पूर्ववत यशस्वी!'); refreshAll(); closeModule('settingsModal');
-        } catch(err) { showAlert('चुकीची फाईल.'); }
+        } catch(err) { alert('चुकीची फाईल.'); }
       };
       reader.readAsText(file);
     }
