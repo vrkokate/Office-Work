@@ -332,7 +332,7 @@
         </div>
       </div>
 
-      <!-- सविस्तर रिपोर्ट फिल्टर कार्ड (पूर्णपणे सुधारित प्लेसहोलर रचना) -->
+      <!-- सविस्तर रिपोर्ट फिल्टर कार्ड -->
       <div class="filter-card">
         <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
         
@@ -372,11 +372,12 @@
           <select class="form-control" id="repDynamicSelect2" onchange="onDynamicSelect2Change()"></select>
         </div>
 
-        <!-- स्टेप ३: वाटप कोणाला केले (फक्त कनिष्ठ अभियंता आणि विभागीय कार्यालय) -->
+        <!-- स्टेप ३: वाटप कोणाला केले (सर्व, कनिष्ठ अभियंता, विभागीय कार्यालय) -->
         <div class="form-group" id="dynamicOptionGroup3" style="display:none;">
           <label id="lblDynamic3">वाटप कोणाला केले?</label>
           <select class="form-control" id="repDynamicSelect3" onchange="onDynamicSelect3Change()">
             <option value="">-- वाटप कोणाला केले निवडा --</option>
+            <option value="ALL">सर्व</option>
             <option value="JE">कनिष्ठ अभियंता</option>
             <option value="Office">विभागीय कार्यालय</option>
           </select>
@@ -839,7 +840,7 @@
         getData('je_records').forEach(function(j) {
           jeListSel.add(new Option(j.name, j.name));
         });
-      } else if (targetType === 'Office') {
+      } else {
         inputGrp.style.display = 'none';
       }
     }
@@ -872,6 +873,8 @@
             if (!givenSubValue) return alert('कृपया कनिष्ठ अभियंता (JE) निवडा.');
           } else if (givenSubTarget === 'Office') {
             givenSubValue = 'विभागीय कार्यालय';
+          } else if (givenSubTarget === 'ALL') {
+            givenSubValue = 'सर्व';
           }
         }
 
@@ -916,6 +919,8 @@
             return m.receivedDetail && m.receivedDetail.toLowerCase() === subVal.toLowerCase();
           } else if (subTarget === 'Office') {
             return m.receivedSource && m.receivedSource.includes('विभागीय कार्यालय');
+          } else if (subTarget === 'ALL') {
+            return true;
           }
           return true;
         });
@@ -937,7 +942,7 @@
 
       var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
       
-      var rawName = subVal ? subVal.replace(/^श्री\.?\s*/i, '') : "";
+      var rawName = (subVal && subVal !== 'सर्व') ? subVal.replace(/^श्री\.?\s*/i, '') : "";
       var personHeaderName = rawName ? "श्री. " + rawName : "";
 
       var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
@@ -962,8 +967,9 @@
         var mbNo = item.mbNumber || item.mbNo;
         var size = item.size || 'लहान M.B.';
         
-        var personCleanName = subVal ? subVal.replace(/^श्री\.?\s*/i, '') : (item.receivedDetail || 'संबंधित');
-        var currentStatus = "श्री. " + personCleanName + " यांच्याकडे आहे";
+        var assignedPerson = item.receivedDetail || item.receivedSource || 'संबंधित';
+        var cleanPersonName = assignedPerson.replace(/^श्री\.?\s*/i, '');
+        var currentStatus = "श्री. " + cleanPersonName + " यांच्याकडे आहे";
 
         html += '<tr>' +
                   '<td style="text-align:center;">' + (idx + 1) + '</td>' +
@@ -982,7 +988,6 @@
       var mbList = getData('mb_records');
       var jeList = getData('je_records');
 
-      // जेव्हा "सर्व कनिष्ठ अभियंते (All JE Combined)" निवडले जाईल, तेव्हा सर्व JE ची यादी दाखवणे
       var targetJEList = [];
       if (subType === 'ALL_JE') {
         targetJEList = jeList.map(function(j){ return j.name; });
@@ -992,7 +997,7 @@
 
       var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
       var rawName = (subType !== 'ALL_JE') ? subType.replace(/^श्री\.?\s*/i, '') : "";
-      var personHeaderName = rawName ? "श्री. " + rawName : "कनिष्ठ अभियंता सूची";
+      var personHeaderName = rawName ? "श्री. " + rawName : "सर्व कनिष्ठ अभियंता";
 
       var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
                    '<div style="text-align:center; margin-bottom:4px;">' +
