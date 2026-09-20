@@ -254,7 +254,7 @@
     </div>
   </div>
 
-  <!-- ==================== डॅशबोर्ड क्लिक तपशील मोडल (सुधारિત फिल्टर ऑप्शन्ससह) ==================== -->
+  <!-- ==================== डॅशबोर्ड क्लिक तपशील मोडल ==================== -->
   <div id="quickInfoModal" class="quick-info-overlay">
     <div class="quick-info-card">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
@@ -262,9 +262,9 @@
         <button class="btn-close" onclick="closeQuickInfoModal()">X</button>
       </div>
       
-      <!-- आकार फिल्टर (सर्व, लहान, मोठी) -->
+      <!-- आकार फिल्टर (फक्त "उपलब्ध एम बी" साठी 'सर्व mb', 'लहान mb', 'मोठी mb' आणि इतर कार्ड्ससाठी संपूर्ण फिल्टर) -->
       <div class="form-group" style="margin-bottom:8px;">
-        <label>एम.बी. आकारानुसार फिल्टर:</label>
+        <label id="sizeFilterLabel">एम.बी. आकारानुसार फिल्टर:</label>
         <select class="form-control" id="quickModalSizeFilter" onchange="onQuickFilterChange()">
           <option value="ALL">सर्व M.B.</option>
           <option value="लहान M.B.">लहान M.B.</option>
@@ -272,8 +272,8 @@
         </select>
       </div>
 
-      <!-- स्रोत/व्यक्ती फिल्टर (सर्व, JE लिस्ट, विभागीय कार्यालय, इतर) -->
-      <div class="form-group" style="margin-bottom:12px;">
+      <!-- स्रोत/व्यक्तीनुसार फिल्टर (फक्त मिळाले/दिले कार्डसाठी, उपलब्धसाठी लपवला जाईल) -->
+      <div class="form-group" id="quickSourceGroup" style="margin-bottom:12px;">
         <label>स्रोत / व्यक्तीनुसार फिल्टर:</label>
         <select class="form-control" id="quickModalSourceFilter" onchange="onQuickFilterChange()">
           <option value="ALL">सर्व (All)</option>
@@ -775,21 +775,26 @@
 
     var currentQuickModalType = '';
 
-    /* डॅशबोर्ड कार्ड क्लिक केल्यावर "सर्व, लहान, मोठी" आकार आणि "सर्व, JE, विभागीय कार्यालय, इतर" फिल्टर असणारा पॉपअप उघडणे */
+    /* डॅशबोर्ड कार्ड क्लिक केल्यावर पॉपअप उघडणे */
     function openQuickInfoModal(type) {
       currentQuickModalType = type;
       
-      // आकार फिल्टर रीसेट
       document.getElementById('quickModalSizeFilter').value = 'ALL';
       
-      // स्रोत/व्यक्ती फिल्टर ड्रॉपडाऊन भरणे (सर्व, JE नावे, विभागीय कार्यालय, इतर)
+      var sourceGroup = document.getElementById('quickSourceGroup');
       var sourceSelect = document.getElementById('quickModalSourceFilter');
-      sourceSelect.innerHTML = '<option value="ALL">सर्व (All)</option><option value="विभागीय कार्यालय">विभागीय कार्यालय</option><option value="इतर">इतर</option>';
-      
-      getData('je_records').forEach(function(j) {
-        sourceSelect.add(new Option(j.name, j.name));
-      });
-      sourceSelect.value = 'ALL';
+
+      if (type === 'AVAILABLE') {
+        // "उपलब्ध एम बी" कार्डसाठी फक्त सर्व M.B., लहान M.B., मोठी M.B. हेच फिल्टर असतील, त्यामुळे स्रोत फिल्टर लपवला आहे
+        sourceGroup.style.display = 'none';
+      } else {
+        sourceGroup.style.display = 'block';
+        sourceSelect.innerHTML = '<option value="ALL">सर्व (All)</option><option value="भंडारपाल">भंडारपाल</option><option value="विभागीय कार्यालय">विभागीय कार्यालय</option><option value="इतर">इतर</option>';
+        getData('je_records').forEach(function(j) {
+          sourceSelect.add(new Option(j.name, j.name));
+        });
+        sourceSelect.value = 'ALL';
+      }
 
       renderQuickModalContent('ALL', 'ALL');
       document.getElementById('quickInfoModal').style.display = 'flex';
