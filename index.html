@@ -206,14 +206,16 @@
     .action-cell { white-space: nowrap; text-align: center; display: flex; gap: 4px; justify-content: center; align-items: center; }
     .btn-action { border: none; padding: 4px 8px; border-radius: 3px; font-size: 11px; cursor: pointer; color: #fff; }
 
+    /* अचूक प्रिंटींग व पेज ब्रेक नियंत्रण */
     @media print {
       body * { visibility: hidden; }
       #printableArea, #printableArea * { visibility: visible; }
-      #printableArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 4mm; }
-      @page { size: A4 portrait; margin: 6mm; }
-      .print-table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+      #printableArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 2mm; }
+      @page { size: A4 portrait; margin: 4mm; }
+      .print-table { width: 100%; border-collapse: collapse; font-size: 10pt; page-break-inside: avoid; }
       .print-table th, .print-table td { border: 1px solid #222; padding: 4px 5px; text-align: left; }
       .print-table th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+      div { page-break-inside: avoid; }
     }
   </style>
 </head>
@@ -369,7 +371,7 @@
           <select class="form-control" id="repDynamicSelect2" onchange="onDynamicSelect2Change()"></select>
         </div>
 
-        <!-- स्टेप ३: वाटप कोणाला केले (इतर काढून टाकले, फक्त कनिष्ठ अभियंता आणि विभागीय कार्यालय) -->
+        <!-- स्टेप ३: वाटप कोणाला केले (फक्त कनिष्ठ अभियंता आणि विभागीय कार्यालय, इतर काढून टाकले) -->
         <div class="form-group" id="dynamicOptionGroup3" style="display:none;">
           <label id="lblDynamic3">वाटप कोणाला केले?</label>
           <select class="form-control" id="repDynamicSelect3" onchange="onDynamicSelect3Change()">
@@ -378,10 +380,10 @@
           </select>
         </div>
 
-        <!-- स्टेप ४: कनिष्ठ अभियंता ड्रॉपडाऊन -->
+        <!-- स्टेप ४: कनिष्ठ अभियंता ड्रॉपडाऊन लिस्ट -->
         <div class="form-group" id="dynamicInputGroup" style="display:none;">
-          <label id="lblDynamicInput">तपशील भरा</label>
-          <select class="form-control" id="repDynamicJEList" style="display:none;"></select>
+          <label id="lblDynamicInput">कनिष्ठ अभियंता (JE) निवडा</label>
+          <select class="form-control" id="repDynamicJEList"></select>
         </div>
 
         <!-- स्मार्ट शोध -->
@@ -923,15 +925,21 @@
       });
 
       var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-      var personHeaderName = subVal ? subVal : "सर्व संबंधित";
+      
+      // श्री. चे डुप्लिकेशन टाळून अचूक नाव दर्शवणे
+      var rawName = subVal ? subVal.replace(/^श्री\.?\s*/i, '') : "संबंधित";
+      var personHeaderName = rawName ? "श्री. " + rawName : "सर्व संबंधित";
 
-      var html = '<div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #333; padding-bottom:6px; margin-bottom:12px;">' +
-                   '<div style="font-size:12px; font-weight:700;">श्री ' + personHeaderName + '</div>' +
-                   '<div style="text-align:center;">' +
-                     '<h2 style="font-size:15px; margin:0;">सार्वजनिक बांधकाम विभाग</h2>' +
-                     '<h3 style="font-size:12px; margin:2px 0;">' + reportTitle + ' (' + sizeChoice + ')</h3>' +
+      // सुधारित रिपोर्ट लेआउट (सार्वजनिक बांधकाम विभाग मोठ्या अक्षरात सेंटरला, खाली रिपोर्टचे नाव, डाव्या बाजूला नाव आणि खाली दिनांक)
+      var html = '<div style="margin-bottom:15px; border-bottom:2px solid #333; padding-bottom:8px;">' +
+                   '<div style="text-align:center; margin-bottom:6px;">' +
+                     '<h1 style="font-size:18px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
+                     '<h2 style="font-size:13px; font-weight:700; margin:3px 0;">' + reportTitle + ' (' + sizeChoice + ')</h2>' +
                    '</div>' +
-                   '<div style="text-align:right; font-size:11px; font-weight:600;">अहवाल दिनांक: ' + todayStr + '</div>' +
+                   '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11.5px; margin-top:6px;">' +
+                     '<div><strong style="font-size:12px;">' + personHeaderName + '</strong><br>अहवाल दिनांक: ' + todayStr + '</div>' +
+                     '<div style="text-align:right;"></div>' +
+                   '</div>' +
                  '</div>' +
                  '<table class="print-table">' +
                    '<thead><tr>' +
@@ -977,11 +985,19 @@
       });
 
       var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-      var html = '<div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #333; padding-bottom:6px; margin-bottom:12px;">' +
-                   '<div style="font-size:12px; font-weight:700;">श्री ' + (subType === 'ALL_JE' ? 'सर्व कनिष्ठ अभियंता' : subType) + '</div>' +
-                   '<div style="text-align:center;"><h2 style="font-size:15px; margin:0;">सार्वजनिक बांधकाम विभाग</h2><h3 style="font-size:12px; margin:2px 0;">कनिष्ठ अभियंता (JE) निहाय वाटप अहवाल</h3></div>' +
-                   '<div style="text-align:right; font-size:11px;">अहवाल दिनांक: ' + todayStr + '</div></div>' +
-                   '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>JE चे नाव</th><th>M.B. क्र.</th><th>आकार</th><th style="text-align:center;">दिनांक</th></tr></thead><tbody>';
+      var rawName = subType !== 'ALL_JE' ? subType.replace(/^श्री\.?\s*/i, '') : "सर्व कनिष्ठ अभियंता";
+      var personHeaderName = subType !== 'ALL_JE' ? "श्री. " + rawName : "सर्व कनिष्ठ अभियंता";
+
+      var html = '<div style="margin-bottom:15px; border-bottom:2px solid #333; padding-bottom:8px;">' +
+                   '<div style="text-align:center; margin-bottom:6px;">' +
+                     '<h1 style="font-size:18px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
+                     '<h2 style="font-size:13px; font-weight:700; margin:3px 0;">कनिष्ठ अभियंता (JE) निहाय वाटप अहवाल</h2>' +
+                   '</div>' +
+                   '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11.5px; margin-top:6px;">' +
+                     '<div><strong style="font-size:12px;">' + personHeaderName + '</strong><br>अहवाल दिनांक: ' + todayStr + '</div>' +
+                   '</div>' +
+                 '</div>' +
+                 '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>JE चे नाव</th><th>M.B. क्र.</th><th>आकार</th><th style="text-align:center;">दिनांक</th></tr></thead><tbody>';
       mapped.forEach(function(r, i) {
         html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + r.jeName + '</td><td>' + r.mbNo + '</td><td>' + r.size + '</td><td style="text-align:center;">' + formatDateToDMY(r.date) + '</td></tr>';
       });
@@ -1000,11 +1016,16 @@
 
     function renderBillTableHTML(billsList, preHTML, title) {
       var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-      var html = preHTML + '<div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #333; padding-bottom:6px; margin-bottom:12px;">' +
-                 '<div style="font-size:12px; font-weight:700;">देयक नोंदवही</div>' +
-                 '<div style="text-align:center;"><h2 style="font-size:15px; margin:0;">सार्वजनिक बांधकाम विभाग</h2><h3 style="font-size:12px; margin:2px 0;">' + title + '</h3></div>' +
-                 '<div style="text-align:right; font-size:11px;">अहवाल दिनांक: ' + todayStr + '</div></div>' +
-                 '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>कंत्राटदार</th><th>कामाचे नाव</th><th>JE</th><th style="text-align:center;">M.B.</th><th>बिल प्रकार</th><th style="text-align:right;">रक्कम (₹)</th></tr></thead><tbody>';
+      var html = preHTML + '<div style="margin-bottom:15px; border-bottom:2px solid #333; padding-bottom:8px;">' +
+                 '<div style="text-align:center; margin-bottom:6px;">' +
+                   '<h1 style="font-size:18px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
+                   '<h2 style="font-size:13px; font-weight:700; margin:3px 0;">' + title + '</h2>' +
+                 '</div>' +
+                 '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11.5px; margin-top:6px;">' +
+                   '<div><strong style="font-size:12px;">देयक नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div>' +
+                 '</div>' +
+               '</div>' +
+               '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>कंत्राटदार</th><th>कामाचे नाव</th><th>JE</th><th style="text-align:center;">M.B.</th><th>बिल प्रकार</th><th style="text-align:right;">रक्कम (₹)</th></tr></thead><tbody>';
       var total = 0;
       billsList.forEach(function(b, i) {
         var amt = parseFloat(b.amount) || 0;
@@ -1018,11 +1039,16 @@
     function generateWorkReport(fDate, tDate) {
       var works = getData('work_records');
       var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-      var html = '<div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #333; padding-bottom:6px; margin-bottom:12px;">' +
-                 '<div style="font-size:12px; font-weight:700;">कामांची यादी</div>' +
-                 '<div style="text-align:center;"><h2 style="font-size:15px; margin:0;">सार्वजनिक बांधकाम विभाग</h2><h3 style="font-size:12px; margin:2px 0;">कामांची यादी (Work Register)</h3></div>' +
-                 '<div style="text-align:right; font-size:11px;">अहवाल दिनांक: ' + todayStr + '</div></div>' +
-                 '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>कामाचे नाव</th><th>JE</th><th>कंत्राटदार</th><th style="text-align:center;">M.B. क्र.</th></tr></thead><tbody>';
+      var html = '<div style="margin-bottom:15px; border-bottom:2px solid #333; padding-bottom:8px;">' +
+                 '<div style="text-align:center; margin-bottom:6px;">' +
+                   '<h1 style="font-size:18px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
+                   '<h2 style="font-size:13px; font-weight:700; margin:3px 0;">कामांची यादी (Work Register)</h2>' +
+                 '</div>' +
+                 '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11.5px; margin-top:6px;">' +
+                   '<div><strong style="font-size:12px;">कामांची यादी</strong><br>अहवाल दिनांक: ' + todayStr + '</div>' +
+                 '</div>' +
+               '</div>' +
+               '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>कामाचे नाव</th><th>JE</th><th>कंत्राटदार</th><th style="text-align:center;">M.B. क्र.</th></tr></thead><tbody>';
       works.forEach(function(w, i) {
         html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + w.name + '</td><td>' + w.je + '</td><td>' + w.contractor + '</td><td style="text-align:center;">' + w.mbNo + '</td></tr>';
       });
