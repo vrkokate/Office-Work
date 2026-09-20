@@ -189,12 +189,6 @@
       font-size: 13px; font-weight: 700; border-radius: 6px; cursor: pointer; margin-top: 6px;
     }
 
-    .footer-home-btn { text-align: center; margin: 15px 0; }
-    .btn-bottom-home {
-      background: #0d47a1; color: #fff; border: none; border-radius: 20px;
-      padding: 9px 24px; font-size: 12.5px; font-weight: 700; cursor: pointer;
-    }
-
     .modal-overlay {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.55); z-index: 999; justify-content: center; align-items: center; padding: 10px;
@@ -336,7 +330,7 @@
         </div>
       </div>
 
-      <!-- सविस्तर रिपोर्ट फिल्टर कार्ड -->
+      <!-- सविस्तर रिपोर्ट फिल्टर कार्ड (नवीन ऑटोमॅटिक कास्केडिंग रचना) -->
       <div class="filter-card">
         <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
         
@@ -351,7 +345,7 @@
           </div>
         </div>
         
-        <!-- मुख्य घटक (Main Categories) -->
+        <!-- मुख्य घटक -->
         <div class="form-group">
           <label>मुख्य घटक</label>
           <select class="form-control" id="repMainCategory" onchange="onMainCategoryChange()">
@@ -363,26 +357,15 @@
           </select>
         </div>
 
-        <!-- उपघटक (Sub Category) -->
-        <div class="form-group" id="subCategoryGroup">
-          <label>उपघटक (Sub Category)</label>
-          <select class="form-control" id="repSubCategory" onchange="onSubCategoryChange()"></select>
+        <!-- डायनॅमिकली येणारे पुढील पर्याय (स्टेप बाय स्टेप) -->
+        <div class="form-group" id="dynamicOptionGroup1" style="display:none;">
+          <label id="lblDynamic1">पुढील पर्याय</label>
+          <select class="form-control" id="repDynamicSelect1" onchange="onDynamicSelect1Change()"></select>
         </div>
 
-        <!-- अतिरिक्त M.B. प्रकार निवडा (All/Small/Big) -->
-        <div class="form-group" id="mbSizeFilterGroup">
-          <label>M.B. प्रकार निवडा</label>
-          <select class="form-control" id="repMbSizeChoice" onchange="onMbSizeChoiceChange()">
-            <option value="All M.B.">All M.B.</option>
-            <option value="Small M.B.">Small M.B.</option>
-            <option value="Big M.B.">Big M.B.</option>
-          </select>
-        </div>
-
-        <!-- अंतिम उप-पर्याय (उपलब्ध / वाटप / मिळालेली / सर्व) -->
-        <div class="form-group" id="mbFinalTypeGroup">
-          <label>एम.बी. सविस्तर स्थिती</label>
-          <select class="form-control" id="repMbFinalType"></select>
+        <div class="form-group" id="dynamicOptionGroup2" style="display:none;">
+          <label id="lblDynamic2">सविस्तर स्थिती</label>
+          <select class="form-control" id="repDynamicSelect2"></select>
         </div>
 
         <!-- स्मार्ट शोध -->
@@ -392,10 +375,6 @@
         </div>
         
         <button class="btn-report" onclick="generateGeneralReport()">📄 REPORT / PRINT</button>
-      </div>
-
-      <div class="footer-home-btn">
-        <button class="btn-bottom-home" onclick="showDigitalHub()">🏠 मुख्य Digital Hub वर परत जा</button>
       </div>
     </div>
 
@@ -454,7 +433,7 @@
 
         <div class="form-group" id="groupMBSelect" style="display:none;">
           <label>उपलब्ध एम बी निवडा *</label>
-          <select class="form-control" id="selectAvailableMB" onchange="onSelectAvailableMBChange()"></select>
+          <select class="form-control" id="selectAvailableMB"></select>
         </div>
 
         <div class="form-group">
@@ -657,9 +636,7 @@
       const now = new Date();
       const hourIndex = now.getHours() % marathiSuvicharList.length;
       const suvicharEl = document.getElementById('dynamicSuvichar');
-      if (suvicharEl) {
-        suvicharEl.innerText = marathiSuvicharList[hourIndex];
-      }
+      if (suvicharEl) suvicharEl.innerText = marathiSuvicharList[hourIndex];
     }
 
     function getData(key) { return JSON.parse(localStorage.getItem(key) || '[]'); }
@@ -717,18 +694,14 @@
     function getAvailableStock() {
       var allMBs = getData('mb_records');
       var stockMap = {};
-
       allMBs.forEach(function(m) {
         var no = m.mbNumber;
         if (m.actionType === 'मिळालेली एमबी') {
           stockMap[no] = { mbNumber: no, size: m.size, date: m.date, inStock: true };
         } else if (m.actionType === 'दिलेली एमबी') {
-          if (stockMap[no]) {
-            stockMap[no].inStock = false;
-          }
+          if (stockMap[no]) stockMap[no].inStock = false;
         }
       });
-
       var available = [];
       for (var no in stockMap) {
         if (stockMap[no].inStock) available.push(stockMap[no]);
@@ -740,19 +713,13 @@
       var list = getData('mb_records');
       var tbody = document.getElementById('mbListBody');
       tbody.innerHTML = '';
-      
-      var rcvCount = 0;
-      var givenCount = 0;
+      var rcvCount = 0, givenCount = 0;
 
       list.forEach(function(m, idx) {
         if (m.actionType === 'मिळालेली एमबी') rcvCount++;
         if (m.actionType === 'दिलेली एमबी') givenCount++;
-
         tbody.innerHTML += '<tr><td>' + (idx+1) + '</td><td>' + m.mbNumber + '</td><td>' + m.size + '</td><td>' + (m.receivedFrom || '-') + '</td>' +
-          '<td class="action-cell">' +
-            '<button class="btn-action" style="background:#2e7d32;" onclick="editMB(' + idx + ')">Edit</button>' +
-            '<button class="btn-action" style="background:#d32f2f;" onclick="deleteMB(' + idx + ')">Delete</button>' +
-          '</td></tr>';
+          '<td class="action-cell"><button class="btn-action" style="background:#2e7d32;" onclick="editMB(' + idx + ')">Edit</button><button class="btn-action" style="background:#d32f2f;" onclick="deleteMB(' + idx + ')">Delete</button></td></tr>';
       });
 
       var stock = getAvailableStock();
@@ -761,55 +728,60 @@
       document.getElementById('countAvailableMB').innerText = stock.length;
     }
 
-    /* ==================== नवीन डायनॅमिक रिपोर्ट फिल्टर लॉजिक ==================== */
+    /* ==================== ऑटोमॅटिक कास्केडिंग फिल्टर लॉजिक ==================== */
     function onMainCategoryChange() {
       var mainCat = document.getElementById('repMainCategory').value;
-      var subCatSelect = document.getElementById('repSubCategory');
-      var sizeGroup = document.getElementById('mbSizeFilterGroup');
-      var finalGroup = document.getElementById('mbFinalTypeGroup');
-      subCatSelect.innerHTML = '';
+      var grp1 = document.getElementById('dynamicOptionGroup1');
+      var grp2 = document.getElementById('dynamicOptionGroup2');
+      var sel1 = document.getElementById('repDynamicSelect1');
+      var sel2 = document.getElementById('repDynamicSelect2');
+      
+      sel1.innerHTML = '';
+      sel2.innerHTML = '';
+      grp2.style.display = 'none';
 
       if (mainCat === 'M.B.') {
-        sizeGroup.style.display = 'block';
-        finalGroup.style.display = 'block';
-        subCatSelect.add(new Option('All M.B.', 'ALL_MB_CHOICE'));
-        subCatSelect.add(new Option('Small M.B.', 'SMALL_MB_CHOICE'));
-        subCatSelect.add(new Option('Big M.B.', 'BIG_MB_CHOICE'));
-        onMbSizeChoiceChange();
+        grp1.style.display = 'block';
+        document.getElementById('lblDynamic1').innerText = 'M.B. प्रकार निवडा';
+        sel1.add(new Option('All M.B.', 'All M.B.'));
+        sel1.add(new Option('Small M.B.', 'Small M.B.'));
+        sel1.add(new Option('Big M.B.', 'Big M.B.'));
+        onDynamicSelect1Change();
       } else if (mainCat === 'J.E.') {
-        sizeGroup.style.display = 'none';
-        finalGroup.style.display = 'none';
-        subCatSelect.add(new Option('सर्व कनिष्ठ अभियंते (All JE Combined)', 'ALL_JE'));
+        grp1.style.display = 'block';
+        document.getElementById('lblDynamic1').innerText = 'कनिष्ठ अभियंता निवडा';
+        sel1.add(new Option('सर्व कनिष्ठ अभियंते (All JE Combined)', 'ALL_JE'));
         getData('je_records').forEach(function(j) {
-          subCatSelect.add(new Option(j.name + ' (स्वतंत्र अहवाल)', j.name));
+          sel1.add(new Option(j.name, j.name));
         });
       } else if (mainCat === 'Bill') {
-        sizeGroup.style.display = 'none';
-        finalGroup.style.display = 'none';
-        subCatSelect.add(new Option('सर्व देयक नोंदी (Master Bill Register)', 'ALL_BILLS'));
+        grp1.style.display = 'block';
+        document.getElementById('lblDynamic1').innerText = 'देयक प्रकार निवडा';
+        sel1.add(new Option('सर्व देयक नोंदी (Master Bill Register)', 'ALL_BILLS'));
         getData('je_records').forEach(function(j) {
-          subCatSelect.add(new Option(j.name + ' - यांची बिले', 'JE_BILLS:' + j.name));
+          sel1.add(new Option(j.name + ' - बिले', 'JE_BILLS:' + j.name));
         });
-      } else if (mainCat === 'Contractor' || mainCat === 'Agency') {
-        sizeGroup.style.display = 'none';
-        finalGroup.style.display = 'none';
-        subCatSelect.add(new Option('सर्व ' + mainCat + ' कामे', 'ALL_' + mainCat.toUpperCase()));
+      } else {
+        grp1.style.display = 'none';
       }
     }
 
-    function onMbSizeChoiceChange() {
-      var choice = document.getElementById('repMbSizeChoice').value;
-      var finalSel = document.getElementById('repMbFinalType');
-      finalSel.innerHTML = '';
+    function onDynamicSelect1Change() {
+      var mainCat = document.getElementById('repMainCategory').value;
+      var grp2 = document.getElementById('dynamicOptionGroup2');
+      var sel2 = document.getElementById('repDynamicSelect2');
 
-      finalSel.add(new Option('सर्व M.B. (All M.B.)', 'ALL'));
-      finalSel.add(new Option('उपलब्ध M.B. (Available)', 'AVAILABLE'));
-      finalSel.add(new Option('वाटप केलेली M.B. (Given)', 'GIVEN'));
-      finalSel.add(new Option('मिळालेली M.B. (Received)', 'RECEIVED'));
-    }
-
-    function onSubCategoryChange() {
-      // उपघटक बदलल्यावर आवश्यक असल्यास पुढील प्रक्रिया
+      if (mainCat === 'M.B.') {
+        grp2.style.display = 'block';
+        document.getElementById('lblDynamic2').innerText = 'एम.बी. सविस्तर स्थिती';
+        sel2.innerHTML = '';
+        sel2.add(new Option('सर्व M.B. (All M.B.)', 'ALL'));
+        sel2.add(new Option('उपलब्ध M.B. (Available)', 'AVAILABLE'));
+        sel2.add(new Option('वाटप केलेली M.B. (Given)', 'GIVEN'));
+        sel2.add(new Option('मिळालेली M.B. (Received)', 'RECEIVED'));
+      } else {
+        grp2.style.display = 'none';
+      }
     }
 
     function generateGeneralReport() {
@@ -824,14 +796,14 @@
       }
 
       if (mainCat === 'M.B.') {
-        var sizeChoice = document.getElementById('repMbSizeChoice').value; // All M.B., Small M.B., Big M.B.
-        var finalType = document.getElementById('repMbFinalType').value;     // ALL, AVAILABLE, GIVEN, RECEIVED
+        var sizeChoice = document.getElementById('repDynamicSelect1').value;
+        var finalType = document.getElementById('repDynamicSelect2').value;
         generateAdvancedMBReport(sizeChoice, finalType, fDate, tDate);
       } else if (mainCat === 'J.E.') {
-        var sub = document.getElementById('repSubCategory').value;
+        var sub = document.getElementById('repDynamicSelect1').value;
         generateJEReports(sub, 'ALL', fDate, tDate);
       } else if (mainCat === 'Bill') {
-        var sub = document.getElementById('repSubCategory').value;
+        var sub = document.getElementById('repDynamicSelect1').value;
         generateBillReports(sub, fDate, tDate);
       } else if (mainCat === 'Contractor' || mainCat === 'Agency') {
         generateWorkReport(fDate, tDate);
@@ -842,18 +814,15 @@
       var allMBs = getData('mb_records');
       var stock = getAvailableStock();
 
-      // १. आकारानुसार फिल्टर (All, Small, Big)
       var filtered = allMBs.filter(function(m) {
         if (fDate && m.date < fDate) return false;
         if (tDate && m.date > tDate) return false;
-
         if (sizeChoice === 'Small M.B.' && m.size !== 'लहान M.B.') return false;
         if (sizeChoice === 'Big M.B.' && m.size !== 'मोठी M.B.') return false;
         return true;
       });
 
-      // २. सविस्तर स्थितीनुसार फिल्टर (ALL, AVAILABLE, GIVEN, RECEIVED)
-      let reportTitle = "सर्व मोजमा पुस्तिका अहवाल";
+      let reportTitle = "सर्व मोजमाप पुस्तिका अहवाल";
       if (finalType === 'AVAILABLE') {
         filtered = stock.filter(function(s) {
           if (sizeChoice === 'Small M.B.' && s.size !== 'लहान M.B.') return false;
@@ -869,14 +838,11 @@
         reportTitle = "मिळालेली मोजमाप पुस्तिका अहवाल";
       }
 
-      if (filtered.length === 0) {
-        return alert('निवडलेल्या निकषांनुसार कोणतीही नोंद आढळली नाही.');
-      }
+      if (filtered.length === 0) return alert('निवडलेल्या निकषांनुसार कोणतीही नोंद आढळली नाही.');
 
-      // क्रमवारी: मोठी M.B. आधी, नंतर लहान M.B.
       filtered.sort(function(a, b) {
-        var sA = a.size || (a.size);
-        var sB = b.size || (b.size);
+        var sA = a.size || 'लहान M.B.';
+        var sB = b.size || 'लहान M.B.';
         if (sA === 'मोठी M.B.' && sB !== 'मोठी M.B.') return -1;
         if (sA !== 'मोठी M.B.' && sB === 'मोठी M.B.') return 1;
         return 0;
@@ -916,17 +882,21 @@
       printA4Document(html);
     }
 
-    /* जुनी सपोर्टिंग फंक्शन्स */
     function generateJEReports(subType, sizeFilter, fDate, tDate) {
       var assigns = getData('assign_records');
       var mbList = getData('mb_records');
+      if (subType !== 'ALL_JE') assigns = assigns.filter(function(a){ return a.jeName === subType; });
+
       var mapped = assigns.map(function(a) {
         var found = mbList.find(function(m){ return m.mbNumber === a.mbNo; });
         return { jeName: a.jeName, mbNo: a.mbNo, size: found ? found.size : 'लहान M.B.', date: a.assignDate };
       });
 
-      var html = '<div style="text-align:center; margin-bottom:10px;"><h2>सार्वजनिक बांधकाम विभाग</h2><h3>कनिष्ठ अभियंता (JE) निहाय वाटप अहवाल</h3></div>' +
-                 '<table class="print-table"><thead><tr><th>अ.क्र.</th><th>JE चे नाव</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th></tr></thead><tbody>';
+      var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
+      var html = '<div style="display:flex; justify-content:space-between; border-bottom:2px solid #333; padding-bottom:6px; margin-bottom:12px;">' +
+                   '<div><h2>सार्वजनिक बांधकाम विभाग</h2><h3>कनिष्ठ अभियंता (JE) निहाय वाटप अहवाल</h3></div>' +
+                   '<div style="text-align:right; font-size:11px;">अहवाल दिनांक: ' + todayStr + '</div></div>' +
+                   '<table class="print-table"><thead><tr><th>अ.क्र.</th><th>JE चे नाव</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th></tr></thead><tbody>';
       mapped.forEach(function(r, i) {
         html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + r.jeName + '</td><td>' + r.mbNo + '</td><td>' + r.size + '</td><td style="text-align:center;">' + formatDateToDMY(r.date) + '</td></tr>';
       });
@@ -936,11 +906,18 @@
 
     function generateBillReports(subType, fDate, tDate) {
       var bills = getData('bill_records');
+      if (subType.startsWith('JE_BILLS:')) {
+        var jeName = subType.split(':')[1];
+        bills = bills.filter(function(b){ return b.je === jeName; });
+      }
       renderBillTableHTML(bills, '', 'देयक नोंदवही अहवाल');
     }
 
     function renderBillTableHTML(billsList, preHTML, title) {
-      var html = preHTML + '<div style="text-align:center; margin-bottom:10px;"><h2>सार्वजनिक बांधकाम विभाग</h2><h3>' + title + '</h3></div>' +
+      var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
+      var html = preHTML + '<div style="display:flex; justify-content:space-between; border-bottom:2px solid #333; padding-bottom:6px; margin-bottom:12px;">' +
+                 '<div><h2>सार्वजनिक बांधकाम विभाग</h2><h3>' + title + '</h3></div>' +
+                 '<div style="text-align:right; font-size:11px;">अहवाल दिनांक: ' + todayStr + '</div></div>' +
                  '<table class="print-table"><thead><tr><th>अ.क्र.</th><th>कंत्राटदार</th><th>कामाचे नाव</th><th>JE</th><th>M.B.</th><th>बिल प्रकार</th><th style="text-align:right;">रक्कम (₹)</th></tr></thead><tbody>';
       var total = 0;
       billsList.forEach(function(b, i) {
@@ -954,7 +931,10 @@
 
     function generateWorkReport(fDate, tDate) {
       var works = getData('work_records');
-      var html = '<div style="text-align:center; margin-bottom:10px;"><h2>सार्वजनिक बांधकाम विभाग</h2><h3>कामांची यादी (Work Register)</h3></div>' +
+      var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
+      var html = '<div style="display:flex; justify-content:space-between; border-bottom:2px solid #333; padding-bottom:6px; margin-bottom:12px;">' +
+                 '<div><h2>सार्वजनिक बांधकाम विभाग</h2><h3>कामांची यादी (Work Register)</h3></div>' +
+                 '<div style="text-align:right; font-size:11px;">अहवाल दिनांक: ' + todayStr + '</div></div>' +
                  '<table class="print-table"><thead><tr><th>अ.क्र.</th><th>कामाचे नाव</th><th>JE</th><th>कंत्राटदार</th><th>M.B. क्र.</th></tr></thead><tbody>';
       works.forEach(function(w, i) {
         html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + w.name + '</td><td>' + w.je + '</td><td>' + w.contractor + '</td><td style="text-align:center;">' + w.mbNo + '</td></tr>';
@@ -1011,8 +991,6 @@
         sel.add(new Option(s.mbNumber + ' (' + s.size + ')', s.mbNumber));
       });
     }
-
-    function onSelectAvailableMBChange() {}
 
     function onMBReceivedSourceChange() {
       var src = document.getElementById('mbReceivedFromSource').value;
