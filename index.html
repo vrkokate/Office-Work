@@ -277,17 +277,18 @@
         <label>स्रोत / व्यक्तीनुसार मुख्य फिल्टर:</label>
         <select class="form-control" id="quickModalMainSource" onchange="onQuickMainSourceChange()">
           <option value="ALL">सर्व (All)</option>
+          <option value="भंडारपाल कडून प्राप्त">भंडारपाल कडून प्राप्त</option>
           <option value="विभागीय कार्यालय">विभागीय कार्यालय</option>
           <option value="JE">Je</option>
           <option value="इतर">इतर</option>
         </select>
       </div>
 
-      <!-- Je निवडल्यास उघडणारा कनिष्ठ अभियंता उप-ड्रॉपडाऊन (सर्व JE + सर्व कनिष्ठ अभियंता) -->
+      <!-- Je निवडल्यास उघडणारा कनिष्ठ अभियंता उप-ड्रॉपडाऊन -->
       <div class="form-group" id="quickModalJESubGroup" style="display:none; margin-bottom:12px;">
         <label>कनिष्ठ अभियंता (JE) निवडा:</label>
         <select class="form-control" id="quickModalJESubSelect" onchange="onQuickFilterChange()">
-          <option value="ALL_JE">सर्व JE</option>
+          <option value="सर्व JE">सर्व JE</option>
         </select>
       </div>
 
@@ -836,7 +837,9 @@
       var listHTML = "";
 
       if (currentQuickModalType === 'RECEIVED') {
-        var rcvList = allMBs.filter(function(m){ return m.actionType === 'मिळालेली M.B.'; });
+        var rcvList = allMBs.filter(function(m){ 
+          return m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी'; 
+        });
         
         if (sizeFilter !== 'ALL') {
           rcvList = rcvList.filter(function(m){ return m.size === sizeFilter; });
@@ -852,7 +855,9 @@
               });
             }
           } else if (mainSource === 'भंडारपाल') {
-            rcvList = rcvList.filter(function(m){ return m.receivedFrom && (m.receivedFrom.includes('भंडारपाल') || m.receivedFrom.includes('भंडारपाळ')); });
+            rcvList = rcvList.filter(function(m){ return m.receivedFrom && (m.receivedFrom.includes('भंडारपाल') || m.receivedFrom.includes('भंडारपाळ') || m.receivedFrom.includes('नवीन')); });
+          } else if (mainSource === 'विभागीय कार्यालय') {
+            rcvList = rcvList.filter(function(m){ return m.receivedFrom && m.receivedFrom.includes('विभागीय कार्यालय'); });
           } else {
             rcvList = rcvList.filter(function(m){ return m.receivedFrom && m.receivedFrom.toLowerCase().includes(mainSource.toLowerCase()); });
           }
@@ -868,7 +873,7 @@
           listHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>साईज</th><th>स्रोत</th></tr></thead><tbody>';
           rcvList.forEach(function(m, i) {
             var displaySource = m.receivedFrom || '-';
-            if (displaySource.includes('भंडारपाल') || displaySource.includes('भंडारपाळ')) {
+            if (displaySource.includes('भंडारपाल') || displaySource.includes('भंडारपाळ') || displaySource.includes('नवीन')) {
               displaySource = 'भंडारपाल कडून प्राप्त';
             }
             listHTML += '<tr><td>' + (i+1) + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + displaySource + '</td></tr>';
@@ -876,7 +881,9 @@
           listHTML += '</tbody></table>';
         }
       } else if (currentQuickModalType === 'GIVEN') {
-        var givenList = allMBs.filter(function(m){ return m.actionType === 'दिलेली M.B.'; });
+        var givenList = allMBs.filter(function(m){ 
+          return m.actionType === 'दिलेली M.B.' || m.actionType === 'दिलेली एमबी'; 
+        });
         
         if (sizeFilter !== 'ALL') {
           givenList = givenList.filter(function(m){ return m.size === sizeFilter; });
@@ -1032,9 +1039,9 @@
 
       allMBs.forEach(function(m) {
         var no = m.mbNumber;
-        if (m.actionType === 'मिळालेली M.B.') {
+        if (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी') {
           stockMap[no] = { mbNumber: no, size: m.size, date: m.date, inStock: true };
-        } else if (m.actionType === 'दिलेली M.B.') {
+        } else if (m.actionType === 'दिलेली M.B.' || m.actionType === 'दिलेली एमबी') {
           if (stockMap[no]) stockMap[no].inStock = false;
         }
       });
@@ -1058,10 +1065,10 @@
       var rcvCount = 0, givenCount = 0;
 
       list.forEach(function(m, idx) {
-        if (m.actionType === 'मिळालेली M.B.') rcvCount++;
-        if (m.actionType === 'दिलेली M.B.') givenCount++;
+        if (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी') rcvCount++;
+        if (m.actionType === 'दिलेली M.B.' || m.actionType === 'दिलेली एमबी') givenCount++;
         var displaySource = m.receivedFrom || '-';
-        if (displaySource.includes('भंडारपाल') || displaySource.includes('भंडारपाळ')) {
+        if (displaySource.includes('भंडारपाल') || displaySource.includes('भंडारपाळ') || displaySource.includes('नवीन')) {
           displaySource = 'भंडारपाल कडून प्राप्त';
         }
         tbody.innerHTML += '<tr><td>' + (idx+1) + '</td><td>' + m.mbNumber + '</td><td>' + m.size + '</td><td>' + displaySource + '</td>' +
@@ -1271,7 +1278,7 @@
       var list = getData('mb_records');
       if (idx === -1 && actionType === 'मिळालेली M.B.') {
         var exists = list.some(function(m) {
-          return m.mbNumber.toLowerCase() === no.toLowerCase() && m.actionType === 'मिळालेली M.B.';
+          return m.mbNumber.toLowerCase() === no.toLowerCase() && (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी');
         });
         if (exists) {
           return showAlert('M.B. क्रमांक "' + no + '" ची नोंद आधीच झालेली आहे!');
@@ -1314,7 +1321,7 @@
       onMBActionTypeChange();
       document.getElementById('newMBSize').value = item.size;
       onMBSizeChange();
-      if (item.actionType === 'दिलेली M.B.') {
+      if (item.actionType === 'दिलेली M.B.' || item.actionType === 'दिलेली एमबी') {
         document.getElementById('selectAvailableMB').value = item.mbNumber;
         onSelectAvailableMBChange();
       } else {
@@ -1613,7 +1620,7 @@
         reportTitle = "सर्व उपलब्ध मोजमाप पुस्तिका अहवाल";
       } else if (finalType === 'GIVEN') {
         filtered = filtered.filter(function(m) {
-          if (m.actionType !== 'दिलेली M.B.') return false;
+          if (m.actionType !== 'दिलेली M.B.' && m.actionType !== 'दिलेली एमबी') return false;
           if (subTarget === 'JE' && subVal) {
             return m.receivedDetail && m.receivedDetail.toLowerCase() === subVal.toLowerCase();
           } else if (subTarget === 'Office') {
@@ -1625,7 +1632,7 @@
         });
         reportTitle = "दिलेली मोजमाप पुस्तिका अहवाल";
       } else if (finalType === 'RECEIVED') {
-        filtered = filtered.filter(function(m) { return m.actionType === 'मिळालेली M.B.'; });
+        filtered = filtered.filter(function(m) { return m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी'; });
         reportTitle = "मिळालेली मोजमाप पुस्तिका अहवाल";
       }
 
