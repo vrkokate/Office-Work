@@ -375,7 +375,6 @@ min-width: 450px;
 </div>
 <button class="btn-report" style="background:#d32f2f; margin-top:10px;" onclick="deleteSelectedData()">निवडलेली माहिती कायमची हटवा</button>
 </div></div>
-​<div id="printableArea" style="display:none;"></div>
 </div>
 ​<!-- बिल विझार्ड मॉडेल (4-Step) -->
 <div id="wizardModal" class="wizard-overlay"><div class="wizard-card">
@@ -685,8 +684,7 @@ if(document.getElementById('countReceivedMB')) document.getElementById('countRec
 if(document.getElementById('countGivenMB')) document.getElementById('countGivenMB').innerText = givenCount;
 if(document.getElementById('countAvailableMB')) document.getElementById('countAvailableMB').innerText = stock.length;
 }
-​/* M.B. नोंद फॉर्म लॉजिक */
-function onMBActionTypeChange() {
+​function onMBActionTypeChange() {
 var actionType = document.getElementById('mbActionType').value;
 var sizeGrp = document.getElementById('groupMBSizeSelect');
 var grpInp = document.getElementById('groupMBInput');
@@ -918,8 +916,7 @@ setData('mb_records', list);
 refreshAll();
 }
 }
-​/* ==================== कामांची यादी (Work List) लॉजिक ==================== */
-function onWorkJEChange() {
+​function onWorkJEChange() {
 var je = document.getElementById('workJE').value;
 var mbSel = document.getElementById('workMB');
 mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';
@@ -1032,8 +1029,7 @@ wJE.innerHTML = '<option value="">-- कनिष्ठ अभियंता �
 getData('je_records').forEach(function(j){ wJE.add(new Option(j.name, j.name)); });
 }
 }
-​/* ==================== रिपोर्ट आणि कास्केडिंग लॉजिक ==================== */
-function onMainCategoryChange() {
+​function onMainCategoryChange() {
 var mainCat = document.getElementById('repMainCategory').value;
 var grp1 = document.getElementById('dynamicOptionGroup1');
 var grp2 = document.getElementById('dynamicOptionGroup2');
@@ -1283,7 +1279,7 @@ return (b.mbNo && b.mbNo.toLowerCase().includes(query)) || (b.je && b.je.toLower
 });
 renderBillTableHTML(bills, '', 'स्मार्ट शोध अहवाल (शोध: ' + query + ')');
 }
-​/* html2pdf लायब्ररी वापरून थेट PDF डाऊनलोड करण्याचे फंक्शन */
+​/* html2pdf लायब्ररी वापरून थेट PDF डाऊनलोड करण्याचे अचूक फंक्शन */
 function generatePDFFromHTML(htmlContent, fileName) {
 var element = document.createElement('div');
 element.innerHTML = htmlContent;
@@ -1389,8 +1385,7 @@ jeSel.innerHTML = '<option value="">-- JE निवडा --</option>';
 getData('je_records').forEach(function(j){ jeSel.add(new Option(j.name, j.name)); });
 }
 }
-​/* ==================== 4-Step Bill Wizard & Register ==================== */
-function refreshBillDashboard() {
+​function refreshBillDashboard() {
 var bills = getData('dmbms_bills');
 var totalBills = bills.length;
 var totalAmt = 0, totalDed = 0, netPayable = 0;
@@ -1591,8 +1586,7 @@ setData('dmbms_bills', bills);
 refreshBillDashboard();
 }
 }
-​/* सेटिंग्स व बॅकअप लॉजिक */
-function downloadBackup() {
+​function downloadBackup() {
 var allData = { je_records: getData('je_records'), mb_records: getData('mb_records'), work_records: getData('work_records'), bill_records: getData('bill_records'), assign_records: getData('assign_records') };
 var blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
 var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
