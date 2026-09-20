@@ -254,7 +254,7 @@
     </div>
   </div>
 
-  <!-- ==================== डॅशबोर्ड क्लिक तपशील मोडल (सुधारित मुख्य व उप-फिल्टर सह) ==================== -->
+  <!-- ==================== डॅशबोर्ड क्लिक तपशील मोडल ==================== -->
   <div id="quickInfoModal" class="quick-info-overlay">
     <div class="quick-info-card">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
@@ -273,7 +273,7 @@
       </div>
 
       <!-- मुख्य फिल्टर (सर्व, विभागीय कार्यालय, Je, इतर) -->
-      <div class="form-group" style="margin-bottom:8px;">
+      <div class="form-group" style="margin-bottom:8px;" id="quickSourceGroup">
         <label>स्रोत / व्यक्तीनुसार मुख्य फिल्टर:</label>
         <select class="form-control" id="quickModalMainSource" onchange="onQuickMainSourceChange()">
           <option value="ALL">सर्व (All)</option>
@@ -283,11 +283,11 @@
         </select>
       </div>
 
-      <!-- Je निवडल्यास उघडणारी कनिष्ठ अभियंता लिस्ट (All JE + वैयक्तिक JE) -->
+      <!-- Je निवडल्यास उघडणारा कनिष्ठ अभियंता उप-ड्रॉपडाऊन (सर्व JE + सर्व कनिष्ठ अभियंता) -->
       <div class="form-group" id="quickModalJESubGroup" style="display:none; margin-bottom:12px;">
         <label>कनिष्ठ अभियंता (JE) निवडा:</label>
         <select class="form-control" id="quickModalJESubSelect" onchange="onQuickFilterChange()">
-          <option value="ALL_JE">all je (सर्व JE)</option>
+          <option value="ALL_JE">सर्व JE</option>
         </select>
       </div>
 
@@ -809,7 +809,7 @@
       var jeSubSelect = document.getElementById('quickModalJESubSelect');
 
       jeSubGroup.style.display = 'none';
-      jeSubSelect.innerHTML = '<option value="ALL_JE">all je (सर्व JE)</option>';
+      jeSubSelect.innerHTML = '<option value="ALL_JE">सर्व JE</option>';
 
       if (mainVal === 'JE') {
         jeSubGroup.style.display = 'block';
@@ -847,7 +847,10 @@
             if (jeSubVal !== 'ALL_JE') {
               rcvList = rcvList.filter(function(m){ return m.receivedFrom && m.receivedFrom.toLowerCase().includes(jeSubVal.toLowerCase()); });
             } else {
-              rcvList = rcvList.filter(function(m){ return m.receivedFrom && (m.receivedFrom.includes('JE') || m.receivedFrom.includes('श्री')); });
+              var jeNames = getData('je_records').map(function(j){ return j.name.toLowerCase(); });
+              rcvList = rcvList.filter(function(m){ 
+                return m.receivedFrom && (m.receivedFrom.includes('JE') || jeNames.some(function(name){ return m.receivedFrom.toLowerCase().includes(name); })); 
+              });
             }
           } else {
             rcvList = rcvList.filter(function(m){ return m.receivedFrom && m.receivedFrom.toLowerCase().includes(mainSource.toLowerCase()); });
@@ -883,10 +886,8 @@
                 return m.receivedDetail && jeNames.some(function(name){ return m.receivedDetail.toLowerCase().includes(name); }); 
               });
             }
-          } else if (mainSource === 'विभागीय कार्यालय') {
-            givenList = givenList.filter(function(m){ return m.receivedSource && m.receivedSource.includes('विभागीय कार्यालय'); });
-          } else if (mainSource === 'इतर') {
-            givenList = givenList.filter(function(m){ return m.receivedSource && !m.receivedSource.includes('विभागीय कार्यालय') && !m.receivedSource.includes('JE'); });
+          } else {
+            givenList = givenList.filter(function(m){ return m.receivedSource && m.receivedSource.toLowerCase().includes(mainSource.toLowerCase()); });
           }
         }
 
