@@ -465,7 +465,7 @@
       <div class="wizard-buttons"><button class="btn-wizard btn-next" onclick="goToStep(2)">पुढील ➔</button></div>
     </div>
 
-    <!-- स्टेप २: कपात व हिशोब (टक्केवारीनुसार अचूक ऑटो-कॅल्क्युलेशन) -->
+    <!-- स्टेप २: कपात व हिशोब (टक्केवारीनुसार अचूक ऑटो-कॅल्क्युलेशन आणि स्वच्छ नावे) -->
     <div class="wizard-step" id="step2" style="display:none;">
       <h4 style="font-size:13px; color:#0d47a1; margin-bottom:6px; border-bottom:1.5px solid #0d47a1; padding-bottom:2px;">Deduction (कपात तपशील)</h4>
       
@@ -475,14 +475,14 @@
       </div>
 
       <div class="deduction-scroll-box" id="deductionFieldsContainer">
-        <div class="form-row-compact"><label>Income Tax (2%)</label><input type="number" class="form-control calc-ded" id="dedIT" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-row-compact"><label>Income Tax</label><input type="number" class="form-control calc-ded" id="dedIT" value="0" oninput="autoCalculateDeductions()"></div>
         <div class="form-row-compact"><label>Security Deposit</label><input type="number" class="form-control calc-ded" id="dedSD" value="0" oninput="autoCalculateDeductions()"></div>
-        <div class="form-row-compact"><label>Maintenance (3%)</label><input type="number" class="form-control calc-ded" id="dedMaint" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-row-compact"><label>Maintenance</label><input type="number" class="form-control calc-ded" id="dedMaint" value="0" oninput="autoCalculateDeductions()"></div>
         <div class="form-row-compact"><label>Royalty Charges</label><input type="number" class="form-control calc-ded" id="dedRoyalty" value="0" oninput="autoCalculateDeductions()"></div>
-        <div class="form-row-compact"><label>Govt. Ins. Scheme (1%)</label><input type="number" class="form-control calc-ded" id="dedGovt" value="0" oninput="autoCalculateDeductions()"></div>
-        <div class="form-row-compact"><label>Upkar (W.C. 1%)</label><input type="number" class="form-control calc-ded" id="dedUpkar" value="0" oninput="autoCalculateDeductions()"></div>
-        <div class="form-row-compact"><label>CGST (1%)</label><input type="number" class="form-control calc-ded" id="dedCGST" value="0" oninput="autoCalculateDeductions()"></div>
-        <div class="form-row-compact"><label>SGST (1%)</label><input type="number" class="form-control calc-ded" id="dedSGST" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-row-compact"><label>Govt. Ins. Scheme</label><input type="number" class="form-control calc-ded" id="dedGovt" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-row-compact"><label>Upkar (W.C.)</label><input type="number" class="form-control calc-ded" id="dedUpkar" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-row-compact"><label>CGST 1%</label><input type="number" class="form-control calc-ded" id="dedCGST" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-row-compact"><label>SGST 1%</label><input type="number" class="form-control calc-ded" id="dedSGST" value="0" oninput="autoCalculateDeductions()"></div>
         
         <div class="form-row-compact" id="otherRow1">
           <div style="display:flex; align-items:center; justify-content:space-between;">
@@ -1657,15 +1657,15 @@
       if(step === 3) renderPreview();
     }
 
-    /* छायाचित्रातील नोंदीनुसार अचूक टक्केवारीचे ऑटो-कॅल्क्युलेशन आणि मॅन्युअल एडिट */
+    /* छायाचित्रातील टक्केवारीनुसार अचूक ऑटो-कॅल्क्युलेशन */
     function autoCalculateDeductions() {
       var passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
       var itInput = document.getElementById('dedIT');
       if (itInput && parseFloat(itInput.value) === 0 && passed > 0) {
         document.getElementById('dedIT').value = Math.round(passed * 0.02);        // Income Tax 2%
-        document.getElementById('dedSD').value = 10000;                            // Security Deposit (Fixed/Custom)
-        document.getElementById('dedMaint').value = Math.round(passed * 0.04);     // Maintenance 4%
-        document.getElementById('dedRoyalty').value = 28000;                       // Royalty Charges
+        document.getElementById('dedSD').value = 10000;                            // Security Deposit (Fixed / Custom)
+        document.getElementById('dedMaint').value = Math.round(passed * 0.03);     // Maintenance 3%
+        document.getElementById('dedRoyalty').value = 28000;                       // Royalty Charges (Fixed / Custom)
         document.getElementById('dedGovt').value = Math.round(passed * 0.01);      // Govt. Ins. Scheme 1%
         document.getElementById('dedUpkar').value = Math.round(passed * 0.01);     // Upkar W.C. 1%
         document.getElementById('dedCGST').value = Math.round(passed * 0.01);      // CGST 1%
