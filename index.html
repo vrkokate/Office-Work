@@ -441,6 +441,8 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <input type="number" class="form-control" id="wPassedAmt" placeholder="उदा. 1000000" oninput="autoCalculateDeductions()" style="padding:5px 8px; height:32px;">
 </div>
 ​<div class="deduction-scroll-box" id="deductionFieldsContainer">
+<!-- दोन भागात मांडणी (2 Columns grid) -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
 <div class="form-row-compact"><label>Income Tax</label><input type="number" class="form-control calc-ded" id="dedIT" value="0" oninput="autoCalculateDeductions()"></div>
 <div class="form-row-compact"><label>Security Deposit</label><input type="number" class="form-control calc-ded" id="dedSD" value="0" oninput="autoCalculateDeductions()"></div>
 <div class="form-row-compact"><label>Maintenance</label><input type="number" class="form-control calc-ded" id="dedMaint" value="0" oninput="autoCalculateDeductions()"></div>
@@ -449,12 +451,16 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div class="form-row-compact"><label>Upkar (W.C.)</label><input type="number" class="form-control calc-ded" id="dedUpkar" value="0" oninput="autoCalculateDeductions()"></div>
 <div class="form-row-compact"><label>CGST 1%</label><input type="number" class="form-control calc-ded" id="dedCGST" value="0" oninput="autoCalculateDeductions()"></div>
 <div class="form-row-compact"><label>SGST 1%</label><input type="number" class="form-control calc-ded" id="dedSGST" value="0" oninput="autoCalculateDeductions()"></div>
-​<div class="form-row-compact" id="otherRow1">
+</div>
+​<!-- Other Deductions Container -->
+<div id="otherDeductionsWrapper" style="margin-top: 6px; display: flex; flex-direction: column; gap: 5px;">
+<div class="form-row-compact" id="otherRow1">
 <div style="display:flex; align-items:center; justify-content:space-between;">
-<label style="margin:0; font-size:11.5px;"><input type="text" id="otherName1" value="Other-1" style="border:none; border-bottom:1px dashed #999; background:transparent; font-size:11.5px; width:80px; outline:none;" title="नाव बदला"></label>
+<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला">Other-1</span></label>
 <button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="नवीन कपात जोडा">+</button>
 </div>
 <input type="number" class="form-control calc-ded" id="dedOther1" value="0" oninput="autoCalculateDeductions()">
+</div>
 </div>
 </div>
 ​<div style="background:#fff3e0; padding:8px; border-radius:6px; margin-top:6px; font-size:11.5px;">
@@ -1476,16 +1482,16 @@ if(container) container.innerHTML = listHTML;
 ​var otherDeductionCount = 1;
 function addOtherDeductionField() {
 otherDeductionCount++;
-var container = document.getElementById('deductionFieldsContainer');
+var wrapper = document.getElementById('otherDeductionsWrapper');
 var div = document.createElement('div');
 div.className = 'form-row-compact';
 div.id = 'otherRow' + otherDeductionCount;
 div.innerHTML = '<div style="display:flex; align-items:center; justify-content:space-between;">' +
-'<label style="margin:0; font-size:11.5px;"><input type="text" id="otherName' + otherDeductionCount + '" value="Other-' + otherDeductionCount + '" style="border:none; border-bottom:1px dashed #999; background:transparent; font-size:11.5px; width:80px; outline:none;" title="नाव बदला"></label>' +
+'<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला">Other-' + otherDeductionCount + '</span></label>' +
 '<button type="button" onclick="removeOtherDeductionField(\'otherRow' + otherDeductionCount + '\')" style="background:#d32f2f; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="काढून टाका">-</button>' +
 '</div>' +
 '<input type="number" class="form-control calc-ded" id="dedOther' + otherDeductionCount + '" value="0" oninput="autoCalculateDeductions()">';
-container.appendChild(div);
+wrapper.appendChild(div);
 }
 ​function removeOtherDeductionField(rowId) {
 var row = document.getElementById(rowId);
@@ -1505,6 +1511,16 @@ document.getElementById('wWorkName').value = '';
 document.getElementById('wBillType').value = '';
 document.getElementById('wBillDate').value = '';
 document.getElementById('wPassedAmt').value = '';
+​// Reset Other fields to only Other-1
+otherDeductionCount = 1;
+var wrapper = document.getElementById('otherDeductionsWrapper');
+wrapper.innerHTML = '<div class="form-row-compact" id="otherRow1">' +
+'<div style="display:flex; align-items:center; justify-content:space-between;">' +
+'<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला">Other-1</span></label>' +
+'<button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="नवीन कपात जोडा">+</button>' +
+'</div>' +
+'<input type="number" class="form-control calc-ded" id="dedOther1" value="0" oninput="autoCalculateDeductions()">' +
+'</div>';
 ​var dedInputs = document.querySelectorAll('.calc-ded');
 dedInputs.forEach(function(input) { input.value = 0; });
 document.getElementById('wLblTotalDed').innerText = '₹ 0';
