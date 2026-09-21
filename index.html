@@ -200,7 +200,7 @@
 
       <div id="quickModalBody"></div>
       
-      <button class="btn-report" style="margin-top:12px;" onclick="printQuickModalReport()">📄 REPORT / PRINT</button>
+      <button class="btn-report" style="margin-top:12px;" onclick="printQuickModalReport()">📄 REPORT / PRINT (DIRECT DOWNLOAD)</button>
     </div>
   </div>
 
@@ -338,7 +338,7 @@
           <input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका">
         </div>
         
-        <button class="btn-report" onclick="generateGeneralReport()">📄 REPORT / PRINT</button>
+        <button class="btn-report" onclick="generateGeneralReport()">📄 REPORT / PRINT (DIRECT DOWNLOAD)</button>
       </div>
     </div>
 
@@ -1524,7 +1524,19 @@
       var p = document.getElementById('printableArea');
       p.innerHTML = content;
       p.style.display = 'block';
-      window.print();
+      
+      // Auto Blob / Data URI PDF Downloader for Android WebView
+      var fullHTML = '<html><head><title>Report</title><style>body{font-family:Arial,sans-serif;padding:15px;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #333;padding:5px;font-size:11px;}th{background:#eee;}</style></head><body>' + content + '</body></html>';
+      var blob = new Blob([fullHTML], { type: 'text/html' });
+      var url = URL.createObjectURL(blob);
+      
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'Office_Report_' + new Date().toISOString().slice(0,10) + '.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
       p.style.display = 'none';
     }
 
