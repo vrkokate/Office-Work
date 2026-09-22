@@ -115,6 +115,16 @@ border-radius: 8px;
 padding: 4px;
 }
 
+/* पॉपअपमधील टेबल स्क्रोल सुलभ करण्यासाठी नवीन CSS */
+.table-responsive-box {
+max-height: 300px;
+overflow-y: auto;
+overflow-x: auto;
+border: 1px solid #ddd;
+border-radius: 6px;
+margin-top: 8px;
+}
+
 .steps-indicator { display: flex; justify-content: space-between; margin-bottom: 14px; padding: 0 20px; }
 .step-dot { width: 26px; height: 26px; border-radius: 50%; background: #ccc; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
 .step-dot.active { background: #f57c00; box-shadow: 0 0 10px rgba(245,124,0,0.5); }
@@ -393,7 +403,11 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div class="sum-card-clickable" onclick="openDetailPopup('TOTAL_DEDUCTION')"><div style="font-size:11px; color:#666;">Total Deduction</div><div style="font-size:16px; font-weight:700; color:#d32f2f;" id="sumTotalDed">₹ 0</div></div>
 <div class="sum-card-clickable" onclick="openDetailPopup('NET_PAYABLE')"><div style="font-size:11px; color:#666;">Net Payable</div><div style="font-size:16px; font-weight:700; color:#2e7d32;" id="sumNetPay">₹ 0</div></div>
 </div>
-<button class="btn-report" style="background:#f57c00; margin-bottom:12px;" onclick="openWizard(1)"><span>➕</span> नवीन देयक नोंदवा (Add New Bill)</button>
+
+<div style="display: flex; gap: 6px; margin-bottom: 12px;">
+<button class="btn-report" style="background:#f57c00; margin:0; flex:1;" onclick="openWizard(1)"><span>➕</span> नवीन देयक नोंदवा</button>
+<button class="btn-report" style="background:#0d47a1; margin:0; flex:1;" onclick="printMasterBillRegister()"><span>📄</span> प्रिंट / पीडीएफ रिपोर्ट</button>
+</div>
 
 <!-- सुधारित टेबल फॉरमॅट आणि स्क्रोल कन्टेनर -->
 <div class="bill-scroll-container">
@@ -431,13 +445,13 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <button class="btn-report" style="background:#d32f2f; margin-top:10px;" onclick="deleteSelectedData()">निवडलेली माहिती कायमची हटवा</button>
 </div></div>
 
-<!-- तपशील पॉप-अप (डॅशबोर्ड कार्ड क्लिक करण्यासाठी व प्रिंट साठी) -->
-<div id="detailModal" class="modal-overlay"><div class="modal-card">
+<!-- तपशील पॉप-अप (स्क्रीन फिट व स्क्रोल करण्यायोग्य) -->
+<div id="detailModal" class="modal-overlay"><div class="modal-card" style="max-width:95vw; width:450px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:10px;">
 <h3 id="detailModalTitle" style="font-size:14px; color:#0d47a1;">तपशील</h3>
 <button class="btn-close" onclick="closeDetailPopup()">X</button>
 </div>
-<div id="detailModalBody"></div>
+<div class="table-responsive-box" id="detailModalBody"></div>
 <button class="btn-report" style="margin-top:12px;" onclick="printDetailModalReport()">📄 REPORT / PRINT</button>
 </div></div>
 
@@ -1469,6 +1483,12 @@ bills = bills.filter(function(b){ return b.je === jeName; });
 renderBillTableHTML(bills, '', 'देयक नोंदवही अहवाल');
 }
 
+function printMasterBillRegister() {
+var bills = getData('dmbms_bills');
+if (bills.length === 0) return showAlert('कोणतीही देयक नोंद उपलब्ध नाही.');
+renderBillTableHTML(bills, '', 'संपूर्ण देयक नोंदवही (Master Bill Register)');
+}
+
 function renderBillTableHTML(billsList, preHTML, title) {
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var html = preHTML + '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
@@ -1631,7 +1651,7 @@ getData('je_records').forEach(function(j){ jeSel.add(new Option(j.name, j.name))
 }
 }
 
-/* ==================== 4-Step Bill Wizard & Register (सुधारित डिझाईन टेबल सह) ==================== */
+/* ==================== 4-Step Bill Wizard & Register ==================== */
 function refreshBillDashboard() {
 var bills = getData('dmbms_bills');
 var totalBills = bills.length;
@@ -1672,7 +1692,7 @@ listHTML += '<tr>' +
 '<td>' + (b.billType || '-') + '</td>' +
 '<td>' + (b.date ? formatDateToDMY(b.date) : '-') + '</td>' +
 '<td style="text-align:right;">₹ ' + passedAmt.toLocaleString('en-IN') + '</td>' +
-'<td style="text-align:right; color:#d32f2f;">₹ ' + totalDed.toLocaleString('en-IN') + '</td>' +
+'<td style="text-align:right; color:#d32f2f; font-weight:700; cursor:pointer;" title="कपात तपशील पाहण्यासाठी क्लिक करा" onclick="openBillDeductionDetail(' + actualIdx + ')">₹ ' + totalDed.toLocaleString('en-IN') + '</td>' +
 '<td style="text-align:right; color:#2e7d32; font-weight:700;">₹ ' + netPay.toLocaleString('en-IN') + '</td>' +
 '<td class="action-cell" style="text-align:center;">' +
 '<button class="btn-action" style="background:#2e7d32; padding:3px 8px;" onclick="editBill(' + actualIdx + ')">Edit</button>' +
@@ -1684,6 +1704,48 @@ listHTML += '</tbody></table>';
 }
 var container = document.getElementById('billListContainer');
 if(container) container.innerHTML = listHTML;
+}
+
+/* विशिष्ट बिलाच्या कपात बाबींचा तपशील पॉपअप */
+function openBillDeductionDetail(idx) {
+var b = getData('dmbms_bills')[idx];
+if(!b) return;
+var d = b.deductions || {
+IT: parseFloat(b.dedIT) || 0,
+SD: parseFloat(b.dedSD) || 0,
+Maint: parseFloat(b.dedMaint) || 0,
+Royalty: parseFloat(b.dedRoyalty) || 0,
+Govt: parseFloat(b.dedGovt) || 0,
+Upkar: parseFloat(b.dedUpkar) || 0,
+CGST: parseFloat(b.dedCGST) || 0,
+SGST: parseFloat(b.dedSGST) || 0
+};
+
+var title = "कपात तपशील (बिल क्र: " + (b.billNo || '-') + " | कंत्राटदार: " + (b.contractor || '-') + ")";
+var tableHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>कपात बाब (Deduction Item)</th><th style="text-align:right;">रक्कम (₹)</th></tr></thead><tbody>';
+
+var items = [
+{name: "Income Tax", val: parseFloat(d.IT) || 0},
+{name: "Security Deposit", val: parseFloat(d.SD) || 0},
+{name: "Maintenance", val: parseFloat(d.Maint) || 0},
+{name: "Royalty Charges", val: parseFloat(d.Royalty) || 0},
+{name: "Govt. Ins. Scheme", val: parseFloat(d.Govt) || 0},
+{name: "Upkar (W.C.)", val: parseFloat(d.Upkar) || 0},
+{name: "CGST 1%", val: parseFloat(d.CGST) || 0},
+{name: "SGST 1%", val: parseFloat(d.SGST) || 0}
+];
+
+var sum = 0;
+items.forEach(function(item, i) {
+sum += item.val;
+tableHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + item.name + '</td><td style="text-align:right;">₹ ' + item.val.toLocaleString('en-IN') + '</td></tr>';
+});
+
+tableHTML += '<tr style="font-weight:750; background:#f5f5f5;"><td colspan="2" style="text-align:right;">एकूण कपात (Total Deduction):</td><td style="text-align:right; color:#d32f2f;">₹ ' + sum.toLocaleString('en-IN') + '</td></tr></tbody></table>';
+
+document.getElementById('detailModalTitle').innerText = title;
+document.getElementById('detailModalBody').innerHTML = tableHTML;
+document.getElementById('detailModal').style.display = 'flex';
 }
 
 /* कपात बाबींच्या तपशीलासह सर्व टॅब तपशील पॉपअप */
