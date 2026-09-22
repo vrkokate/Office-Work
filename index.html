@@ -37,7 +37,6 @@ color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justif
 .text-smart-strong span { color: #00e5ff; }
 .text-created-by { font-size: 10px; color: #8be4ff; margin-top: 4px; font-weight: 600; }
 
-/* प्रोफाईल पॉपअप डिझाईन व ब्रँड आयकॉन्स (WhatsApp, Call, Instagram) */
 .profile-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 5, 15, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
 .profile-card { background: #051d3b; border: 2px solid #00e5ff; border-radius: 18px; width: 100%; max-width: 340px; padding: 22px 18px; text-align: center; position: relative; box-shadow: 0 5px 25px rgba(0,229,255,0.4); }
 .profile-card-close { position: absolute; right: 12px; top: 12px; color: #ff3d57; font-weight: 800; cursor: pointer; border: 1.5px solid #ff3d57; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
@@ -471,7 +470,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 
 <div class="form-group">
 <label>बिलाचा प्रकार निवडा *</label>
-<select class="form-control" id="wBillType">
+<select class="form-control" id="wBillType" onchange="checkExistingBillType()">
 <option value="">-- बिलाचा प्रकार निवडा --</option>
 <option value="First RA Bill">First RA Bill</option>
 <option value="Second RA Bill">Second RA Bill</option>
@@ -754,7 +753,6 @@ refreshBillDashboard();
 
 function closeModule(id) { document.getElementById(id).style.display = 'none'; refreshMBDashboard(); }
 
-/* सुधारित आणि अचूक उपलब्ध स्टॉक कॅलक्युलेशन लॉजिक */
 function getAvailableStock() {
 var allMBs = getData('mb_records');
 var receivedMap = {};
@@ -801,7 +799,6 @@ if(document.getElementById('countGivenMB')) document.getElementById('countGivenM
 if(document.getElementById('countAvailableMB')) document.getElementById('countAvailableMB').innerText = stock.length;
 }
 
-/* M.B. नोंद फॉर्म लॉजिक */
 function onMBActionTypeChange() {
 var actionType = document.getElementById('mbActionType').value;
 var sizeGrp = document.getElementById('groupMBSizeSelect');
@@ -1069,7 +1066,6 @@ refreshAll();
 }
 }
 
-/* ==================== कामांची यादी (Work List) लॉजिक ==================== */
 function onWorkJEChange() {
 var je = document.getElementById('workJE').value;
 var mbSel = document.getElementById('workMB');
@@ -1203,7 +1199,6 @@ getData('je_records').forEach(function(j){ wJE.add(new Option(j.name, j.name)); 
 }
 }
 
-/* ==================== रिपोर्ट आणि कास्केडिंग लॉजिक ==================== */
 function onMainCategoryChange() {
 var mainCat = document.getElementById('repMainCategory').value;
 var grp1 = document.getElementById('dynamicOptionGroup1');
@@ -1785,6 +1780,23 @@ document.getElementById('wContractor').value = works[0].contractor || '';
 } else {
 document.getElementById('wWorkName').value = 'काम नोंदवलेले नाही';
 document.getElementById('wContractor').value = '-';
+}
+checkExistingBillType();
+}
+
+/* नवीन फिचर: आधीच बिल दिले असल्यास चेक करून मेसेज दाखवणे */
+function checkExistingBillType() {
+var selectedMb = document.getElementById('wMbSelect').value;
+var selectedBillType = document.getElementById('wBillType').value;
+if (!selectedMb || !selectedBillType) return;
+
+var bills = getData('dmbms_bills');
+var found = bills.some(function(b) {
+return b.mbNo === selectedMb && b.billType === selectedBillType;
+});
+
+if (found) {
+showAlert('हे बिल (' + selectedBillType + ') या पूर्वी या M.B. साठी देण्यात आले आहे. कृपया पुढील/दुसरा बिलाचा प्रकार निवडा.');
 }
 }
 
