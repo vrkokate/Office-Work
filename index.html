@@ -115,7 +115,6 @@ border-radius: 8px;
 padding: 4px;
 }
 
-/* पॉपअपमधील टेबल स्क्रोल सुलभ करण्यासाठी नवीन CSS */
 .table-responsive-box {
 max-height: 300px;
 overflow-y: auto;
@@ -1706,20 +1705,11 @@ var container = document.getElementById('billListContainer');
 if(container) container.innerHTML = listHTML;
 }
 
-/* विशिष्ट बिलाच्या कपात बाबींचा तपशील पॉपअप */
+/* विशिष्ट बिलाच्या सर्व कपात बाबींचा तपशील व डायनॅमिक इतर कपातीसह पॉपअप */
 function openBillDeductionDetail(idx) {
 var b = getData('dmbms_bills')[idx];
 if(!b) return;
-var d = b.deductions || {
-IT: parseFloat(b.dedIT) || 0,
-SD: parseFloat(b.dedSD) || 0,
-Maint: parseFloat(b.dedMaint) || 0,
-Royalty: parseFloat(b.dedRoyalty) || 0,
-Govt: parseFloat(b.dedGovt) || 0,
-Upkar: parseFloat(b.dedUpkar) || 0,
-CGST: parseFloat(b.dedCGST) || 0,
-SGST: parseFloat(b.dedSGST) || 0
-};
+var d = b.deductions || {};
 
 var title = "कपात तपशील (बिल क्र: " + (b.billNo || '-') + " | कंत्राटदार: " + (b.contractor || '-') + ")";
 var tableHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>कपात बाब (Deduction Item)</th><th style="text-align:right;">रक्कम (₹)</th></tr></thead><tbody>';
@@ -1735,10 +1725,18 @@ var items = [
 {name: "SGST 1%", val: parseFloat(d.SGST) || 0}
 ];
 
-var sum = 0;
-items.forEach(function(item, i) {
+if (d.otherList && Array.isArray(d.otherList)) {
+d.otherList.forEach(function(ot) {
+items.push({ name: ot.name || 'Other', val: parseFloat(ot.val) || 0 });
+});
+} else if (d.Other1 !== undefined) {
+items.push({ name: "Other-1", val: parseFloat(d.Other1) || 0 });
+}
+
+var sum = 0, count = 1;
+items.forEach(function(item) {
 sum += item.val;
-tableHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + item.name + '</td><td style="text-align:right;">₹ ' + item.val.toLocaleString('en-IN') + '</td></tr>';
+tableHTML += '<tr><td style="text-align:center;">' + count++ + '</td><td>' + item.name + '</td><td style="text-align:right;">₹ ' + item.val.toLocaleString('en-IN') + '</td></tr>';
 });
 
 tableHTML += '<tr style="font-weight:750; background:#f5f5f5;"><td colspan="2" style="text-align:right;">एकूण कपात (Total Deduction):</td><td style="text-align:right; color:#d32f2f;">₹ ' + sum.toLocaleString('en-IN') + '</td></tr></tbody></table>';
@@ -1783,16 +1781,7 @@ title = "एकूण कपात तपशील (Total Deduction - सर्�
 tableHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>बिल क्र.</th><th>कंत्राटदार</th><th>Income Tax</th><th>Sec. Deposit</th><th>Maintenance</th><th>Royalty</th><th>Govt. Ins.</th><th>Upkar</th><th>CGST</th><th>SGST</th><th style="text-align:right;">एकूण कपात (₹)</th></tr></thead><tbody>';
 var tIT=0, tSD=0, tMaint=0, tRoy=0, tGovt=0, tUpk=0, tCGST=0, tSGST=0, tTotalDed=0;
 bills.forEach(function(b, i) {
-var d = b.deductions || {
-IT: parseFloat(b.dedIT) || 0,
-SD: parseFloat(b.dedSD) || 0,
-Maint: parseFloat(b.dedMaint) || 0,
-Royalty: parseFloat(b.dedRoyalty) || 0,
-Govt: parseFloat(b.dedGovt) || 0,
-Upkar: parseFloat(b.dedUpkar) || 0,
-CGST: parseFloat(b.dedCGST) || 0,
-SGST: parseFloat(b.dedSGST) || 0
-};
+var d = b.deductions || {};
 var it = parseFloat(d.IT) || 0; tIT += it;
 var sd = parseFloat(d.SD) || 0; tSD += sd;
 var maint = parseFloat(d.Maint) || 0; tMaint += maint;
@@ -1801,7 +1790,7 @@ var govt = parseFloat(d.Govt) || 0; tGovt += govt;
 var upkar = parseFloat(d.Upkar) || 0; tUpk += upkar;
 var cgst = parseFloat(d.CGST) || 0; tCGST += cgst;
 var sgst = parseFloat(d.SGST) || 0; tSGST += sgst;
-var tot = parseFloat(b.totalDed) || (it+sd+maint+roy+govt+upkar+cgst+sgst); tTotalDed += tot;
+var tot = parseFloat(b.totalDed) || 0; tTotalDed += tot;
 
 tableHTML += '<tr><td>' + (i+1) + '</td><td>' + (b.billNo || '-') + '</td><td>' + (b.contractor || '-') + '</td>' +
 '<td>' + it + '</td><td>' + sd + '</td><td>' + maint + '</td><td>' + roy + '</td><td>' + govt + '</td><td>' + upkar + '</td><td>' + cgst + '</td><td>' + sgst + '</td>' +
@@ -2034,6 +2023,10 @@ var netPay = passed - totalDed;
 var date = document.getElementById('wBillDate').value;
 var idx = parseInt(document.getElementById('editBillIndex').value, 10);
 
+var currentYear = new Date().getFullYear();
+var serialNo = String(bills.length + 1).padStart(2, '0');
+var autoBillNo = currentYear + '/' + serialNo;
+
 var deductionsObj = {
 IT: parseFloat(document.getElementById('dedIT').value) || 0,
 SD: parseFloat(document.getElementById('dedSD').value) || 0,
@@ -2042,11 +2035,24 @@ Royalty: parseFloat(document.getElementById('dedRoyalty').value) || 0,
 Govt: parseFloat(document.getElementById('dedGovt').value) || 0,
 Upkar: parseFloat(document.getElementById('dedUpkar').value) || 0,
 CGST: parseFloat(document.getElementById('dedCGST').value) || 0,
-SGST: parseFloat(document.getElementById('dedSGST').value) || 0
+SGST: parseFloat(document.getElementById('dedSGST').value) || 0,
+otherList: []
 };
 
+// इतर डायनॅमिक कपाती गोळा करणे
+for (var i = 1; i <= otherDeductionCount; i++) {
+var lblEl = document.getElementById('otherLabel' + i);
+var valEl = document.getElementById('dedOther' + i);
+if (lblEl && valEl) {
+deductionsObj.otherList.push({
+name: lblEl.innerText.trim(),
+val: parseFloat(valEl.value) || 0
+});
+}
+}
+
 var billData = {
-billNo: (idx === -1) ? ('BILL-2026-' + (101 + bills.length)) : bills[idx].billNo,
+billNo: (idx === -1) ? autoBillNo : bills[idx].billNo,
 je: document.getElementById('wJeSelect').value,
 mbNo: document.getElementById('wMbSelect').value,
 contractor: document.getElementById('wContractor').value,
@@ -2082,17 +2088,7 @@ document.getElementById('wBillType').value = b.billType;
 document.getElementById('wBillDate').value = b.date;
 document.getElementById('wPassedAmt').value = b.passedAmt;
 
-var d = b.deductions || {
-IT: parseFloat(b.dedIT) || 0,
-SD: parseFloat(b.dedSD) || 0,
-Maint: parseFloat(b.dedMaint) || 0,
-Royalty: parseFloat(b.dedRoyalty) || 0,
-Govt: parseFloat(b.dedGovt) || 0,
-Upkar: parseFloat(b.dedUpkar) || 0,
-CGST: parseFloat(b.dedCGST) || 0,
-SGST: parseFloat(b.dedSGST) || 0
-};
-
+var d = b.deductions || {};
 if(document.getElementById('dedIT')) document.getElementById('dedIT').value = d.IT || 0;
 if(document.getElementById('dedSD')) document.getElementById('dedSD').value = d.SD || 0;
 if(document.getElementById('dedMaint')) document.getElementById('dedMaint').value = d.Maint || 0;
@@ -2101,6 +2097,20 @@ if(document.getElementById('dedGovt')) document.getElementById('dedGovt').value 
 if(document.getElementById('dedUpkar')) document.getElementById('dedUpkar').value = d.Upkar || 0;
 if(document.getElementById('dedCGST')) document.getElementById('dedCGST').value = d.CGST || 0;
 if(document.getElementById('dedSGST')) document.getElementById('dedSGST').value = d.SGST || 0;
+
+if(d.otherList && Array.isArray(d.otherList) && d.otherList.length > 0) {
+// प्रथम इतर कपातीसाठी अतिरिक्त फिल्ड तयार करणे
+for (var i = 2; i <= d.otherList.length; i++) {
+addOtherDeductionField();
+}
+d.otherList.forEach(function(ot, index) {
+var idxNum = index + 1;
+var lblEl = document.getElementById('otherLabel' + idxNum);
+var valEl = document.getElementById('dedOther' + idxNum);
+if(lblEl) lblEl.innerText = ot.name;
+if(valEl) valEl.value = ot.val;
+});
+}
 
 autoCalculateDeductions();
 }
