@@ -658,7 +658,8 @@ refreshBillDashboard();
 }
 }
 ​function closeModule(id) { document.getElementById(id).style.display = 'none'; refreshMBDashboard(); }
-​function getAvailableStock() {
+​/* अचूक स्टॉक लॉजिक: मिळालेली - दिलेली = उपलब्ध */
+function getAvailableStock() {
 var allMBs = getData('mb_records');
 var receivedMap = {};
 var givenMap = {};
@@ -1547,16 +1548,14 @@ mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';
 document.getElementById('wContractor').value = '';
 document.getElementById('wWorkName').value = '';
 if(!jeName) return;
-​var assigns = getData('assign_records').filter(function(a){ return a.jeName === jeName; });
-var uniqueAssignedMBs = [];
-var seenMBs = {};
+var assigns = getData('assign_records').filter(function(a){ return a.jeName === jeName; });
+​var uniqueMBs = {};
 assigns.forEach(function(a) {
-if (!seenMBs[a.mbNo]) {
-seenMBs[a.mbNo] = true;
-uniqueAssignedMBs.push(a);
+if (!uniqueMBs[a.mbNo]) {
+uniqueMBs[a.mbNo] = true;
+mbSel.add(new Option(a.mbNo, a.mbNo));
 }
 });
-uniqueAssignedMBs.forEach(function(a){ mbSel.add(new Option(a.mbNo, a.mbNo)); });
 }
 ​function onWizardMBChange() {
 var mbNo = document.getElementById('wMbSelect').value;
