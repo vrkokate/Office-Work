@@ -658,24 +658,20 @@ refreshBillDashboard();
 }
 }
 ​function closeModule(id) { document.getElementById(id).style.display = 'none'; refreshMBDashboard(); }
-​/* अचूक स्टॉक लॉजिक: मिळालेली - दिलेली = उपलब्ध */
-function getAvailableStock() {
+​function getAvailableStock() {
 var allMBs = getData('mb_records');
-var receivedMap = {};
-var givenMap = {};
-​allMBs.forEach(function(m) {
-var no = (m.mbNumber || '').trim();
-if (!no) return;
-if (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी') {
-receivedMap[no] = { mbNumber: no, size: m.size, date: m.date };
-} else if (m.actionType === 'दिलेली M.B.' || m.actionType === 'दिलेली एमबी') {
-givenMap[no] = true;
-}
+var works = getData('work_records');
+var stockMap = {};
+allMBs.forEach(function(m) {
+var no = m.mbNumber;
+if (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी') stockMap[no] = { mbNumber: no, size: m.size, date: m.date, inStock: true };
+else if (m.actionType === 'दिलेली M.B.' || m.actionType === 'दिलेली एमबी') { if (stockMap[no]) stockMap[no].inStock = false; }
 });
-​var available = [];
-for (var no in receivedMap) {
-if (!givenMap[no]) {
-available.push(receivedMap[no]);
+var available = [];
+for (var no in stockMap) {
+if (stockMap[no].inStock) {
+var activeWork = works.find(function(w){ return w.mbNo === no && w.status === 'अपूर्ण'; });
+if (!activeWork) available.push(stockMap[no]);
 }
 }
 return available;
@@ -930,7 +926,7 @@ setData('mb_records', list);
 refreshAll();
 }
 }
-​/* ==================== कामांची यादी (Work List) लॉजिक ==================== */
+​/* ==================== कामांची यादी (Work List) लॉजिक (सुधारित Syncing सह) ==================== */
 function onWorkJEChange() {
 var je = document.getElementById('workJE').value;
 var mbSel = document.getElementById('workMB');
@@ -1695,7 +1691,8 @@ showAlert('डेटा पूर्ववत यशस्वी!'); refreshAll(
 };
 reader.readAsText(file);
 }
-function toggleSelectAll(master) { document.querySelectorAll('.del-chk').forEach(function(c){ c.checked = master.checked; }); }
+function toggleSelectAll(master) { document.querySelectorAll('.del-chk').forEach(function(c){ c.checked = master.checked; });
+}
 function deleteSelectedData() {
 var selected = []; document.querySelectorAll('.del-chk:checked').forEach(function(c){ selected.push(c.value); });
 if (selected.length === 0) return showAlert('किमान एक निवडा.');
