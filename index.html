@@ -1712,7 +1712,16 @@ title = "एकूण कपात तपशील (Total Deduction - सर्�
 tableHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>बिल क्र.</th><th>कंत्राटदार</th><th>Income Tax</th><th>Sec. Deposit</th><th>Maintenance</th><th>Royalty</th><th>Govt. Ins.</th><th>Upkar</th><th>CGST</th><th>SGST</th><th style="text-align:right;">एकूण कपात (₹)</th></tr></thead><tbody>';
 var tIT=0, tSD=0, tMaint=0, tRoy=0, tGovt=0, tUpk=0, tCGST=0, tSGST=0, tTotalDed=0;
 bills.forEach(function(b, i) {
-var d = b.deductions || {};
+var d = b.deductions || {
+IT: parseFloat(b.dedIT) || 0,
+SD: parseFloat(b.dedSD) || 0,
+Maint: parseFloat(b.dedMaint) || 0,
+Royalty: parseFloat(b.dedRoyalty) || 0,
+Govt: parseFloat(b.dedGovt) || 0,
+Upkar: parseFloat(b.dedUpkar) || 0,
+CGST: parseFloat(b.dedCGST) || 0,
+SGST: parseFloat(b.dedSGST) || 0
+};
 var it = parseFloat(d.IT) || 0; tIT += it;
 var sd = parseFloat(d.SD) || 0; tSD += sd;
 var maint = parseFloat(d.Maint) || 0; tMaint += maint;
@@ -1721,7 +1730,7 @@ var govt = parseFloat(d.Govt) || 0; tGovt += govt;
 var upkar = parseFloat(d.Upkar) || 0; tUpk += upkar;
 var cgst = parseFloat(d.CGST) || 0; tCGST += cgst;
 var sgst = parseFloat(d.SGST) || 0; tSGST += sgst;
-var tot = parseFloat(b.totalDed) || 0; tTotalDed += tot;
+var tot = parseFloat(b.totalDed) || (it+sd+maint+roy+govt+upkar+cgst+sgst); tTotalDed += tot;
 
 tableHTML += '<tr><td>' + (i+1) + '</td><td>' + (b.billNo || '-') + '</td><td>' + (b.contractor || '-') + '</td>' +
 '<td>' + it + '</td><td>' + sd + '</td><td>' + maint + '</td><td>' + roy + '</td><td>' + govt + '</td><td>' + upkar + '</td><td>' + cgst + '</td><td>' + sgst + '</td>' +
@@ -2002,16 +2011,26 @@ document.getElementById('wBillType').value = b.billType;
 document.getElementById('wBillDate').value = b.date;
 document.getElementById('wPassedAmt').value = b.passedAmt;
 
-if(b.deductions) {
-if(document.getElementById('dedIT')) document.getElementById('dedIT').value = b.deductions.IT || 0;
-if(document.getElementById('dedSD')) document.getElementById('dedSD').value = b.deductions.SD || 0;
-if(document.getElementById('dedMaint')) document.getElementById('dedMaint').value = b.deductions.Maint || 0;
-if(document.getElementById('dedRoyalty')) document.getElementById('dedRoyalty').value = b.deductions.Royalty || 0;
-if(document.getElementById('dedGovt')) document.getElementById('dedGovt').value = b.deductions.Govt || 0;
-if(document.getElementById('dedUpkar')) document.getElementById('dedUpkar').value = b.deductions.Upkar || 0;
-if(document.getElementById('dedCGST')) document.getElementById('dedCGST').value = b.deductions.CGST || 0;
-if(document.getElementById('dedSGST')) document.getElementById('dedSGST').value = b.deductions.SGST || 0;
-}
+var d = b.deductions || {
+IT: parseFloat(b.dedIT) || 0,
+SD: parseFloat(b.dedSD) || 0,
+Maint: parseFloat(b.dedMaint) || 0,
+Royalty: parseFloat(b.dedRoyalty) || 0,
+Govt: parseFloat(b.dedGovt) || 0,
+Upkar: parseFloat(b.dedUpkar) || 0,
+CGST: parseFloat(b.dedCGST) || 0,
+SGST: parseFloat(b.dedSGST) || 0
+};
+
+if(document.getElementById('dedIT')) document.getElementById('dedIT').value = d.IT || 0;
+if(document.getElementById('dedSD')) document.getElementById('dedSD').value = d.SD || 0;
+if(document.getElementById('dedMaint')) document.getElementById('dedMaint').value = d.Maint || 0;
+if(document.getElementById('dedRoyalty')) document.getElementById('dedRoyalty').value = d.Royalty || 0;
+if(document.getElementById('dedGovt')) document.getElementById('dedGovt').value = d.Govt || 0;
+if(document.getElementById('dedUpkar')) document.getElementById('dedUpkar').value = d.Upkar || 0;
+if(document.getElementById('dedCGST')) document.getElementById('dedCGST').value = d.CGST || 0;
+if(document.getElementById('dedSGST')) document.getElementById('dedSGST').value = d.SGST || 0;
+
 autoCalculateDeductions();
 }
 
