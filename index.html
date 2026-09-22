@@ -518,7 +518,7 @@
         
         <div class="form-row-compact" id="otherRow1">
           <div style="display:flex; align-items:center; justify-content:space-between;">
-            <label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला">Other-1</span></label>
+            <label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="otherLabel1">Other-1</span></label>
             <button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="नवीन कपात जोडा">+</button>
           </div>
           <input type="number" class="form-control calc-ded" id="dedOther1" value="0" oninput="autoCalculateDeductions()">
@@ -1055,6 +1055,7 @@
       }
     }
 
+    /* ==================== कामांची यादी (Work List) लॉजिक ==================== */
     function onWorkJEChange() {
       var je = document.getElementById('workJE').value;
       var mbSel = document.getElementById('workMB');
@@ -1064,7 +1065,6 @@
       var assignedMBs = getData('assign_records').filter(function(a){ return a.jeName === je; });
       var works = getData('work_records');
       
-      // Duplication prevention: Ensure unique MB numbers for the selected JE
       var uniqueAssignedMBs = [];
       var seenMBs = {};
       assignedMBs.forEach(function(a) {
@@ -1207,6 +1207,7 @@
       }
     }
 
+    /* ==================== रिपोर्ट आणि कास्केडिंग लॉजिक ==================== */
     function onMainCategoryChange() {
       var mainCat = document.getElementById('repMainCategory').value;
       var grp1 = document.getElementById('dynamicOptionGroup1');
@@ -1648,6 +1649,7 @@
       }
     }
 
+    /* ==================== 4-Step Bill Wizard & Register ==================== */
     function refreshBillDashboard() {
       var bills = getData('dmbms_bills');
       var totalBills = bills.length;
@@ -1683,8 +1685,57 @@
       if(container) container.innerHTML = listHTML;
     }
 
+    var otherDeductionCount = 1;
+
+    function addOtherDeductionField() {
+      otherDeductionCount++;
+      var container = document.getElementById('deductionFieldsContainer');
+      var newRowId = 'otherRow' + otherDeductionCount;
+      var newLabelId = 'otherLabel' + otherDeductionCount;
+      var newInputId = 'dedOther' + otherDeductionCount;
+
+      var div = document.createElement('div');
+      div.className = 'form-row-compact';
+      div.id = newRowId;
+      div.innerHTML = '<div style="display:flex; align-items:center; justify-content:space-between;">' +
+                        '<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="' + newLabelId + '">Other-' + otherDeductionCount + '</span></label>' +
+                        '<button type="button" onclick="removeOtherDeductionField(\'' + newRowId + '\')" style="background:#d32f2f; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="कपात काढा">-</button>' +
+                      '</div>' +
+                      '<input type="number" class="form-control calc-ded" id="' + newInputId + '" value="0" oninput="autoCalculateDeductions()">';
+      container.appendChild(div);
+      autoCalculateDeductions();
+    }
+
+    function removeOtherDeductionField(rowId) {
+      var row = document.getElementById(rowId);
+      if(row) {
+        row.remove();
+        autoCalculateDeductions();
+      }
+    }
+
     function openWizard(step) {
       document.getElementById('editBillIndex').value = '-1';
+      otherDeductionCount = 1;
+      
+      // Reset deduction container to default state (keeping fixed ones + Other-1)
+      var container = document.getElementById('deductionFieldsContainer');
+      container.innerHTML = '<div class="form-row-compact"><label>Income Tax</label><input type="number" class="form-control calc-ded" id="dedIT" value="0" oninput="autoCalculateDeductions()"></div>' +
+                            '<div class="form-row-compact"><label>Security Deposit</label><input type="number" class="form-control calc-ded" id="dedSD" value="0" oninput="autoCalculateDeductions()"></div>' +
+                            '<div class="form-row-compact"><label>Maintenance</label><input type="number" class="form-control calc-ded" id="dedMaint" value="0" oninput="autoCalculateDeductions()"></div>' +
+                            '<div class="form-row-compact"><label>Royalty Charges</label><input type="number" class="form-control calc-ded" id="dedRoyalty" value="0" oninput="autoCalculateDeductions()"></div>' +
+                            '<div class="form-row-compact"><label>Govt. Ins. Scheme</label><input type="number" class="form-control calc-ded" id="dedGovt" value="0" oninput="autoCalculateDeductions()"></div>' +
+                            '<div class="form-row-compact"><label>Upkar (W.C.)</label><input type="number" class="form-control calc-ded" id="dedUpkar" value="0" oninput="autoCalculateDeductions()"></div>' +
+                            '<div class="form-row-compact"><label>CGST 1%</label><input type="number" class="form-control calc-ded" id="dedCGST" value="0" oninput="autoCalculateDeductions()"></div>' +
+                            '<div class="form-row-compact"><label>SGST 1%</label><input type="number" class="form-control calc-ded" id="dedSGST" value="0" oninput="autoCalculateDeductions()"></div>' +
+                            '<div class="form-row-compact" id="otherRow1">' +
+                              '<div style="display:flex; align-items:center; justify-content:space-between;">' +
+                                '<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="otherLabel1">Other-1</span></label>' +
+                                '<button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="नवीन कपात जोडा">+</button>' +
+                              '</div>' +
+                              '<input type="number" class="form-control calc-ded" id="dedOther1" value="0" oninput="autoCalculateDeductions()">' +
+                            '</div>';
+
       var jeSel = document.getElementById('wJeSelect');
       if(jeSel) {
         jeSel.innerHTML = '<option value="">-- JE निवडा --</option>';
@@ -1717,10 +1768,8 @@
       document.getElementById('wContractor').value = '';
       document.getElementById('wWorkName').value = '';
       if(!jeName) return;
-
-      var assigns = getData('assign_records').filter(function(a){ return a.jeName === jeName; });
       
-      // FIX: Ensuring M.B. numbers are displayed uniquely without duplicates for selected JE in New Bill Wizard
+      var assigns = getData('assign_records').filter(function(a){ return a.jeName === jeName; });
       var uniqueAssignedMBs = [];
       var seenMBs = {};
       assigns.forEach(function(a) {
@@ -1729,7 +1778,6 @@
           uniqueAssignedMBs.push(a);
         }
       });
-
       uniqueAssignedMBs.forEach(function(a){ mbSel.add(new Option(a.mbNo, a.mbNo)); });
     }
 
@@ -1825,7 +1873,7 @@
         mbNo: document.getElementById('wMbSelect').value,
         contractor: document.getElementById('wContractor').value,
         workName: document.getElementById('wWorkName').value,
-        billType: document.getElementById('wBillType'.value),
+        billType: document.getElementById('wBillType').value,
         date: date,
         passedAmt: passed,
         totalDed: totalDed,
@@ -1866,6 +1914,7 @@
       }
     }
 
+    /* सेटिंग्स व बॅकअप लॉजिक */
     function downloadBackup() {
       var allData = { je_records: getData('je_records'), mb_records: getData('mb_records'), work_records: getData('work_records'), bill_records: getData('bill_records'), assign_records: getData('assign_records') };
       var blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
