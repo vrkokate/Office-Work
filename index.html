@@ -161,6 +161,69 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 </div>
 </div>
 
+<!-- Form टॅब क्लिक केल्यावर उघडणारे उप-टॅब्स (Pay Fixation सह) -->
+<div id="formModal" class="modal-overlay">
+<div class="modal-card" style="max-width:440px;">
+<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:12px;">
+<h3 style="font-size:15px; color:#ff7b00;">📋 Form - उप-टॅब व्यवस्थापन</h3>
+<button class="btn-close" onclick="closeFormModal()">X</button>
+</div>
+<div style="display:flex; flex-direction:column; gap:8px;">
+<div style="display:flex; gap:6px;">
+<div class="tab-card btn-form" style="flex:1; height:40px; font-size:9.5px;" onclick="openPayFixationModal()">Pay Fixation</div>
+<div class="tab-card btn-form" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Form Tab 2')">Form-2</div>
+<div class="tab-card btn-form" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Form Tab 3')">Form-3</div>
+<div class="tab-card btn-form" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Form Tab 4')">Form-4</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Pay Fixation कॅल्क्युलेटर मॉडेल -->
+<div id="payFixationModal" class="modal-overlay">
+<div class="modal-card" style="max-width:450px;">
+<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:12px;">
+<h3 style="font-size:15px; color:#28a745;">💰 वेतन निश्चिती (Pay Fixation)</h3>
+<button class="btn-close" onclick="closePayFixationModal()">X</button>
+</div>
+<div class="form-group">
+<label>वेतन आयोग निवडा:</label>
+<select class="form-control" id="pfCommission" onchange="onCommissionChange()">
+<option value="6">६ वा वेतन आयोग (५व्या वरून)</option>
+<option value="7">७ वा वेतन आयोग (६व्या वरून)</option>
+<option value="5">५ वा वेतन आयोग</option>
+</select>
+</div>
+<div class="form-row">
+<div class="form-group"><label>केव्हापासून (दिनांक):</label><input type="date" class="form-control" id="pfFromDate"></div>
+<div class="form-group"><label>केव्हापर्यंत (दिनांक):</label><input type="date" class="form-control" id="pfToDate"></div>
+</div>
+<div class="form-group" id="pfGroupOldBasic">
+<label id="lblOldBasic">जुने मूळ वेतन (5th Basic):</label>
+<input type="number" class="form-control" id="pfOldBasic" placeholder="उदा. 8000">
+</div>
+<div class="form-group" id="pfGroupPayBand" style="display:none;">
+<label>वेतन बँड (Pay Band):</label>
+<select class="form-control" id="pfPayBand">
+<option value="5200-20200">PB-1 (5200 - 20200)</option>
+<option value="9300-34800" selected>PB-2 (9300 - 34800)</option>
+<option value="15600-39100">PB-3 (15600 - 39100)</option>
+<option value="37400-67000">PB-4 (37400 - 67000)</option>
+</select>
+</div>
+<div class="form-group" id="pfGroupGradePay">
+<label>ग्रेड पे (Grade Pay - रु.):</label>
+<input type="number" class="form-control" id="pfGradePay" placeholder="उदा. 4200">
+</div>
+<button class="btn-report" style="background:#28a745;" onclick="calculateFixation()">वेतन निश्चिती करा</button>
+<div class="result-box" id="pfResultSection" style="margin-top:15px; padding:10px; background:#e9ecef; border-left:4px solid #28a745; display:none; font-size:12px;">
+<h4 style="color:#28a745; margin-bottom:5px;">निश्चितीचा हिशोब:</h4>
+<p id="pfResultText"></p>
+<button class="btn-report" style="background:#0d47a1; margin-top:8px; padding:6px;" onclick="printPayFixationReport()">📄 प्रिंट / रिपोर्ट</button>
+</div>
+</div>
+</div>
+
 <!-- Setting टॅब क्लिक केल्यानंतर उघडणारे १२ नवीन टॅब्सचे मॉडेल -->
 <div id="settingModal" class="modal-overlay">
 <div class="modal-card" style="max-width:440px;">
@@ -170,7 +233,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 </div>
 <div style="display:flex; flex-direction:column; gap:8px;">
 <div style="display:flex; gap:6px;">
-<div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px; background:linear-gradient(180deg, #0d47a1, #051d3b);" onclick="openPayFixationModal(); closeSettingModal();">Pay Fixation</div>
+<div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 1')">Set-1</div>
 <div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 2')">Set-2</div>
 <div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 3')">Set-3</div>
 <div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 4')">Set-4</div>
@@ -185,49 +248,6 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 11')">Set-11</div>
 <div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px; background:linear-gradient(180deg, #1976d2, #0d47a1);" onclick="openBackupModal(); closeSettingModal();">Backup</div>
 </div>
-</div>
-</div>
-</div>
-
-<!-- Pay Fixation मॉडेल (वेतन निश्चिती कॅल्क्युलेटर) -->
-<div id="payFixationModal" class="modal-overlay">
-<div class="modal-card" style="max-width:500px;">
-<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:12px;">
-<h3 style="font-size:14px; color:#0d47a1;">📊 वेतन निश्चिती (Pay Fixation) कॅल्क्युलेटर</h3>
-<button class="btn-close" onclick="closePayFixationModal()">X</button>
-</div>
-
-<div class="form-group">
-<label for="pfCommission">वेतन आयोग निवडा:</label>
-<select id="pfCommission" class="form-control" onchange="onCommissionChange()">
-<option value="6th">६ वा वेतन आयोग (५व्या वरून)</option>
-<option value="7th">७ वा वेतन आयोग (६व्या वरून)</option>
-</select>
-</div>
-
-<div class="form-row">
-<div class="form-group"><label>केव्हापासून (दिनांक):</label><input type="date" class="form-control" id="pfFromDate"></div>
-<div class="form-group"><label>केव्हापर्यंत (दिनांक):</label><input type="date" class="form-control" id="pfToDate"></div>
-</div>
-
-<div id="pfDynamicFields">
-<!-- डायनॅमिक इनपुट फील्ड्स यहाँ लोड होतील -->
-</div>
-
-<div class="form-group">
-<label for="pfIncrementMonth">वेतनवाढीचा महिना (Increment Month):</label>
-<select id="pfIncrementMonth" class="form-control">
-<option value="07">जुलै (July)</option>
-<option value="01">जानेवारी (January)</option>
-</select>
-</div>
-
-<button class="btn-report" style="background:#2e7d32;" onclick="calculateFixation()">वेतन निश्चिती करा</button>
-
-<div class="result-box" id="pfResultSection" style="margin-top:15px; padding:12px; background:#e9ecef; border-left:5px solid #007bff; border-radius:4px; display:none; font-size:12px;">
-<h4 style="margin-top:0; color:#007bff; font-size:13px;">निश्चितीचा हिशोब:</h4>
-<p id="pfResultContent"></p>
-<button class="btn-report" style="margin-top:10px; background:#0d47a1; font-size:11px; padding:6px;" onclick="printPayFixationReport()">📄 प्रिंट / रिपोर्ट</button>
 </div>
 </div>
 </div>
@@ -304,7 +324,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div style="display:flex; justify-content:center; gap:5px;">
 <div class="tab-card btn-est" onclick="showAlert('Est. टॅब')">Est.</div>
 <div class="tab-card btn-mb" onclick="showMBSystem()">M.B.</div>
-<div class="tab-card btn-form" onclick="showAlert('Form टॅब')">Form</div>
+<div class="tab-card btn-form" onclick="openFormModal()">Form</div>
 <div class="tab-card btn-tab4" onclick="showAlert('Tab-4 टॅब')">Tab-4</div>
 <div class="tab-card btn-setting" onclick="showAlert('Set-1 टॅब')">Set-1</div>
 <div class="tab-card btn-setting" onclick="showAlert('Set-2 टॅब')">Set-2</div>
@@ -686,91 +706,106 @@ function closeBackupModal() {
 document.getElementById('backupModal').style.display = 'none';
 }
 
+function openFormModal() {
+document.getElementById('formModal').style.display = 'flex';
+}
+function closeFormModal() {
+document.getElementById('formModal').style.display = 'none';
+}
+
 function openPayFixationModal() {
+closeFormModal();
 document.getElementById('payFixationModal').style.display = 'flex';
-onCommissionChange();
 }
 function closePayFixationModal() {
 document.getElementById('payFixationModal').style.display = 'none';
 }
 
 function onCommissionChange() {
-var comm = document.getElementById('pfCommission').value;
-var container = document.getElementById('pfDynamicFields');
-if (comm === '6th') {
-container.innerHTML = `
-<div class="form-group"><label>5व्या आयोगाचे जुने मूळ वेतन (Basic):</label><input type="number" class="form-control" id="pfOldBasic" placeholder="उदा. 8000"></div>
-<div class="form-group"><label>वेतन बँड (Pay Band):</label>
-<select class="form-control" id="pfPayBand"><option value="5200-20200">PB-1 (5200 - 20200)</option><option value="9300-34800" selected>PB-2 (9300 - 34800)</option><option value="15600-39100">PB-3 (15600 - 39100)</option><option value="37400-67000">PB-4 (37400 - 67000)</option></select></div>
-<div class="form-group"><label>ग्रेड पे (Grade Pay - रु.):</label><input type="number" class="form-control" id="pfGradePay" placeholder="उदा. 4200"></div>
-`;
-} else {
-container.innerHTML = `
-<div class="form-group"><label>6व्या आयोगाचे मूळ वेतन (Basic Pay in 6th):</label><input type="number" class="form-control" id="pf6thBasic" placeholder="उदा. 15600"></div>
-<div class="form-group"><label>6व्या आयोगाचा ग्रेड पे (Grade Pay):</label><input type="number" class="form-control" id="pf6thGradePay" placeholder="उदा. 5400"></div>
-<div class="form-group"><label>7व्या आयोगाची लेव्हल (Pay Matrix Level):</label>
-<select class="form-control" id="pfPayLevel"><option value="S-15" selected>Level S-15</option><option value="S-20">Level S-20</option><option value="S-23">Level S-23</option></select></div>
-`;
+let comm = document.getElementById('pfCommission').value;
+let oldBasicLabel = document.getElementById('lblOldBasic');
+let payBandGroup = document.getElementById('pfGroupPayBand');
+
+if (comm === '6') {
+oldBasicLabel.innerText = "जुने मूळ वेतन (5th Basic):";
+payBandGroup.style.display = 'none';
+} else if (comm === '7') {
+oldBasicLabel.innerText = "6th मूळ वेतन (6th Basic Pay):";
+payBandGroup.style.display = 'none';
+} else if (comm === '5') {
+oldBasicLabel.innerText = "जुने मूळ वेतन (4th Basic):";
+payBandGroup.style.display = 'none';
 }
 }
 
 function calculateFixation() {
-var comm = document.getElementById('pfCommission').value;
-var fromDt = document.getElementById('pfFromDate').value;
-var toDt = document.getElementById('pfToDate').value;
-var incMonth = document.getElementById('pfIncrementMonth').value;
-var resultHTML = "";
+let comm = document.getElementById('pfCommission').value;
+let oldBasic = parseFloat(document.getElementById('pfOldBasic').value);
+let gradePay = parseFloat(document.getElementById('pfGradePay').value) || 0;
+let fromDt = document.getElementById('pfFromDate').value;
+let toDt = document.getElementById('pfToDate').value;
 
-if (comm === '6th') {
-var oldBasic = parseFloat(document.getElementById('pfOldBasic').value);
-var gradePay = parseFloat(document.getElementById('pfGradePay').value);
-if (isNaN(oldBasic) || isNaN(gradePay)) return alert("कृपया सर्व माहिती अचूक भरा!");
+if (isNaN(oldBasic)) {
+alert("कृपया मूळ वेतन अचूक भरा!");
+return;
+}
 
-var multipliedVal = oldBasic * 1.86;
-var roundedPayInPB = Math.ceil(multipliedVal / 10) * 10;
-var revisedBasic0101 = roundedPayInPB + gradePay;
+let resultHTML = "";
+if (comm === '6') {
+let multipliedVal = oldBasic * 1.86;
+let roundedPayInPB = Math.ceil(multipliedVal / 10) * 10;
+let revisedBasic0101 = roundedPayInPB + gradePay;
 
-var incrementAmount = Math.round((roundedPayInPB * 0.03) / 10) * 10;
+let incrementAmount = Math.round((roundedPayInPB * 0.03) / 10) * 10;
 if (incrementAmount < 100) incrementAmount = 100;
-var newPayInPBInc = roundedPayInPB + incrementAmount;
-var revisedBasicInc = newPayInPBInc + gradePay;
+let newPayInPBJuly = roundedPayInPB + incrementAmount;
+let revisedBasicJuly = newPayInPBJuly + gradePay;
 
 resultHTML = `
-<strong>कालावधी:</strong> ${fromDt ? formatDateToDMY(fromDt) : '-'} ते ${toDt ? formatDateToDMY(toDt) : '-'}<br>
-<strong>अ) ६ वा वेतन आयोग निश्चिती:</strong><br>
+<strong>काळ:</strong> ${fromDt ? formatDateToDMY(fromDt) : '-'} ते ${toDt ? formatDateToDMY(toDt) : '-'}<br>
+<strong>अ) दिनांक 01-01-2006 रोजीची ६व्या आयोगाची निश्चिती:</strong><br>
 - जुने मूळ वेतन (× 1.86): ₹ ${multipliedVal.toFixed(2)}<br>
 - Pay in Pay Band (10 च्या पटीत): ₹ ${roundedPayInPB}<br>
-- एकूण सुधारित मूळ वेतन: <b>₹ ${revisedBasic0101}</b><br><br>
-<strong>ब) वार्षिक वेतनवाढ (महिना: ${incMonth == '07' ? 'जुलै' : 'जानेवारी'}):</strong><br>
-- नवीन Pay in PB (3% वाढ): ₹ ${newPayInPBInc}<br>
-- वर्धित सुधारित वेतन: <b>₹ ${revisedBasicInc}</b>
+- ग्रेड पे (${gradePay}) मिळवून एकूण वेतन: <b>₹ ${revisedBasic0101}</b><br><br>
+<strong>ब) दिनांक 01-07-2006 रोजीची वार्षिक वेतनवाढ:</strong><br>
+- नवीन Pay in PB (3% वाढ नंतर): ₹ ${newPayInPBJuly}<br>
+- जुलै २००६ मधील एकूण वेतन: <b>₹ ${revisedBasicJuly}</b>
 `;
-} else {
-var basic6th = parseFloat(document.getElementById('pf6thBasic').value);
-var gp6th = parseFloat(document.getElementById('pf6thGradePay').value);
-if (isNaN(basic6th) || isNaN(gp6th)) return alert("कृपया सर्व माहिती अचूक भरा!");
-
-var total6th = basic6th + gp6th;
-var multiplied7th = total6th * 2.57;
-var revisedBasic7th = Math.round(multiplied7th / 100) * 100; // 7व्या आयोगात 100 च्या पटीत गोठवले जाते
+} else if (comm === '7') {
+let total6th = oldBasic + gradePay;
+let multipliedVal = total6th * 2.57;
+let revised7thBasic = Math.round(multipliedVal / 100) * 100;
 
 resultHTML = `
-<strong>कालावधी:</strong> ${fromDt ? formatDateToDMY(fromDt) : '-'} ते ${toDt ? formatDateToDMY(toDt) : '-'}<br>
-<strong>अ) ७ वा वेतन आयोग निश्चिती (Fitment Factor 2.57):</strong><br>
-- 6वे मूळ वेतन + ग्रेड पे: ₹ ${total6th}<br>
-- गुणोत्तर रक्कम (× 2.57): ₹ ${multiplied7th.toFixed(2)}<br>
-- 7व्या आयोगाचे निश्चित मूळ वेतन (Pay Matrix): <b>₹ ${revisedBasic7th}</b>
+<strong>काळ:</strong> ${fromDt ? formatDateToDMY(fromDt) : '-'} ते ${toDt ? formatDateToDMY(toDt) : '-'}<br>
+<strong>७ वा वेतन आयोग निश्चिती (दि. 01-01-2016):</strong><br>
+- 6th मूळ वेतन + ग्रेड पे: ₹ ${total6th}<br>
+- Fitment Factor (× 2.57): ₹ ${multipliedVal.toFixed(2)}<br>
+- Pay Matrix नुसार सुधारित मूळ वेतन: <b>₹ ${revised7thBasic}</b>
+`;
+} else {
+resultHTML = `
+<strong>काळ:</strong> ${fromDt ? formatDateToDMY(fromDt) : '-'} ते ${toDt ? formatDateToDMY(toDt) : '-'}<br>
+<strong>५ वा वेतन आयोग निश्चिती:</strong><br>
+- जुने मूळ वेतन: ₹ ${oldBasic}<br>
+- सुधारित मूळ वेतन निश्चित.
 `;
 }
 
-document.getElementById('pfResultContent').innerHTML = resultHTML;
+document.getElementById('pfResultText').innerHTML = resultHTML;
 document.getElementById('pfResultSection').style.display = 'block';
 }
 
 function printPayFixationReport() {
-var content = document.getElementById('pfResultContent').innerHTML;
+var content = document.getElementById('pfResultText').innerHTML;
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">वेतन निश्चिती (Pay Fixation) अहवाल</h2></div><div style="text-align:right; font-size:11px;">अहवाल दिनांक: ' + todayStr + '</div></div><div style="font-size:12px; line-height:1.6;">' + content + '</div>';
+var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;">' +
+'<div style="text-align:center; margin-bottom:4px;">' +
+'<h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1>' +
+'<h2 style="font-size:12px; font-weight:700; margin:2px 0;">वेतन निश्चिती (Pay Fixation) अहवाल</h2>' +
+'</div>' +
+'<div style="text-align:right; font-size:11px;">अहवाल दिनांक: ' + todayStr + '</div>' +
+'</div>' + content;
 printA4Document(html);
 }
 
