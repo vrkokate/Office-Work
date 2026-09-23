@@ -183,23 +183,8 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 9')">Set-9</div>
 <div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 10')">Set-10</div>
 <div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 11')">Set-11</div>
-<div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px; background:linear-gradient(180deg, #1976d2, #0d47a1);" onclick="openBackupModal(); closeSettingModal();">Backup</div>
+<div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px; background:linear-gradient(180deg, #1976d2, #0d47a1);" onclick="openModule('settingsModal'); closeSettingModal();">Backup</div>
 </div>
-</div>
-</div>
-</div>
-
-<!-- बॅकअप व रेस्टोअर मोडल (Backup Tab) -->
-<div id="backupModal" class="modal-overlay">
-<div class="modal-card" style="max-width:380px;">
-<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:12px;">
-<h3 style="font-size:14px; color:#1976d2;">💾 डेटा बॅकअप व रेस्टोअर</h3>
-<button class="btn-close" onclick="closeBackupModal()">X</button>
-</div>
-<div style="display:flex; flex-direction:column; gap:10px; margin-bottom:10px;">
-<button class="btn-report" style="background:#1976d2;" onclick="downloadBackup()">BACKUP SAVE (डेटा डाऊनलोड)</button>
-<button class="btn-report" style="background:#455a64;" onclick="document.getElementById('restoreFileInput').click()">BACKUP RESTORE (डेटा अपलोड)</button>
-<input type="file" id="restoreFileInput" style="display:none;" accept=".json" onchange="restoreBackup(event)">
 </div>
 </div>
 </div>
@@ -327,7 +312,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <button class="action-btn btn-work" onclick="openModule('workModal')"><span>📋</span>Work list</button>
 <button class="action-btn btn-bill" onclick="openModule('billModal')"><span>📄</span>Bill reg.</button>
 <button class="action-btn btn-assign" onclick="openModule('assignModal')"><span>📁</span>Assign</button>
-<button class="action-btn btn-settings" onclick="openModule('settingsModal')"><span>⚙️</span>Tab-6</button>
+<button class="action-btn btn-settings" onclick="openModule('settingsModal')"><span>⚙️</span>Data Manager</button>
 </div>
 
 <div class="container">
@@ -487,7 +472,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 
 <!-- 6. Data Manager (Backup / Restore) मोडल -->
 <div id="settingsModal" class="modal-overlay"><div class="modal-card">
-<div class="modal-header"><h3 style="font-size: 14px; color:#c2185b;">⚙️ Data Manager (बॅकअप व रेस्टोर)</h3><button class="btn-close" onclick="closeModule('settingsModal')">X</button></div>
+<div class="modal-header"><h3 style="font-size: 14px; color:#c2185b;">⚙️ Data Manager</h3><button class="btn-close" onclick="closeModule('settingsModal')">X</button></div>
 <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
 <button class="btn-report" style="background:#1976d2;" onclick="downloadBackup()">BACKUP SAVE (डेटा डाऊनलोड)</button>
 <button class="btn-report" style="background:#455a64;" onclick="document.getElementById('restoreFileInput').click()">BACKUP RESTORE (डेटा अपलोड/पूर्ववत)</button>
@@ -639,13 +624,6 @@ document.getElementById('settingModal').style.display = 'flex';
 }
 function closeSettingModal() {
 document.getElementById('settingModal').style.display = 'none';
-}
-
-function openBackupModal() {
-document.getElementById('backupModal').style.display = 'flex';
-}
-function closeBackupModal() {
-document.getElementById('backupModal').style.display = 'none';
 }
 
 var currentQuickModalType = '';
