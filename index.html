@@ -183,8 +183,23 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 9')">Set-9</div>
 <div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 10')">Set-10</div>
 <div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 11')">Set-11</div>
-<div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px; background:linear-gradient(180deg, #1976d2, #0d47a1);" onclick="openModule('settingsModal'); closeSettingModal();">Backup</div>
+<div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px; background:linear-gradient(180deg, #1976d2, #0d47a1);" onclick="openBackupModal(); closeSettingModal();">Backup</div>
 </div>
+</div>
+</div>
+</div>
+
+<!-- बॅकअप व रेस्टोअर मोडल (Backup Tab) -->
+<div id="backupModal" class="modal-overlay">
+<div class="modal-card" style="max-width:380px;">
+<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:12px;">
+<h3 style="font-size:14px; color:#1976d2;">💾 डेटा बॅकअप व रेस्टोअर</h3>
+<button class="btn-close" onclick="closeBackupModal()">X</button>
+</div>
+<div style="display:flex; flex-direction:column; gap:10px; margin-bottom:10px;">
+<button class="btn-report" style="background:#1976d2;" onclick="downloadBackup()">BACKUP SAVE (डेटा डाऊनलोड)</button>
+<button class="btn-report" style="background:#455a64;" onclick="document.getElementById('restoreFileInput').click()">BACKUP RESTORE (डेटा अपलोड)</button>
+<input type="file" id="restoreFileInput" style="display:none;" accept=".json" onchange="restoreBackup(event)">
 </div>
 </div>
 </div>
@@ -470,7 +485,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <table class="data-table"><thead><tr><th>M.B.</th><th>JE</th><th>वाटप दिनांक</th><th style="width:20%; text-align:center;">Action</th></tr></thead><tbody id="assignListBody"></tbody></table>
 </div></div>
 
-<!-- 6. Data Manager (Backup / Restore सहित) -->
+<!-- 6. Data Manager (Backup / Restore) मोडल -->
 <div id="settingsModal" class="modal-overlay"><div class="modal-card">
 <div class="modal-header"><h3 style="font-size: 14px; color:#c2185b;">⚙️ Data Manager (बॅकअप व रेस्टोर)</h3><button class="btn-close" onclick="closeModule('settingsModal')">X</button></div>
 <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
@@ -624,6 +639,13 @@ document.getElementById('settingModal').style.display = 'flex';
 }
 function closeSettingModal() {
 document.getElementById('settingModal').style.display = 'none';
+}
+
+function openBackupModal() {
+document.getElementById('backupModal').style.display = 'flex';
+}
+function closeBackupModal() {
+document.getElementById('backupModal').style.display = 'none';
 }
 
 var currentQuickModalType = '';
@@ -2229,7 +2251,7 @@ refreshBillDashboard();
 
 /* सेटिंग्स व बॅकअप लॉजिक */
 function downloadBackup() {
-var allData = { je_records: getData('je_records'), mb_records: getData('mb_records'), work_records: getData('work_records'), bill_records: getData('bill_records'), assign_records: getData('assign_records') };
+var allData = { je_records: getData('je_records'), mb_records: getData('mb_records'), work_records: getData('work_records'), bill_records: getData('dmbms_bills'), assign_records: getData('assign_records') };
 var blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
 var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
 a.download = 'MBMS_Backup_' + new Date().toISOString().slice(0, 10) + '.json'; a.click();
@@ -2240,8 +2262,12 @@ var reader = new FileReader();
 reader.onload = function(e) {
 try {
 var d = JSON.parse(e.target.result);
-['je_records', 'mb_records', 'work_records', 'bill_records', 'assign_records'].forEach(function(k){ if (d[k]) setData(k, d[k]); });
-showAlert('डेटा पूर्ववत यशस्वी!'); refreshAll(); closeModule('settingsModal');
+if(d.je_records) setData('je_records', d.je_records);
+if(d.mb_records) setData('mb_records', d.mb_records);
+if(d.work_records) setData('work_records', d.work_records);
+if(d.bill_records) setData('dmbms_bills', d.bill_records);
+if(d.assign_records) setData('assign_records', d.assign_records);
+showAlert('डेटा पूर्ववत यशस्वी!'); refreshAll(); closeBackupModal();
 } catch(err) { alert('चुकीची फाईल.'); }
 };
 reader.readAsText(file);
