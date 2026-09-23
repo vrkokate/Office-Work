@@ -193,6 +193,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <option value="4">४ था वेतन आयोग (1986)</option>
 <option value="5">५ वा वेतन आयोग (1996)</option>
 <option value="6">६ वा वेतन आयोग (2006)</option>
+<option value="7">७ वा वेतन आयोग (2016)</option>
 </select>
 </div>
 
@@ -796,6 +797,11 @@ scaleSel.innerHTML = `
 <option value="5200-1900">PB-1 रु. ५२०० - २०२०० + ग्रेड पे १९०० (कनिष्ठ लिपिक)</option>
 <option value="5200-2400">PB-1 रु. ५२०० - २०२०० + ग्रेड पे २४०० (वरिष्ठ लिपिक)</option>
 `;
+} else if (comm === '7') {
+scaleSel.innerHTML = `
+<option value="level-6">Pay Matrix Level S-6 (कनिष्ठ लिपिक)</option>
+<option value="level-8">Pay Matrix Level S-8 (वरिष्ठ लिपिक)</option>
+`;
 }
 }
 
@@ -824,7 +830,6 @@ let comm = document.getElementById('pfCommission').value;
 let oldBasic = parseFloat(document.getElementById('pfOldBasic').value);
 let fromDt = document.getElementById('pfFromDate').value;
 let toDt = document.getElementById('pfToDate').value;
-let incMonth = document.getElementById('pfIncMonth').value;
 let serviceEvent = document.getElementById('pfServiceEvent').value;
 let withheld = document.getElementById('pfWithheldStatus').value;
 
@@ -840,7 +845,6 @@ let currentBasic = oldBasic;
 let calcLog = `• प्रारंभिक मूळ वेतन (${fromDt}): <b>₹ ${currentBasic}</b><br>`;
 
 if (comm === '4') {
-// 4th Pay Commission calculation chain
 let curYear = startYear + 1;
 while (curYear <= endYear) {
 if (curYear === 1989 && withheld === 'cumulative') {
@@ -863,11 +867,9 @@ let promoAvail = document.getElementById('pfPromoAvailable').value;
 let promoDt = document.getElementById('pfPromoDate').value;
 calcLog += `<br><strong>पदोन्नती घटना (${promoDt}):</strong><br>`;
 if (promoAvail === 'yes') {
-let fakeIncrement = currentBasic + 20;
-calcLog += `- नियम ११ नुसार काल्पनिक वाढ (१०९० + २० = १११०).<br>`;
-let fixedBasic = 1200; // Senior clerk min scale protection
-calcLog += `- वरिष्ठ लिपिक पदाची किमान वेतनश्रेणी (रु. १२००-२०४०) लागू.<br>`;
-calcLog += `- प्रत्यक्ष निश्चित मूळ वेतन: <b>₹ ${fixedBasic}</b> (किमान वेतन संरक्षण)<br>`;
+let fixedBasic = 1200; 
+calcLog += `- नियम ११ नुसार काल्पनिक वाढ घेऊन किमान वेतन संरक्षण लागू.<br>`;
+calcLog += `- वरिष्ठ लिपिक पदाची किमान वेतनश्रेणी प्रारंभिक मूळ वेतन: <b>₹ ${fixedBasic}</b><br>`;
 currentBasic = fixedBasic;
 } else {
 calcLog += `- एकाकी पद असल्यामुळे वरची वेतनश्रेणी लागू नाही.<br>`;
@@ -876,8 +878,12 @@ calcLog += `- एकाकी पद असल्यामुळे वरची
 } else if (comm === '5') {
 calcLog += `• ५ व्या वेतन आयोगानुसार निश्चित मूळ वेतन: <b>₹ ${currentBasic}</b><br>`;
 } else if (comm === '6') {
-currentBasic = currentBasic * 1.86 + 2400; // Basic + Grade Pay example
+currentBasic = currentBasic * 1.86 + 2400; 
 calcLog += `• ६ व्या वेतन आयोगानुसार निश्चित वेतन: <b>₹ ${currentBasic}</b><br>`;
+} else if (comm === '7') {
+currentBasic = currentBasic * 2.57;
+currentBasic = Math.round(currentBasic / 100) * 100;
+calcLog += `• ७ व्या वेतन आयोगाच्या फिटमेंट फॅक्टरनुसार (2.57) निश्चित वेतन: <b>₹ ${currentBasic}</b><br>`;
 }
 
 let resultHTML = `
