@@ -22,7 +22,7 @@ color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justif
 .btn-mb { background: linear-gradient(180deg, #00a843, #006626); border: 1.5px solid #00ff6a; }
 .btn-form { background: linear-gradient(180deg, #ff7b00, #b34700); border: 1.5px solid #ffaa00; }
 .btn-tab4 { background: linear-gradient(180deg, #7c1fa2, #4a0072); border: 1.5px solid #e040fb; }
-.btn-tab5 { background: linear-gradient(180deg, #e50914, #8b0000); border: 1.5px solid #ff3d57; }
+.btn-setting-hub { background: linear-gradient(180deg, #e50914, #8b0000); border: 1.5px solid #ff3d57; }
 
 .center-stage { position: relative; text-align: center; padding: 5px 0; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 480px; margin: 0 auto; }
 .suvichar-running-box { width: 100%; margin: 8px 0 12px 0; overflow: hidden; white-space: nowrap; padding: 0 10px; }
@@ -124,6 +124,32 @@ border-radius: 6px;
 margin-top: 8px;
 }
 
+/* सेटिंग ग्रिड डिझाईन (६x२ ग्रिड) */
+.setting-grid {
+display: grid;
+grid-template-columns: repeat(6, 1fr);
+gap: 6px;
+margin-bottom: 12px;
+}
+.setting-grid-btn {
+background: #0d47a1;
+color: #fff;
+border: none;
+border-radius: 6px;
+padding: 8px 4px;
+font-size: 11px;
+font-weight: 700;
+cursor: pointer;
+text-align: center;
+transition: 0.2s;
+}
+.setting-grid-btn:hover { background: #1565c0; }
+.setting-grid-btn.backup-btn {
+background: #d32f2f;
+grid-column: span 6;
+font-size: 12px;
+}
+
 .steps-indicator { display: flex; justify-content: space-between; margin-bottom: 14px; padding: 0 20px; }
 .step-dot { width: 26px; height: 26px; border-radius: 50%; background: #ccc; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
 .step-dot.active { background: #f57c00; box-shadow: 0 0 10px rgba(245,124,0,0.5); }
@@ -218,7 +244,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div class="tab-card btn-mb" onclick="showMBSystem()">M.B.</div>
 <div class="tab-card btn-form">Form</div>
 <div class="tab-card btn-tab4">Tab-4</div>
-<div class="tab-card btn-tab5" onclick="openModule('settingsModal')">Setting</div>
+<div class="tab-card btn-setting-hub" onclick="openModule('settingsModal')">Setting</div>
 </div>
 
 <div class="center-stage">
@@ -429,16 +455,37 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <table class="data-table"><thead><tr><th>M.B.</th><th>JE</th><th>वाटप दिनांक</th><th style="width:20%; text-align:center;">Action</th></tr></thead><tbody id="assignListBody"></tbody></table>
 </div></div>
 
-<!-- 6. सेटिंग्स मोडल -->
-<div id="settingsModal" class="modal-overlay"><div class="modal-card">
-<div class="modal-header"><h3 style="font-size: 14px; color:#c2185b;">⚙️ सेटिंग्स (Backup / Restore / Delete)</h3><button class="btn-close" onclick="closeModule('settingsModal')">X</button></div>
-<div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
-<button class="btn-report" style="background:#1976d2;" onclick="downloadBackup()">BACKUP SAVE (डाउनलोड)</button>
-<button class="btn-report" style="background:#455a64;" onclick="document.getElementById('restoreFileInput').click()">BACKUP RESTORE (पूर्ववत करा)</button>
+<!-- 6. सेटिंग्स मोडल (12 टॅब ग्रिड फॉरमॅट व बॅकअप सेवा सह) -->
+<div id="settingsModal" class="modal-overlay">
+<div class="modal-card" style="max-width:520px;">
+<div class="modal-header">
+<h3 style="font-size: 14px; color:#c2185b;">⚙️ प्रणाली सेटिंग व टूल्स (12 Tabs)</h3>
+<button class="btn-close" onclick="closeModule('settingsModal')">X</button>
+</div>
+
+<div class="setting-grid">
+<button class="setting-grid-btn" onclick="showAlert('टॅब १ क्लिक केला')">टॅब-1</button>
+<button class="setting-grid-btn" onclick="showAlert('टॅब २ क्लिक केला')">टॅब-2</button>
+<button class="setting-grid-btn" onclick="showAlert('टॅब ३ क्लिक केला')">टॅब-3</button>
+<button class="setting-grid-btn" onclick="showAlert('टॅब ४ क्लिक केला')">टॅब-4</button>
+<button class="setting-grid-btn" onclick="showAlert('टॅब ५ क्लिक केला')">टॅब-5</button>
+<button class="setting-grid-btn" onclick="showAlert('टॅब ६ क्लिक केला')">टॅब-6</button>
+
+<button class="setting-grid-btn" onclick="showAlert('टॅब ७ क्लिक केला')">टॅब-7</button>
+<button class="setting-grid-btn" onclick="showAlert('टॅब ८ क्लिक केला')">टॅब-8</button>
+<button class="setting-grid-btn" onclick="showAlert('टॅब ९ क्लिक केला')">टॅब-9</button>
+<button class="setting-grid-btn" onclick="showAlert('टॅब १० क्लिक केला')">टॅब-10</button>
+<button class="setting-grid-btn" onclick="showAlert('टॅब ११ क्लिक केला')">टॅब-11</button>
+<button class="setting-grid-btn backup-btn" onclick="downloadBackup()">बॅकअप (Backup Save)</button>
+</div>
+
+<h4 style="font-size:12px; color:#c2185b; border-bottom:1px solid #ddd; padding-bottom:4px; margin-bottom:6px;">डेटा रिस्टोर व हटवा (Restore / Delete)</h4>
+<div style="display:flex; gap:6px; margin-bottom:10px;">
+<button class="btn-report" style="background:#455a64; margin:0;" onclick="document.getElementById('restoreFileInput').click()">BACKUP RESTORE</button>
 <input type="file" id="restoreFileInput" style="display:none;" accept=".json" onchange="restoreBackup(event)">
 </div>
-<h4 style="font-size:12px; color:#c2185b; border-bottom:1px solid #ddd; padding-bottom:4px; margin-bottom:6px;">डेटा हटवा (Select & Delete)</h4>
-<div style="font-size:12px; display:flex; flex-direction:column; gap:6px;">
+
+<div style="font-size:12px; display:flex; flex-direction:column; gap:4px;">
 <label><input type="checkbox" id="delAll" onchange="toggleSelectAll(this)"> <strong>सर्व डेटा निवडा (Select All)</strong></label>
 <label><input type="checkbox" class="del-chk" value="je_records"> JE डेटा</label>
 <label><input type="checkbox" class="del-chk" value="mb_records"> M.B. डेटा</label>
@@ -446,9 +493,11 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <label><input type="checkbox" class="del-chk" value="dmbms_bills"> देयक नोंदवही डेटा</label>
 <label><input type="checkbox" class="del-chk" value="assign_records"> M.B. वाटप डेटा</label>
 </div>
-<button class="btn-report" style="background:#d32f2f; margin-top:10px;" onclick="deleteSelectedData()">निवडलेली माहिती कायमची हटवा</button>
-</div></div>
+<button class="btn-report" style="background:#d32f2f; margin-top:8px;" onclick="deleteSelectedData()">निवडलेली माहिती कायमची हटवा</button>
+</div>
+</div>
 
+<!-- तपशील पॉप-अप (स्क्रीन फिट व स्क्रोल करण्यायोग्य) -->
 <div id="detailModal" class="modal-overlay"><div class="modal-card" style="max-width:95vw; width:450px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:10px;">
 <h3 id="detailModalTitle" style="font-size:14px; color:#0d47a1;">तपशील</h3>
