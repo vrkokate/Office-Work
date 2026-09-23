@@ -179,9 +179,9 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 </div>
 </div>
 
-<!-- Pay Fixation कॅल्क्युलेटर मॉडेल (सुधारित नियमांनुसार) -->
+<!-- Pay Fixation कॅल्क्युलेटर मॉडेल -->
 <div id="payFixationModal" class="modal-overlay">
-<div class="modal-card" style="max-width:460px;">
+<div class="modal-card" style="max-width:450px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:12px;">
 <h3 style="font-size:15px; color:#28a745;">💰 वेतन निश्चिती (Pay Fixation)</h3>
 <button class="btn-close" onclick="closePayFixationModal()">X</button>
@@ -190,17 +190,17 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div class="form-group">
 <label>वेतन आयोग निवडा:</label>
 <select class="form-control" id="pfCommission" onchange="onCommissionChange()">
-<option value="5">५ वा वेतन आयोग</option>
 <option value="6">६ वा वेतन आयोग</option>
 <option value="7">७ वा वेतन आयोग</option>
+<option value="5">५ वा वेतन आयोग</option>
 </select>
 </div>
 
-<div class="form-group" id="pfSubOptionGroup">
-<label id="lblSubOption">निश्चितीचा आधार निवडा:</label>
-<select class="form-control" id="pfSubOption" onchange="onSubOptionChange()">
-<option value="from4th">४ थ्या वेतन आयोगावरून</option>
-<option value="from5th">५ व्या वेतन आयोगातील वेतनानुसार</option>
+<div class="form-group" id="pfSubOptionGroup" style="display:block;">
+<label>निश्चितीचा आधार निवडा:</label>
+<select class="form-control" id="pfSubOption">
+<option value="from5th">५ व्या वेतन आयोगावरून (01-01-2006)</option>
+<option value="from6th">६ व्या वेतन आयोगातील वेतनानुसार</option>
 </select>
 </div>
 
@@ -209,44 +209,28 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div class="form-group"><label>केव्हापर्यंत (दिनांक):</label><input type="date" class="form-control" id="pfToDate"></div>
 </div>
 
-<div class="form-group" id="pfIncMonthGroup">
-<label>वेतनवाढीचा महिना:</label>
+<div class="form-group">
+<label>वेतनवाढ महिना (Increment Month):</label>
 <select class="form-control" id="pfIncMonth">
 <option value="7">जुलै (July)</option>
 <option value="1">जानेवारी (January)</option>
 </select>
 </div>
 
-<div class="form-group">
+<div class="form-group" id="pfGroupOldBasic">
 <label id="lblOldBasic">जुने मूळ वेतन (Basic):</label>
 <input type="number" class="form-control" id="pfOldBasic" placeholder="उदा. 8000">
 </div>
 
-<div class="form-group" id="pfGroupGradePay" style="display:none;">
+<div class="form-group" id="pfGroupGradePay">
 <label>ग्रेड पे (Grade Pay - रु.):</label>
 <input type="number" class="form-control" id="pfGradePay" placeholder="उदा. 4200">
 </div>
 
-<div class="form-group">
-<label>वेतनवाढ स्थिती:</label>
-<select class="form-control" id="pfWithheldStatus" onchange="onWithheldChange()">
-<option value="normal">सर्व वार्षिक वेतनवाढ नियमित देण्यात आल्या</option>
-<option value="withheld">काही वर्षांची वेतनवाढ थांबवण्यात आली होती (Withheld)</option>
-</select>
-</div>
-
-<div class="form-group" id="pfWithheldImpactGroup" style="display:none;">
-<label>थांबवलेल्या वेतनवाढीचा परिणाम:</label>
-<select class="form-control" id="pfWithheldImpact">
-<option value="no_impact">पुढील वेतनवाढीवर फरक पडणार नाही (मागील वाढीचा परिणाम नाही)</option>
-<option value="with_impact">पुढील वेतनवाढीवर फरक पडणार आहे (मागील वाढीचा परिणाम कायम)</option>
-</select>
-</div>
-
-<button class="btn-report" style="background:#28a745;" onclick="calculateFixation()">वेतन निश्चिती व साखळी करा</button>
+<button class="btn-report" style="background:#28a745;" onclick="calculateFixation()">वेतन निश्चिती करा</button>
 
 <div class="result-box" id="pfResultSection" style="margin-top:15px; padding:10px; background:#e9ecef; border-left:4px solid #28a745; display:none; font-size:12px;">
-<h4 style="color:#28a745; margin-bottom:5px;">निश्चितीचा तपशील व साखळी:</h4>
+<h4 style="color:#28a745; margin-bottom:5px;">निश्चितीचा हिशोब व वार्षिक वेतनवाढ साखळी:</h4>
 <p id="pfResultText"></p>
 <button class="btn-report" style="background:#0d47a1; margin-top:8px; padding:6px;" onclick="printPayFixationReport()">📄 प्रिंट / रिपोर्ट</button>
 </div>
@@ -745,7 +729,6 @@ document.getElementById('formModal').style.display = 'none';
 function openPayFixationModal() {
 closeFormModal();
 document.getElementById('payFixationModal').style.display = 'flex';
-onCommissionChange();
 }
 function closePayFixationModal() {
 document.getElementById('payFixationModal').style.display = 'none';
@@ -753,36 +736,15 @@ document.getElementById('payFixationModal').style.display = 'none';
 
 function onCommissionChange() {
 let comm = document.getElementById('pfCommission').value;
-let subOptSelect = document.getElementById('pfSubOption');
-let gradePayGrp = document.getElementById('pfGroupGradePay');
-let incMonthGrp = document.getElementById('pfIncMonthGroup');
+let subOptGroup = document.getElementById('pfSubOptionGroup');
+let oldBasicLabel = document.getElementById('lblOldBasic');
 
-subOptSelect.innerHTML = '';
-if (comm === '5') {
-subOptSelect.add(new Option('४ थ्या वेतन आयोगावरून', 'from4th'));
-subOptSelect.add(new Option('५ व्या वेतन आयोगातील वेतनानुसार', 'from5th'));
-gradePayGrp.style.display = 'none';
-incMonthGrp.style.display = 'block';
-} else if (comm === '6') {
-subOptSelect.add(new Option('५ व्या वेतन आयोगावरून (01-01-2006)', 'from5th'));
-subOptSelect.add(new Option('६ व्या वेतन आयोगातील वेतनानुसार', 'from6th'));
-gradePayGrp.style.display = 'block';
-incMonthGrp.style.display = 'block';
-} else if (comm === '7') {
-subOptSelect.add(new Option('६ व्या वेतन आयोगावरून (01-01-2016)', 'from6th'));
-subOptSelect.add(new Option('७ व्या वेतन आयोगातील वेतनानुसार', 'from7th'));
-gradePayGrp.style.display = 'block';
-incMonthGrp.style.display = 'block';
-}
-}
-
-function onWithheldChange() {
-let status = document.getElementById('pfWithheldStatus').value;
-let impactGrp = document.getElementById('pfWithheldImpactGroup');
-if (status === 'withheld') {
-impactGrp.style.display = 'block';
+if (comm === '6') {
+subOptGroup.style.display = 'block';
+oldBasicLabel.innerText = "जुने मूळ वेतन (Basic):";
 } else {
-impactGrp.style.display = 'none';
+subOptGroup.style.display = 'none';
+oldBasicLabel.innerText = "जुने मूळ वेतन (Basic):";
 }
 }
 
@@ -790,12 +752,9 @@ function calculateFixation() {
 let comm = document.getElementById('pfCommission').value;
 let subOpt = document.getElementById('pfSubOption').value;
 let oldBasic = parseFloat(document.getElementById('pfOldBasic').value);
-let gradePay = parseFloat(document.getElementById('pfGradePay').value) || 0;
 let fromDt = document.getElementById('pfFromDate').value;
 let toDt = document.getElementById('pfToDate').value;
 let incMonth = parseInt(document.getElementById('pfIncMonth').value);
-let withheldStatus = document.getElementById('pfWithheldStatus').value;
-let withheldImpact = document.getElementById('pfWithheldImpact').value;
 
 if (isNaN(oldBasic)) {
 alert("कृपया मूळ वेतन अचूक भरा!");
@@ -806,45 +765,39 @@ let startYear = fromDt ? new Date(fromDt).getFullYear() : 2006;
 let endYear = toDt ? new Date(toDt).getFullYear() : 2026;
 
 let currentBasic = oldBasic;
-let currentGP = gradePay;
 let calcLog = "";
 
-if (comm === '6' && subOpt === 'from5th') {
-currentBasic = (currentBasic * 1.86);
+if (comm === '6') {
+if (subOpt === 'from5th') {
+currentBasic = currentBasic * 1.86;
 currentBasic = Math.ceil(currentBasic / 10) * 10;
-currentBasic = currentBasic + currentGP;
-calcLog += `• ५ व्या वरून ६ वा आयोग (01-01-2006): (5th Basic × 1.86) + Grade Pay = ₹ ${currentBasic}<br>`;
-} else if (comm === '7' && subOpt === 'from6th') {
-let total6th = currentBasic + currentGP;
-let multipliedVal = total6th * 2.57;
-currentBasic = Math.round(multipliedVal / 100) * 100;
-calcLog += `• ७ वा वेतन आयोग (Fitment Factor 2.57): (6th Basic + GP) × 2.57 = ₹ ${currentBasic}<br>`;
+calcLog += `• ५ व्या वरून ६ वा आयोग (01-01-2006): मूळ वेतन × 1.86 = ₹ ${currentBasic.toFixed(2)}<br>`;
 } else {
-calcLog += `• प्रारंभिक मूळ वेतन: ₹ ${currentBasic} ${currentGP > '+ GP: ' + currentGP : ''}<br>`;
+calcLog += `• ६ व्या आयोगातील वेतनानुसार सुरू: ₹ ${currentBasic}<br>`;
+}
+} else if (comm === '7') {
+currentBasic = currentBasic * 2.57;
+currentBasic = Math.round(currentBasic / 100) * 100;
+calcLog += `• ७ वा वेतन आयोग (Fitment Factor 2.57): ₹ ${currentBasic}<br>`;
+} else {
+calcLog += `• ५ वा वेतन आयोग निश्चिती: ₹ ${currentBasic}<br>`;
 }
 
-// वार्षिक वेतनवाढ साखळी (Increment Chain Calculation)
-for (let yr = startYear + 1; yr <= endYear; yr++) {
-let isWithheldYear = (withheldStatus === 'withheld' && yr === (startYear + 1)); // उदा. पहिल्या वर्षी वाढ थांबवली असे धरू
-
-if (isWithheldYear) {
-calcLog += `• वर्ष ${yr}: वेतनवाढ थांबवण्यात आली (Withheld)<br>`;
-if (withheldImpact === 'with_impact') {
-// पुढील वेतनवाढीवर परिणाम होतो (मागील वर्षाचे मूळ वेतन तसेच राहील)
-}
-} else {
+// कालावधीतील दरवर्षीची वेतनवाढ (Increment Chain)
+for (let yr = startYear; yr <= endYear; yr++) {
+let incYear = (incMonth === 7) ? yr : yr;
+calcLog += `• वर्ष ${incYear} (${incMonth === 7 ? 'जुलै' : 'जानेवारी'}): वाढीव मूळ वेतन: `;
 let inc = Math.round((currentBasic * 0.03) / 10) * 10;
 if (inc < 100) inc = 100;
 currentBasic += inc;
-calcLog += `• वर्ष ${yr} (${incMonth === 7 ? 'जुलै' : 'जानेवारी'}): वाढीव मूळ वेतन (3% वाढ): <b>₹ ${currentBasic}</b> (ग्रेड पे सह एकूण: ₹ ${currentBasic + currentGP})<br>`;
-}
+calcLog += `<b>₹ ${currentBasic}</b><br>`;
 }
 
 let resultHTML = `
 <strong>काळ:</strong> ${fromDt ? formatDateToDMY(fromDt) : '-'} ते ${toDt ? formatDateToDMY(toDt) : '-'}<br><br>
 <strong>वेतन निश्चिती व वेतनवाढ साखळी तपशील:</strong><br>
 ${calcLog}
-<br><strong>अखेरचे सुधारित मूळ वेतन (Basic + GP): ₹ ${currentBasic + currentGP}</strong>
+<br><strong>अखेरचे सुधारित मूळ वेतन: ₹ ${currentBasic}</strong>
 `;
 
 document.getElementById('pfResultText').innerHTML = resultHTML;
