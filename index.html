@@ -17,7 +17,7 @@ color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justif
 .hub-title-box h1 { font-size: 26px; font-weight: 800; background: linear-gradient(180deg, #ffffff 40%, #00e5ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
 .tabs-wrapper { display: flex; flex-direction: column; gap: 5px; padding: 6px 8px; z-index: 5; }
-.tab-card { flex: 1; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 700; color: #ffffff; cursor: pointer; text-align: center; padding: 0 2px; }
+.tab-card { flex: 1; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #ffffff; cursor: pointer; text-align: center; padding: 0 2px; }
 .btn-est { background: linear-gradient(180deg, #0051ff, #002b99); border: 1.5px solid #00d2ff; }
 .btn-mb { background: linear-gradient(180deg, #00a843, #006626); border: 1.5px solid #00ff6a; }
 .btn-form { background: linear-gradient(180deg, #ff7b00, #b34700); border: 1.5px solid #ffaa00; }
@@ -170,7 +170,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 </div>
 <div style="display:flex; flex-direction:column; gap:8px;">
 <div style="display:flex; gap:6px;">
-<div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 1')">Set-1</div>
+<div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="openPayFixationModal(); closeSettingModal();">Pay Fix</div>
 <div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 2')">Set-2</div>
 <div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 3')">Set-3</div>
 <div class="tab-card btn-setting" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Set Tab 4')">Set-4</div>
@@ -189,7 +189,39 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 </div>
 </div>
 
-<!-- बॅकअप व रेस्टोअर मोडल (Backup Tab) -->
+<!-- Pay Fixation मॉडेल -->
+<div id="payFixationModal" class="modal-overlay">
+<div class="modal-card" style="max-width:500px;">
+<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:12px;">
+<h3 style="font-size:15px; color:#28a745;">सहावा वेतन आयोग - वेतन निश्चिती</h3>
+<button class="btn-close" onclick="closePayFixationModal()">X</button>
+</div>
+<div class="form-group">
+<label for="oldBasic">दिनांक 01-01-2006 रोजीचे जुने मूळ वेतन:</label>
+<input type="number" class="form-control" id="oldBasic" placeholder="उदा. 8000">
+</div>
+<div class="form-group">
+<label for="payBand">वेतन बँड (Pay Band):</label>
+<select class="form-control" id="payBand">
+<option value="5200-20200">PB-1 (5200 - 20200)</option>
+<option value="9300-34800" selected>PB-2 (9300 - 34800)</option>
+<option value="15600-39100">PB-3 (15600 - 39100)</option>
+<option value="37400-67000">PB-4 (37400 - 67000)</option>
+</select>
+</div>
+<div class="form-group">
+<label for="gradePay">ग्रेड पे (Grade Pay - रु.):</label>
+<input type="number" class="form-control" id="gradePay" placeholder="उदा. 2800 किंवा 4200">
+</div>
+<button class="btn-report" style="background:#28a745;" onclick="calculateFixation()">वेतन निश्चिती करा</button>
+<div class="result-box" id="resultSection" style="margin-top: 15px; padding: 10px; background: #e9ecef; border-left: 5px solid #007bff; border-radius: 4px; display: none;">
+<h3 style="margin-top: 0; color: #007bff; font-size: 13px;">निश्चितीचा हिशोब:</h3>
+<p id="res01012006" style="font-size: 12px;"></p>
+</div>
+</div>
+</div>
+
+<!-- बॅकअप व रेस्टोअर मोडल -->
 <div id="backupModal" class="modal-overlay">
 <div class="modal-card" style="max-width:380px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:12px;">
@@ -261,7 +293,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div style="display:flex; justify-content:center; gap:5px;">
 <div class="tab-card btn-est" onclick="showAlert('Est. टॅब')">Est.</div>
 <div class="tab-card btn-mb" onclick="showMBSystem()">M.B.</div>
-<div class="tab-card btn-form" onclick="showAlert('Form टॅब')">Form</div>
+<div class="tab-card btn-form" onclick="openPayFixationModal()">Pay Fix</div>
 <div class="tab-card btn-tab4" onclick="showAlert('Tab-4 टॅब')">Tab-4</div>
 <div class="tab-card btn-setting" onclick="showAlert('Set-1 टॅब')">Set-1</div>
 <div class="tab-card btn-setting" onclick="showAlert('Set-2 टॅब')">Set-2</div>
@@ -485,7 +517,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <table class="data-table"><thead><tr><th>M.B.</th><th>JE</th><th>वाटप दिनांक</th><th style="width:20%; text-align:center;">Action</th></tr></thead><tbody id="assignListBody"></tbody></table>
 </div></div>
 
-<!-- 6. Data Manager मोडल (फक्त डिलीट आणि व्यवस्थापन) -->
+<!-- 6. Data Manager मोडल (फक्त डिलीट व्यवस्थापन) -->
 <div id="settingsModal" class="modal-overlay"><div class="modal-card">
 <div class="modal-header"><h3 style="font-size: 14px; color:#c2185b;">⚙️ Data Manager</h3><button class="btn-close" onclick="closeModule('settingsModal')">X</button></div>
 <h4 style="font-size:12px; color:#c2185b; border-bottom:1px solid #ddd; padding-bottom:4px; margin-bottom:6px;">डेटा हटवा (Select & Delete)</h4>
@@ -641,6 +673,13 @@ document.getElementById('backupModal').style.display = 'flex';
 }
 function closeBackupModal() {
 document.getElementById('backupModal').style.display = 'none';
+}
+
+function openPayFixationModal() {
+document.getElementById('payFixationModal').style.display = 'flex';
+}
+function closePayFixationModal() {
+document.getElementById('payFixationModal').style.display = 'none';
 }
 
 var currentQuickModalType = '';
@@ -2299,6 +2338,40 @@ selected.forEach(function(key){ localStorage.removeItem(key); });
 showAlert('हटवले!'); refreshAll(); closeModule('settingsModal');
 }
 }
+
+function calculateFixation() {
+    let oldBasic = parseFloat(document.getElementById('oldBasic').value);
+    let gradePay = parseFloat(document.getElementById('gradePay').value);
+
+    if (isNaN(oldBasic) || isNaN(gradePay)) {
+        alert("कृपया सर्व माहिती अचूक भरा!");
+        return;
+    }
+
+    let multipliedVal = oldBasic * 1.86;
+    let roundedPayInPB = Math.ceil(multipliedVal / 10) * 10;
+    let revisedBasic0101 = roundedPayInPB + gradePay;
+
+    let incrementAmount = Math.round((roundedPayInPB * 0.03) / 10) * 10;
+    if (incrementAmount < 100) incrementAmount = 100;
+    let newPayInPBJuly = roundedPayInPB + incrementAmount;
+    let revisedBasicJuly = newPayInPBJuly + gradePay;
+
+    let resultHTML = `
+        <strong>अ) दिनांक 01-01-2006 रोजीची वेतन निश्चिती:</strong><br>
+        - जुने मूळ वेतन (× 1.86): ₹ ${multipliedVal.toFixed(2)}<br>
+        - पुढील 10 च्या पटीत (Pay in Pay Band): ₹ ${roundedPayInPB}<br>
+        - ग्रेड पे मिळवून एकूण सुधारित मूळ वेतन: <b>₹ ${revisedBasic0101}</b><br><br>
+        
+        <strong>ब) दिनांक 01-07-2006 रोजीची वार्षिक वेतनवाढ:</strong><br>
+        - नवीन Pay in PB (3% वाढ नंतर): ₹ ${newPayInPBJuly}<br>
+        - जुलै २००६ मधील एकूण सुधारित वेतन: <b>₹ ${revisedBasicJuly}</b>
+    `;
+
+    document.getElementById('res01012006').innerHTML = resultHTML;
+    document.getElementById('resultSection').style.display = 'block';
+}
 </script>
+
 </body>
 </html>
