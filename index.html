@@ -37,7 +37,7 @@ color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justif
 .text-smart-strong span { color: #00e5ff; }
 .text-created-by { font-size: 10px; color: #8be4ff; margin-top: 4px; font-weight: 600; }
 
-.profile-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 5, 15, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
+.profile-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 5, 15, 0.85); z-index: 9999; justify-content: center; align-items: center; padding: 15px; }
 .profile-card { background: #051d3b; border: 2px solid #00e5ff; border-radius: 18px; width: 100%; max-width: 340px; padding: 22px 18px; text-align: center; position: relative; box-shadow: 0 5px 25px rgba(0,229,255,0.4); }
 .profile-card-close { position: absolute; right: 12px; top: 12px; color: #ff3d57; font-weight: 800; cursor: pointer; border: 1.5px solid #ff3d57; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
 .profile-avatar-small { width: 85px; height: 85px; border-radius: 50%; object-fit: cover; object-position: center 10%; border: 2px solid #00e5ff; margin-bottom: 6px; box-shadow: 0 0 12px rgba(0,229,255,0.5); }
@@ -61,7 +61,7 @@ color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justif
 .btn-back-hub { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: #ff9800; color: #000; border: none; border-radius: 6px; padding: 6px 10px; font-size: 11.5px; font-weight: 800; cursor: pointer; z-index: 5; }
 
 .action-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 10px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-.action-btn { border: none; border-radius: 8px; color: #fff; padding: 10px 4px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+.action-btn { border: none; border-radius: 8px; color: #fff; padding: 10px 4px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; z-index: 10; position: relative; }
 .btn-je { background: #1976d2; } .btn-mb-act { background: #2e7d32; } .btn-work { background: #00897b; } .btn-bill { background: #f57c00; } .btn-assign { background: #7b1fa2; } .btn-settings { background: #c2185b; }
 
 .container { padding: 10px; max-width: 800px; margin: auto; }
@@ -69,8 +69,7 @@ color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justif
 .summary-title { font-size: 13px; font-weight: 700; text-align: center; color: #0d47a1; margin-bottom: 8px; }
 .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
-/* कार्ड्सवर क्लिक करण्यासाठी आवश्यक स्टाईल व झि-इंडेक्स */
-.stat-card { border: 1px solid #bbdefb; border-radius: 6px; text-align: center; padding: 10px 4px; cursor: pointer; background: #fcfdfe; transition: 0.2s; position: relative; z-index: 10; }
+.stat-card { border: 1px solid #bbdefb; border-radius: 6px; text-align: center; padding: 10px 4px; cursor: pointer; background: #fcfdfe; transition: 0.2s; position: relative; z-index: 50; }
 .stat-card:hover { background: #e3f2fd; transform: scale(1.02); }
 .stat-num { font-size: 18px; font-weight: 700; color: #0d47a1; pointer-events: none; }
 .stat-label { font-size: 11px; color: #555; margin-top: 2px; pointer-events: none; }
@@ -87,8 +86,9 @@ color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justif
 
 .btn-report { width: 100%; background: #0d47a1; color: #fff; border: none; padding: 10px; font-size: 13px; font-weight: 700; border-radius: 6px; cursor: pointer; margin-top: 6px; }
 
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 999; justify-content: center; align-items: center; padding: 10px; }
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 9999; justify-content: center; align-items: center; padding: 10px; }
 .modal-card { background: #fff; border-radius: 8px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; padding: 16px; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px; }
 .btn-close { background: #e53935; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
 
 .data-table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; }
@@ -100,10 +100,7 @@ color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justif
 .action-cell { white-space: nowrap; text-align: center; display: flex; gap: 4px; justify-content: center; align-items: center; }
 .btn-action { border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; cursor: pointer; color: #fff; }
 
-.quick-info-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: 9999; justify-content: center; align-items: center; padding: 15px; }
-.quick-info-card { background: #ffffff; border-radius: 12px; width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto; padding: 18px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
-
-.wizard-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2500; justify-content: center; align-items: center; padding: 10px; }
+.wizard-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; padding: 10px; }
 .wizard-card { background: #fff; border-radius: 12px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; padding: 18px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
 .deduction-scroll-box { max-height: 260px; overflow-y: auto; padding-right: 4px; border: 1px solid #eee; border-radius: 6px; padding: 6px; margin-bottom: 6px; }
 
@@ -223,9 +220,9 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 </div>
 </div>
 
-<!-- M.B. स्थिती कार्ड क्लिक केल्यावर उघडणारे पॉपअप मॉडेल (प्रत्यक्ष कार्यक्षम) -->
-<div id="quickInfoModal" class="quick-info-overlay">
-<div class="quick-info-card">
+<!-- M.B. स्थिती कार्ड क्लिक केल्यावर उघडणारे पॉपअप मॉडेल -->
+<div id="quickInfoModal" class="modal-overlay" style="z-index:9999;">
+<div class="modal-card" style="max-width:480px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
 <h3 id="quickModalTitle" style="font-size: 14px; color:#0d47a1;">तपशील</h3>
 <button class="btn-close" onclick="closeQuickInfoModal()">X</button>
@@ -352,15 +349,15 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div class="summary-box">
 <div class="summary-title">📖 मोजमाप पुस्तिका (M.B.) स्थिती</div>
 <div class="card-grid">
-<div class="stat-card" onclick="openQuickInfoModal('RECEIVED');">
+<div class="stat-card" onclick="openQuickInfoModal('RECEIVED'); event.stopPropagation();">
     <div class="stat-num" id="countReceivedMB">0</div>
     <div class="stat-label">मिळालेली M.B.</div>
 </div>
-<div class="stat-card" onclick="openQuickInfoModal('GIVEN');">
+<div class="stat-card" onclick="openQuickInfoModal('GIVEN'); event.stopPropagation();">
     <div class="stat-num" id="countGivenMB">0</div>
     <div class="stat-label">दिलेली M.B.</div>
 </div>
-<div class="stat-card" onclick="openQuickInfoModal('AVAILABLE');">
+<div class="stat-card" onclick="openQuickInfoModal('AVAILABLE'); event.stopPropagation();">
     <div class="stat-num" id="countAvailableMB">0</div>
     <div class="stat-label">उपलब्ध M.B.</div>
 </div>
@@ -836,6 +833,163 @@ html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formattedD
 });
 
 html += '</tbody></table>';
+printA4Document(html);
+}
+
+/* मिळालेली M.B., दिलेली M.B., उपलब्ध M.B. कार्ड क्लिकवर पॉपअप उघडणे व डायनॅमिक फिल्टरिंग */
+var currentQuickModalType = '';
+
+function openQuickInfoModal(type) {
+currentQuickModalType = type;
+var srcGroup = document.getElementById('quickSourceGroup');
+var srcSelect = document.getElementById('quickModalMainSource');
+var sizeSelect = document.getElementById('quickModalSizeFilter');
+var jeSubGrp = document.getElementById('quickModalJESubGroup');
+
+if (srcSelect) srcSelect.value = 'ALL';
+if (sizeSelect) sizeSelect.value = 'ALL';
+if (jeSubGrp) jeSubGrp.style.display = 'none';
+
+if (type === 'RECEIVED') {
+if (srcGroup) srcGroup.style.display = 'block';
+if (srcSelect) {
+srcSelect.innerHTML = '<option value="ALL">सर्व (All)</option>' +
+'<option value="विभागीय कार्यालय">विभागीय कार्यालय</option>' +
+'<option value="JE">JE</option>' +
+'<option value="भंडारपाल">भंडारपाल</option>';
+}
+} else if (type === 'GIVEN') {
+if (srcGroup) srcGroup.style.display = 'block';
+if (srcSelect) {
+srcSelect.innerHTML = '<option value="ALL">सर्व (All)</option>' +
+'<option value="JE">JE (कनिष्ठ अभियंता)</option>' +
+'<option value="विभागीय कार्यालय">विभागीय कार्यालय</option>';
+}
+} else {
+if (srcGroup) srcGroup.style.display = 'none';
+}
+
+renderQuickModalContent('ALL', 'ALL', 'सर्व JE');
+document.getElementById('quickInfoModal').style.display = 'flex';
+}
+
+function onQuickMainSourceChange() {
+var mainVal = document.getElementById('quickModalMainSource').value;
+var jeSubGroup = document.getElementById('quickModalJESubGroup');
+var jeSubSelect = document.getElementById('quickModalJESubSelect');
+
+if (!jeSubGroup || !jeSubSelect) return;
+jeSubGroup.style.display = 'none';
+jeSubSelect.innerHTML = '<option value="सर्व JE">सर्व JE</option>';
+
+if (mainVal === 'JE') {
+jeSubGroup.style.display = 'block';
+getData('je_records').forEach(function(j) { 
+    jeSubSelect.add(new Option(j.name, j.name)); 
+});
+jeSubSelect.value = 'सर्व JE';
+}
+onQuickFilterChange();
+}
+
+function onQuickFilterChange() {
+var sizeVal = document.getElementById('quickModalSizeFilter').value;
+var mainSrcVal = document.getElementById('quickModalMainSource') ? document.getElementById('quickModalMainSource').value : 'ALL';
+var jeSubVal = document.getElementById('quickModalJESubSelect') ? document.getElementById('quickModalJESubSelect').value : 'सर्व JE';
+renderQuickModalContent(sizeVal, mainSrcVal, jeSubVal);
+}
+
+function renderQuickModalContent(sizeFilter, mainSource, jeSubVal) {
+var allMBs = getData('mb_records');
+var stock = getAvailableStock();
+var title = "", listHTML = "";
+
+if (currentQuickModalType === 'RECEIVED') {
+var rcvList = allMBs.filter(function(m){ return m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी'; });
+if (sizeFilter !== 'ALL') rcvList = rcvList.filter(function(m){ return m.size === sizeFilter; });
+
+if (mainSource !== 'ALL') {
+if (mainSource === 'विभागीय कार्यालय') {
+rcvList = rcvList.filter(function(m){ return m.receivedSource && m.receivedSource.includes('विभागीय कार्यालय'); });
+} else if (mainSource === 'भंडारपाल') {
+rcvList = rcvList.filter(function(m){ return m.receivedSource && (m.receivedSource.includes('भंडारपाल') || m.receivedSource.includes('भंडारपाळ') || m.receivedSource.includes('नवीन')); });
+} else if (mainSource === 'JE') {
+if (jeSubVal !== 'सर्व JE') {
+rcvList = rcvList.filter(function(m){ return m.receivedDetail && m.receivedDetail.toLowerCase() === jeSubVal.toLowerCase(); });
+} else {
+var jeNames = getData('je_records').map(function(j){ return j.name.toLowerCase(); });
+rcvList = rcvList.filter(function(m){ return m.receivedDetail && jeNames.some(function(name){ return m.receivedDetail.toLowerCase().includes(name); }); });
+}
+}
+}
+
+var smallCount = rcvList.filter(function(m){ return m.size === 'लहान M.B.'; }).length;
+var bigCount = rcvList.filter(function(m){ return m.size === 'मोठी M.B.'; }).length;
+title = "मिळालेली M.B. (एकूण: " + rcvList.length + " | लहान: " + smallCount + ", मोठी: " + bigCount + ")";
+
+if (rcvList.length === 0) listHTML = '<p style="text-align:center; padding:15px; color:#666;">कोणतीही नोंद नाही.</p>';
+else {
+listHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>साईज</th><th>कोणाकडून मिळाली</th></tr></thead><tbody>';
+rcvList.forEach(function(m, i) {
+listHTML += '<tr><td>' + (i+1) + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + (m.receivedSource || m.receivedFrom || '-') + '</td></tr>';
+});
+listHTML += '</tbody></table>';
+}
+} else if (currentQuickModalType === 'GIVEN') {
+var givenList = allMBs.filter(function(m){ return m.actionType === 'दिलेली M.B.' || m.actionType === 'दिलेली एमबी'; });
+if (sizeFilter !== 'ALL') givenList = givenList.filter(function(m){ return m.size === sizeFilter; });
+
+if (mainSource !== 'ALL') {
+if (mainSource === 'विभागीय कार्यालय') {
+givenList = givenList.filter(function(m){ return m.receivedSource && m.receivedSource.includes('विभागीय कार्यालय'); });
+} else if (mainSource === 'JE') {
+if (jeSubVal !== 'सर्व JE') {
+givenList = givenList.filter(function(m){ return m.receivedDetail && m.receivedDetail.toLowerCase() === jeSubVal.toLowerCase(); });
+} else {
+var jeNames = getData('je_records').map(function(j){ return j.name.toLowerCase(); });
+givenList = givenList.filter(function(m){ return m.receivedDetail && jeNames.some(function(name){ return m.receivedDetail.toLowerCase().includes(name); }); });
+}
+}
+}
+
+var smallCount = givenList.filter(function(m){ return m.size === 'लहान M.B.'; }).length;
+var bigCount = givenList.filter(function(m){ return m.size === 'मोठी M.B.'; }).length;
+title = "दिलेली M.B. (एकूण: " + givenList.length + " | लहान: " + smallCount + ", मोठी: " + bigCount + ")";
+
+if (givenList.length === 0) listHTML = '<p style="text-align:center; padding:15px; color:#666;">कोणतीही नोंद नाही.</p>';
+else {
+listHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>साईज</th><th>कोणाला दिली</th></tr></thead><tbody>';
+givenList.forEach(function(m, i) {
+listHTML += '<tr><td>' + (i+1) + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + (m.receivedDetail || m.receivedFrom || '-') + '</td></tr>';
+});
+listHTML += '</tbody></table>';
+}
+} else if (currentQuickModalType === 'AVAILABLE') {
+var availableList = stock;
+if (sizeFilter !== 'ALL') availableList = availableList.filter(function(s){ return s.size === sizeFilter; });
+var smallStock = stock.filter(function(s){ return s.size === 'लहान M.B.'; }).length;
+var bigStock = stock.filter(function(s){ return s.size === 'मोठी M.B.'; }).length;
+title = "उपलब्ध M.B. स्टॉक (एकूण: " + stock.length + " | लहान: " + smallStock + ", मोठी: " + bigStock + ")";
+if (availableList.length === 0) listHTML = '<p style="text-align:center; padding:15px; color:#666;">सध्या एकही M.B. उपलब्ध नाही.</p>';
+else {
+listHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>साईज</th><th>स्थिती</th></tr></thead><tbody>';
+availableList.forEach(function(s, i) {
+listHTML += '<tr><td>' + (i+1) + '</td><td><strong>' + s.mbNumber + '</strong></td><td>' + s.size + '</td><td style="color:green; font-weight:700;">उपलब्ध</td></tr>';
+});
+listHTML += '</tbody></table>';
+}
+}
+document.getElementById('quickModalTitle').innerText = title;
+document.getElementById('quickModalBody').innerHTML = listHTML;
+}
+
+function closeQuickInfoModal() { document.getElementById('quickInfoModal').style.display = 'none'; }
+
+function printQuickModalReport() {
+var contentTitle = document.getElementById('quickModalTitle').innerText;
+var tableHTML = document.getElementById('quickModalBody').innerHTML;
+var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
+var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; padding-bottom:6px;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + contentTitle + '</h2></div><div style="text-align:right; font-size:11.5px;">अहवाल दिनांक: ' + todayStr + '</div></div>' + tableHTML;
 printA4Document(html);
 }
 
@@ -1617,9 +1771,6 @@ refreshAll();
 onMainCategoryChange();
 }
 }
-functionREFRESHJEList() {
-refreshJEList();
-}
 function refreshJEList() {
 var list = getData('je_records');
 var tbody = document.getElementById('jeListBody');
@@ -2217,6 +2368,12 @@ if (confirm('नष्ट करायचे का?')) {
 selected.forEach(function(key){ localStorage.removeItem(key); });
 showAlert('हटवले!'); refreshAll(); closeModule('settingsModal');
 }
+}
+
+/* पॉपअप बंद करण्याचे अचूक फंक्शन */
+function closeQuickInfoModal() {
+    var modal = document.getElementById('quickInfoModal');
+    if (modal) modal.style.display = 'none';
 }
 </script>
 </body>
