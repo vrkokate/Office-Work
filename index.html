@@ -68,7 +68,7 @@ color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justif
 .summary-box { background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .summary-title { font-size: 13px; font-weight: 700; text-align: center; color: #0d47a1; margin-bottom: 8px; }
 .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.stat-card { border: 1px solid #bbdefb; border-radius: 6px; text-align: center; padding: 10px 4px; cursor: pointer; background: #fcfdfe; transition: 0.2s; position: relative; z-index: 10; }
+.stat-card { border: 1px solid #bbdefb; border-radius: 6px; text-align: center; padding: 10px 4px; cursor: pointer; background: #fcfdfe; transition: 0.2s; position: relative; z-index: 10; pointer-events: auto !important; }
 .stat-card:hover { background: #e3f2fd; transform: scale(1.02); }
 .stat-num { font-size: 18px; font-weight: 700; color: #0d47a1; pointer-events: none; }
 .stat-label { font-size: 11px; color: #555; margin-top: 2px; pointer-events: none; }
@@ -352,9 +352,18 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div class="summary-box">
 <div class="summary-title">📖 मोजमाप पुस्तिका (M.B.) स्थिती</div>
 <div class="card-grid">
-<div class="stat-card" onclick="openQuickInfoModal('RECEIVED')"><div class="stat-num" id="countReceivedMB">0</div><div class="stat-label">मिळालेली M.B.</div></div>
-<div class="stat-card" onclick="openQuickInfoModal('GIVEN')"><div class="stat-num" id="countGivenMB">0</div><div class="stat-label">दिलेली M.B.</div></div>
-<div class="stat-card" onclick="openQuickInfoModal('AVAILABLE')"><div class="stat-num" id="countAvailableMB">0</div><div class="stat-label">उपलब्ध M.B.</div></div>
+<div class="stat-card" onclick="openQuickInfoModal('RECEIVED'); event.stopPropagation();">
+    <div class="stat-num" id="countReceivedMB">0</div>
+    <div class="stat-label">मिळालेली M.B.</div>
+</div>
+<div class="stat-card" onclick="openQuickInfoModal('GIVEN'); event.stopPropagation();">
+    <div class="stat-num" id="countGivenMB">0</div>
+    <div class="stat-label">दिलेली M.B.</div>
+</div>
+<div class="stat-card" onclick="openQuickInfoModal('AVAILABLE'); event.stopPropagation();">
+    <div class="stat-num" id="countAvailableMB">0</div>
+    <div class="stat-label">उपलब्ध M.B.</div>
+</div>
 </div>
 </div>
 
@@ -617,7 +626,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div><strong>एकूण कपात (Total Deduction):</strong> <span id="wLblTotalDed" style="color:#d32f2f; font-weight:700;">₹ 0</span></div>
 <div><strong>प्रत्यक्षात देय रक्कम (Net Payable):</strong> <span id="wLblNetPay" style="color:#2e7d32; font-weight:700;">₹ 0</span></div>
 </div>
-div class="wizard-buttons"><button class="btn-wizard btn-back" onclick="goToStep(1)">◀ मागे</button><button class="btn-wizard btn-next" onclick="goToStep(3)">पुढील ➔</button></div>
+<div class="wizard-buttons"><button class="btn-wizard btn-back" onclick="goToStep(1)">◀ मागे</button><button class="btn-wizard btn-next" onclick="goToStep(3)">पुढील ➔</button></div>
 </div>
 
 <!-- स्टेप ३: पूर्वावलोकन -->
@@ -1819,7 +1828,7 @@ tableHTML += '<tr><td>' + (i+1) + '</td><td>' + (b.billNo || '-') + '</td><td>' 
 tableHTML += '<tr style="font-weight:700; background:#f5f5f5;"><td colspan="5" style="text-align:right;">एकूण बिले: ' + bills.length + '</td><td style="text-align:right;">₹ ' + sumAmt.toLocaleString('en-IN') + '</td></tr></tbody></table>';
 } else if (type === 'TOTAL_AMOUNT') {
 title = "एकूण रक्कम तपशील (Total Amount)";
-tableHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>बिल क्र.</th><th>कंत्राटदार</th><th>कामाचे नाव</th><th style="text-align:right;">पास रक्कम (₹)</th></tr></thead><tbody>';
+tableHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>बिल क्र.</th><th>कंत्राטदार</th><th>कामाचे नाव</th><th style="text-align:right;">पास रक्कम (₹)</th></tr></thead><tbody>';
 var sumAmt = 0;
 bills.forEach(function(b, i) {
 var amt = parseFloat(b.passedAmt) || 0;
@@ -2161,7 +2170,7 @@ if(valEl) valEl.value = ot.val;
 });
 }
 
-autoCalculateDzIndex = autoCalculateDeductions();
+autoCalculateDeductions();
 }
 
 function deleteBill(idx) {
