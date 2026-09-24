@@ -133,7 +133,7 @@
             <input type="date" id="empJoinDate" required>
         </div>
 
-        <!-- ४. वेतन आयोग निवडा (नवीन जागेवर) -->
+        <!-- ४. वेतन आयोग निवडा -->
         <div class="form-group">
             <label for="payCommission">४. वेतन आयोग:</label>
             <select id="payCommission" onchange="updateCommissionRules()">
@@ -144,10 +144,13 @@
             </select>
         </div>
 
-        <!-- ५. सध्याची वेतनश्रेणी -->
+        <!-- ५. सध्याची वेतनश्रेणी (सर्च करण्यायोग्य आणि हस्ते एडिट करण्याची सोय) -->
         <div class="form-group">
             <label for="currentPayScale">५. सध्याची वेतनश्रेणी:</label>
-            <input type="text" id="currentPayScale" placeholder="वेतनश्रेणी लिहा" required>
+            <input type="text" id="currentPayScale" list="payScaleList" placeholder="सर्च करा किंवा निवडा / लिहा" required>
+            <datalist id="payScaleList">
+                <!-- जॅवास्क्रिप्टद्वारे डेटा येईल -->
+            </datalist>
         </div>
 
         <!-- आर्थिक लाभ प्रकार -->
@@ -176,43 +179,31 @@
             <input type="date" id="benefitDate">
         </div>
 
-        <!-- ६. वेतनश्रेणी सूची -->
+        <!-- ६. सध्या घेत असलेले मूळ वेतन -->
         <div class="form-group">
-            <label for="scaleDropdown">६. वेतनश्रेणी सूची:</label>
-            <select id="scaleDropdown" onchange="fillScaleInput()">
-                <option value="">-- सूचीतून निवडा --</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="editableScale">वेतनश्रेणी (हस्ते एडिट):</label>
-            <input type="text" id="editableScale" required>
-        </div>
-
-        <!-- ७. सध्या घेत असलेले मूळ वेतन -->
-        <div class="form-group">
-            <label for="basicPay">७. मूळ वेतन (Basic):</label>
+            <label for="basicPay">६. मूळ वेतन (Basic):</label>
             <input type="number" id="basicPay" placeholder="उदा. 950" required>
         </div>
 
-        <!-- ८. ग्रेड पे (फक्त ६ व्या आयोगासाठी) -->
+        <!-- ७. ग्रेड पे (फक्त ६ व्या आयोगासाठी) -->
         <div class="form-group hidden" id="gradePayGroup">
-            <label for="gradePay">८. ग्रेड पे (Grade Pay):</label>
+            <label for="gradePay">७. ग्रेड पे (Grade Pay):</label>
             <input type="number" id="gradePay" placeholder="उदा. 4200">
         </div>
 
-        <!-- ९. वेतन निश्चितीचा कालावधी -->
+        <!-- ८. वेतन निश्चितीचा कालावधी -->
         <div class="form-group">
-            <label for="fixationFrom">९अ. सुरू दिनांक:</label>
+            <label for="fixationFrom">८अ. सुरू दिनांक:</label>
             <input type="date" id="fixationFrom" required>
         </div>
         <div class="form-group">
-            <label for="fixationTo">९ब. समाप्त दिनांक:</label>
+            <label for="fixationTo">८ब. समाप्त दिनांक:</label>
             <input type="date" id="fixationTo" required>
         </div>
 
-        <!-- १०. वेतनवाढ महिना / नियम -->
+        <!-- ९. वेतनवाढ महिना / नियम -->
         <div class="form-group">
-            <label for="incrementMonthRule">१०. वेतनवाढ दिनांक:</label>
+            <label for="incrementMonthRule">९. वेतनवाढ दिनांक:</label>
             <select id="incrementMonthRule">
                 <option value="appointment_month">नियुक्ती महिन्याची १ तारीख</option>
                 <option value="july">प्रत्येक वर्षाची १ जुलै</option>
@@ -220,25 +211,25 @@
             </select>
         </div>
 
-        <!-- ११. वेतनवाढ रोखण्याची स्थिती -->
+        <!-- १०. वेतनवाढ रोखण्याची स्थिती -->
         <div class="form-group">
-            <label for="incrementWithheld">११अ. वेतनवाढ थांबवली?</label>
+            <label for="incrementWithheld">१०अ. वेतनवाढ थांबवली?</label>
             <select id="incrementWithheld" onchange="toggleWithheldOptions()">
                 <option value="No">नाही</option>
                 <option value="Yes">होय</option>
             </select>
         </div>
         <div class="form-group hidden" id="withheldEffectDiv">
-            <label for="withheldEffect">११ब. पुढील वाढीवर परिणाम?</label>
+            <label for="withheldEffect">१०ब. पुढील वाढीवर परिणाम?</label>
             <select id="withheldEffect">
                 <option value="cumulative">होय (परिणाम करणारी)</option>
                 <option value="non_cumulative">नाही (न करणारी)</option>
             </select>
         </div>
 
-        <!-- १४. विकल्प दिनांक -->
+        <!-- ११. विकल्प दिनांक -->
         <div class="form-group hidden" id="optionDateGroup">
-            <label for="optionDate">१४. विकल्पाचा दिनांक:</label>
+            <label for="optionDate">११. विकल्पाचा दिनांक:</label>
             <input type="date" id="optionDate">
         </div>
 
@@ -269,17 +260,46 @@
 </div>
 
 <script>
+    // सार्वजनिक बांधकाम विभागाकडील (PWD) पदांच्या वेतनश्रेण्यांचा डेटा
     const payScalesData = {
-        "4th": ["रु. 950 - 20 - 1150 - EB - 25 - 1400", "रु. 1200 - 30 - 1560 - EB - 40 - 2040"],
-        "5th": ["रु. 3050 - 75 - 3950 - 80 - 4590", "रु. 4500 - 125 - 7000", "रु. 6500 - 200 - 10500"],
-        "6th": ["PB-1 : 5200 - 20200 (GP 1900)", "PB-1 : 5200 - 20200 (GP 2400)", "PB-2 : 9300 - 34800 (GP 4200)"],
-        "7th": ["S-6 (21700 - 69100)", "S-8 (29200 - 92300)", "S-10 (38600 - 122800)"]
+        "4th": [
+            "कनिष्ठ लिपिक - रु. ९५० - २० - ११५० - इ.रो. - २५ - १४००",
+            "वरिष्ठ लिपिक - रु. १२०० - ३० - १५६० - इ.रो. - ४० - २०४०",
+            "शाखा अभियंता (Junior Engineer) - रु. १६४० - ६० - २६०० - ७५ - २९००",
+            "सहाय्यक अभियंता (Assistant Engineer) - रु. २००० - ६० - २३०० - ७५ - ३२००",
+            "वाहनचालक (Driver) - रु. ९५० - २० - ११५० - २५ - १५००",
+            "शिपाई (Peon) - रु. ७५० - १२ - ८७० - १४ - ९४०"
+        ],
+        "5th": [
+            "कनिष्ठ लिपिक - रु. ३०५० - ७५ - ३९५० - ८० - ४५९०",
+            "वरिष्ठ लिपिक - रु. ४००० - १०० - ६०००",
+            "शाखा अभियंता (Junior Engineer) - रु. ५००० - १५० - ८०००",
+            "सहाय्यक अभियंता (Assistant Engineer) - रु. ६५०० - २०० - १०५००",
+            "वाहनचालक (Driver) - रु. ३०५० - ७५ - ३९५० - ८० - ४५९०",
+            "शिपाई (Peon) - रु. २५४० - ३५ - ३१६० - ४० - ३४४०"
+        ],
+        "6th": [
+            "कनिष्ठ लिपिक - PB-1 : 5200 - 20200 (GP 1900)",
+            "वरिष्ठ लिपिक - PB-1 : 5200 - 20200 (GP 2400)",
+            "शाखा अभियंता (Junior Engineer) - PB-2 : 9300 - 34800 (GP 4200)",
+            "सहाय्यक अभियंता (Assistant Engineer) - PB-2 : 9300 - 34800 (GP 5400)",
+            "वाहनचालक (Driver) - PB-1 : 5200 - 20200 (GP 2400)",
+            "शिपाई (Peon) - PB-1 : 4440 - 7440 (GP 1300)"
+        ],
+        "7th": [
+            "कनिष्ठ लिपिक - S-6 (21700 - 69100)",
+            "वरिष्ठ लिपिक - S-8 (29200 - 92300)",
+            "शाखा अभियंता (Junior Engineer) - S-13 (35400 - 112400)",
+            "सहाय्यक अभियंता (Assistant Engineer) - S-15 (41800 - 132300)",
+            "वाहनचालक (Driver) - S-7 (25500 - 81100)",
+            "शिपाई (Peon) - S-1 (15000 - 47600)"
+        ]
     };
 
     function updateCommissionRules() {
         const commission = document.getElementById('payCommission').value;
         const gradePayGroup = document.getElementById('gradePayGroup');
-        const scaleDropdown = document.getElementById('scaleDropdown');
+        const payScaleList = document.getElementById('payScaleList');
         
         if (commission === '6th') {
             gradePayGroup.classList.remove('hidden');
@@ -287,21 +307,14 @@
             gradePayGroup.classList.add('hidden');
         }
 
-        scaleDropdown.innerHTML = '<option value="">-- सूचीतून निवडा --</option>';
+        // डॅटालिस्टमध्ये पदे आणि वेतनश्रेण्या भरणे
+        payScaleList.innerHTML = '';
         if (payScalesData[commission]) {
             payScalesData[commission].forEach(scale => {
                 let opt = document.createElement('option');
                 opt.value = scale;
-                opt.textContent = scale;
-                scaleDropdown.appendChild(opt);
+                payScaleList.appendChild(opt);
             });
-        }
-    }
-
-    function fillScaleInput() {
-        const selectedScale = document.getElementById('scaleDropdown').value;
-        if(selectedScale) {
-            document.getElementById('editableScale').value = selectedScale;
         }
     }
 
@@ -346,7 +359,7 @@
         const name = document.getElementById('empName').value;
         const designation = document.getElementById('empDesignation').value;
         const joinDate = document.getElementById('empJoinDate').value;
-        const scale = document.getElementById('editableScale').value;
+        const scale = document.getElementById('currentPayScale').value;
         const basic = parseFloat(document.getElementById('basicPay').value);
         const commission = document.getElementById('payCommission').value;
         const gradePay = parseFloat(document.getElementById('gradePay').value) || 0;
