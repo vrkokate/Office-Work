@@ -193,6 +193,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <option value="4">४ था वेतन आयोग (1986)</option>
 <option value="5">५ वा वेतन आयोग (1996)</option>
 <option value="6">६ वा वेतन आयोग (2006)</option>
+<option value="7">७ वा वेतन आयोग (2016)</option>
 </select>
 </div>
 
@@ -204,12 +205,13 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 </select>
 </div>
 
+<!-- वेतनश्रेणी (डेटालिस्टसह जेणेकरून निवडताही येईल आणि हस्ते टाईपही करता येईल) -->
 <div class="form-group" id="pfScaleGroup">
-<label>वेतनश्रेणी:</label>
-<select class="form-control" id="pfScale">
-<option value="950-1400">रु. ९५० - २० - ११५० - इ.रो. (EB) - २५ - १४०० (कनिष्ठ लिपिक)</option>
-<option value="1200-2040">रु. १२०० - ३० - १५६० - इ.रो. (EB) - ४० - २०४० (वरिष्ठ लिपिक)</option>
-</select>
+<label>वेतनश्रेणी (निवडा किंवा हस्ते टाईप करा):</label>
+<input class="form-control" list="scaleOptionsList" id="pfScale" placeholder="वेतनश्रेणी निवडा किंवा टाईप करा">
+<datalist id="scaleOptionsList">
+  <!-- JavaScript द्वारे आयोगाप्रमाणे ऑटोमॅटिक लोड होईल -->
+</datalist>
 </div>
 
 <div class="form-group">
@@ -771,6 +773,7 @@ document.getElementById('formModal').style.display = 'none';
 function openPayFixationModal() {
 closeFormModal();
 document.getElementById('payFixationModal').style.display = 'flex';
+onCommissionChange(); // सुरुवातीला वेतनश्रेणी लिस्ट लोड करण्यासाठी
 }
 function closePayFixationModal() {
 document.getElementById('payFixationModal').style.display = 'none';
@@ -778,34 +781,51 @@ document.getElementById('payFixationModal').style.display = 'none';
 
 function onCommissionChange() {
 let comm = document.getElementById('pfCommission').value;
-let scaleSel = document.getElementById('pfScale');
-scaleSel.innerHTML = '';
+let dataList = document.getElementById('scaleOptionsList');
+let scaleInput = document.getElementById('pfScale');
+dataList.innerHTML = '';
+scaleInput.value = '';
 
 if (comm === '4') {
-scaleSel.innerHTML = `
-<option value="950-1400">रु. ९५० - २० - ११५० - इ.रो. (EB) - २५ - १४०० (कनिष्ठ लिपिक)</option>
-<option value="1200-2040">रु. १२०० - ३० - १५६० - इ.रो. (EB) - ४० - २०४० (वरिष्ठ लिपिक)</option>
+dataList.innerHTML = `
+<option value="रु. ९५० - २० - ११५० - इ.रो. (EB) - २५ - १४०० (कनिष्ठ लिपिक)">
+<option value="रु. १२०० - ३० - १५६० - इ.रो. (EB) - ४० - २०४० (वरिष्ठ लिपिक)">
 `;
+scaleInput.value = "रु. ९५० - २० - ११५० - इ.रो. (EB) - २५ - १४०० (कनिष्ठ लिपिक)";
 } else if (comm === '5') {
-scaleSel.innerHTML = `
-<option value="3050-4590">रु. ३०५० - ७५ - ३९५० - ८० - ४५९० (कनिष्ठ लिपिक)</option>
-<option value="4000-6000">रु. ४००० - १०० - ६००० (वरिष्ठ लिपिक)</option>
+dataList.innerHTML = `
+<option value="रु. ३०५० - ७५ - ३९५० - ८० - ४५९० (कनिष्ठ लिपिक)">
+<option value="रु. ४००० - १०० - ६००० (वरिष्ठ लिपिक)">
 `;
+scaleInput.value = "रु. ३०५० - ७५ - ३९५० - ८० - ४५९० (कनिष्ठ लिपिक)";
 } else if (comm === '6') {
-scaleSel.innerHTML = `
-<option value="5200-1900">PB-1 रु. ५२०० - २०२०० + ग्रेड पे १९०० (कनिष्ठ लिपिक)</option>
-<option value="5200-2400">PB-1 रु. ५२०० - २०२०० + ग्रेड पे २४०० (वरिष्ठ लिपिक)</option>
+dataList.innerHTML = `
+<option value="PB-1 रु. ५२०० - २०२०० + ग्रेड पे १९०० (कनिष्ठ लिपिक)">
+<option value="PB-1 रु. ५२०० - २०२०० + ग्रेड पे २४०० (वरिष्ठ लिपिक)">
 `;
+scaleInput.value = "PB-1 रु. ५२०० - २०२०० + ग्रेड पे १९०० (कनिष्ठ लिपिक)";
+} else if (comm === '7') {
+dataList.innerHTML = `
+<option value="Pay Matrix Level S-6 (कनिष्ठ लिपिक)">
+<option value="Pay Matrix Level S-8 (वरिष्ठ लिपिक)">
+`;
+scaleInput.value = "Pay Matrix Level S-6 (कनिष्ठ लिपिक)";
 }
 }
 
 function onDesignationChange() {
 let desig = document.getElementById('pfDesignation').value;
-let scaleSel = document.getElementById('pfScale');
-if (desig === 'junior_clerk') {
-scaleSel.selectedIndex = 0;
-} else {
-scaleSel.selectedIndex = 1;
+let scaleInput = document.getElementById('pfScale');
+let comm = document.getElementById('pfCommission').value;
+
+if (comm === '4') {
+scaleInput.value = (desig === 'junior_clerk') ? "रु. ९५० - २० - ११५० - इ.रो. (EB) - २५ - १४०० (कनिष्ठ लिपिक)" : "रु. १२०० - ३० - १५६० - इ.रो. (EB) - ४० - २०४० (वरिष्ठ लिपिक)";
+} else if (comm === '5') {
+scaleInput.value = (desig === 'junior_clerk') ? "रु. ३०५० - ७५ - ३९५० - ८० - ४५९० (कनिष्ठ लिपिक)" : "रु. ४००० - १०० - ६००० (वरिष्ठ लिपिक)";
+} else if (comm === '6') {
+scaleInput.value = (desig === 'junior_clerk') ? "PB-1 रु. ५२०० - २०२०० + ग्रेड पे १९०० (कनिष्ठ लिपिक)" : "PB-1 रु. ५२०० - २०२०० + ग्रेड पे २४०० (वरिष्ठ लिपिक)";
+} else if (comm === '7') {
+scaleInput.value = (desig === 'junior_clerk') ? "Pay Matrix Level S-6 (कनिष्ठ लिपिक)" : "Pay Matrix Level S-8 (वरिष्ठ लिपिक)";
 }
 }
 
@@ -824,9 +844,9 @@ let comm = document.getElementById('pfCommission').value;
 let oldBasic = parseFloat(document.getElementById('pfOldBasic').value);
 let fromDt = document.getElementById('pfFromDate').value;
 let toDt = document.getElementById('pfToDate').value;
-let incMonth = document.getElementById('pfIncMonth').value;
 let serviceEvent = document.getElementById('pfServiceEvent').value;
 let withheld = document.getElementById('pfWithheldStatus').value;
+let chosenScale = document.getElementById('pfScale').value;
 
 if (isNaN(oldBasic)) {
 alert("कृपया मूळ वेतन अचूक भरा!");
@@ -837,10 +857,10 @@ let startYear = fromDt ? new Date(fromDt).getFullYear() : 1986;
 let endYear = toDt ? new Date(toDt).getFullYear() : 1993;
 
 let currentBasic = oldBasic;
-let calcLog = `• प्रारंभिक मूळ वेतन (${fromDt}): <b>₹ ${currentBasic}</b><br>`;
+let calcLog = `• निवडलेली वेतनश्रेणी: <b>${chosenScale}</b><br>`;
+calcLog += `• प्रारंभिक मूळ वेतन (${fromDt}): <b>₹ ${currentBasic}</b><br>`;
 
 if (comm === '4') {
-// 4th Pay Commission calculation chain
 let curYear = startYear + 1;
 while (curYear <= endYear) {
 if (curYear === 1989 && withheld === 'cumulative') {
@@ -863,11 +883,9 @@ let promoAvail = document.getElementById('pfPromoAvailable').value;
 let promoDt = document.getElementById('pfPromoDate').value;
 calcLog += `<br><strong>पदोन्नती घटना (${promoDt}):</strong><br>`;
 if (promoAvail === 'yes') {
-let fakeIncrement = currentBasic + 20;
-calcLog += `- नियम ११ नुसार काल्पनिक वाढ (१०९० + २० = १११०).<br>`;
-let fixedBasic = 1200; // Senior clerk min scale protection
-calcLog += `- वरिष्ठ लिपिक पदाची किमान वेतनश्रेणी (रु. १२००-२०४०) लागू.<br>`;
-calcLog += `- प्रत्यक्ष निश्चित मूळ वेतन: <b>₹ ${fixedBasic}</b> (किमान वेतन संरक्षण)<br>`;
+let fixedBasic = 1200; 
+calcLog += `- नियम ११ नुसार काल्पनिक वाढ घेऊन किमान वेतन संरक्षण लागू.<br>`;
+calcLog += `- वरिष्ठ लिपिक पदाची किमान वेतनश्रेणी प्रारंभिक मूळ वेतन: <b>₹ ${fixedBasic}</b><br>`;
 currentBasic = fixedBasic;
 } else {
 calcLog += `- एकाकी पद असल्यामुळे वरची वेतनश्रेणी लागू नाही.<br>`;
@@ -876,8 +894,12 @@ calcLog += `- एकाकी पद असल्यामुळे वरची
 } else if (comm === '5') {
 calcLog += `• ५ व्या वेतन आयोगानुसार निश्चित मूळ वेतन: <b>₹ ${currentBasic}</b><br>`;
 } else if (comm === '6') {
-currentBasic = currentBasic * 1.86 + 2400; // Basic + Grade Pay example
+currentBasic = currentBasic * 1.86 + 2400; 
 calcLog += `• ६ व्या वेतन आयोगानुसार निश्चित वेतन: <b>₹ ${currentBasic}</b><br>`;
+} else if (comm === '7') {
+currentBasic = currentBasic * 2.57;
+currentBasic = Math.round(currentBasic / 100) * 100;
+calcLog += `• ७ व्या वेतन आयोगाच्या फिटमेंट फॅक्टरनुसार (2.57) निश्चित वेतन: <b>₹ ${currentBasic}</b><br>`;
 }
 
 let resultHTML = `
