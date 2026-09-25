@@ -219,7 +219,15 @@
             outline: none;
             box-shadow: 0 0 0 2px rgba(46,125,50,0.15);
         }
-        .field-group input::placeholder { color: #9e9e9e; }
+        
+        /* अंधुक अक्षरांसाठी CSS (Placeholder Styling) */
+        input::placeholder, select::placeholder { 
+            color: #888888 !important; 
+            opacity: 1;
+        }
+        select:invalid, select option[value=""] {
+            color: #888888 !important;
+        }
 
         .row-two-cols { display: flex; gap: 8px; }
         .row-two-cols .field-group { flex: 1; }
@@ -252,7 +260,7 @@
         .row-three-cols input, .row-three-cols select {
             flex: 1;
             min-width: 0;
-            padding: 7px 5px;
+            padding: 8px 6px;
             font-size: 11px;
             border: 1px solid #a5d6a7;
             border-radius: 4px;
@@ -278,15 +286,20 @@
             margin-top: 8px;
         }
 
-        /* इन-प्लेस ड्रॉपडाऊन */
-        .combobox-container { position: relative; }
+        /* इन-प्लेस ड्रॉपडाऊन व दिनांक रकाना */
+        .combobox-container { 
+            position: relative; 
+        }
+        .combobox-container input {
+            padding-right: 32px;
+        }
         .combobox-arrow {
             position: absolute;
             right: 10px;
             top: 50%;
             transform: translateY(-50%);
             color: #616161;
-            font-size: 11px;
+            font-size: 13px;
             cursor: pointer;
             user-select: none;
         }
@@ -416,7 +429,7 @@
         <button class="close-btn" onclick="window.location.href='index.html'">X</button>
     </div>
 
-    <!-- ३ स्मार्ट अ‍ॅक्शन कार्ड्स -->
+    <!-- ३ मुख्य स्मार्ट कार्ड्स -->
     <div class="smart-cards-list">
         
         <!-- कार्ड १: कर्मचारी माहिती -->
@@ -533,12 +546,15 @@
 
         <div class="field-group">
             <label>३. नियुक्ती दिनांक:</label>
-            <input type="date" id="empJoinDate" onclick="openPicker(this)" placeholder="दिनांक निवडा">
+            <div class="combobox-container">
+                <input type="text" id="empJoinDate" placeholder="नियुक्ती दिनांक निवडा" onfocus="openDateInput(this)" onclick="openDateInput(this)" onblur="closeDateInput(this, 'नियुक्ती दिनांक निवडा')" autocomplete="off">
+                <span class="combobox-arrow" onclick="triggerDatePicker('empJoinDate')">📅</span>
+            </div>
         </div>
 
         <div class="field-group">
             <label>४. वेतन आयोग:</label>
-            <select id="payCommission" onchange="updateCommissionRules()">
+            <select id="payCommission" onchange="updateCommissionRules()" required>
                 <option value="" disabled selected>वेतन आयोग निवडा</option>
                 <option value="4th">४था वेतन आयोग (1986)</option>
                 <option value="5th">५वा वेतन आयोग (1996)</option>
@@ -572,7 +588,9 @@
 
         <div class="field-group hidden" id="initialLevelDiv">
             <label>८. ७व्या आयोगातील मूळ स्तर:</label>
-            <select id="initial7thLevel"></select>
+            <select id="initial7thLevel">
+                <option value="" disabled selected>मूळ स्तर निवडा</option>
+            </select>
         </div>
 
         <button type="button" class="modal-save-btn" onclick="saveEmployeeModal()">माहिती जतन करा (Save)</button>
@@ -591,17 +609,18 @@
         <div class="benefit-sub-card">
             <div class="benefit-sub-header">
                 <span>⭐ पहिला लाभ / पहिली पदोन्नती</span>
-                <select id="b1_type" onchange="toggleBenefitRow(1)" style="font-size:11px; padding:3px 6px;">
-                    <option value="None">लागू नाही</option>
+                <select id="b1_type" onchange="toggleBenefitRow(1)" style="font-size:11px; padding:4px 6px;">
+                    <option value="None" selected>लागू नाही</option>
                     <option value="Promotion">पदोन्नती (Promotion)</option>
                     <option value="MACP">आश्वासित प्रगती योजना (MACP)</option>
                 </select>
             </div>
             <div id="b1_fields" class="hidden">
                 <div class="row-three-cols">
-                    <input type="date" id="b1_date" onclick="openPicker(this)" onchange="onBenefitDateChange(1)" title="लाभाचा / पदोन्नतीचा दिनांक">
-                    <input type="date" id="b1_optDate" onclick="openPicker(this)" title="विकल्पाचा दिनांक">
-                    <select id="b1_comm" onchange="updateSubScaleList(1)" title="संबंधित वेतन आयोग">
+                    <input type="text" id="b1_date" placeholder="पदोन्नती दिनांक निवडा" onfocus="openDateInput(this)" onclick="openDateInput(this)" onblur="closeDateInput(this, 'पदोन्नती दिनांक निवडा')" onchange="onBenefitDateChange(1)">
+                    <input type="text" id="b1_optDate" placeholder="विकल्प दिनांक निवडा" onfocus="openDateInput(this)" onclick="openDateInput(this)" onblur="closeDateInput(this, 'विकल्प दिनांक निवडा')">
+                    <select id="b1_comm" onchange="updateSubScaleList(1)" required>
+                        <option value="" disabled selected>वेतन आयोग निवडा</option>
                         <option value="4th">४था वेतन आयोग</option>
                         <option value="5th">५वा वेतन आयोग</option>
                         <option value="6th">६वा वेतन आयोग</option>
@@ -609,8 +628,8 @@
                     </select>
                 </div>
                 <div class="row-three-cols">
-                    <input type="text" id="b1_post" placeholder="पदोन्नतीचे पद टाका" title="पदोन्नतीचे पद">
-                    <input type="text" id="b1_scale" list="b1_scaleList" placeholder="मंजूर वेतनश्रेणी / स्तर" title="वेतनश्रेणी किंवा स्तर">
+                    <input type="text" id="b1_post" placeholder="पदोन्नतीचे पद टाका">
+                    <input type="text" id="b1_scale" list="b1_scaleList" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा">
                     <datalist id="b1_scaleList"></datalist>
                 </div>
             </div>
@@ -620,7 +639,7 @@
         <div class="benefit-sub-card">
             <div class="benefit-sub-header">
                 <span>⭐ दुसरा लाभ / दुसरी पदोन्नती</span>
-                <select id="b2_type" onchange="toggleBenefitRow(2)" style="font-size:11px; padding:3px 6px;">
+                <select id="b2_type" onchange="toggleBenefitRow(2)" style="font-size:11px; padding:4px 6px;">
                     <option value="None" selected>लागू नाही</option>
                     <option value="Promotion">पदोन्नती (Promotion)</option>
                     <option value="MACP">आश्वासित प्रगती योजना (MACP)</option>
@@ -628,9 +647,10 @@
             </div>
             <div id="b2_fields" class="hidden">
                 <div class="row-three-cols">
-                    <input type="date" id="b2_date" onclick="openPicker(this)" onchange="onBenefitDateChange(2)" title="लाभाचा / पदोन्नतीचा दिनांक">
-                    <input type="date" id="b2_optDate" onclick="openPicker(this)" title="विकल्पाचा दिनांक">
-                    <select id="b2_comm" onchange="updateSubScaleList(2)" title="संबंधित वेतन आयोग">
+                    <input type="text" id="b2_date" placeholder="पदोन्नती दिनांक निवडा" onfocus="openDateInput(this)" onclick="openDateInput(this)" onblur="closeDateInput(this, 'पदोन्नती दिनांक निवडा')" onchange="onBenefitDateChange(2)">
+                    <input type="text" id="b2_optDate" placeholder="विकल्प दिनांक निवडा" onfocus="openDateInput(this)" onclick="openDateInput(this)" onblur="closeDateInput(this, 'विकल्प दिनांक निवडा')">
+                    <select id="b2_comm" onchange="updateSubScaleList(2)" required>
+                        <option value="" disabled selected>वेतन आयोग निवडा</option>
                         <option value="4th">४था वेतन आयोग</option>
                         <option value="5th">५वा वेतन आयोग</option>
                         <option value="6th">६वा वेतन आयोग</option>
@@ -638,8 +658,8 @@
                     </select>
                 </div>
                 <div class="row-three-cols">
-                    <input type="text" id="b2_post" placeholder="पदोन्नतीचे पद टाका" title="पदोन्नतीचे पद">
-                    <input type="text" id="b2_scale" list="b2_scaleList" placeholder="मंजूर वेतनश्रेणी / स्तर" title="वेतनश्रेणी किंवा स्तर">
+                    <input type="text" id="b2_post" placeholder="पदोन्नतीचे पद टाका">
+                    <input type="text" id="b2_scale" list="b2_scaleList" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा">
                     <datalist id="b2_scaleList"></datalist>
                 </div>
             </div>
@@ -649,7 +669,7 @@
         <div class="benefit-sub-card">
             <div class="benefit-sub-header">
                 <span>⭐ तिसरा लाभ / तिसरी पदोन्नती</span>
-                <select id="b3_type" onchange="toggleBenefitRow(3)" style="font-size:11px; padding:3px 6px;">
+                <select id="b3_type" onchange="toggleBenefitRow(3)" style="font-size:11px; padding:4px 6px;">
                     <option value="None" selected>लागू नाही</option>
                     <option value="Promotion">पदोन्नती (Promotion)</option>
                     <option value="MACP">आश्वासित प्रगती योजना (MACP)</option>
@@ -657,9 +677,10 @@
             </div>
             <div id="b3_fields" class="hidden">
                 <div class="row-three-cols">
-                    <input type="date" id="b3_date" onclick="openPicker(this)" onchange="onBenefitDateChange(3)" title="लाभाचा / पदोन्नतीचा दिनांक">
-                    <input type="date" id="b3_optDate" onclick="openPicker(this)" title="विकल्पाचा दिनांक">
-                    <select id="b3_comm" onchange="updateSubScaleList(3)" title="संबंधित वेतन आयोग">
+                    <input type="text" id="b3_date" placeholder="पदोन्नती दिनांक निवडा" onfocus="openDateInput(this)" onclick="openDateInput(this)" onblur="closeDateInput(this, 'पदोन्नती दिनांक निवडा')" onchange="onBenefitDateChange(3)">
+                    <input type="text" id="b3_optDate" placeholder="विकल्प दिनांक निवडा" onfocus="openDateInput(this)" onclick="openDateInput(this)" onblur="closeDateInput(this, 'विकल्प दिनांक निवडा')">
+                    <select id="b3_comm" onchange="updateSubScaleList(3)" required>
+                        <option value="" disabled selected>वेतन आयोग निवडा</option>
                         <option value="4th">४था वेतन आयोग</option>
                         <option value="5th">५वा वेतन आयोग</option>
                         <option value="6th">६वा वेतन आयोग</option>
@@ -667,8 +688,8 @@
                     </select>
                 </div>
                 <div class="row-three-cols">
-                    <input type="text" id="b3_post" placeholder="पदोन्नतीचे पद टाका" title="पदोन्नतीचे पद">
-                    <input type="text" id="b3_scale" list="b3_scaleList" placeholder="मंजूर वेतनश्रेणी / स्तर" title="वेतनश्रेणी किंवा स्तर">
+                    <input type="text" id="b3_post" placeholder="पदोन्नतीचे पद टाका">
+                    <input type="text" id="b3_scale" list="b3_scaleList" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा">
                     <datalist id="b3_scaleList"></datalist>
                 </div>
             </div>
@@ -689,11 +710,17 @@
         <div class="row-two-cols">
             <div class="field-group">
                 <label>कालावधी सुरू (पासून):</label>
-                <input type="date" id="fixationFrom" onclick="openPicker(this)" placeholder="दिनांक निवडा">
+                <div class="combobox-container">
+                    <input type="text" id="fixationFrom" placeholder="कालावधी सुरू दिनांक निवडा" onfocus="openDateInput(this)" onclick="openDateInput(this)" onblur="closeDateInput(this, 'कालावधी सुरू दिनांक निवडा')" autocomplete="off">
+                    <span class="combobox-arrow" onclick="triggerDatePicker('fixationFrom')">📅</span>
+                </div>
             </div>
             <div class="field-group">
                 <label>कालावधी अखेर (पर्यंत):</label>
-                <input type="date" id="fixationTo" onclick="openPicker(this)" placeholder="दिनांक निवडा">
+                <div class="combobox-container">
+                    <input type="text" id="fixationTo" placeholder="कालावधी अखेर दिनांक निवडा" onfocus="openDateInput(this)" onclick="openDateInput(this)" onblur="closeDateInput(this, 'कालावधी अखेर दिनांक निवडा')" autocomplete="off">
+                    <span class="combobox-arrow" onclick="triggerDatePicker('fixationTo')">📅</span>
+                </div>
             </div>
         </div>
 
@@ -742,10 +769,25 @@
         return dateString;
     }
 
-    function openPicker(input) {
+    // दिनांक बॉक्सवर टच करताच कॅलेंडर उघडणे व रिकामा असताना अंधुक नाव दिसणे
+    function openDateInput(input) {
+        input.type = 'date';
         if (input.showPicker) {
             try { input.showPicker(); } catch (e) {}
         }
+    }
+
+    function closeDateInput(input, defaultPlaceholder) {
+        if (!input.value) {
+            input.type = 'text';
+            input.placeholder = defaultPlaceholder;
+        }
+    }
+
+    function triggerDatePicker(inputId) {
+        const input = document.getElementById(inputId);
+        openDateInput(input);
+        input.focus();
     }
 
     function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
@@ -754,12 +796,14 @@
     function saveEmployeeModal() {
         const name = document.getElementById('empName').value.trim();
         const desig = document.getElementById('empDesignation').value.trim();
+        const joinDate = formatDateToDDMMYYYY(document.getElementById('empJoinDate').value);
         const basic = document.getElementById('basicPay').value;
         const comm = document.getElementById('payCommission').value;
 
         if (name || desig || basic) {
             const preview = document.getElementById('cardEmpPreview');
-            preview.textContent = `✓ ${name || 'कर्मचारी'} | ${desig || 'पद'} | रु. ${basic || 0} (${comm ? comm + ' आयोग' : ''})`;
+            let dateText = joinDate ? `नियुक्ती: ${joinDate} | ` : '';
+            preview.textContent = `✓ ${name || 'कर्मचारी'} | ${desig || 'पद'} | ${dateText}रु. ${basic || 0} (${comm ? comm + ' आयोग' : ''})`;
             preview.classList.add('active-badge');
         }
         closeModal('employeeModal');
@@ -768,8 +812,28 @@
     function toggleBenefitRow(idx) {
         const type = document.getElementById(`b${idx}_type`).value;
         const fields = document.getElementById(`b${idx}_fields`);
+        const dateInput = document.getElementById(`b${idx}_date`);
+        const optDateInput = document.getElementById(`b${idx}_optDate`);
+        const postInput = document.getElementById(`b${idx}_post`);
+        const scaleInput = document.getElementById(`b${idx}_scale`);
+
         if (type !== 'None') {
             fields.classList.remove('hidden');
+            let isPromo = (type === 'Promotion');
+            let dPlaceholder = isPromo ? "पदोन्नती दिनांक निवडा" : "लाभाचा दिनांक निवडा";
+            let optPlaceholder = "विकल्प दिनांक निवडा";
+            
+            if (!dateInput.value) {
+                dateInput.type = 'text';
+                dateInput.placeholder = dPlaceholder;
+            }
+            if (!optDateInput.value) {
+                optDateInput.type = 'text';
+                optDateInput.placeholder = optPlaceholder;
+            }
+            postInput.placeholder = isPromo ? "पदोन्नतीचे पद टाका" : "वरिष्ठ पद टाका";
+            scaleInput.value = ""; // आधी भरलेली व्हॅल्यू काढून टाकणे
+            scaleInput.placeholder = "मंजूर वेतनश्रेणी / स्तर निवडा";
             updateSubScaleList(idx);
         } else {
             fields.classList.add('hidden');
@@ -781,7 +845,9 @@
         if (!dVal) return;
 
         const optInput = document.getElementById(`b${idx}_optDate`);
-        if (!optInput.value) optInput.value = dVal;
+        if (!optInput.value) {
+            optInput.value = dVal;
+        }
 
         const dt = new Date(dVal);
         const commSelect = document.getElementById(`b${idx}_comm`);
@@ -794,6 +860,7 @@
         updateSubScaleList(idx);
     }
 
+    // वेतनश्रेणी यादी तयार करणे (कोणतीही डीफॉल्ट व्हॅल्यू न भरता फक्त प्लेसहोल्डर ठेवणे)
     function updateSubScaleList(idx) {
         const comm = document.getElementById(`b${idx}_comm`).value;
         const datalist = document.getElementById(`b${idx}_scaleList`);
@@ -804,7 +871,7 @@
         if (comm === '4th') list = payScales4th;
         else if (comm === '5th') list = payScales5th;
         else if (comm === '6th') list = payScales6th;
-        else list = Object.values(level7thStartPay).map(v => v.desc);
+        else if (comm === '7th') list = Object.values(level7thStartPay).map(v => v.desc);
 
         list.forEach(item => {
             let opt = document.createElement('option');
@@ -812,12 +879,8 @@
             datalist.appendChild(opt);
         });
 
-        if (!input.value) {
-            if (comm === '4th') input.value = "रु. 1200 - 30 - 1560 - EB - 40 - 2040 (वरिष्ठ लिपिक)";
-            else if (comm === '5th') input.value = "रु. 4000 - 100 - 6000 (वरिष्ठ लिपिक)";
-            else if (comm === '6th') input.value = "PB-1 : 5200 - 20200 (GP 2400) - वरिष्ठ लिपिक";
-            else input.value = "S-8 (25500 - 81100) - वरिष्ठ लिपिक";
-        }
+        // परस्पर मजकूर न भरता फक्त प्लेसहोल्डर ठेवणे
+        input.placeholder = "मंजूर वेतनश्रेणी / स्तर निवडा किंवा लिहा";
     }
 
     function saveBenefitModal() {
@@ -879,7 +942,6 @@
         }
     }
 
-    // वेतन आयोग वेतनश्रेणी डेटा
     const payScales4th = [
         "रु. 750 - 12 - 870 - EB - 14 - 940 (शिपाई / चतुर्थश्रेणी)",
         "रु. 775 - 12 - 871 - EB - 14 - 1025 (दफ्तरी / नाईक)",
@@ -941,12 +1003,11 @@
 
     function populate7thLevelDropdowns() {
         const initSelect = document.getElementById('initial7thLevel');
-        initSelect.innerHTML = "";
+        initSelect.innerHTML = `<option value="" disabled selected>मूळ स्तर निवडा</option>`;
         for (const [key, val] of Object.entries(level7thStartPay)) {
             let opt = document.createElement('option');
             opt.value = key;
             opt.textContent = val.desc;
-            if (key === "S-6") opt.selected = true;
             initSelect.appendChild(opt);
         }
     }
@@ -1114,7 +1175,6 @@
         return { basic: cells[cells.length - 1], index: cells.length - 1 };
     }
 
-    // मुख्य कॅल्क्युलेशन प्रक्रिया
     function processFixation() {
         const startCommission = document.getElementById('payCommission').value;
         const name = document.getElementById('empName').value.trim();
@@ -1144,7 +1204,6 @@
         const fromDateFormatted = formatDateToDDMMYYYY(fromDateInput);
         const toDateFormatted = formatDateToDDMMYYYY(toDateInput);
 
-        // तिन्ही लाभांची माहिती गोळा करणे
         let activeBenefits = [];
         let summaryBenefitsText = [];
 
@@ -1198,7 +1257,7 @@
         let startDate = new Date(fromDateInput);
         let endDate = new Date(toDateInput);
 
-        // १. नियुक्तीची मूळ नोंद
+        // १. मूळ नोंद
         events.push({
             date: new Date(fromDateInput),
             dateStr: fromDateFormatted,
@@ -1240,7 +1299,7 @@
             }
         }
 
-        // ६. तिन्ही लाभांच्या नोंदी जोडणे
+        // ६. तिन्ही लाभांच्या नोंदी
         activeBenefits.forEach(b => {
             let title = (b.type === 'Promotion') ? `पदोन्नती-${b.index} (${b.post})` : `MACP-${b.index} लाभ`;
             if (b.date >= startDate && b.date <= endDate) {
@@ -1271,7 +1330,6 @@
             }
         });
 
-        // सर्व इव्हेंट्स तारखेनुसार अचूक क्रमाने लावणे
         events.sort((a, b) => a.date - b.date);
 
         let srNo = 1;
@@ -1349,7 +1407,6 @@
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'ANNUAL_INC') {
-                // जर हा दिवस आधीच विकल्प दिवस म्हणून वापरला असेल तर दुबार वाढ टाळणे
                 let isOptDay = activeBenefits.some(b => b.optDate.getTime() === ev.date.getTime());
                 if (isOptDay) return;
 
