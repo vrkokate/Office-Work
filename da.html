@@ -73,16 +73,45 @@
         }
         
         .content-body {
+            padding: 12px;
+        }
+
+        /* Selector Section */
+        .selector-card {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .selector-card label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #0d47a1;
+        }
+        .selector-card select {
+            width: 100%;
             padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            background: #fff;
+            font-weight: bold;
         }
 
         /* Commission Section */
         .commission-section {
-            margin-bottom: 20px;
+            display: none;
+            margin-bottom: 15px;
             background: #fafafa;
             border: 1px solid #e0e0e0;
             border-radius: 6px;
-            padding: 8px;
+            padding: 10px;
+        }
+        .commission-section.active {
+            display: block;
         }
         .commission-title {
             background: #1976d2;
@@ -91,11 +120,10 @@
             font-size: 15px;
             font-weight: bold;
             border-radius: 4px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             text-align: center;
         }
 
-        /* Table styling optimized for mobile screen without horizontal overflow */
         .table-container {
             width: 100%;
             overflow-x: hidden;
@@ -123,14 +151,12 @@
             background-color: #f9f9f9;
         }
 
-        /* Column widths explicitly balanced for mobile */
         .col-no { width: 10%; }
         .col-date { width: 38%; font-size: 11px; }
         .col-due { width: 16%; }
         .col-drawn { width: 16%; }
         .col-action { width: 20%; }
 
-        /* Action Buttons */
         .btn-delete {
             background-color: #d32f2f;
             color: white;
@@ -146,16 +172,16 @@
 
         /* Add / Update Form Section */
         .form-card {
-            background: #e3f2fd;
-            border: 1px solid #90caf9;
+            background: #f1f8e9;
+            border: 1px solid #c8e6c9;
             padding: 12px;
             border-radius: 6px;
             margin-top: 15px;
         }
         .form-card h3 {
-            font-size: 15px;
-            color: #0d47a1;
-            margin-bottom: 10px;
+            font-size: 14px;
+            color: #2e7d32;
+            margin-bottom: 8px;
             text-align: center;
         }
         .form-group {
@@ -168,7 +194,7 @@
             margin-bottom: 3px;
             color: #333;
         }
-        .form-group select, .form-group input {
+        .form-group input {
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
@@ -192,7 +218,6 @@
             background-color: #1b5e20;
         }
 
-        /* Print Button Section */
         .print-section {
             text-align: center;
             margin-top: 15px;
@@ -216,7 +241,7 @@
         }
 
         @media print {
-            .header-bar, .form-card, .print-section, .btn-delete, .commission-title {
+            .header-bar, .selector-card, .form-card, .print-section, .btn-delete, .commission-title {
                 display: none !important;
             }
             body {
@@ -227,6 +252,11 @@
                 box-shadow: none;
                 border: none;
             }
+            .commission-section {
+                display: block !important;
+                border: none;
+                margin-bottom: 10px;
+            }
             table {
                 font-size: 11px;
             }
@@ -236,7 +266,7 @@
 <body>
 
 <div class="main-container">
-    <!-- Header Bar: Green Back Button (Left), Title (Center), Red Close Button (Right) -->
+    <!-- Header Bar -->
     <div class="header-bar">
         <a href="index.html" class="btn-back" title="मागे जा">←</a>
         <div class="header-title">महागाई भत्ता</div>
@@ -244,10 +274,20 @@
     </div>
 
     <div class="content-body">
+        <!-- Commission Selector Dropdown -->
+        <div class="selector-card">
+            <label for="commissionDropdown">प्रथम वेतन आयोग निवडा:</label>
+            <select id="commissionDropdown" onchange="showSelectedCommission()">
+                <option value="pc7" selected>७ वा वेतन आयोग</option>
+                <option value="pc6">६ वा वेतन आयोग</option>
+                <option value="pc5">५ वा वेतन आयोग</option>
+                <option value="pc4">४ था वेतन आयोग</option>
+            </select>
+        </div>
 
-        <!-- ४ था वेतन आयोग -->
-        <div class="commission-section">
-            <div class="commission-title">४ था वेतन आयोग</div>
+        <!-- ४ था वेतन आयोग Section -->
+        <div id="section-pc4" class="commission-section">
+            <div class="commission-title">४ था वेतन आयोग - महागाई भत्ता तक्ता</div>
             <div class="table-container">
                 <table id="table-pc4">
                     <thead>
@@ -259,16 +299,14 @@
                             <th class="col-action">कृती</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- नोंदी येथे जोडल्या जातील -->
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- ५ वा वेतन आयोग -->
-        <div class="commission-section">
-            <div class="commission-title">५ वा वेतन आयोग</div>
+        <!-- ५ वा वेतन आयोग Section -->
+        <div id="section-pc5" class="commission-section">
+            <div class="commission-title">५ वा वेतन आयोग - महागाई भत्ता तक्ता</div>
             <div class="table-container">
                 <table id="table-pc5">
                     <thead>
@@ -293,9 +331,9 @@
             </div>
         </div>
 
-        <!-- ६ वा वेतन आयोग -->
-        <div class="commission-section">
-            <div class="commission-title">६ वा वेतन आयोग</div>
+        <!-- ६ वा वेतन आयोग Section -->
+        <div id="section-pc6" class="commission-section">
+            <div class="commission-title">६ वा वेतन आयोग - महागाई भत्ता तक्ता</div>
             <div class="table-container">
                 <table id="table-pc6">
                     <thead>
@@ -327,9 +365,9 @@
             </div>
         </div>
 
-        <!-- ७ वा वेतन आयोग -->
-        <div class="commission-section">
-            <div class="commission-title">७ वा वेतन आयोग</div>
+        <!-- ७ वा वेतन आयोग Section -->
+        <div id="section-pc7" class="commission-section active">
+            <div class="commission-title">७ वा वेतन आयोग - महागाई भत्ता तक्ता</div>
             <div class="table-container">
                 <table id="table-pc7">
                     <thead>
@@ -391,17 +429,8 @@
 
         <!-- Add / Update Form Section -->
         <div class="form-card">
-            <h3>नवीन डीए दर जोडा / अपडेट करा</h3>
+            <h3 id="formTitle">७ वा वेतन आयोगसाठी नवीन डीए दर जोडा</h3>
             <form id="addDaForm" onsubmit="addNewDA(event)">
-                <div class="form-group">
-                    <label for="commissionSelect">वेतन आयोग निवडा</label>
-                    <select id="commissionSelect" required>
-                        <option value="pc4">४ था वेतन आयोग</option>
-                        <option value="pc5">५ वा वेतन आयोग</option>
-                        <option value="pc6">६ वा वेतन आयोग</option>
-                        <option value="pc7" selected>७ वा वेतन आयोग</option>
-                    </select>
-                </div>
                 <div class="form-group">
                     <label for="periodInput">दिनांक पासून - ते दिनांक</label>
                     <input type="text" id="periodInput" placeholder="उदा. 01.01.2025 ते 30.06.2025" required>
@@ -414,7 +443,7 @@
                     <label for="drawnInput">Drawn DA रेट (%)</label>
                     <input type="text" id="drawnInput" placeholder="उदा. 53%" required>
                 </div>
-                <button type="submit" class="btn-submit">नवीन नोंद समाविष्ट करा</button>
+                <button type="submit" class="btn-submit">या आयोगात नोंद समाविष्ट करा</button>
             </form>
         </div>
 
@@ -427,9 +456,25 @@
 </div>
 
 <script>
+    function showSelectedCommission() {
+        const selectedVal = document.getElementById("commissionDropdown").value;
+        
+        // Hide all commission sections
+        const sections = document.querySelectorAll('.commission-section');
+        sections.forEach(sec => sec.classList.remove('active'));
+        
+        // Show selected commission section
+        document.getElementById("section-" + selectedVal).classList.add('active');
+        
+        // Update form heading text
+        const dropdownText = document.getElementById("commissionDropdown");
+        const selectedText = dropdownText.options[dropdownText.selectedIndex].text;
+        document.getElementById("formTitle").innerText = selectedText + 'साठी नवीन डीए दर जोडा';
+    }
+
     function addNewDA(event) {
         event.preventDefault();
-        const pc = document.getElementById("commissionSelect").value;
+        const pc = document.getElementById("commissionDropdown").value;
         let period = document.getElementById("periodInput").value;
         const due = document.getElementById("dueInput").value;
         const drawn = document.getElementById("drawnInput").value;
@@ -449,7 +494,7 @@
         `;
 
         document.getElementById("addDaForm").reset();
-        alert("नवीन डीए दर यशस्वीरित्या जोडण्यात आला आहे!");
+        alert("निवडलेल्या वेतन आयोगानुसार नवीन डीए दर यशस्वीरित्या जोडण्यात आला आहे!");
     }
 
     function deleteRow(btn) {
