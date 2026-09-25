@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>वेतन फरक व आयोग व्यवस्थापन (Difference Hub)</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    font-family: "Noto Sans Devanagari", "Segoe UI", Arial, sans-serif;
+    background: radial-gradient(circle at 50% 25%, #173b69 0%, #071a32 45%, #020914 100%);
+    color: white;
+    overflow-x: hidden;
+}
+
+.main-wrapper {
+    width: min(1100px, 96%);
+    margin: 12px auto;
+    background: #0f1c30;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    overflow: hidden;
+}
+
+/* ================= शीर्षलेख (HEADER) ================= */
+.header {
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    background: linear-gradient(135deg, #ff9800, #ff6d00 55%, #e65100);
+    box-shadow: 0 8px 25px rgba(255, 111, 0, 0.35);
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: clamp(16px, 3.8vw, 24px);
+    font-weight: 900;
+}
+
+.close-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.95);
+    color: #d32f2f;
+    font-size: 24px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.close-btn:active {
+    transform: scale(0.92);
+}
+
+/* ================= मॅजिक ॲनिमेशन एरिया ================= */
+.magic-area {
+    width: 100%;
+    height: 140px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 50%, rgba(23, 59, 105, 0.6) 0%, transparent 70%);
+}
+
+.magic-portal {
+    position: absolute;
+    width: 105px;
+    height: 105px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,193,7,0.4) 20%, transparent 70%);
+    box-shadow: 0 0 25px #ff9800, 0 0 50px #ff6d00;
+}
+
+.magic-ring {
+    position: absolute;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,193,7,0.9);
+    border-top-color: #fff;
+    border-right-color: #ff6d00;
+    animation: spin 6s linear infinite;
+}
+
+.magic-ring.two {
+    width: 90px;
+    height: 90px;
+    border-color: #29b6f6;
+    border-left-color: #fff;
+    animation: spin-rev 4s linear infinite;
+}
+
+.magic-title-text {
+    position: relative;
+    z-index: 5;
+    font-size: clamp(17px, 3.8vw, 21px);
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 10px #ff9800, 0 0 20px #e65100;
+    text-align: center;
+}
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes spin-rev { 100% { transform: rotate(-360deg); } }
+
+/* ================= १० टॅब्स ग्रिड ================= */
+.tabs-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    background-color: #08111e;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+@media (max-width: 768px) {
+    .tabs-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.tab-btn {
+    background: #15253d;
+    color: #cbd5e1;
+    border: 1px solid #233b5d;
+    padding: 10px 4px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    transition: 0.25s all ease;
+}
+
+.tab-btn:hover {
+    background: #1f3659;
+    color: #ffffff;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #ff9800, #e65100);
+    color: #ffffff;
+    border-color: #ff9800;
+    box-shadow: 0 0 12px rgba(255, 152, 0, 0.45);
+}
+
+/* ================= पॅनेल्स (PANELS) ================= */
+.tab-content {
+    display: none;
+    padding: 16px;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card-box {
+    background: #142238;
+    border: 1px solid #233b5d;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 14px;
+}
+
+.box-title {
+    color: #00e5ff;
+    font-size: 17px;
+    margin-top: 0;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 14px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 13px;
+    color: #cbd5e1;
+}
+
+.form-control {
+    background: #091322;
+    border: 1px solid #28446e;
+    color: #fff;
+    padding: 9px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-control:focus {
+    border-color: #ff9800;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #ff9800, #e65100);
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 12px;
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.btn-primary:active {
+    transform: scale(0.96);
+}
+
+.table-custom {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 14px;
+    font-size: 13px;
+}
+
+.table-custom th, .table-custom td {
+    border: 1px solid #233b5d;
+    padding: 9px;
+    text-align: center;
+}
+
+.table-custom th {
+    background: #091322;
+    color: #00e5ff;
+}
+
+.table-custom tr:nth-child(even) {
+    background: #0d1b30;
+}
+
+.del-btn {
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="main-wrapper">
+    <!-- शीर्षलेख (Header) -->
+    <div class="header">
+        <div class="header-title">
+            <span>⚡</span>
+            <span>वेतन व फरक व्यवस्थापन प्रणाली</span>
+        </div>
+        <button class="close-btn" onclick="location.href='index.html'" title="मुख्य पानावर परत जा">×</button>
+    </div>
+
+    <!-- मॅजिक ॲनिमेशन एरिया -->
+    <div class="magic-area">
+        <div class="magic-portal"></div>
+        <div class="magic-ring"></div>
+        <div class="magic-ring two"></div>
+        <div class="magic-title-text" id="magicHeading">४. ७ वा वेतन आयोग</div>
+    </div>
+
+    <!-- १० टॅब्स नेव्हिगेशन -->
+    <div class="tabs-grid">
+        <button class="tab-btn" onclick="switchTab(1, '१. ४ था वेतन आयोग')">१. ४ था आयोग</button>
+        <button class="tab-btn" onclick="switchTab(2, '२. ५ वा वेतन आयोग')">२. ५ वा आयोग</button>
+        <button class="tab-btn" onclick="switchTab(3, '३. ६ वा वेतन आयोग')">३. ६ वा आयोग</button>
+        <button class="tab-btn active" onclick="switchTab(4, '४. ७ वा वेतन आयोग')">४. ७ वा आयोग</button>
+        <button class="tab-btn" onclick="switchTab(5, '५. ८ वा वेतन आयोग')">५. ८ वा आयोग</button>
+        <button class="tab-btn" onclick="switchTab(6, '६. वेतन फरक (Due-Drawn)')" style="border-color:#00e5ff;">६. वेतन फरक</button>
+        <button class="tab-btn" onclick="switchTab(7, '७. DA मास्टर दर')">७. DA दर</button>
+        <button class="tab-btn" onclick="switchTab(8, '८. HRA मास्टर दर')">८. HRA दर</button>
+        <button class="tab-btn" onclick="switchTab(9, '९. इतर भत्ते दर')">९. इतर भत्ते</button>
+        <button class="tab-btn" onclick="switchTab(10, '१०. बॅकअप व सेटिंग्ज')">१०. सेटिंग्ज</button>
+    </div>
+
+    <!-- टॅब १: ४ था आयोग -->
+    <div id="tab-1" class="tab-content">
+        <div class="card-box">
+            <h3 class="box-title">४ था वेतन आयोग (4th Pay Commission)</h3>
+            <p style="color:#94a3b8;">४ थ्या आयोगातील वेतनश्रेणी व बेसिक इनपुट फॉर्म.</p>
+        </div>
+    </div>
+
+    <!-- टॅब २: ५ वा आयोग -->
+    <div id="tab-2" class="tab-content">
+        <div class="card-box">
+            <h3 class="box-title">५ वा वेतन आयोग (5th Pay Commission)</h3>
+            <p style="color:#94a3b8;">५ व्या आयोगातील Pay Scale व त्यावेळचे नियम.</p>
+        </div>
+    </div>
+
+    <!-- टॅब ३: ६ वा आयोग -->
+    <div id="tab-3" class="tab-content">
+        <div class="card-box">
+            <h3 class="box-title">६ वा वेतन आयोग (6th Pay Commission)</h3>
+            <p style="color:#94a3b8;">Pay Band + Grade Pay = Basic Pay रचना व हिशोब.</p>
+        </div>
+    </div>
+
+    <!-- टॅब ४: ७ वा आयोग (सक्रिय) -->
+    <div id="tab-4" class="tab-content active">
+        <div class="card-box">
+            <h3 class="box-title">७ वा वेतन आयोग मासिक वेतन निश्चिती</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>पे मॅट्रिक्स स्तर (Pay Level):</label>
+                    <select class="form-control" id="payLevel7">
+                        <option value="S-1">S-1 (15,000 - 47,600)</option>
+                        <option value="S-6">S-6 (21,700 - 69,100)</option>
+                        <option value="S-8">S-8 (25,500 - 81,100)</option>
+                        <option value="S-10">S-10 (29,200 - 92,300)</option>
+                        <option value="S-13">S-13 (35,400 - 1,12,400)</option>
+                        <option value="S-15" selected>S-15 (41,800 - 1,32,300)</option>
+                        <option value="S-20">S-20 (56,100 - 1,77,500)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>मूळ वेतन (Basic Pay ₹):</label>
+                    <input type="number" class="form-control" id="basicPay7" value="41800">
+                </div>
+                <div class="form-group">
+                    <label>HRA शहर वर्गवारी:</label>
+                    <select class="form-control" id="hraClass7">
+                        <option value="10">Z वर्ग (१०% - ग्रामीण व इतर)</option>
+                        <option value="20" selected>Y वर्ग (२०% - लातूर/मध्यम शहरे)</option>
+                        <option value="30">X वर्ग (३०% - मुंबई/पुणे)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>वाहतूक भत्ता (T.A. ₹):</label>
+                    <input type="number" class="form-control" id="taAmount7" value="1350">
+                </div>
+            </div>
+            <button class="btn-primary" onclick="calculate7thPay()">मासिक वेतन गणना करा</button>
+
+            <div id="resultBox7" style="display:none; margin-top:16px;">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Basic</th>
+                            <th>DA (५०%)</th>
+                            <th>HRA</th>
+                            <th>TA</th>
+                            <th>एकूण वेतन (Gross)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultBody7"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- टॅब ५: ८ वा आयोग -->
+    <div id="tab-5" class="tab-content">
+        <div class="card-box">
+            <h3 class="box-title">८ वा वेतन आयोग (प्रस्तावित)</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>अंदाजित फिटमेंट फॅक्टर (Fitment Factor):</label>
+                    <input type="number" step="0.01" class="form-control" id="fitment8" value="2.28">
+                </div>
+            </div>
+            <p style="color:#94a3b8; margin-top:10px;">८ व्या वेतन आयोगाच्या घोषणेनंतर येथे सुधारित पे मॅट्रिक्स जोडले जाईल.</p>
+        </div>
+    </div>
+
+    <!-- टॅब ६: फरक कॅल्क्युलेटर (Due-Drawn) -->
+    <div id="tab-6" class="tab-content">
+        <div class="card-box">
+            <h3 class="box-title">🔄 वेतन फरक तुलना विवरणपत्रक (Due - Drawn)</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>सुरुवातीचा महिना-वर्ष:</label>
+                    <input type="month" class="form-control" id="diffFrom" value="2024-01">
+                </div>
+                <div class="form-group">
+                    <label>अखेरचा महिना-वर्ष:</label>
+                    <input type="month" class="form-control" id="diffTo" value="2024-06">
+                </div>
+                <div class="form-group">
+                    <label>फरक प्रकार:</label>
+                    <select class="form-control">
+                        <option>सर्व भत्त्यांसह एकूण वेतन फरक</option>
+                        <option>फक्त महागाई भत्ता (DA) फरक</option>
+                        <option>वेतनवाढ / पदोन्नती फरक</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="alert('निवडलेल्या कालावधीनुसार फरक तक्ता तयार केला जात आहे!')">फरक बिल तयार करा</button>
+        </div>
+    </div>
+
+    <!-- टॅब ७: DA मास्टर दर -->
+    <div id="tab-7" class="tab-content">
+        <div class="card-box">
+            <h3 class="box-title">📈 महागाई भत्ता (D.A.) मास्टर दर व्यवस्थापन</h3>
+            <p style="color:#cbd5e1; font-size:13px;">भविष्यात नवीन GR आल्यास खालील फॉर्ममधून दर जोडा (हे आपोआप सेव्ह होईल):</p>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>लागू दिनांक:</label>
+                    <input type="date" class="form-control" id="daInputDate">
+                </div>
+                <div class="form-group">
+                    <label>DA टक्केवारी (%):</label>
+                    <input type="number" class="form-control" id="daInputPercent" placeholder="उदा. 53">
+                </div>
+                <div class="form-group">
+                    <label>GR संदर्भ:</label>
+                    <input type="text" class="form-control" id="daInputGR" placeholder="उदा. शासन निर्णय क्र...">
+                </div>
+            </div>
+            <button class="btn-primary" onclick="addDaEntry()">+ नवीन दर सेव्ह करा</button>
+
+            <table class="table-custom" id="daMasterTable">
+                <thead>
+                    <tr>
+                        <th>लागू दिनांक</th>
+                        <th>DA दर (%)</th>
+                        <th>GR संदर्भ</th>
+                        <th>कृती</th>
+                    </tr>
+                </thead>
+                <tbody id="daTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- टॅब ८: HRA मास्टर दर -->
+    <div id="tab-8" class="tab-content">
+        <div class="card-box">
+            <h3 class="box-title">🏠 घरभाडे भत्ता (H.R.A.) दर व्यवस्थापन</h3>
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>शहर वर्ग</th>
+                        <th>DA ५०% च्या आधी दर</th>
+                        <th>DA ५०% झाल्यावर सुधारित दर</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>X वर्ग (मुंबई, पुणे इ.)</td><td>२४%</td><td>३०%</td></tr>
+                    <tr><td>Y वर्ग (लातूर, नाशिक, नागपूर इ.)</td><td>१६%</td><td>२०%</td></tr>
+                    <tr><td>Z वर्ग (इतर लहान शहरे व ग्रामीण)</td><td>८%</td><td>१०%</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- टॅब ९: इतर भत्ते -->
+    <div id="tab-9" class="tab-content">
+        <div class="card-box">
+            <h3 class="box-title">🚗 इतर भत्ते (T.A. / C.L.A. / W.A.) दर</h3>
+            <p style="color:#94a3b8;">वाहतूक भत्ता, शहर भरपाई व धुलाई भत्ता व्यवस्थापन.</p>
+        </div>
+    </div>
+
+    <!-- टॅब १०: बॅकअप व सेटिंग्ज -->
+    <div id="tab-10" class="tab-content">
+        <div class="card-box">
+            <h3 class="box-title">⚙️ डेटा बॅकअप व सेटिंग्ज</h3>
+            <p style="color:#cbd5e1;">तुम्ही जोडलेले सर्व दर तुमच्या ब्राऊझरच्या मेमरीमध्ये कायमस्वरूपी सुरक्षित आहेत.</p>
+            <button class="btn-primary" onclick="exportData()">डेटा Export करा (JSON)</button>
+            <button class="btn-primary" style="background:#0284c7;" onclick="alert('Excel रिपोर्ट डाऊनलोड लवकरच उपलब्ध होईल!')">📊 Excel डाऊनलोड</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// टॅब बदलण्याचे फंक्शन
+function switchTab(index, title) {
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+    const targetTab = document.getElementById('tab-' + index);
+    if(targetTab) targetTab.classList.add('active');
+    
+    const btns = document.querySelectorAll('.tab-btn');
+    if(btns[index - 1]) btns[index - 1].classList.add('active');
+
+    document.getElementById('magicHeading').innerText = title;
+}
+
+// ७ व्या वेतन आयोगाची गणना
+function calculate7thPay() {
+    const basic = parseFloat(document.getElementById('basicPay7').value) || 0;
+    const hraRate = parseFloat(document.getElementById('hraClass7').value) || 0;
+    const ta = parseFloat(document.getElementById('taAmount7').value) || 0;
+    
+    const da = Math.round(basic * 0.50); // ५०% DA
+    const hra = Math.round(basic * (hraRate / 100));
+    const gross = basic + da + hra + ta;
+
+    document.getElementById('resultBody7').innerHTML = `
+        <tr>
+            <td>₹ ${basic.toLocaleString('en-IN')}</td>
+            <td>₹ ${da.toLocaleString('en-IN')} (50%)</td>
+            <td>₹ ${hra.toLocaleString('en-IN')} (${hraRate}%)</td>
+            <td>₹ ${ta.toLocaleString('en-IN')}</td>
+            <td style="color:#00e5ff; font-weight:bold; font-size:15px;">₹ ${gross.toLocaleString('en-IN')}</td>
+        </tr>
+    `;
+    document.getElementById('resultBox7').style.display = 'block';
+}
+
+// DA मास्टर दर (LocalStorage सह)
+let defaultDaRates = [
+    { date: "01/01/2024", rate: 50, gr: "शासन निर्णय" },
+    { date: "01/07/2023", rate: 46, gr: "शासन निर्णय" },
+    { date: "01/01/2023", rate: 42, gr: "शासन निर्णय" },
+    { date: "01/07/2022", rate: 38, gr: "शासन निर्णय" }
+];
+
+function loadDaRates() {
+    const saved = localStorage.getItem('da_rates_data');
+    const list = saved ? JSON.parse(saved) : defaultDaRates;
+    const tbody = document.getElementById('daTableBody');
+    tbody.innerHTML = '';
+    list.forEach((item, idx) => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${item.date}</td>
+                <td style="color:#10b981; font-weight:bold;">${item.rate}%</td>
+                <td>${item.gr}</td>
+                <td><button class="del-btn" onclick="deleteDa(${idx})">हटवा</button></td>
+            </tr>
+        `;
+    });
+}
+
+function addDaEntry() {
+    const dateVal = document.getElementById('daInputDate').value;
+    const rateVal = document.getElementById('daInputPercent').value;
+    const grVal = document.getElementById('daInputGR').value || 'शासन निर्णय';
+
+    if(!dateVal || !rateVal) {
+        alert('कृपया दिनांक आणि DA टक्केवारी टाका!');
+        return;
+    }
+
+    const saved = localStorage.getItem('da_rates_data');
+    let list = saved ? JSON.parse(saved) : [...defaultDaRates];
+    list.unshift({ date: dateVal, rate: rateVal, gr: grVal });
+    localStorage.setItem('da_rates_data', JSON.stringify(list));
+
+    loadDaRates();
+    alert('नवीन DA दर यशस्वीरीत्या सेव्ह झाला!');
+    document.getElementById('daInputDate').value = '';
+    document.getElementById('daInputPercent').value = '';
+    document.getElementById('daInputGR').value = '';
+}
+
+function deleteDa(idx) {
+    const saved = localStorage.getItem('da_rates_data');
+    let list = saved ? JSON.parse(saved) : [...defaultDaRates];
+    list.splice(idx, 1);
+    localStorage.setItem('da_rates_data', JSON.stringify(list));
+    loadDaRates();
+}
+
+function exportData() {
+    const data = localStorage.getItem('da_rates_data') || JSON.stringify(defaultDaRates);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'salary_difference_rates.json';
+    a.click();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    loadDaRates();
+});
+</script>
+
+</body>
+</html>
