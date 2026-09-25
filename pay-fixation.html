@@ -346,7 +346,7 @@
             font-weight: bold;
         }
 
-        /* पदोन्नती कार्ड */
+        /* पदोन्नती २+२+१ कार्ड */
         .benefit-sub-card {
             background: #fbfdfb;
             border: 1.5px solid #a5d6a7;
@@ -578,6 +578,7 @@
                 box-shadow: none !important;
             }
 
+            /* बाहेरील डबा / बॉर्डर्स पूर्णपणे काढल्या */
             .output-box {
                 border: none !important;
                 box-shadow: none !important;
@@ -771,7 +772,7 @@
         </div>
 
         <div class="field-group">
-            <label>५. वेतनश्रेणी:</label>
+            <label>५. वेतनश्रेणी (ग्रेड पे सह):</label>
             <div class="combobox-container" id="scaleWrapper">
                 <input type="text" id="currentPayScale" placeholder="वेतनश्रेणी निवडा किंवा लिहा" autocomplete="off" readonly onclick="toggleScaleDropdown('currentPayScale', 'customScaleDropdown')">
                 <span class="combobox-arrow">▼</span>
@@ -789,13 +790,11 @@
             </div>
         </div>
 
-        <div class="field-group hidden" id="gradePayGroup">
-            <label>७. ग्रेड पे (Grade Pay):</label>
-            <input type="number" id="gradePay" placeholder="ग्रेड पे टाका (उदा. 1900)">
-        </div>
+        <input type="hidden" id="gradePay" value="0">
 
+        <!-- ७. ७व्या आयोगातील मूळ स्तर -->
         <div class="field-group hidden" id="initialLevelDiv">
-            <label>८. ७व्या आयोगातील मूळ स्तर:</label>
+            <label>७. ७व्या आयोगातील मूळ स्तर:</label>
             <select id="initial7thLevel">
                 <option value="" disabled selected>मूळ स्तर निवडा</option>
             </select>
@@ -1201,7 +1200,6 @@
         "रु. 3000 - 100 - 3500 - 125 - 4500 (कार्यकारी अभियंता / EE)"
     ];
 
-    // Annexure - I मधील सर्व २७ अधिकृत वेतनश्रेण्या
     const payScales5th = [
         "रु. 2550 - 55 - 2660 - 60 - 3200",
         "रु. 2610 - 60 - 2910 - 65 - 3300 - 70 - 4000",
@@ -1232,7 +1230,6 @@
         "रु. 22400 - 525 - 24500 (मुख्य सचिव / CS)"
     ];
 
-    // Annexure - II मधील सर्व सुधारित पे बँड्स व ग्रेड पे
     const payScales6th = [
         "-1S : 4440 - 7440 (GP 1300) - शिपाई / चतुर्थश्रेणी",
         "-1S : 4440 - 7440 (GP 1400) - नाईक",
@@ -1273,7 +1270,6 @@
         "PB-4 : 37400 - 67000 (GP 12000) - सचिव (Secretary)"
     ];
 
-    // Annexure - III मधील अधिकृत Entry Pay (Pay in Pay Band for Direct Recruits)
     const entryPayAnnexureIII = {
         1300: 4440,
         1400: 4440,
@@ -1281,7 +1277,7 @@
         1650: 4920,
         1700: 4920,
         1800: 5200,
-        1900: 5830, // GP 1900 -> 5830 (शासकीय परिपत्रकानुसार)
+        1900: 5830,
         2000: 6460,
         2400: 7510,
         2500: 7770,
@@ -1349,9 +1345,6 @@
         }
     }
 
-    // =========================================================================
-    // ⚙️ अचूक वेतन टप्पे गणना (६व्या आयोगासाठी ३% + पुढील १० च्या पटीतील नियम)
-    // =========================================================================
     function parsePayScaleStages(scaleStr, commission, gradePayOverride = 0) {
         if (!scaleStr) return [];
 
@@ -1363,7 +1356,7 @@
             return fullPayMatrix7th["S-6"];
         }
 
-        // ६वा वेतन आयोग (३% काढून पुढील १० च्या पटीत राउंडिंग)
+        // ६वा वेतन आयोग
         if (commission === '6th' || scaleStr.includes('PB') || scaleStr.includes('GP') || scaleStr.includes('-1S')) {
             let clean = scaleStr.replace(/\(.*?\)/g, '');
             let bandMatch = clean.match(/(\d{4,6})\s*-\s*(\d{4,6})/);
@@ -1377,7 +1370,6 @@
 
                 let stagesSet = new Set();
 
-                // १. प्रथम भरती वेतन (Annexure-III Entry Pay) साखळी
                 if (entryPay && entryPay >= bandMin && entryPay <= bandMax) {
                     let curr = entryPay;
                     let safety = 0;
@@ -1391,7 +1383,6 @@
                     }
                 }
 
-                // २. पे बँड किमान वेतन (Band Minimum Pay) साखळी
                 if (bandMin && bandMin <= bandMax) {
                     let curr = bandMin;
                     let safety = 0;
@@ -1465,9 +1456,15 @@
                 input.value = scale;
                 dropdown.classList.add('hidden');
                 
-                if (comm === '6th' && scale.includes('GP') && inputId === 'currentPayScale') {
-                    let gpMatch = scale.match(/GP\s*(\d+)/);
-                    if (gpMatch && gpMatch[1]) document.getElementById('gradePay').value = gpMatch[1];
+                if (comm === '6th' && scale.includes('GP')) {
+                    let gpMatch = scale.match(/GP\s*(\d+)/i);
+                    if (gpMatch && gpMatch[1]) {
+                        document.getElementById('gradePay').value = gpMatch[1];
+                    }
+                }
+                
+                if (inputId === 'currentPayScale') {
+                    validateCard1();
                 }
             };
             dropdown.appendChild(div);
@@ -1542,22 +1539,17 @@
 
     function updateCommissionRules() {
         const commission = document.getElementById('payCommission').value;
-        const gradePayGroup = document.getElementById('gradePayGroup');
         const initialLevelDiv = document.getElementById('initialLevelDiv');
         const currentPayScaleInput = document.getElementById('currentPayScale');
         const basicInput = document.getElementById('basicPay');
 
         currentPayScaleInput.value = "";
         basicInput.value = "";
+        document.getElementById('gradePay').value = "0";
 
-        if (commission === '6th') {
-            gradePayGroup.classList.remove('hidden');
-            initialLevelDiv.classList.remove('hidden');
-        } else if (commission === '7th') {
-            gradePayGroup.classList.add('hidden');
+        if (commission === '6th' || commission === '7th') {
             initialLevelDiv.classList.remove('hidden');
         } else {
-            gradePayGroup.classList.add('hidden');
             initialLevelDiv.classList.add('hidden');
         }
     }
@@ -1812,7 +1804,10 @@
         let basic = parseFloat(document.getElementById('basicPay').value);
         const fromDateInput = document.getElementById('fixationFrom').value;
         const toDateInput = document.getElementById('fixationTo').value;
-        let gradePay = parseFloat(document.getElementById('gradePay').value) || 0;
+        
+        let gpMatch = scale.match(/GP\s*(\d+)/i);
+        let gradePay = gpMatch ? parseFloat(gpMatch[1]) : (parseFloat(document.getElementById('gradePay').value) || 0);
+
         const autoUpgrade = document.getElementById('autoCommissionChange').value === 'Yes';
         const rule7th = document.getElementById('incrementMonthRule7th').value;
         
@@ -1932,13 +1927,14 @@
                 incDate = new Date(yr, 6, 1);
                 incDesc = `नियमित वार्षिक वेतनवाढ (६वा आयोग - १ जुलै)`;
             } else if (activeComm === "7th") {
+                // ७व्या आयोगात केवळ 'नियमित वार्षिक वेतन वाढ' असेच शीर्षक
                 if (rule7th === 'january') {
                     incDate = new Date(yr, 0, 1);
                     if (yr === 2016) continue;
-                    incDesc = `नियमित वार्षिक वेतनवाढ (७वा आयोग - १ जानेवारी)`;
+                    incDesc = `नियमित वार्षिक वेतन वाढ`;
                 } else {
                     incDate = new Date(yr, 6, 1);
-                    incDesc = `नियमित वार्षिक वेतनवाढ (७वा आयोग - १ जुलै)`;
+                    incDesc = `नियमित वार्षिक वेतन वाढ`;
                 }
             }
 
