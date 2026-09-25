@@ -33,8 +33,8 @@ letter-spacing: 0.5px;
 .tab-card { flex: 1; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 700; color: #ffffff; cursor: pointer; text-align: center; padding: 0 2px; }
 .btn-est { background: linear-gradient(180deg, #0051ff, #002b99); border: 1.5px solid #00d2ff; }
 .btn-mb { background: linear-gradient(180deg, #00a843, #006626); border: 1.5px solid #00ff6a; }
-.btn-form { background: linear-gradient(180deg, #ff7b00, #b34700); border: 1.5px solid #ffaa00; }
-.btn-tab4 { background: linear-gradient(180deg, #7c1fa2, #4a0072); border: 1.5px solid #e040fb; text-decoration: none; }
+.btn-form { background: linear-gradient(180deg, #ff7b00, #b34700); border: 1.5px solid #ffaa00; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+.btn-tab4 { background: linear-gradient(180deg, #7c1fa2, #4a0072); border: 1.5px solid #e040fb; text-decoration: none; display: flex; align-items: center; justify-content: center; }
 .btn-setting { background: linear-gradient(180deg, #c2185b, #880e4f); border: 1.5px solid #ff80ab; }
 
 .center-stage { position: relative; text-align: center; padding: 5px 0; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 480px; margin: 0 auto; }
@@ -175,21 +175,6 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 </div>
 </div>
 
-<!-- Form टॅब क्लिक केल्यावर उघडणारे उप-टॅब्स (कोणताही दुसरा पर्याय ठेवली नाही) -->
-<div id="formModal" class="modal-overlay" style="z-index:3000;">
-<div class="modal-card" style="max-width:340px;">
-<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:12px;">
-<h3 style="font-size:15px; color:#ff7b00;">📋 Form - उप-टॅब व्यवस्थापन</h3>
-<button class="btn-close" onclick="closeFormModal()">X</button>
-</div>
-<div style="display:flex; flex-direction:column; gap:8px;">
-<div style="display:flex; text-align:center; padding:10px; color:#666; font-size:12px;">
-    इथे सध्या कोणतीही नोंद उपलब्ध नाही.
-</div>
-</div>
-</div>
-</div>
-
 <!-- Setting टॅब क्लिक केल्यानंतर उघडणारे १२ नवीन टॅब्सचे मॉडेल -->
 <div id="settingModal" class="modal-overlay" style="z-index:3000;">
 <div class="modal-card" style="max-width:440px;">
@@ -289,12 +274,12 @@ div { page-break-inside: avoid; page-break-after: avoid; }
     <span>🏠 मुख्य पृष्ठ</span> &gt; <span>डैशबोर्ड</span>
 </div>
 
-<!-- मुखपृष्ठावर १२ टॅब्स - Tab-4 चे नाव 'Pay Fixation' केले आहे -->
+<!-- मुखपृष्ठावर १२ टॅब्स - Form टॅबला थेट form.html लिंक केले आहे -->
 <div class="tabs-wrapper">
 <div style="display:flex; justify-content:center; gap:5px;">
 <div class="tab-card btn-est" onclick="showAlert('Est. टॅब')">Est.</div>
 <div class="tab-card btn-mb" onclick="showMBSystem()">M.B.</div>
-<div class="tab-card btn-form" onclick="openFormModal()">Form</div>
+<a href="form.html" class="tab-card btn-form">Form</a>
 <a href="pay-fixation.html" class="tab-card btn-tab4">Pay Fixation</a>
 <div class="tab-card btn-setting" onclick="showAlert('Set-1 टॅब')">Set-1</div>
 <div class="tab-card btn-setting" onclick="showAlert('Set-2 टॅब')">Set-2</div>
@@ -687,13 +672,6 @@ document.getElementById('backupModal').style.display = 'flex';
 }
 function closeBackupModal() {
 document.getElementById('backupModal').style.display = 'none';
-}
-
-function openFormModal() {
-document.getElementById('formModal').style.display = 'flex';
-}
-function closeFormModal() {
-document.getElementById('formModal').style.display = 'none';
 }
 
 const marathiSuvicharList = [
@@ -2085,7 +2063,7 @@ div.className = 'form-row-compact';
 div.id = newRowId;
 div.innerHTML = '<div style="display:flex; align-items:center; justify-content:space-between;">' +
 '<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="' + newLabelId + '">Other-' + otherDeductionCount + '</span></label>' +
-'<button type="button" onclick="removeOtherDeductionField(\'' + newRowId + '\')" style="background:#d32f2f; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="कपात काढा">-</button>' +
+'<button type="button" onclick="removeOtherDeductionField(\'' + newRowId + \')" style="background:#d32f2f; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="कपात काढा">-</button>' +
 '</div>' +
 '<input type="number" class="form-control calc-ded" id="' + newInputId + '" value="0" oninput="autoCalculateDeductions()">';
 container.appendChild(div);
@@ -2397,7 +2375,6 @@ showAlert('हटवले!'); refreshAll(); closeModule('settingsModal');
 }
 }
 
-/* पॉपअप बंद करण्याचे अचूक फंक्शन */
 function closeQuickInfoModal() {
     var modal = document.getElementById('quickInfoModal');
     if (modal) modal.style.display = 'none';
