@@ -550,9 +550,7 @@
 
         .hidden { display: none !important; }
 
-        /* ========================================================================= */
-        /* 🖨️ परिपूर्ण मल्टी-पेज प्रिंट व PDF नियम (डबा काढून टाकलेला स्वच्छ फॉरमॅट) */
-        /* ========================================================================= */
+        /* 🖨️ परिपूर्ण मल्टी-पेज प्रिंट व PDF नियम */
         @media print {
             html, body {
                 background: #ffffff !important;
@@ -580,7 +578,6 @@
                 box-shadow: none !important;
             }
 
-            /* बाहेरील डबा / बॉर्डर्स पूर्णपणे काढल्या */
             .output-box {
                 border: none !important;
                 box-shadow: none !important;
@@ -664,7 +661,6 @@
         <button class="close-btn" onclick="window.location.href='index.html'">X</button>
     </div>
 
-    <!-- एरर मेसेज बॅनर -->
     <div id="validationBanner" class="validation-alert-box hidden"></div>
 
     <!-- ३ स्मार्ट अ‍ॅक्शन कार्ड्स -->
@@ -783,6 +779,7 @@
             </div>
         </div>
 
+        <!-- ६. मूळ वेतन (६व्या आयोगासाठी सुधारित ३% + १० च्या पटीतील गणना) -->
         <div class="field-group">
             <label>६. मूळ वेतन (Basic):</label>
             <div class="combobox-container" id="basicWrapper">
@@ -816,7 +813,7 @@
             <button type="button" class="modal-close-x" onclick="closeModal('benefitModal')">✕</button>
         </div>
 
-        <!-- ================= लाभ १ ================= -->
+        <!-- लाभ १ -->
         <div class="benefit-sub-card">
             <div class="benefit-sub-header">
                 <span>⭐ पहिला लाभ / पहिली पदोन्नती</span>
@@ -840,7 +837,6 @@
                     </div>
                 </div>
 
-                <!-- स्मार्ट सल्ला व शिफारस बॉक्स (लाभ १) -->
                 <div id="b1_advisor" class="option-advisor-box hidden"></div>
 
                 <div class="card-grid-2">
@@ -870,7 +866,7 @@
             </div>
         </div>
 
-        <!-- ================= लाभ २ ================= -->
+        <!-- लाभ २ -->
         <div class="benefit-sub-card">
             <div class="benefit-sub-header">
                 <span>⭐ दुसरा लाभ / दुसरी पदोन्नती</span>
@@ -894,7 +890,6 @@
                     </div>
                 </div>
 
-                <!-- स्मार्ट सल्ला व शिफारस बॉक्स (लाभ २) -->
                 <div id="b2_advisor" class="option-advisor-box hidden"></div>
 
                 <div class="card-grid-2">
@@ -924,7 +919,7 @@
             </div>
         </div>
 
-        <!-- ================= लाभ ३ ================= -->
+        <!-- लाभ ३ -->
         <div class="benefit-sub-card">
             <div class="benefit-sub-header">
                 <span>⭐ तिसरा लाभ / तिसरी पदोन्नती</span>
@@ -948,7 +943,6 @@
                     </div>
                 </div>
 
-                <!-- स्मार्ट सल्ला व शिफारस बॉक्स (लाभ ३) -->
                 <div id="b3_advisor" class="option-advisor-box hidden"></div>
 
                 <div class="card-grid-2">
@@ -1079,7 +1073,6 @@
         document.getElementById(modalId).classList.add('hidden'); 
     }
 
-    // माहिती दुरुस्त करण्यासाठी स्मूथली वर जाणे (Smooth Scroll to Edit Cards)
     function scrollToEditData() {
         const cardsArea = document.querySelector('.smart-cards-list');
         if (cardsArea) {
@@ -1221,10 +1214,10 @@
     ];
 
     const payScales6th = [
-        "PB-1 : 4440 - 7440 (GP 1300) - शिपाई",
         "PB-1 : 5200 - 20200 (GP 1900) - कनिष्ठ लिपिक",
         "PB-1 : 5200 - 20200 (GP 2400) - वरिष्ठ लिपिक",
         "PB-1 : 5200 - 20200 (GP 2800) - मुख्य लिपिक",
+        "PB-1 : 4440 - 7440 (GP 1300) - शिपाई",
         "PB-2 : 9300 - 34800 (GP 4200) - शाखा अभियंता (JE)",
         "PB-2 : 9300 - 34800 (GP 5400) - उपअभियंता (AE-2)",
         "PB-3 : 15600 - 39100 (GP 6600) - कार्यकारी अभियंता (EE)",
@@ -1261,15 +1254,50 @@
         }
     }
 
-    function parsePayScaleStages(scaleStr, commission) {
+    // =========================================================================
+    // ⚙️ अचूक वेतन टप्पे गणना (६व्या आयोगासाठी ३% + पुढील १० च्या पटीतील नियम)
+    // =========================================================================
+    function parsePayScaleStages(scaleStr, commission, gradePayOverride = 0) {
         if (!scaleStr) return [];
+
+        // ७वा वेतन आयोग
         if (commission === '7th' || scaleStr.includes('S-')) {
             let match = scaleStr.match(/S-(\d+)/);
             let key = match ? "S-" + match[1] : "S-6";
             if (fullPayMatrix7th[key]) return fullPayMatrix7th[key];
             return fullPayMatrix7th["S-6"];
         }
+
+        // ६वा वेतन आयोग (३% काढून पुढील १० च्या पटीत राउंडिंग - उदा. ५२००, ५४२०, ५६४०...)
+        if (commission === '6th' || scaleStr.includes('PB') || scaleStr.includes('GP')) {
+            let clean = scaleStr.replace(/\(.*?\)/g, '');
+            let bandMatch = clean.match(/(\d{4,6})\s*-\s*(\d{4,6})/);
+            let gpMatch = scaleStr.match(/GP\s*(\d+)/i);
+            let gp = gpMatch ? parseInt(gpMatch[1], 10) : (gradePayOverride || 0);
+
+            if (bandMatch) {
+                let startPay = parseInt(bandMatch[1], 10);
+                let endPay = parseInt(bandMatch[2], 10);
+                let stages = [];
+                let curr = startPay;
+                let safety = 0;
+                while (curr <= endPay && safety < 80) {
+                    stages.push(curr);
+                    let total = curr + gp;
+                    // ३% काढून पुढील १० च्या पटीत राउंडिंग
+                    let inc = Math.ceil((total * 0.03) / 10) * 10;
+                    if (inc < 10) inc = 10;
+                    curr += inc;
+                    safety++;
+                }
+                return stages;
+            }
+        }
+
+        // ४था व ५वा वेतन आयोग
         let cleanStr = scaleStr.replace(/\(.*?\)/g, '');
+        cleanStr = cleanStr.replace(/PB\s*-\s*\d+/gi, '').replace(/श्रेणी\s*-\s*\d+/gi, '');
+
         const marathiDigits = ['०','१','२','३','४','५','६','७','८','९'];
         marathiDigits.forEach((d, i) => cleanStr = cleanStr.replaceAll(d, i.toString()));
         let matches = cleanStr.match(/\d+/g);
@@ -1350,8 +1378,14 @@
             return;
         }
 
+        let gp = 0;
+        if (comm === '6th') {
+            let gpInput = document.getElementById('gradePay');
+            if (gpInput && gpInput.value) gp = parseFloat(gpInput.value) || 0;
+        }
+
         dropdown.innerHTML = "";
-        let stages = parsePayScaleStages(scaleStr, comm);
+        let stages = parsePayScaleStages(scaleStr, comm, gp);
 
         if (stages.length === 0) {
             dropdown.innerHTML = `<div class="dropdown-item" style="color:#888;">वैध वेतनश्रेणी उपलब्ध नाही</div>`;
@@ -1920,7 +1954,6 @@
             }
         });
 
-        // अहवाल स्क्रीनवर दाखवणे
         const outputBox = document.getElementById('outputBox');
         outputBox.classList.remove('hidden');
         outputBox.scrollIntoView({ behavior: 'smooth' });
