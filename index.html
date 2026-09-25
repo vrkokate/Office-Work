@@ -223,7 +223,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 </div>
 </div>
 
-<!-- M.B. स्थिती कार्ड क्लिक केल्यावर उघडणारे पॉपअप मॉडेल (Quick Info Modal) -->
+<!-- M.B. स्थिती कार्ड क्लिक केल्यावर उघडणारे पॉपअप मॉडेल -->
 <div id="quickInfoModal" class="quick-info-overlay">
 <div class="quick-info-card">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
@@ -692,7 +692,14 @@ if (suvicharEl) suvicharEl.innerText = marathiSuvicharList[hourIndex];
 }
 
 function getData(key) { return JSON.parse(localStorage.getItem(key) || '[]'); }
-function setData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+function setData(key, data) { 
+    localStorage.setItem(key, JSON.stringify(data)); 
+}
+
+/* ऑटो-सिंक: जेव्हा इतर टॅब किंवा विндоमध्ये डेटा बदलेल, तेव्हा इथे आपोआप रिफ्रेश होईल */
+window.addEventListener('storage', function(e) {
+    refreshAll();
+});
 
 function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; }
 function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
