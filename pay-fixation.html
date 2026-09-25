@@ -1051,6 +1051,24 @@
         return dateString;
     }
 
+    // तारीख अचूक लोकल टाईममध्ये पार्स करणे (Timezone Bug टाळण्यासाठी)
+    function parseLocalDate(dateStr) {
+        if (!dateStr) return null;
+        let parts = dateStr.split('-');
+        if (parts.length === 3) {
+            return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 0, 0, 0, 0);
+        }
+        let d = new Date(dateStr);
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
+    }
+
+    function isSameDay(d1, d2) {
+        if (!d1 || !d2) return false;
+        return d1.getFullYear() === d2.getFullYear() &&
+               d1.getMonth() === d2.getMonth() &&
+               d1.getDate() === d2.getDate();
+    }
+
     function handleDatePicked(dateId, dispId) {
         const dateInput = document.getElementById(dateId);
         const dispInput = document.getElementById(dispId);
@@ -1679,13 +1697,13 @@
 
     function getBestOptionRecommendation(benefitDateStr, comm) {
         if (!benefitDateStr) return null;
-        let bDate = new Date(benefitDateStr);
+        let bDate = parseLocalDate(benefitDateStr);
         let bYear = bDate.getFullYear();
         let bMonth = bDate.getMonth();
         let bDay = bDate.getDate();
 
         let joinDateVal = document.getElementById('empJoinDate').value;
-        let joinMonth = joinDateVal ? new Date(joinDateVal).getMonth() : 6;
+        let joinMonth = joinDateVal ? parseLocalDate(joinDateVal).getMonth() : 6;
 
         let nextIncDate = null;
         let isWithin6MonthsBeforeInc = false;
@@ -1820,12 +1838,12 @@
         const dVal = document.getElementById(`b${idx}_date`).value;
         if (!dVal) return;
 
-        const dt = new Date(dVal);
+        const dt = parseLocalDate(dVal);
         const commSelect = document.getElementById(`b${idx}_comm`);
 
-        if (dt < new Date("1996-01-01")) commSelect.value = "4th";
-        else if (dt >= new Date("1996-01-01") && dt < new Date("2006-01-01")) commSelect.value = "5th";
-        else if (dt >= new Date("2006-01-01") && dt < new Date("2016-01-01")) commSelect.value = "6th";
+        if (dt < new Date(1996, 0, 1)) commSelect.value = "4th";
+        else if (dt >= new Date(1996, 0, 1) && dt < new Date(2006, 0, 1)) commSelect.value = "5th";
+        else if (dt >= new Date(2006, 0, 1) && dt < new Date(2016, 0, 1)) commSelect.value = "6th";
         else commSelect.value = "7th";
 
         updatePromoScaleDropdown(idx);
@@ -1867,7 +1885,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (नियम ११(१) व दोन्ही विकल्प पद्धती)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (एकाच दिवशी दोन नोंदी न येता सिंगल नोंद)
     // =========================================================================
     function processFixation() {
         const isC1Valid = validateCard1();
@@ -1940,9 +1958,9 @@
                     activeBenefits.push({
                         index: i,
                         type: bType,
-                        date: new Date(bDate),
+                        date: parseLocalDate(bDate),
                         dateStr: bDate,
-                        optDate: new Date(bOptDate),
+                        optDate: parseLocalDate(bOptDate),
                         optDateStr: bOptDate,
                         commission: bComm,
                         post: bPost,
@@ -1972,34 +1990,34 @@
         tableBody.innerHTML = "";
 
         let events = [];
-        let startDate = new Date(fromDateInput);
-        let endDate = new Date(toDateInput);
-        let joinDateObj = new Date(joinDateInput);
+        let startDate = parseLocalDate(fromDateInput);
+        let endDate = parseLocalDate(toDateInput);
+        let joinDateObj = parseLocalDate(joinDateInput);
         let joinMonth = joinDateObj.getMonth();
 
         events.push({
-            date: new Date(fromDateInput),
+            date: startDate,
             dateStr: fromDateFormatted,
             type: 'INITIAL',
             desc: 'मूळ वेतन निश्चिती / रुजू'
         });
 
         if (autoUpgrade && startCommission === '4th') {
-            let c5Date = new Date("1996-01-01");
+            let c5Date = new Date(1996, 0, 1);
             if (c5Date >= startDate && c5Date <= endDate) {
                 events.push({ date: c5Date, dateStr: "01-01-1996", type: 'COMMISSION_5TH', desc: '५वा वेतन आयोग सुधारणा' });
             }
         }
 
         if (autoUpgrade && (startCommission === '4th' || startCommission === '5th')) {
-            let c6Date = new Date("2006-01-01");
+            let c6Date = new Date(2006, 0, 1);
             if (c6Date >= startDate && c6Date <= endDate) {
                 events.push({ date: c6Date, dateStr: "01-01-2006", type: 'COMMISSION_6TH', desc: '६वा वेतन आयोग सुधारणा' });
             }
         }
 
         if (autoUpgrade && (startCommission === '4th' || startCommission === '5th' || startCommission === '6th')) {
-            let c7Date = new Date("2016-01-01");
+            let c7Date = new Date(2016, 0, 1);
             if (c7Date >= startDate && c7Date <= endDate) {
                 events.push({ date: c7Date, dateStr: "01-01-2016", type: 'COMMISSION_7TH', desc: `७वा वेतन आयोग सुधारणा (${initialLevel} Matrix Fitment)` });
             }
@@ -2013,9 +2031,9 @@
             let yrDate = new Date(yr, 6, 1);
             let activeComm = startCommission;
             if (autoUpgrade) {
-                if (yrDate < new Date("1996-01-01")) activeComm = "4th";
-                else if (yrDate < new Date("2006-01-01")) activeComm = "5th";
-                else if (yrDate < new Date("2016-01-01")) activeComm = "6th";
+                if (yrDate < new Date(1996, 0, 1)) activeComm = "4th";
+                else if (yrDate < new Date(2006, 0, 1)) activeComm = "5th";
+                else if (yrDate < new Date(2016, 0, 1)) activeComm = "6th";
                 else activeComm = "7th";
             }
 
@@ -2041,6 +2059,17 @@
             }
 
             if (incDate && incDate > startDate && incDate <= endDate) {
+                // =========================================================================
+                // ⚠️ अत्यंत महत्त्वाचा बदल: जर या तारखेला कोणताही DNI विकल्प आधीच असेल,
+                // तर येथे स्वतंत्र नियमित वेतनवाढीची नोंद करायची नाही (कारण ती विकल्पातच समाविष्ट होते)
+                // =========================================================================
+                let isDniOptionDate = activeBenefits.some(b => 
+                    b.optDate > b.date && isSameDay(b.optDate, incDate)
+                );
+                if (isDniOptionDate) {
+                    continue; // ही दुबार नोंद स्किप करा!
+                }
+
                 let m = String(incDate.getMonth() + 1).padStart(2, '0');
                 let d = String(incDate.getDate()).padStart(2, '0');
                 events.push({
@@ -2052,21 +2081,21 @@
             }
         }
 
-        // पदोन्नती / MACP लाभांच्या नोंदी (नियम ११(१) च्या दोन्ही पद्धती)
+        // पदोन्नती / MACP लाभांच्या नोंदी
         activeBenefits.forEach(b => {
             let title = (b.type === 'Promotion') ? `पदोन्नती-${b.index} (${b.post})` : `MACP-${b.index} लाभ`;
             if (b.date >= startDate && b.date <= endDate) {
-                // पद्धत १: लाभाच्याच दिनांकास विकल्प दिल्यास
-                if (b.optDate.getTime() === b.date.getTime()) {
+                // १. लाभाच्याच दिनांकास विकल्प दिल्यास (Method 1)
+                if (isSameDay(b.date, b.optDate)) {
                     events.push({
                         date: b.date,
                         dateStr: formatDateToDDMMYYYY(b.dateStr),
                         type: 'BENEFIT_SAME_DAY',
-                        desc: `${title} (वेतन निश्चिती - नियम ११(१) नुसार)`,
+                        desc: `${title} (नियम ११(१) नुसार वेतन निश्चिती)`,
                         data: b
                     });
                 } 
-                // पद्धत २: पुढील वेतनवाढ दिनांकास विकल्प दिल्यास (DNI Option)
+                // २. पुढील वेतनवाढीच्या दिनांकास विकल्प दिल्यास (Method 2 - DNI Option)
                 else if (b.optDate > b.date && b.optDate <= endDate) {
                     events.push({
                         date: b.date,
@@ -2079,13 +2108,14 @@
                         date: b.optDate,
                         dateStr: formatDateToDDMMYYYY(b.optDateStr),
                         type: 'BENEFIT_OPTION_DNI',
-                        desc: `नियम ११(१) विकल्पानुसार वेतन निश्चिती (वार्षिक वेतनवाढ + पदोन्नती वेतनवाढ)`,
+                        desc: `नियम ११(१) विकल्पानुसार वेतन निश्चिती (नियमित वेतनवाढ + पदोन्नती वेतनवाढ)`,
                         data: b
                     });
                 }
             }
         });
 
+        // सर्व इव्हेंट्स तारखेनुसार अचूक क्रमाने लावणे
         events.sort((a, b) => a.date - b.date);
 
         let srNo = 1;
@@ -2096,6 +2126,7 @@
         let currentMatrixIndex = -1;
         let currentScaleLabel = scale.split(' - ')[0] || scale;
 
+        // कनिष्ठ पदावरील मूळ वेतन व स्तर रेकॉर्ड
         let lowerLevel = currentLevel;
         let lowerMatrixIndex = currentMatrixIndex;
         let lowerBasic = currentBasic;
@@ -2155,7 +2186,7 @@
 
                     let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
                     
-                    // कनिष्ठ पदावर १ वेतनवाढ (Rule 11(1))
+                    // कनिष्ठ पदावर १ पदोन्नती वेतनवाढ (Rule 11(1))
                     let currIdx = cellsLower.indexOf(currentBasic);
                     if (currIdx === -1) {
                         currIdx = Math.max(0, currentMatrixIndex);
@@ -2206,6 +2237,12 @@
                 let b = ev.data;
                 currentCommission = b.commission;
 
+                // तात्पुरते कनिष्ठ पदाचे मूळ रेकॉर्ड सुरक्षित ठेवणे
+                b.savedLowerLevel = currentLevel;
+                b.savedLowerIndex = currentMatrixIndex;
+                b.savedLowerBasic = currentBasic;
+                b.savedLowerGP = currentGP;
+
                 lowerLevel = currentLevel;
                 lowerMatrixIndex = currentMatrixIndex;
                 lowerBasic = currentBasic;
@@ -2215,6 +2252,7 @@
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
 
+                    // तात्पुरती निश्चिती: वरिष्ठ पदातील समान किंवा किमान टप्प्यावर ठेवणे
                     let fitTemp = fitInMatrix(targetLvl, currentBasic);
                     currentLevel = fitTemp.level;
                     currentBasic = fitTemp.basic;
@@ -2238,26 +2276,31 @@
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             // =========================================================================
-            // 🔹 पद्धत २ (भाग ब): विकल्पाच्या दिनांकास वेतन निश्चिती (वार्षिक वाढ + पदोन्नती वाढ)
+            // 🔹 पद्धत २ (भाग ब): विकल्पाच्या दिनांकास अंतिम वेतन निश्चिती (एकच सलग नोंद)
             // =========================================================================
             else if (ev.type === 'BENEFIT_OPTION_DNI') {
                 let b = ev.data;
                 currentCommission = b.commission;
 
+                let lLevel = b.savedLowerLevel || lowerLevel;
+                let lIndex = (b.savedLowerIndex !== undefined && b.savedLowerIndex !== -1) ? b.savedLowerIndex : lowerMatrixIndex;
+                let lBasic = b.savedLowerBasic || lowerBasic;
+                let lGP = b.savedLowerGP || lowerGP;
+
                 if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
 
-                    let cellsLower = fullPayMatrix7th[lowerLevel] || fullPayMatrix7th["S-6"];
+                    let cellsLower = fullPayMatrix7th[lLevel] || fullPayMatrix7th["S-6"];
 
                     // १. कनिष्ठ पदावर नियमित वार्षिक वेतनवाढ (१ ला टप्पा खाली)
-                    lowerMatrixIndex++;
+                    let notionalIdx = lIndex + 1;
                     // २. कनिष्ठ पदावरच नियम ११(१) ची पदोन्नती वेतनवाढ (२ रा टप्पा खाली)
-                    lowerMatrixIndex++;
+                    notionalIdx = notionalIdx + 1;
 
-                    let notionalPay = cellsLower[Math.min(lowerMatrixIndex, cellsLower.length - 1)];
+                    let notionalPay = cellsLower[Math.min(notionalIdx, cellsLower.length - 1)];
 
-                    // ३. वरिष्ठ पदात (S-8) अंतिम वेतन निश्चिती
+                    // ३. वरिष्ठ पदात अंतिम वेतन निश्चिती
                     let fitFinal = fitInMatrix(targetLvl, notionalPay);
                     currentLevel = fitFinal.level;
                     currentBasic = fitFinal.basic;
@@ -2266,10 +2309,12 @@
                     let targetCells = fullPayMatrix7th[currentLevel];
                     currentScaleLabel = `${currentLevel} (${targetCells[0]} - ${targetCells[targetCells.length - 1]})`;
                 } else if (currentCommission === '6th') {
-                    let inc1 = Math.ceil(((lowerBasic + lowerGP) * 0.03) / 10) * 10;
-                    let b1 = lowerBasic + inc1;
+                    // १. कनिष्ठ पदावर नियमित वाढ
+                    let inc1 = Math.ceil(((lBasic + lGP) * 0.03) / 10) * 10;
+                    let b1 = lBasic + inc1;
 
-                    let inc2 = Math.ceil(((b1 + lowerGP) * 0.03) / 10) * 10;
+                    // २. कनिष्ठ पदावर पदोन्नती वाढ (Rule 11(1))
+                    let inc2 = Math.ceil(((b1 + lGP) * 0.03) / 10) * 10;
                     currentBasic = b1 + inc2;
 
                     let gpMatch = b.scale.match(/GP\s*(\d+)/i);
@@ -2281,8 +2326,8 @@
                     currentScaleLabel = b.scale.split(' - ')[0] || b.scale;
                 } else {
                     let stages = parsePayScaleStages(b.scale, currentCommission);
-                    let inc = (currentCommission === '5th') ? 200 : 60;
-                    let target = lowerBasic + inc;
+                    let inc = (currentCommission === '5th') ? 200 : 60; // २ वाढी
+                    let target = lBasic + inc;
                     let found = stages.find(s => s >= target);
                     currentBasic = found ? found : target;
                     currentScaleLabel = b.scale.split(' - ')[0] || b.scale;
@@ -2299,9 +2344,6 @@
             // 🔹 नियमित वार्षिक वेतनवाढ
             // =========================================================================
             else if (ev.type === 'ANNUAL_INC') {
-                let isOptDay = activeBenefits.some(b => b.optDate.getTime() === ev.date.getTime() && b.optDate.getTime() !== b.date.getTime());
-                if (isOptDay) return;
-
                 if (currentCommission === '7th') {
                     const cells = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
                     if (currentMatrixIndex >= 0 && currentMatrixIndex < cells.length - 1) {
