@@ -117,55 +117,45 @@
             font-weight: bold;
         }
 
-        /* नवीन आकर्षक पदोन्नती / MACP कार्ड */
+        /* पदोन्नती / MACP ३-कॉलम कॉम्पॅक्ट कार्ड */
         .benefit-card {
-            background: #f1f8e9;
+            background: #f9fbf9;
             border: 1.5px solid #81c784;
             border-radius: 6px;
             padding: 10px;
-            margin: 10px 0 12px 0;
-            box-shadow: 0 2px 6px rgba(46, 125, 50, 0.1);
+            margin: 8px 0 12px 0;
+            box-shadow: 0 2px 5px rgba(46, 125, 50, 0.08);
         }
         .benefit-card-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             color: #1b5e20;
             margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
             border-bottom: 1px dashed #a5d6a7;
-            padding-bottom: 4px;
+            padding-bottom: 3px;
         }
-        .card-row {
+        .row-three-cols {
             display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 5px;
+            margin-bottom: 6px;
         }
-        .card-col {
+        .row-three-cols:last-child {
+            margin-bottom: 0;
+        }
+        .row-three-cols input, .row-three-cols select {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .card-col label {
+            min-width: 0;
+            padding: 7px 5px;
             font-size: 11px;
-            font-weight: bold;
-            color: #2e7d32;
-        }
-        .card-col input, .card-col select {
-            width: 100%;
-            border: 1px solid #81c784;
-            background: #ffffff;
+            border: 1px solid #a5d6a7;
             border-radius: 4px;
-            padding: 6px 8px;
-            font-size: 12px;
-            font-weight: 500;
+            background-color: #fff;
+            box-sizing: border-box;
         }
-        .card-col input:focus, .card-col select:focus {
+        .row-three-cols input:focus, .row-three-cols select:focus {
             border-color: #2e7d32;
             outline: none;
-            box-shadow: 0 0 4px rgba(46, 125, 50, 0.3);
+            background-color: #f1f8e9;
         }
 
         .date-range-container {
@@ -398,69 +388,51 @@
             </select>
         </div>
 
-        <!-- पदोन्नती विभाग (सुंदर डिझाइन: दोन बॉक्स - पदोन्नती टप्पा आणि दिनांक) -->
+        <!-- पदोन्नती विभाग (सुबक ३-३ बॉक्स डिझाइन - नो लेबल्स, फक्त प्लेसहोल्डर्स) -->
         <div id="promotionCard" class="benefit-card hidden">
-            <div class="benefit-card-title">🎖️ पदोन्नती तपशील व दिनांक</div>
+            <div class="benefit-card-title">🎖️ पदोन्नती तपशील (Promotion Details)</div>
             
-            <!-- पहिली/दुसरी/तिसरी/चौथी पदोन्नती आणि दिनांक चे २ बॉक्सेस -->
-            <div class="card-row">
-                <div class="card-col">
-                    <label for="promoPhaseSelect">पदोन्नती टप्पा निवडा:</label>
-                    <select id="promoPhaseSelect">
-                        <option value="पहिली पदोन्नती" selected>पहिली पदोन्नती</option>
-                        <option value="दुसरी पदोन्नती">दुसरी पदोन्नती</option>
-                        <option value="तिसरी पदोन्नती">तिसरी पदोन्नती</option>
-                        <option value="चौथी पदोन्नती">चौथी पदोन्नती</option>
-                    </select>
-                </div>
-                <div class="card-col">
-                    <label for="promoDateInput">पदोन्नती दिनांक:</label>
-                    <input type="date" id="promoDateInput" onclick="openPicker(this)" onchange="syncPromoOptionDate()">
-                </div>
+            <!-- ओळ १: ३ बॉक्सेस (टप्पा, पदोन्नती दिनांक, विकल्प दिनांक) -->
+            <div class="row-three-cols">
+                <select id="promoPhaseSelect" title="पदोन्नती टप्पा निवडा">
+                    <option value="पहिली पदोन्नती" selected>पहिली पदोन्नती</option>
+                    <option value="दुसरी पदोन्नती">दुसरी पदोन्नती</option>
+                    <option value="तिसरी पदोन्नती">तिसरी पदोन्नती</option>
+                    <option value="चौथी पदोन्नती">चौथी पदोन्नती</option>
+                </select>
+                <input type="date" id="promoDateInput" onclick="openPicker(this)" onchange="onPromoDateChange()" placeholder="पदोन्नती दिनांक" title="पदोन्नती दिनांक निवडा">
+                <input type="date" id="promoOptionDateInput" onclick="openPicker(this)" placeholder="विकल्पाचा दिनांक" title="विकल्प दिनांक निवडा">
             </div>
 
-            <!-- पदोन्नतीचे पद आणि मंजूर वरिष्ठ वेतन स्तर -->
-            <div class="card-row" style="margin-bottom: 0;">
-                <div class="card-col">
-                    <label for="promoDesignationInput">पदोन्नतीचे पद:</label>
-                    <input type="text" id="promoDesignationInput" placeholder="उदा. वरिष्ठ लिपिक / उपअभियंता">
-                </div>
-                <div class="card-col">
-                    <label for="promotionalLevelPromo">मंजूर वरिष्ठ वेतन स्तर:</label>
-                    <select id="promotionalLevelPromo"></select>
-                </div>
+            <!-- ओळ २: ३ बॉक्सेस (पदोन्नती वेतन आयोग, पदोन्नतीचे पद, मंजूर वेतनश्रेणी/स्तर) -->
+            <div class="row-three-cols">
+                <select id="promoCommissionSelect" onchange="updatePromoScalesList()" title="पदोन्नती वेतन आयोग">
+                    <option value="4th">४था वेतन आयोग</option>
+                    <option value="5th">५वा वेतन आयोग</option>
+                    <option value="6th">६वा वेतन आयोग</option>
+                    <option value="7th">७वा वेतन आयोग</option>
+                </select>
+                <input type="text" id="promoDesignationInput" placeholder="पदोन्नतीचे पद" title="पदोन्नतीचे पद लिहा">
+                <input type="text" id="promotionalScaleInput" list="promoScaleDatalist" placeholder="मंजूर वेतनश्रेणी / स्तर" title="मंजूर वेतनश्रेणी निवडा किंवा लिहा">
+                <datalist id="promoScaleDatalist"></datalist>
             </div>
         </div>
 
-        <!-- MACP विभाग (MACP निवडल्यास २ बॉक्सेस) -->
+        <!-- MACP विभाग (३-३ बॉक्सेस) -->
         <div id="macpCard" class="benefit-card hidden">
             <div class="benefit-card-title">⭐ आश्वासित प्रगती योजना (MACP) तपशील</div>
-            <div class="card-row">
-                <div class="card-col">
-                    <label for="macpPhase">MACP लाभ टप्पा:</label>
-                    <select id="macpPhase">
-                        <option value="पहिला लाभ (1st MACP)" selected>पहिला लाभ (1st MACP)</option>
-                        <option value="दुसरा लाभ (2nd MACP)">दुसरा लाभ (2nd MACP)</option>
-                        <option value="तिसरा लाभ (3rd MACP)">तिसरा लाभ (3rd MACP)</option>
-                    </select>
-                </div>
-                <div class="card-col">
-                    <label for="macpDateInput">लाभाचा दिनांक:</label>
-                    <input type="date" id="macpDateInput" onclick="openPicker(this)" onchange="syncMacpOptionDate()">
-                </div>
+            <div class="row-three-cols">
+                <select id="macpPhase" title="MACP लाभ टप्पा">
+                    <option value="पहिला लाभ (1st MACP)" selected>पहिला लाभ (1st MACP)</option>
+                    <option value="दुसरा लाभ (2nd MACP)">दुसरा लाभ (2nd MACP)</option>
+                    <option value="तिसरा लाभ (3rd MACP)">तिसरा लाभ (3rd MACP)</option>
+                </select>
+                <input type="date" id="macpDateInput" onclick="openPicker(this)" onchange="syncMacpOptionDate()" placeholder="लाभाचा दिनांक" title="लाभाचा दिनांक">
+                <input type="date" id="macpOptionDateInput" onclick="openPicker(this)" placeholder="विकल्पाचा दिनांक" title="विकल्प दिनांक">
             </div>
-            <div class="card-row" style="margin-bottom: 0;">
-                <div class="card-col">
-                    <label for="promotionalLevelMacp">मंजूर वरिष्ठ वेतन स्तर:</label>
-                    <select id="promotionalLevelMacp"></select>
-                </div>
+            <div class="row-three-cols">
+                <select id="promotionalLevelMacp" title="मंजूर वरिष्ठ वेतन स्तर" style="flex: 1;"></select>
             </div>
-        </div>
-
-        <!-- विकल्पाचा दिनांक -->
-        <div class="form-group hidden" id="optionDateGroup">
-            <label for="optionDate">विकल्पाचा दिनांक (Option Date):</label>
-            <input type="date" id="optionDate" onclick="openPicker(this)">
         </div>
 
         <!-- १०. कालावधी दिनांक -->
@@ -476,7 +448,7 @@
         <div class="form-group">
             <label for="autoCommissionChange">११. पुढील आयोग लागू करायचे का?</label>
             <select id="autoCommissionChange">
-                <option value="Yes" selected>होय (७वा आयोग लागू करा)</option>
+                <option value="Yes" selected>होय (कालावधीनुसार पुढील आयोग लागू करा)</option>
                 <option value="No">नाही</option>
             </select>
         </div>
@@ -602,17 +574,38 @@
         }
     }
 
-    function syncPromoOptionDate() {
-        const pDate = document.getElementById('promoDateInput').value;
-        if (pDate && !document.getElementById('optionDate').value) {
-            document.getElementById('optionDate').value = pDate;
+    // पदोन्नती दिनांकानुसार वेतन आयोगाची स्वयंचलित निवड
+    function onPromoDateChange() {
+        const pDateVal = document.getElementById('promoDateInput').value;
+        if (!pDateVal) return;
+
+        const optInput = document.getElementById('promoOptionDateInput');
+        if (!optInput.value) {
+            optInput.value = pDateVal;
         }
+
+        const pDate = new Date(pDateVal);
+        const promoCommSelect = document.getElementById('promoCommissionSelect');
+
+        // तारखेनुसार वेतन आयोग ठरवणे
+        if (pDate < new Date("1996-01-01")) {
+            promoCommSelect.value = "4th";
+        } else if (pDate >= new Date("1996-01-01") && pDate < new Date("2006-01-01")) {
+            promoCommSelect.value = "5th";
+        } else if (pDate >= new Date("2006-01-01") && pDate < new Date("2016-01-01")) {
+            promoCommSelect.value = "6th";
+        } else {
+            promoCommSelect.value = "7th";
+        }
+
+        updatePromoScalesList();
     }
 
     function syncMacpOptionDate() {
         const mDate = document.getElementById('macpDateInput').value;
-        if (mDate && !document.getElementById('optionDate').value) {
-            document.getElementById('optionDate').value = mDate;
+        const optInput = document.getElementById('macpOptionDateInput');
+        if (mDate && !optInput.value) {
+            optInput.value = mDate;
         }
     }
 
@@ -620,20 +613,55 @@
         const benefit = document.getElementById('benefitType').value;
         const promoCard = document.getElementById('promotionCard');
         const macpCard = document.getElementById('macpCard');
-        const optionDateGroup = document.getElementById('optionDateGroup');
 
         if (benefit === 'Promotion') {
             promoCard.classList.remove('hidden');
             macpCard.classList.add('hidden');
-            optionDateGroup.classList.remove('hidden');
+            updatePromoScalesList();
         } else if (benefit === 'MACP') {
             macpCard.classList.remove('hidden');
             promoCard.classList.add('hidden');
-            optionDateGroup.classList.remove('hidden');
         } else {
             promoCard.classList.add('hidden');
             macpCard.classList.add('hidden');
-            optionDateGroup.classList.add('hidden');
+        }
+    }
+
+    // वेतन आयोगानुसार पदोन्नती वेतनश्रेण्या लोड करणे
+    function updatePromoScalesList() {
+        const comm = document.getElementById('promoCommissionSelect').value;
+        const datalist = document.getElementById('promoScaleDatalist');
+        const input = document.getElementById('promotionalScaleInput');
+        datalist.innerHTML = "";
+
+        let scales = [];
+        if (comm === '4th') {
+            scales = payScales4th;
+            input.placeholder = "४थ्या आयोगाची वेतनश्रेणी निवडा";
+        } else if (comm === '5th') {
+            scales = payScales5th;
+            input.placeholder = "५व्या आयोगाची वेतनश्रेणी निवडा";
+        } else if (comm === '6th') {
+            scales = payScales6th;
+            input.placeholder = "६व्या आयोगाची वेतनश्रेणी निवडा";
+        } else {
+            scales = Object.values(level7thStartPay).map(v => v.desc);
+            input.placeholder = "७व्या आयोगातील स्तर निवडा";
+        }
+
+        scales.forEach(s => {
+            let opt = document.createElement('option');
+            opt.value = s;
+            datalist.appendChild(opt);
+        });
+
+        // डीफॉल्ट वरिष्ठ पद श्रेणी सुचवणे
+        if (comm === '5th' && !input.value) {
+            input.value = "रु. 4000 - 100 - 6000 (वरिष्ठ लिपिक)";
+        } else if (comm === '4th' && !input.value) {
+            input.value = "रु. 1200 - 30 - 1560 - EB - 40 - 2040 (वरिष्ठ लिपिक)";
+        } else if (comm === '7th' && !input.value) {
+            input.value = "S-8 (25500 - 81100) - वरिष्ठ लिपिक";
         }
     }
 
@@ -652,10 +680,7 @@
         "रु. 2200 - 75 - 2800 - EB - 100 - 4000 (सहाय्यक अभियंता श्रेणी-१ / AE-1)",
         "रु. 3000 - 100 - 3500 - 125 - 4500 (कार्यकारी अभियंता / EE)",
         "रु. 3700 - 125 - 4700 - 150 - 5000 (अधीक्षक अभियंता / SE)",
-        "रु. 4500 - 150 - 5700 (मुख्य अभियंता / CE)",
-        "रु. 5100 - 150 - 5700 - 200 - 6700 (सचिव / Secretary)",
-        "रु. 5900 - 200 - 6700 (अप्पर मुख्य सचिव)",
-        "रु. 7300 - 100 - 7600 (मुख्य सचिव / CS)"
+        "रु. 4500 - 150 - 5700 (मुख्य अभियंता / CE)"
     ];
 
     const payScales5th = [
@@ -673,63 +698,30 @@
         "रु. 8000 - 275 - 13500 (सहाय्यक अभियंता श्रेणी-१ / AE-1)",
         "रु. 10000 - 325 - 15200 (कार्यकारी अभियंता / EE)",
         "रु. 12000 - 375 - 16500 (अधीक्षक अभियंता / SE)",
-        "रु. 14300 - 400 - 18300 (मुख्य अभियंता / CE)",
-        "रु. 16400 - 450 - 20000 (सचिव / Secretary)",
-        "रु. 22400 - 525 - 24500 (मुख्य सचिव / CS)"
+        "रु. 14300 - 400 - 18300 (मुख्य अभियंता / CE)"
     ];
 
     const payScales6th = [
         "PB-1 : 4440 - 7440 (GP 1300) - शिपाई",
-        "PB-1 : 4440 - 7440 (GP 1400) - नाईक",
-        "PB-1 : 4440 - 7440 (GP 1600) - दफ्तरी",
-        "PB-1 : 4440 - 7440 (GP 1650) - जमादार",
         "PB-1 : 5200 - 20200 (GP 1900) - कनिष्ठ लिपिक",
-        "PB-1 : 5200 - 20200 (GP 2400) - वरिष्ठ लिपिक / वाहनचालक",
+        "PB-1 : 5200 - 20200 (GP 2400) - वरिष्ठ लिपिक",
         "PB-1 : 5200 - 20200 (GP 2800) - मुख्य लिपिक",
         "PB-2 : 9300 - 34800 (GP 4200) - शाखा अभियंता (JE)",
-        "PB-2 : 9300 - 34800 (GP 4300) - वरिष्ठ शाखा अभियंता",
-        "PB-2 : 9300 - 34800 (GP 4400) - सहाय्यक अधीक्षक",
-        "PB-2 : 9300 - 34800 (GP 4600) - प्रशासनिक अधिकारी",
         "PB-2 : 9300 - 34800 (GP 5400) - उपअभियंता (AE-2)",
-        "PB-3 : 15600 - 39100 (GP 5400) - सहाय्यक अभियंता श्रेणी-१ (AE-1)",
         "PB-3 : 15600 - 39100 (GP 6600) - कार्यकारी अभियंता (EE)",
-        "PB-3 : 15600 - 39100 (GP 7600) - वरिष्ठ कार्यकारी अभियंता",
-        "PB-4 : 37400 - 67000 (GP 8700) - अधीक्षक अभियंता (SE)",
-        "PB-4 : 37400 - 67000 (GP 8900) - सह मुख्य अभियंता",
-        "PB-4 : 37400 - 67000 (GP 10000) - मुख्य अभियंता (CE)",
-        "PB-4 : 37400 - 67000 (GP 12000) - सचिव (Secretary)"
+        "PB-4 : 37400 - 67000 (GP 8700) - अधीक्षक अभियंता (SE)"
     ];
 
     const level7thStartPay = {
         "S-1": { start: 15000, max: 47600, desc: "S-1 (15000 - 47600) - शिपाई / चतुर्थश्रेणी" },
-        "S-2": { start: 15700, max: 50000, desc: "S-2 (15700 - 50000) - नाईक" },
-        "S-3": { start: 16600, max: 52400, desc: "S-3 (16600 - 52400) - दफ्तरी" },
-        "S-4": { start: 17300, max: 54900, desc: "S-4 (17300 - 54900) - जमादार" },
-        "S-5": { start: 18000, max: 56900, desc: "S-5 (18000 - 56900)" },
         "S-6": { start: 19900, max: 63200, desc: "S-6 (19900 - 63200) - कनिष्ठ लिपिक" },
-        "S-7": { start: 21700, max: 69100, desc: "S-7 (21700 - 69100) - वाहनचालक" },
         "S-8": { start: 25500, max: 81100, desc: "S-8 (25500 - 81100) - वरिष्ठ लिपिक" },
-        "S-9": { start: 27600, max: 87400, desc: "S-9 (27600 - 87400)" },
         "S-10": { start: 29200, max: 92300, desc: "S-10 (29200 - 92300) - मुख्य लिपिक" },
-        "S-11": { start: 30100, max: 95100, desc: "S-11 (30100 - 95100)" },
-        "S-12": { start: 32000, max: 101600, desc: "S-12 (32000 - 101600)" },
         "S-13": { start: 35400, max: 112400, desc: "S-13 (35400 - 112400) - शाखा अभियंता (JE)" },
-        "S-14": { start: 38600, max: 122800, desc: "S-14 (38600 - 122800)" },
         "S-15": { start: 41800, max: 132300, desc: "S-15 (41800 - 132300) - उपअभियंता (AE-2)" },
-        "S-16": { start: 44900, max: 142400, desc: "S-16 (44900 - 142400)" },
-        "S-17": { start: 47600, max: 151100, desc: "S-17 (47600 - 151100)" },
-        "S-18": { start: 50400, max: 159900, desc: "S-18 (50400 - 159900)" },
-        "S-19": { start: 53100, max: 167800, desc: "S-19 (53100 - 167800)" },
         "S-20": { start: 56100, max: 177500, desc: "S-20 (56100 - 177500) - उपअभियंता (AE-1)" },
-        "S-21": { start: 60900, max: 192900, desc: "S-21 (60900 - 192900)" },
-        "S-22": { start: 64100, max: 203100, desc: "S-22 (64100 - 203100)" },
         "S-23": { start: 67700, max: 208700, desc: "S-23 (67700 - 208700) - कार्यकारी अभियंता (EE)" },
-        "S-24": { start: 78800, max: 209200, desc: "S-24 (78800 - 209200)" },
-        "S-25": { start: 118500, max: 214100, desc: "S-25 (118500 - 214100)" },
         "S-26": { start: 123100, max: 215900, desc: "S-26 (123100 - 215900) - अधीक्षक अभियंता (SE)" },
-        "S-27": { start: 127100, max: 216300, desc: "S-27 (127100 - 216300)" },
-        "S-28": { start: 131100, max: 216600, desc: "S-28 (131100 - 216600)" },
-        "S-29": { start: 135100, max: 217100, desc: "S-29 (135100 - 217100)" },
         "S-30": { start: 144200, max: 218200, desc: "S-30 (144200 - 218200) - मुख्य अभियंता (CE)" },
         "S-31": { start: 182200, max: 224100, desc: "S-31 (182200 - 224100) - सचिव (Secretary)" }
     };
@@ -742,12 +734,10 @@
 
     function populate7thLevelDropdowns() {
         const initSelect = document.getElementById('initial7thLevel');
-        const promoSelect1 = document.getElementById('promotionalLevelPromo');
-        const promoSelect2 = document.getElementById('promotionalLevelMacp');
+        const promoSelectMacp = document.getElementById('promotionalLevelMacp');
         
         initSelect.innerHTML = "";
-        promoSelect1.innerHTML = "";
-        promoSelect2.innerHTML = "";
+        promoSelectMacp.innerHTML = "";
 
         for (const [key, val] of Object.entries(level7thStartPay)) {
             let opt1 = document.createElement('option');
@@ -760,13 +750,7 @@
             opt2.value = key;
             opt2.textContent = val.desc;
             if (key === "S-8") opt2.selected = true;
-            promoSelect1.appendChild(opt2);
-
-            let opt3 = document.createElement('option');
-            opt3.value = key;
-            opt3.textContent = val.desc;
-            if (key === "S-8") opt3.selected = true;
-            promoSelect2.appendChild(opt3);
+            promoSelectMacp.appendChild(opt2);
         }
     }
 
@@ -1030,20 +1014,24 @@
         let benefitPhase = "";
         let benefitPost = "";
         let benefitDateInput = "";
-        let promoLevel = "";
+        let optionDateInput = "";
+        let promoScaleOrLevel = "";
+        let promoCommission = "";
 
         if (benefit === 'Promotion') {
             benefitPhase = document.getElementById('promoPhaseSelect').value;
-            benefitPost = document.getElementById('promoDesignationInput').value.trim() || "वरिष्ठ पद";
             benefitDateInput = document.getElementById('promoDateInput').value;
-            promoLevel = document.getElementById('promotionalLevelPromo').value;
+            optionDateInput = document.getElementById('promoOptionDateInput').value || benefitDateInput;
+            promoCommission = document.getElementById('promoCommissionSelect').value;
+            benefitPost = document.getElementById('promoDesignationInput').value.trim() || "वरिष्ठ पद";
+            promoScaleOrLevel = document.getElementById('promotionalScaleInput').value;
         } else if (benefit === 'MACP') {
             benefitPhase = document.getElementById('macpPhase').value;
             benefitDateInput = document.getElementById('macpDateInput').value;
-            promoLevel = document.getElementById('promotionalLevelMacp').value;
+            optionDateInput = document.getElementById('macpOptionDateInput').value || benefitDateInput;
+            promoScaleOrLevel = document.getElementById('promotionalLevelMacp').value;
         }
 
-        const optionDateInput = document.getElementById('optionDate').value;
         const fromDateInput = document.getElementById('fixationFrom').value;
         const toDateInput = document.getElementById('fixationTo').value;
         const autoUpgrade = document.getElementById('autoCommissionChange').value === 'Yes';
@@ -1054,8 +1042,11 @@
         const toDateFormatted = formatDateToDDMMYYYY(toDateInput);
 
         let benefitLabel = "कोणताही नाही";
-        if (benefit === 'Promotion') benefitLabel = `${benefitPhase} (${benefitPost} - मंजूर स्तर: ${promoLevel})`;
-        else if (benefit === 'MACP') benefitLabel = `${benefitPhase} (मंजूर वरिष्ठ वेतन स्तर: ${promoLevel})`;
+        if (benefit === 'Promotion') {
+            benefitLabel = `${benefitPhase} (${benefitPost} - ${promoCommission} आयोग: ${promoScaleOrLevel})`;
+        } else if (benefit === 'MACP') {
+            benefitLabel = `${benefitPhase} (मंजूर वरिष्ठ वेतन स्तर: ${promoScaleOrLevel})`;
+        }
 
         const summaryHtml = `
             <div><b>कर्मचाऱ्याचे नाव:</b> ${name}</div>
@@ -1079,6 +1070,7 @@
         let startDate = new Date(fromDateInput);
         let endDate = new Date(toDateInput);
 
+        // १. नियुक्ती / सुरुवातीची नोंद
         events.push({
             date: new Date(fromDateInput),
             dateStr: fromDateFormatted,
@@ -1086,7 +1078,34 @@
             desc: 'मूळ वेतन निश्चिती / रुजू'
         });
 
-        if (autoUpgrade && startCommission === '6th') {
+        // २. ५वा वेतन आयोग सुधारणा (01-01-1996)
+        if (autoUpgrade && startCommission === '4th') {
+            let c5Date = new Date("1996-01-01");
+            if (c5Date >= startDate && c5Date <= endDate) {
+                events.push({
+                    date: c5Date,
+                    dateStr: "01-01-1996",
+                    type: 'COMMISSION_5TH',
+                    desc: '५वा वेतन आयोग सुधारणा'
+                });
+            }
+        }
+
+        // ३. ६वा वेतन आयोग सुधारणा (01-01-2006)
+        if (autoUpgrade && (startCommission === '4th' || startCommission === '5th')) {
+            let c6Date = new Date("2006-01-01");
+            if (c6Date >= startDate && c6Date <= endDate) {
+                events.push({
+                    date: c6Date,
+                    dateStr: "01-01-2006",
+                    type: 'COMMISSION_6TH',
+                    desc: '६वा वेतन आयोग सुधारणा'
+                });
+            }
+        }
+
+        // ४. ७वा वेतन आयोग सुधारणा (01-01-2016)
+        if (autoUpgrade && (startCommission === '4th' || startCommission === '5th' || startCommission === '6th')) {
             let c7Date = new Date("2016-01-01");
             if (c7Date >= startDate && c7Date <= endDate) {
                 events.push({
@@ -1098,6 +1117,7 @@
             }
         }
 
+        // ५. वार्षिक नियमित वेतनवाढी
         let startYr = startDate.getFullYear();
         let endYr = endDate.getFullYear();
         for (let yr = startYr; yr <= endYr; yr++) {
@@ -1112,6 +1132,7 @@
             }
         }
 
+        // ६. लाभ आणि विकल्प इव्हेंट
         let bDate = benefitDateInput ? new Date(benefitDateInput) : null;
         let optDate = optionDateInput ? new Date(optionDateInput) : (bDate ? bDate : null);
 
@@ -1123,20 +1144,20 @@
                     date: bDate,
                     dateStr: formatDateToDDMMYYYY(benefitDateInput),
                     type: 'BENEFIT_SAME_DAY',
-                    desc: `${eventTitle} (विकल्पानुसार ${promoLevel} फिक्सेशन)`
+                    desc: `${eventTitle} (वेतन निश्चिती)`
                 });
             } else if (optDate && optDate > bDate && optDate <= endDate) {
                 events.push({
                     date: bDate,
                     dateStr: formatDateToDDMMYYYY(benefitDateInput),
                     type: 'BENEFIT_GRANTED',
-                    desc: `${eventTitle} मंजूर (विकल्पापर्यंत ${initialLevel} मध्ये वेतन चालू)`
+                    desc: `${eventTitle} मंजूर (विकल्पापर्यंत मूळ पदावर वेतन चालू)`
                 });
                 events.push({
                     date: optDate,
                     dateStr: formatDateToDDMMYYYY(optionDateInput),
                     type: 'OPTION_DNI',
-                    desc: `नियम ११(१) विकल्पानुसार वेतन निश्चिती (${promoLevel} फिक्सेशन)`
+                    desc: `नियम ११(१) विकल्पानुसार वेतन निश्चिती (${eventTitle})`
                 });
             }
         }
@@ -1155,6 +1176,20 @@
             if (ev.type === 'INITIAL') {
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
+            else if (ev.type === 'COMMISSION_5TH') {
+                currentCommission = '5th';
+                currentBasic = Math.round(currentBasic * 2.3);
+                currentGP = 0;
+                currentScaleLabel = "५वा आयोग सुधारित";
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+            }
+            else if (ev.type === 'COMMISSION_6TH') {
+                currentCommission = '6th';
+                currentBasic = Math.round((currentBasic * 1.86) / 10) * 10;
+                currentGP = gradePay > 0 ? gradePay : 1900;
+                currentScaleLabel = "PB-1 : 5200 - 20200";
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+            }
             else if (ev.type === 'COMMISSION_7TH') {
                 currentCommission = '7th';
                 let totalBefore7th = currentBasic + currentGP;
@@ -1165,32 +1200,45 @@
                 currentScaleLabel = `${currentLevel} (${fullPayMatrix7th[currentLevel][0]} - ${fullPayMatrix7th[currentLevel][fullPayMatrix7th[currentLevel].length - 1]})`;
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
-            else if (ev.type === 'BENEFIT_SAME_DAY') {
-                currentMatrixIndex++;
-                let notionalPay = fullPayMatrix7th[currentLevel][currentMatrixIndex];
-                
-                let fitmentInHigher = fitInMatrix(promoLevel, notionalPay);
-                currentLevel = promoLevel;
-                currentBasic = fitmentInHigher.basic;
-                currentMatrixIndex = fitmentInHigher.index;
-                currentScaleLabel = `${currentLevel} (${fullPayMatrix7th[currentLevel][0]} - ${fullPayMatrix7th[currentLevel][fullPayMatrix7th[currentLevel].length - 1]})`;
+            else if (ev.type === 'BENEFIT_SAME_DAY' || ev.type === 'OPTION_DNI') {
+                // पदोन्नती / MACP निश्चिती
+                if (benefit === 'Promotion') {
+                    currentCommission = promoCommission;
+                    currentScaleLabel = promoScaleOrLevel.split(' - ')[0] || promoScaleOrLevel;
+                }
+
+                if (currentCommission === '7th') {
+                    let lvl = promoScaleOrLevel.includes('S-') ? (promoScaleOrLevel.match(/S-\d+/) || [promoScaleOrLevel])[0] : currentLevel;
+                    currentMatrixIndex++;
+                    let notionalPay = fullPayMatrix7th[currentLevel][currentMatrixIndex];
+                    let fitmentInHigher = fitInMatrix(lvl, notionalPay);
+                    currentLevel = lvl;
+                    currentBasic = fitmentInHigher.basic;
+                    currentMatrixIndex = fitmentInHigher.index;
+                    currentScaleLabel = `${currentLevel} (${fullPayMatrix7th[currentLevel][0]} - ${fullPayMatrix7th[currentLevel][fullPayMatrix7th[currentLevel].length - 1]})`;
+                } else if (currentCommission === '6th') {
+                    let inc = Math.round(((currentBasic + currentGP) * 0.03) / 10) * 10;
+                    currentBasic += inc;
+                    if (promoScaleOrLevel.includes('GP')) {
+                        let gpMatch = promoScaleOrLevel.match(/GP\s*(\d+)/);
+                        if (gpMatch) currentGP = parseInt(gpMatch[1]);
+                    }
+                } else {
+                    // ४था किंवा ५वा आयोग (१ वेतनवाढ + वरिष्ठ श्रेणीतील पुढील स्टेज)
+                    let stages = parsePayScaleStages(promoScaleOrLevel, currentCommission);
+                    let inc = (currentCommission === '5th') ? 100 : 30;
+                    let target = currentBasic + inc;
+                    if (stages.length > 0) {
+                        let found = stages.find(s => s >= target);
+                        currentBasic = found ? found : target;
+                    } else {
+                        currentBasic = target;
+                    }
+                }
 
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'BENEFIT_GRANTED') {
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
-            }
-            else if (ev.type === 'OPTION_DNI') {
-                currentMatrixIndex++;
-                currentMatrixIndex++;
-                let notionalPay = fullPayMatrix7th[currentLevel][currentMatrixIndex];
-
-                let fitmentInHigher = fitInMatrix(promoLevel, notionalPay);
-                currentLevel = promoLevel;
-                currentBasic = fitmentInHigher.basic;
-                currentMatrixIndex = fitmentInHigher.index;
-                currentScaleLabel = `${currentLevel} (${fullPayMatrix7th[currentLevel][0]} - ${fullPayMatrix7th[currentLevel][fullPayMatrix7th[currentLevel].length - 1]})`;
-
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'ANNUAL_INC') {
@@ -1202,12 +1250,15 @@
                         currentMatrixIndex++;
                         currentBasic = cells[currentMatrixIndex];
                     }
-                } else {
+                } else if (currentCommission === '6th') {
                     let inc = Math.round(((currentBasic + currentGP) * 0.03) / 10) * 10;
+                    currentBasic += inc;
+                } else {
+                    let inc = (currentCommission === '5th') ? 100 : 30;
                     currentBasic += inc;
                 }
 
-                let incDesc = `नियमित वार्षिक वेतनवाढ (${currentLevel})`;
+                let incDesc = `नियमित वार्षिक वेतनवाढ (${currentScaleLabel})`;
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, incDesc, currentBasic, currentGP);
             }
         });
