@@ -3,141 +3,457 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>महागाई भत्ता (DA) दर तक्ता - महाराष्ट्र शासन</title>
+    <title>महाराष्ट्र शासन - वेतन आयोगनिहाय महागाई भत्ता (DA) तक्ता</title>
     <style>
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #0d47a1;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #dcdcdc;
+        }
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
             margin: 0;
             padding: 20px;
-            color: #333;
+            color: var(--text-color);
         }
         .container {
-            max-width: 850px;
+            max-width: 1000px;
             margin: auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            padding: 25px 30px 30px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
-        h2 {
-            text-align: center;
-            color: #1a73e8;
+        
+        /* Top Navigation Header Bar */
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 25px;
-            line-height: 1.4;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 15px;
         }
+        .btn-back {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.3s;
+        }
+        .btn-back:hover {
+            background-color: #218838;
+        }
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 0;
+            text-align: center;
+            flex-grow: 1;
+        }
+        .btn-close {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            width: 38px;
+            height: 38px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        .btn-close:hover {
+            background-color: #c82333;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+            margin-top: -10px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background-color: #e0e0e0;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 8px rgba(26,115,232,0.3);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Tables */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
             margin-bottom: 25px;
+            font-size: 15px;
         }
         th, td {
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             padding: 12px;
             text-align: center;
         }
         th {
-            background-color: #1a73e8;
+            background-color: var(--primary-color);
             color: white;
-            font-size: 16px;
+            font-weight: 600;
         }
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #f9fbfd;
         }
         tr:hover {
             background-color: #f1f3f4;
         }
-        .btn-container {
-            text-align: center;
-            margin-top: 25px;
+
+        /* Add Form Section */
+        .form-section {
+            background: #f8f9fa;
+            border: 1px solid #ced4da;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
         }
-        .btn {
-            display: inline-block;
-            background-color: #1a73e8;
+        .form-section h3 {
+            margin-top: 0;
+            color: var(--secondary-color);
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #444;
+        }
+        .form-group input, .form-group select {
+            padding: 9px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn-submit {
+            grid-column: 1 / -1;
+            background-color: #28a745;
             color: white;
-            padding: 12px 25px;
-            text-decoration: none;
-            border-radius: 5px;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
             font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
             transition: background 0.3s;
+            margin-top: 10px;
         }
-        .btn:hover {
-            background-color: #1557b0;
+        .btn-submit:hover {
+            background-color: #218838;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+        .actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .print-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .print-btn:hover {
+            background-color: #5a6268;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>महाराष्ट्र शासन - ७ वा वेतन आयोग<br>महागाई भत्ता (DA) दर तक्ता (जानेवारी २०२२ ते जानेवारी २०२६)</h2>
+    <!-- Header Bar: Back Button (Green), Title (Center), Close Button (Red Cross) -->
+    <div class="header-bar">
+        <a href="index.html" class="btn-back" title="मागे जा">← मागे</a>
+        <h1 class="header-title">महागाई भत्ता</h1>
+        <button class="btn-close" onclick="closePage()" title="बंद करा">✕</button>
+    </div>
     
-    <table>
-        <thead>
-            <tr>
-                <th>अ.क्र.</th>
-                <th>लागू महिना / वर्ष</th>
-                <th>महागाई भत्ता दर (%)</th>
-                <th>शासन निर्णय (GR) दिनांक</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>१</td>
-                <td>जानेवारी २०२२</td>
-                <td>३४%</td>
-                <td>-</td>
-            </tr>
-            <tr>
-                <td>२</td>
-                <td>जुलै २०२२</td>
-                <td>३८%</td>
-                <td>-</td>
-            </tr>
-            <tr>
-                <td>३</td>
-                <td>जानेवारी २०२३</td>
-                <td>४२%</td>
-                <td>-</td>
-            </tr>
-            <tr>
-                <td>४</td>
-                <td>जुलै २०२३</td>
-                <td>४६%</td>
-                <td>-</td>
-            </tr>
-            <tr>
-                <td>५</td>
-                <td>जानेवारी २०२४</td>
-                <td>५०%</td>
-                <td>-</td>
-            </tr>
-            <tr>
-                <td>६</td>
-                <td>जुलै २०२४</td>
-                <td>५३%</td>
-                <td>-</td>
-            </tr>
-            <tr>
-                <td>७</td>
-                <td>जानेवारी २०२५</td>
-                <td>५५% (अपडेट करा)</td>
-                <td>-</td>
-            </tr>
-            <tr>
-                <td>८</td>
-                <td>जानेवारी २०२६</td>
-                <td>५८% (अपडेट करा)</td>
-                <td>-</td>
-            </tr>
-        </tbody>
-    </table>
+    <p class="subtitle">महाराष्ट्र शासन - वेतन आयोगनिहाय महागाई भत्ता (DA) व एरियर्स तक्ता आणि नवीन नोंद करण्याची सुविधा</p>
 
-    <div class="btn-container">
-        <!-- मुख्य डॅशबोर्ड किंवा मुखपृष्ठ लिंक -->
-        <a href="index.html" class="btn">मुखपृष्ठ (Home)</a>
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(event, 'pc7')">७ वा वेतन आयोग</button>
+        <button class="tab-btn" onclick="switchTab(event, 'pc6')">६ वा वेतन आयोग</button>
+        <button class="tab-btn" onclick="switchTab(event, 'pc5')">५ वा वेतन आयोग</button>
+    </div>
+
+    <!-- 7th Pay Commission Tab -->
+    <div id="pc7" class="tab-content active">
+        <h3 style="color: var(--secondary-color);">७ वा वेतन आयोग (दिनांक ०१.०१.२०१६ पासून पुढे)</h3>
+        <table id="table-pc7">
+            <thead>
+                <tr>
+                    <th>अनुक्रमांक</th>
+                    <th>दिनांक पासून - ते दिनांक</th>
+                    <th>Due डीए रेट (%)</th>
+                    <th>Drawn डीए रेट (%)</th>
+                    <th>कृती</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>१</td>
+                    <td>01.01.2022 ते 30.06.2022</td>
+                    <td>34%</td>
+                    <td>31%</td>
+                    <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
+                </tr>
+                <tr>
+                    <td>२</td>
+                    <td>01.07.2022 ते 31.12.2022</td>
+                    <td>38%</td>
+                    <td>34%</td>
+                    <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
+                </tr>
+                <tr>
+                    <td>३</td>
+                    <td>01.01.2023 ते 30.06.2023</td>
+                    <td>42%</td>
+                    <td>38%</td>
+                    <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
+                </tr>
+                <tr>
+                    <td>४</td>
+                    <td>01.07.2023 ते 31.12.2023</td>
+                    <td>46%</td>
+                    <td>42%</td>
+                    <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
+                </tr>
+                <tr>
+                    <td>५</td>
+                    <td>01.01.2024 ते 30.06.2024</td>
+                    <td>50%</td>
+                    <td>46%</td>
+                    <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
+                </tr>
+                <tr>
+                    <td>६</td>
+                    <td>01.07.2024 ते 31.12.2024</td>
+                    <td>53%</td>
+                    <td>50%</td>
+                    <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 6th Pay Commission Tab -->
+    <div id="pc6" class="tab-content">
+        <h3 style="color: var(--secondary-color);">६ वा वेतन आयोग (दिनांक ०१.०१.२००६ ते ३१.१२.२०१५)</h3>
+        <table id="table-pc6">
+            <thead>
+                <tr>
+                    <th>अनुक्रमांक</th>
+                    <th>दिनांक पासून - ते दिनांक</th>
+                    <th>Due डीए रेट (%)</th>
+                    <th>Drawn डीए रेट (%)</th>
+                    <th>कृती</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>१</td>
+                    <td>01.01.2015 ते 31.12.2015</td>
+                    <td>119%</td>
+                    <td>113%</td>
+                    <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
+                </tr>
+                <tr>
+                    <td>२</td>
+                    <td>01.07.2015 ते 31.12.2015</td>
+                    <td>125%</td>
+                    <td>119%</td>
+                    <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 5th Pay Commission Tab -->
+    <div id="pc5" class="tab-content">
+        <h3 style="color: var(--secondary-color);">५ वा वेतन आयोग (Historical / जुने दर)</h3>
+        <table id="table-pc5">
+            <thead>
+                <tr>
+                    <th>अनुक्रमांक</th>
+                    <th>दिनांक पासून - ते दिनांक</th>
+                    <th>Due डीए रेट (%)</th>
+                    <th>Drawn डीए रेट (%)</th>
+                    <th>कृती</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>१</td>
+                    <td>01.01.2005 ते 31.12.2005</td>
+                    <td>223%</td>
+                    <td>211%</td>
+                    <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add New Entry Form -->
+    <div class="form-section">
+        <h3>नवीन डीए दर (शासन निर्णयानुसार) जोडा</h3>
+        <form id="addDaForm" onsubmit="addNewDA(event)">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="commissionSelect">वेतन आयोग निवडा</label>
+                    <select id="commissionSelect" required>
+                        <option value="pc7">७ वा वेतन आयोग</option>
+                        <option value="pc6">६ वा वेतन आयोग</option>
+                        <option value="pc5">५ वा वेतन आयोग</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="periodInput">दिनांक पासून - ते दिनांक</label>
+                    <input type="text" id="periodInput" placeholder="उदा. 01.01.2025 ते 30.06.2025" required>
+                </div>
+                <div class="form-group">
+                    <label for="dueInput">Due डीए रेट (%)</label>
+                    <input type="text" id="dueInput" placeholder="उदा. 55%" required>
+                </div>
+                <div class="form-group">
+                    <label for="drawnInput">Drawn डीए रेट (%)</label>
+                    <input type="text" id="drawnInput" placeholder="उदा. 53%" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">नवीन नोंद समाविष्ट करा</button>
+        </form>
+    </div>
+
+    <div class="actions">
+        <button class="print-btn" onclick="window.print()">तक्ता प्रिन्ट करा / PDF सेव्ह करा</button>
     </div>
 </div>
+
+<script>
+    function switchTab(evt, pcId) {
+        let i, tabcontent, tabbtn;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].classList.remove("active");
+        }
+        tabbtn = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tabbtn.length; i++) {
+            tabbtn[i].classList.remove("active");
+        }
+        document.getElementById(pcId).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    function addNewDA(event) {
+        event.preventDefault();
+        const pc = document.getElementById("commissionSelect").value;
+        const period = document.getElementById("periodInput").value;
+        const due = document.getElementById("dueInput").value;
+        const drawn = document.getElementById("drawnInput").value;
+
+        const table = document.getElementById("table-" + pc).getElementsByTagName('tbody')[0];
+        const rowCount = table.rows.length + 1;
+
+        const newRow = table.insertRow();
+        newRow.innerHTML = `
+            <td>${rowCount}</td>
+            <td>${period}</td>
+            <td>${due}</td>
+            <td>${drawn}</td>
+            <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
+        `;
+
+        document.getElementById("addDaForm").reset();
+        alert("नवीन डीए दर यशस्वीरित्या जोडण्यात आला आहे!");
+    }
+
+    function deleteRow(btn) {
+        const row = btn.parentNode.parentNode;
+        const tbody = row.parentNode;
+        row.parentNode.removeChild(row);
+        
+        // Re-index serial numbers
+        for (let i = 0; i < tbody.rows.length; i++) {
+            tbody.rows[i].cells[0].innerText = i + 1;
+        }
+    }
+
+    function closePage() {
+        if (confirm("तुम्हाला ही पेज बंद करायची आहे का?")) {
+            window.close();
+            window.location.href = "index.html";
+        }
+    }
+</script>
 
 </body>
 </html>
