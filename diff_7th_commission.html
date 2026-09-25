@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>७ वा वेतन आयोग फरक</title>
+<style>
+* { box-sizing: border-box; }
+body {
+    margin: 0; padding: 12px;
+    font-family: "Noto Sans Devanagari", Arial, sans-serif;
+    background: radial-gradient(circle at 50% 25%, #173b69 0%, #071a32 45%, #020914 100%);
+    color: white; min-height: 100vh;
+}
+.box {
+    max-width: 950px; margin: 0 auto; background: #0f1c30;
+    border-radius: 16px; border: 1px solid #ea580c; padding: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+}
+.top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ea580c; padding-bottom: 12px; margin-bottom: 20px; }
+.back-btn { background: #ea580c; color: white; padding: 8px 16px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; }
+.title { font-size: 20px; font-weight: bold; color: #fdba74; margin: 0; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-top: 15px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+label { font-size: 13px; color: #cbd5e1; }
+input, select { background: #091322; border: 1px solid #c2410c; color: white; padding: 9px; border-radius: 6px; outline: none; }
+.calc-btn { background: linear-gradient(135deg, #ea580c, #dc2626); color: white; border: none; padding: 10px 22px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 16px; }
+.res-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+.res-table th, .res-table td { border: 1px solid #c2410c; padding: 8px; text-align: center; }
+.res-table th { background: #091322; color: #00e5ff; }
+</style>
+</head>
+<body>
+<div class="box">
+    <div class="top-bar">
+        <a href="difference.html" class="back-btn">⬅ मागे जा</a>
+        <h2 class="title">७ वा वेतन आयोग (7th Pay Commission)</h2>
+    </div>
+
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Pay Matrix Level (स्तर):</label>
+            <select id="level7">
+                <option value="S-1">S-1 (15000 - 47600)</option>
+                <option value="S-8">S-8 (25500 - 81100)</option>
+                <option value="S-10">S-10 (29200 - 92300)</option>
+                <option value="S-13">S-13 (35400 - 112400)</option>
+                <option value="S-15" selected>S-15 (41800 - 132300)</option>
+                <option value="S-20">S-20 (56100 - 177500)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>मूळ वेतन (Basic Pay ₹):</label>
+            <input type="number" id="basic7" value="41800">
+        </div>
+        <div class="form-group">
+            <label>घरभाडे भत्ता (HRA वर्ग):</label>
+            <select id="hraClass7">
+                <option value="10">Z वर्ग (१०%)</option>
+                <option value="20" selected>Y वर्ग (२०%)</option>
+                <option value="30">X वर्ग (३०%)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>वाहतूक भत्ता (T.A. ₹):</label>
+            <input type="number" id="ta7" value="1350">
+        </div>
+    </div>
+    <button class="calc-btn" onclick="calc7()">मासिक वेतन काढा</button>
+
+    <div id="resBox" style="display:none; margin-top:15px;">
+        <table class="res-table">
+            <thead>
+                <tr><th>Basic</th><th>DA (५०%)</th><th>HRA</th><th>TA</th><th>एकूण वेतन (Gross)</th></tr>
+            </thead>
+            <tbody id="resBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function calc7() {
+    const basic = parseFloat(document.getElementById('basic7').value) || 0;
+    const hraRate = parseFloat(document.getElementById('hraClass7').value) || 0;
+    const ta = parseFloat(document.getElementById('ta7').value) || 0;
+    const da = Math.round(basic * 0.50);
+    const hra = Math.round(basic * (hraRate / 100));
+    const gross = basic + da + hra + ta;
+
+    document.getElementById('resBody').innerHTML = `
+        <tr>
+            <td>₹ ${basic.toLocaleString('en-IN')}</td>
+            <td>₹ ${da.toLocaleString('en-IN')}</td>
+            <td>₹ ${hra.toLocaleString('en-IN')}</td>
+            <td>₹ ${ta.toLocaleString('en-IN')}</td>
+            <td style="color:#00e5ff; font-weight:bold; font-size:15px;">₹ ${gross.toLocaleString('en-IN')}</td>
+        </tr>
+    `;
+    document.getElementById('resBox').style.display = 'block';
+}
+</script>
+</body>
+</html>
