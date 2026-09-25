@@ -63,6 +63,9 @@
             box-sizing: border-box;
             background-color: #fff;
         }
+        select:invalid, select option[value=""] {
+            color: #888;
+        }
         .date-range-container {
             flex: 1.4;
             display: flex;
@@ -167,7 +170,6 @@
             font-weight: 500;
         }
 
-        /* प्रिंट बटण स्टाईल */
         .print-action-bar {
             display: flex;
             justify-content: flex-end;
@@ -187,7 +189,6 @@
             background-color: #01579b;
         }
 
-        /* प्रिंट साठी CSS नियम */
         @media print {
             body * {
                 visibility: hidden;
@@ -237,20 +238,21 @@
             <input type="date" id="empJoinDate" onclick="openPicker(this)" required>
         </div>
 
-        <!-- ४. आरंभीचा वेतन आयोग -->
+        <!-- ४. वेतन आयोग (सुधारित) -->
         <div class="form-group">
-            <label for="payCommission">४. आरंभीचा वेतन आयोग:</label>
-            <select id="payCommission" onchange="updateCommissionRules()">
-                <option value="6th" selected>६वा वेतन आयोग (2006)</option>
-                <option value="5th">५वा वेतन आयोग (1996)</option>
+            <label for="payCommission">४. वेतन आयोग:</label>
+            <select id="payCommission" onchange="updateCommissionRules()" required>
+                <option value="" disabled selected>वेतन आयोग निवडा</option>
                 <option value="4th">४था वेतन आयोग (1986)</option>
+                <option value="5th">५वा वेतन आयोग (1996)</option>
+                <option value="6th">६वा वेतन आयोग (2006)</option>
                 <option value="7th">७वा वेतन आयोग (2016)</option>
             </select>
         </div>
 
         <!-- ५. सध्याची वेतनश्रेणी -->
         <div class="form-group">
-            <label for="currentPayScale">५. आरंभीची वेतनश्रेणी:</label>
+            <label for="currentPayScale">५. वेतनश्रेणी:</label>
             <input type="text" id="currentPayScale" list="payScaleList" placeholder="सर्च करा किंवा निवडा / लिहा" required>
             <datalist id="payScaleList"></datalist>
         </div>
@@ -262,13 +264,13 @@
         </div>
 
         <!-- ७. ग्रेड पे -->
-        <div class="form-group" id="gradePayGroup">
+        <div class="form-group hidden" id="gradePayGroup">
             <label for="gradePay">७. ग्रेड पे (Grade Pay):</label>
             <input type="number" id="gradePay" placeholder="उदा. 1900">
         </div>
 
         <!-- ८. ७व्या आयोगातील मूळ स्तर -->
-        <div class="form-group" id="initialLevelDiv">
+        <div class="form-group hidden" id="initialLevelDiv">
             <label for="initial7thLevel">८. ७व्या आयोगातील मूळ स्तर:</label>
             <select id="initial7thLevel"></select>
         </div>
@@ -354,13 +356,11 @@
             </select>
         </div>
 
-        <!-- बदललेले बटण: Submit Data -->
         <button type="submit" class="submit-btn">Submit Data</button>
     </form>
 
     <!-- अहवाल व तक्ता बॉक्स -->
     <div class="output-box hidden" id="outputBox">
-        <!-- दोन नवीन टॅब्स: वेतन निश्चिती आणि रिपोर्ट / प्रिंट -->
         <div class="report-nav-tabs">
             <button type="button" class="nav-tab-btn active" id="tabBtn1" onclick="switchReportTab('fixation')">📊 वेतन निश्चिती</button>
             <button type="button" class="nav-tab-btn" id="tabBtn2" onclick="switchReportTab('report')">🖨️ रिपोर्ट किंवा प्रिंट</button>
@@ -432,7 +432,6 @@
         }
     }
 
-    // टॅब बदलण्याचे फंक्शन
     function switchReportTab(tabName) {
         const tabBtn1 = document.getElementById('tabBtn1');
         const tabBtn2 = document.getElementById('tabBtn2');
@@ -506,19 +505,34 @@
     function updateCommissionRules() {
         const commission = document.getElementById('payCommission').value;
         const gradePayGroup = document.getElementById('gradePayGroup');
+        const initialLevelDiv = document.getElementById('initialLevelDiv');
         const payScaleList = document.getElementById('payScaleList');
         
         if (commission === '6th') {
             gradePayGroup.classList.remove('hidden');
+            initialLevelDiv.classList.remove('hidden');
+        } else if (commission === '7th') {
+            gradePayGroup.classList.add('hidden');
+            initialLevelDiv.classList.remove('hidden');
         } else {
             gradePayGroup.classList.add('hidden');
+            initialLevelDiv.classList.add('hidden');
         }
 
-        payScaleList.innerHTML = `
-            <option value="PB-1 : 5200 - 20200 (GP 1900) - कनिष्ठ लिपिक">
-            <option value="PB-1 : 5200 - 20200 (GP 2400) - वरिष्ठ लिपिक">
-            <option value="PB-2 : 9300 - 34800 (GP 4200) - शाखा अभियंता">
-        `;
+        payScaleList.innerHTML = '';
+        if (commission === '6th') {
+            payScaleList.innerHTML = `
+                <option value="PB-1 : 5200 - 20200 (GP 1900) - कनिष्ठ लिपिक">
+                <option value="PB-1 : 5200 - 20200 (GP 2400) - वरिष्ठ लिपिक">
+                <option value="PB-2 : 9300 - 34800 (GP 4200) - शाखा अभियंता">
+            `;
+        } else if (commission === '7th') {
+            for (const val of Object.values(level7thStartPay)) {
+                let opt = document.createElement('option');
+                opt.value = val.desc;
+                payScaleList.appendChild(opt);
+            }
+        }
     }
 
     function syncOptionDateDefault() {
@@ -575,12 +589,17 @@
     function processFixation(event) {
         event.preventDefault();
         
+        const startCommission = document.getElementById('payCommission').value;
+        if (!startCommission) {
+            alert("कृपया प्रथम वेतन आयोग निवडा!");
+            return;
+        }
+
         const name = document.getElementById('empName').value;
         const designation = document.getElementById('empDesignation').value;
         const joinDateInput = document.getElementById('empJoinDate').value;
         const scale = document.getElementById('currentPayScale').value;
         let basic = parseFloat(document.getElementById('basicPay').value);
-        let startCommission = document.getElementById('payCommission').value;
         let gradePay = parseFloat(document.getElementById('gradePay').value) || 0;
         const benefit = document.getElementById('benefitType').value;
         const macpPhase = document.getElementById('macpPhase').value;
@@ -605,7 +624,7 @@
             <div><b>कर्मचाऱ्याचे नाव:</b> ${name}</div>
             <div><b>पदनाम:</b> ${designation}</div>
             <div><b>नियुक्ती दिनांक:</b> ${joinDateFormatted}</div>
-            <div><b>आरंभीचा वेतन आयोग / वेतनश्रेणी:</b> ${startCommission} आयोग | ${scale}</div>
+            <div><b>वेतन आयोग / वेतनश्रेणी:</b> ${startCommission} आयोग | ${scale}</div>
             <div><b>आर्थिक लाभ तपशील:</b> ${benefitLabel}</div>
             <div><b>लाभाचा दिनांक:</b> ${formatDateToDDMMYYYY(benefitDateInput)} | <b>विकल्पाचा दिनांक:</b> ${formatDateToDDMMYYYY(optionDateInput)}</div>
             <div><b>वेतन निश्चिती कालावधी:</b> ${fromDateFormatted} ते ${toDateFormatted}</div>
@@ -623,7 +642,6 @@
         let startDate = new Date(fromDateInput);
         let endDate = new Date(toDateInput);
 
-        // सुरुवातीची रुजू नोंद
         events.push({
             date: new Date(fromDateInput),
             dateStr: fromDateFormatted,
@@ -631,7 +649,6 @@
             desc: 'मूळ वेतन निश्चिती / रुजू'
         });
 
-        // ७वा वेतन आयोग सुधारणा
         if (autoUpgrade && startCommission === '6th') {
             let c7Date = new Date("2016-01-01");
             if (c7Date >= startDate && c7Date <= endDate) {
@@ -644,7 +661,6 @@
             }
         }
 
-        // वार्षिक वेतनवाढ नोंदी
         let startYr = startDate.getFullYear();
         let endYr = endDate.getFullYear();
         for (let yr = startYr; yr <= endYr; yr++) {
@@ -659,7 +675,6 @@
             }
         }
 
-        // लाभ आणि विकल्प
         let bDate = benefitDateInput ? new Date(benefitDateInput) : null;
         let optDate = optionDateInput ? new Date(optionDateInput) : (bDate ? bDate : null);
 
@@ -758,11 +773,9 @@
             }
         });
 
-        // अहवाल स्क्रीनवर दाखवणे आणि पहिल्या टॅबवर सेट करणे
         document.getElementById('outputBox').classList.remove('hidden');
         switchReportTab('fixation');
 
-        // फॉर्म रिस्टोअर करणे
         document.getElementById('payFixationForm').reset();
         populate7thLevelDropdowns();
         updateCommissionRules();
