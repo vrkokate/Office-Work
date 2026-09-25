@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>वेतन निश्चिती (Pay Fixation System)</title>
+    <title>वेतन निश्चिती प्रणाली (Pay Fixation System)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,7 +12,7 @@
             padding: 5px;
         }
         .container {
-            max-width: 650px;
+            max-width: 680px;
             background: #ffffff;
             margin: 10px auto;
             padding: 15px;
@@ -45,7 +45,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 9px;
             gap: 8px;
         }
         label {
@@ -56,19 +56,28 @@
         }
         select, input {
             flex: 1.4;
-            padding: 8px;
+            padding: 7px 8px;
             font-size: 12px;
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
             background-color: #fff;
         }
+        .date-range-container {
+            flex: 1.4;
+            display: flex;
+            gap: 5px;
+        }
+        .date-range-container input {
+            flex: 1;
+            width: 100%;
+        }
         .submit-btn {
             width: 100%;
             background-color: #2e7d32;
             color: white;
             border: none;
-            padding: 10px;
+            padding: 11px;
             font-size: 14px;
             font-weight: bold;
             border-radius: 4px;
@@ -88,21 +97,47 @@
             border-radius: 6px;
             border: 1px solid #a5d6a7;
         }
+        .scrollable-report-area {
+            max-height: 420px;
+            overflow: auto;
+            border: 1px solid #c8e6c9;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .report-details {
+            text-align: left;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            color: #222;
+        }
+        .report-details div {
+            margin-bottom: 3px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 8px;
             background: #fff;
+            white-space: nowrap;
         }
         th, td {
             border: 1px solid #ccc;
-            padding: 6px;
+            padding: 6px 10px;
             text-align: center;
             font-size: 12px;
         }
         th {
             background-color: #2e7d32;
             color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .event-cell {
+            text-align: left;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -118,7 +153,7 @@
         <!-- १. कर्मचाऱ्याचे नाव -->
         <div class="form-group">
             <label for="empName">१. कर्मचाऱ्याचे नाव:</label>
-            <input type="text" id="empName" placeholder="पूर्ण नाव लिहा" required>
+            <input type="text" id="empName" placeholder="कर्मचाऱ्याचे नाव लिहा" required>
         </div>
 
         <!-- २. पदनाम -->
@@ -130,12 +165,12 @@
         <!-- ३. नियुक्ती दिनांक -->
         <div class="form-group">
             <label for="empJoinDate">३. नियुक्ती दिनांक:</label>
-            <input type="date" id="empJoinDate" required>
+            <input type="text" id="empJoinDate" placeholder="दिनांक निवडा" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'" required>
         </div>
 
-        <!-- ४. वेतन आयोग निवडा -->
+        <!-- ४. आरंभीचा वेतन आयोग -->
         <div class="form-group">
-            <label for="payCommission">४. वेतन आयोग:</label>
+            <label for="payCommission">४. आरंभीचा वेतन आयोग:</label>
             <select id="payCommission" onchange="updateCommissionRules()">
                 <option value="4th">४था वेतन आयोग (1986)</option>
                 <option value="5th">५वा वेतन आयोग (1996)</option>
@@ -144,157 +179,165 @@
             </select>
         </div>
 
-        <!-- ५. सध्याची वेतनश्रेणी (सर्च करण्यायोग्य आणि हस्ते एडिट करण्याची सोय) -->
+        <!-- ५. सध्याची वेतनश्रेणी -->
         <div class="form-group">
-            <label for="currentPayScale">५. सध्याची वेतनश्रेणी:</label>
+            <label for="currentPayScale">५. आरंभीची वेतनश्रेणी:</label>
             <input type="text" id="currentPayScale" list="payScaleList" placeholder="सर्च करा किंवा निवडा / लिहा" required>
-            <datalist id="payScaleList">
-                <!-- जॅवास्क्रिप्टद्वारे डेटा येईल -->
-            </datalist>
+            <datalist id="payScaleList"></datalist>
         </div>
 
-        <!-- आर्थिक लाभ प्रकार -->
+        <!-- ६. मूळ वेतन -->
         <div class="form-group">
-            <label for="benefitType">आर्थिक लाभ प्रकार:</label>
+            <label for="basicPay">६. मूळ वेतन (Basic):</label>
+            <input type="number" id="basicPay" placeholder="उदा. 950 किंवा 5830" required>
+        </div>
+
+        <!-- ७. ग्रेड पे (फक्त ६ व्या आयोगासाठी सुरुवातीस) -->
+        <div class="form-group hidden" id="gradePayGroup">
+            <label for="gradePay">७. ग्रेड पे (Grade Pay):</label>
+            <input type="number" id="gradePay" placeholder="उदा. 1900">
+        </div>
+
+        <!-- ८. आर्थिक लाभ प्रकार (पदोन्नती / आश्वासित प्रगती योजना) -->
+        <div class="form-group">
+            <label for="benefitType">८. आर्थिक लाभ प्रकार:</label>
             <select id="benefitType" onchange="toggleBenefitOptions()">
-                <option value="None">कोणताही लाभ नाही</option>
+                <option value="None">कोणताही लाभ नाही (नियमित)</option>
                 <option value="Promotion">पदोन्नती (Promotion)</option>
-                <option value="MACP">आश्वासित प्रगती योजना</option>
+                <option value="MACP">आश्वासित प्रगती योजना (MACP)</option>
             </select>
         </div>
 
-        <!-- MACP टप्पा -->
+        <!-- MACP टप्पा निवडा -->
         <div class="form-group hidden" id="macpBenefitDiv">
             <label for="macpPhase">MACP लाभ टप्पा:</label>
             <select id="macpPhase">
-                <option value="1st">पहिला लाभ</option>
-                <option value="2nd">दुसरा लाभ</option>
-                <option value="3rd">तिसरा लाभ</option>
+                <option value="पहिला लाभ (1st MACP)">पहिला लाभ (1st MACP)</option>
+                <option value="दुसरा लाभ (2nd MACP)">दुसरा लाभ (2nd MACP)</option>
+                <option value="तिसरा लाभ (3rd MACP)">तिसरा लाभ (3rd MACP)</option>
             </select>
         </div>
 
-        <!-- लाभ दिनांक -->
+        <!-- पदोन्नती / लाभाचा दिनांक -->
         <div class="form-group hidden" id="benefitDateDiv">
-            <label for="benefitDate">पदो/लाभाचा दिनांक:</label>
-            <input type="date" id="benefitDate">
+            <label for="benefitDate">पदोन्नती / लाभाचा दिनांक:</label>
+            <input type="text" id="benefitDate" placeholder="लाभाचा दिनांक निवडा" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'">
         </div>
 
-        <!-- ६. सध्या घेत असलेले मूळ वेतन -->
+        <!-- ९. कालावधी दिनांक (पासून आणि पर्यंत) -->
         <div class="form-group">
-            <label for="basicPay">६. मूळ वेतन (Basic):</label>
-            <input type="number" id="basicPay" placeholder="उदा. 950" required>
+            <label>९. कालावधी दिनांक:</label>
+            <div class="date-range-container">
+                <input type="text" id="fixationFrom" placeholder="पासून" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'" required>
+                <input type="text" id="fixationTo" placeholder="पर्यंत" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'" required>
+            </div>
         </div>
 
-        <!-- ७. ग्रेड पे (फक्त ६ व्या आयोगासाठी) -->
-        <div class="form-group hidden" id="gradePayGroup">
-            <label for="gradePay">७. ग्रेड पे (Grade Pay):</label>
-            <input type="number" id="gradePay" placeholder="उदा. 4200">
-        </div>
-
-        <!-- ८. वेतन निश्चितीचा कालावधी -->
+        <!-- १०. पुढील वेतन आयोग बदल लागू करणे -->
         <div class="form-group">
-            <label for="fixationFrom">८अ. सुरू दिनांक:</label>
-            <input type="date" id="fixationFrom" required>
-        </div>
-        <div class="form-group">
-            <label for="fixationTo">८ब. समाप्त दिनांक:</label>
-            <input type="date" id="fixationTo" required>
-        </div>
-
-        <!-- ९. वेतनवाढ महिना / नियम -->
-        <div class="form-group">
-            <label for="incrementMonthRule">९. वेतनवाढ दिनांक:</label>
-            <select id="incrementMonthRule">
-                <option value="appointment_month">नियुक्ती महिन्याची १ तारीख</option>
-                <option value="july">प्रत्येक वर्षाची १ जुलै</option>
-                <option value="jan_or_july">जानेवारी किंवा जुलै</option>
+            <label for="autoCommissionChange">१०. कालावधीत पुढील वेतन आयोग बदलायचे का?</label>
+            <select id="autoCommissionChange">
+                <option value="Yes">होय (कालावधीनुसार पुढील आयोग लागू करा)</option>
+                <option value="No">नाही (फक्त याच आयोगात गणना करा)</option>
             </select>
         </div>
 
-        <!-- १०. वेतनवाढ रोखण्याची स्थिती -->
+        <!-- ११. वेतनवाढ महिना / नियम -->
         <div class="form-group">
-            <label for="incrementWithheld">१०अ. वेतनवाढ थांबवली?</label>
+            <label for="incrementMonthRule">११. वेतनवाढ दिनांक नियम:</label>
+            <select id="incrementMonthRule">
+                <option value="appointment_month">नियुक्ती महिन्याची १ तारीख (४था व ५वा आयोग)</option>
+                <option value="july">प्रत्येक वर्षाची १ जुलै (६वा व ७वा आयोग)</option>
+                <option value="january">प्रत्येक वर्षाची १ जानेवारी (७वा आयोग)</option>
+            </select>
+        </div>
+
+        <!-- १२. वेतनवाढ रोखली आहे का? -->
+        <div class="form-group">
+            <label for="incrementWithheld">१२अ. वेतनवाढ थांबवली का?</label>
             <select id="incrementWithheld" onchange="toggleWithheldOptions()">
                 <option value="No">नाही</option>
                 <option value="Yes">होय</option>
             </select>
         </div>
         <div class="form-group hidden" id="withheldEffectDiv">
-            <label for="withheldEffect">१०ब. पुढील वाढीवर परिणाम?</label>
+            <label for="withheldEffect">१२ब. पुढील वाढीवर परिणाम?</label>
             <select id="withheldEffect">
-                <option value="cumulative">होय (परिणाम करणारी)</option>
-                <option value="non_cumulative">नाही (न करणारी)</option>
+                <option value="cumulative">होय (परिणाम करणारी - रोखून)</option>
+                <option value="non_cumulative">नाही (परिणाम न करणारी)</option>
             </select>
         </div>
 
-        <!-- ११. विकल्प दिनांक -->
+        <!-- १३. विकल्पाचा दिनांक -->
         <div class="form-group hidden" id="optionDateGroup">
-            <label for="optionDate">११. विकल्पाचा दिनांक:</label>
-            <input type="date" id="optionDate">
+            <label for="optionDate">१३. विकल्पाचा दिनांक:</label>
+            <input type="text" id="optionDate" placeholder="विकल्प दिनांक निवडा" onfocus="this.type='date'" onblur="if(!this.value)this.type='text'">
         </div>
 
-        <!-- सबमिट बटन -->
         <button type="submit" class="submit-btn">वेतन निश्चिती करा व तक्ता बनवा</button>
     </form>
 
-    <!-- आऊटपुट तक्ता बॉक्स -->
+    <!-- अहवाल व तक्ता बॉक्स -->
     <div class="output-box hidden" id="outputBox">
-        <h3>📊 वेतन निश्चिती अहवाल व तक्ता</h3>
-        <p id="summaryText" style="font-size: 12px; line-height: 1.4;"></p>
-        <div style="overflow-x: auto;">
-            <table id="fixationTable">
-                <thead>
-                    <tr id="tableHeaderRow">
-                        <th>अ.क्र.</th>
-                        <th>वेतनवाढ दिनांक</th>
-                        <th>मूळ वेतन</th>
-                        <th>एकूण वेतन</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <!-- डायनॅमिक डेटा -->
-                </tbody>
-            </table>
+        <h3 style="margin-top: 0; color: #2e7d32;">📊 वेतन निश्चिती अहवाल व तक्ता</h3>
+        <div class="scrollable-report-area">
+            <div class="report-details" id="summaryText"></div>
+            <div>
+                <table id="fixationTable">
+                    <thead>
+                        <tr>
+                            <th>अ.क्र.</th>
+                            <th>दिनांक</th>
+                            <th>वेतन आयोग</th>
+                            <th>तपशील / सेवा घटना</th>
+                            <th>मूळ वेतन</th>
+                            <th>ग्रेड पे</th>
+                            <th>एकूण वेतन</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // सार्वजनिक बांधकाम विभागाकडील (PWD) पदांच्या वेतनश्रेण्यांचा डेटा
     const payScalesData = {
         "4th": [
             "कनिष्ठ लिपिक - रु. ९५० - २० - ११५० - इ.रो. - २५ - १४००",
             "वरिष्ठ लिपिक - रु. १२०० - ३० - १५६० - इ.रो. - ४० - २०४०",
-            "शाखा अभियंता (Junior Engineer) - रु. १६४० - ६० - २६०० - ७५ - २९००",
-            "सहाय्यक अभियंता (Assistant Engineer) - रु. २००० - ६० - २३०० - ७५ - ३२००",
-            "वाहनचालक (Driver) - रु. ९५० - २० - ११५० - २५ - १५००",
-            "शिपाई (Peon) - रु. ७५० - १२ - ८७० - १४ - ९४०"
+            "शाखा अभियंता (JE) - रु. १६४० - ६० - २६०० - ७५ - २९००",
+            "सहाय्यक अभियंता (AE) - रु. २००० - ६० - २३०० - ७५ - ३२००"
         ],
         "5th": [
             "कनिष्ठ लिपिक - रु. ३०५० - ७५ - ३९५० - ८० - ४५९०",
             "वरिष्ठ लिपिक - रु. ४००० - १०० - ६०००",
-            "शाखा अभियंता (Junior Engineer) - रु. ५००० - १५० - ८०००",
-            "सहाय्यक अभियंता (Assistant Engineer) - रु. ६५०० - २०० - १०५००",
-            "वाहनचालक (Driver) - रु. ३०५० - ७५ - ३९५० - ८० - ४५९०",
-            "शिपाई (Peon) - रु. २५४० - ३५ - ३१६० - ४० - ३४४०"
+            "शाखा अभियंता (JE) - रु. ५००० - १५० - ८०००",
+            "सहाय्यक अभियंता (AE) - रु. ६५०० - २०० - १०५००"
         ],
         "6th": [
             "कनिष्ठ लिपिक - PB-1 : 5200 - 20200 (GP 1900)",
             "वरिष्ठ लिपिक - PB-1 : 5200 - 20200 (GP 2400)",
-            "शाखा अभियंता (Junior Engineer) - PB-2 : 9300 - 34800 (GP 4200)",
-            "सहाय्यक अभियंता (Assistant Engineer) - PB-2 : 9300 - 34800 (GP 5400)",
-            "वाहनचालक (Driver) - PB-1 : 5200 - 20200 (GP 2400)",
-            "शिपाई (Peon) - PB-1 : 4440 - 7440 (GP 1300)"
+            "शाखा अभियंता (JE) - PB-2 : 9300 - 34800 (GP 4200)",
+            "सहाय्यक अभियंता (AE) - PB-2 : 9300 - 34800 (GP 5400)"
         ],
         "7th": [
             "कनिष्ठ लिपिक - S-6 (21700 - 69100)",
             "वरिष्ठ लिपिक - S-8 (29200 - 92300)",
-            "शाखा अभियंता (Junior Engineer) - S-13 (35400 - 112400)",
-            "सहाय्यक अभियंता (Assistant Engineer) - S-15 (41800 - 132300)",
-            "वाहनचालक (Driver) - S-7 (25500 - 81100)",
-            "शिपाई (Peon) - S-1 (15000 - 47600)"
+            "शाखा अभियंता (JE) - S-13 (35400 - 112400)",
+            "सहाय्यक अभियंता (AE) - S-15 (41800 - 132300)"
         ]
     };
+
+    function formatDateToDDMMYYYY(dateString) {
+        if (!dateString) return '';
+        let parts = dateString.split('-');
+        if (parts.length === 3) {
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+        return dateString;
+    }
 
     function updateCommissionRules() {
         const commission = document.getElementById('payCommission').value;
@@ -307,7 +350,6 @@
             gradePayGroup.classList.add('hidden');
         }
 
-        // डॅटालिस्टमध्ये पदे आणि वेतनश्रेण्या भरणे
         payScaleList.innerHTML = '';
         if (payScalesData[commission]) {
             payScalesData[commission].forEach(scale => {
@@ -358,61 +400,131 @@
         
         const name = document.getElementById('empName').value;
         const designation = document.getElementById('empDesignation').value;
-        const joinDate = document.getElementById('empJoinDate').value;
+        const joinDateInput = document.getElementById('empJoinDate').value;
         const scale = document.getElementById('currentPayScale').value;
-        const basic = parseFloat(document.getElementById('basicPay').value);
-        const commission = document.getElementById('payCommission').value;
-        const gradePay = parseFloat(document.getElementById('gradePay').value) || 0;
+        let basic = parseFloat(document.getElementById('basicPay').value);
+        let startCommission = document.getElementById('payCommission').value;
+        let gradePay = parseFloat(document.getElementById('gradePay').value) || 0;
         const benefit = document.getElementById('benefitType').value;
-        const fromDate = document.getElementById('fixationFrom').value;
-        const toDate = document.getElementById('fixationTo').value;
+        const macpPhase = document.getElementById('macpPhase').value;
+        const benefitDateInput = document.getElementById('benefitDate').value;
+        const fromDateInput = document.getElementById('fixationFrom').value;
+        const toDateInput = document.getElementById('fixationTo').value;
+        const autoUpgrade = document.getElementById('autoCommissionChange').value === 'Yes';
 
-        let reasonText = "नियमित वेतनवाढ साखळी";
-        if(benefit === 'Promotion') reasonText = "पदोन्नती वेतन निश्चिती";
-        else if(benefit === 'MACP') reasonText = "आश्वासित प्रगती योजना लाभ वेतन निश्चिती";
+        const joinDateFormatted = formatDateToDDMMYYYY(joinDateInput);
+        const fromDateFormatted = formatDateToDDMMYYYY(fromDateInput);
+        const toDateFormatted = formatDateToDDMMYYYY(toDateInput);
 
+        let benefitLabel = "कोणताही नाही (नियमित)";
+        if(benefit === 'Promotion') benefitLabel = "पदोन्नती (दिनांक: " + formatDateToDDMMYYYY(benefitDateInput) + ")";
+        else if(benefit === 'MACP') benefitLabel = macpPhase + " (दिनांक: " + formatDateToDDMMYYYY(benefitDateInput) + ")";
+
+        // अहवाल सारांश
         document.getElementById('summaryText').innerHTML = `
-            <b>नाव:</b> ${name} | <b>पद:</b> ${designation}<br>
-            <b>नियुक्ती:</b> ${joinDate} | <b>वेतनश्रेणी:</b> ${scale}<br>
-            <b>कालावधी:</b> ${fromDate} ते ${toDate} (${reasonText})
+            <div><b>कर्मचाऱ्याचे नाव:</b> ${name}</div>
+            <div><b>पदनाम:</b> ${designation}</div>
+            <div><b>नियुक्ती दिनांक:</b> ${joinDateFormatted}</div>
+            <div><b>आरंभीचा वेतन आयोग / वेतनश्रेणी:</b> ${startCommission} आयोग | ${scale}</div>
+            <div><b>आर्थिक लाभ तपशील:</b> ${benefitLabel}</div>
+            <div><b>वेतन निश्चिती कालावधी:</b> ${fromDateFormatted} ते ${toDateFormatted}</div>
         `;
 
-        const headerRow = document.getElementById('tableHeaderRow');
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = "";
 
-        let includeGP = (commission === '6th');
-        if (includeGP) {
-            headerRow.innerHTML = `<th>अ.क्र.</th><th>दिनांक</th><th>मूळ वेतन</th><th>ग्रेड पे</th><th>एकूण</th>`;
-        } else {
-            headerRow.innerHTML = `<th>अ.क्र.</th><th>दिनांक</th><th>मूळ वेतन</th><th>एकूण वेतन</th>`;
-        }
-
-        let simulatedBasic = basic;
-        let startYear = new Date(fromDate).getFullYear();
-        let endYear = new Date(toDate).getFullYear();
         let srNo = 1;
+        let currentCommission = startCommission;
+        let currentBasic = basic;
+        let currentGP = (currentCommission === '6th') ? gradePay : 0;
 
-        for (let year = startYear; year <= endYear; year++) {
-            let row = document.createElement('tr');
-            let incrementDate = year + "-07-01";
-            
-            if(year > startYear) {
-                simulatedBasic = simulatedBasic + Math.round(simulatedBasic * 0.03);
+        // १. प्रथम नोंद (सुरुवातीची स्थिती)
+        addTableRow(srNo++, fromDateFormatted, getCommissionLabel(currentCommission), "मूळ वेतन निश्चिती / रुजू", currentBasic, currentGP);
+
+        // कालावधीतील वर्षांची गणना
+        let startDate = new Date(fromDateInput);
+        let endDate = new Date(toDateInput);
+        let startYear = startDate.getFullYear();
+        let endYear = endDate.getFullYear();
+
+        let benefitHandled = false;
+
+        for (let yr = startYear; yr <= endYear; yr++) {
+            // अ) ५वा वेतन आयोग सुधारणा (01-01-1996)
+            if (autoUpgrade && currentCommission === '4th' && yr === 1996 && new Date("1996-01-01") >= startDate && new Date("1996-01-01") <= endDate) {
+                currentCommission = '5th';
+                currentBasic = Math.round(currentBasic * 2.3); // ५वा आयोग फिटमेंट अंदाजे
+                currentGP = 0;
+                addTableRow(srNo++, "01-01-1996", getCommissionLabel(currentCommission), "५वा वेतन आयोग सुधारणा", currentBasic, currentGP);
             }
 
-            let totalPay = simulatedBasic + gradePay;
-
-            if (includeGP) {
-                row.innerHTML = `<td>${srNo++}</td><td>${incrementDate}</td><td>${simulatedBasic}</td><td>${gradePay}</td><td><b>${totalPay}</b></td>`;
-            } else {
-                row.innerHTML = `<td>${srNo++}</td><td>${incrementDate}</td><td>${simulatedBasic}</td><td><b>${totalPay}</b></td>`;
+            // ब) ६वा वेतन आयोग सुधारणा (01-01-2006)
+            if (autoUpgrade && (currentCommission === '4th' || currentCommission === '5th') && yr === 2006 && new Date("2006-01-01") >= startDate && new Date("2006-01-01") <= endDate) {
+                currentCommission = '6th';
+                currentBasic = Math.round((currentBasic * 1.86) / 10) * 10;
+                currentGP = gradePay > 0 ? gradePay : 1900;
+                addTableRow(srNo++, "01-01-2006", getCommissionLabel(currentCommission), "६वा वेतन आयोग सुधारणा (GP लागू)", currentBasic, currentGP);
             }
-            tableBody.appendChild(row);
+
+            // क) ७वा वेतन आयोग सुधारणा (01-01-2016)
+            if (autoUpgrade && (currentCommission === '5th' || currentCommission === '6th') && yr === 2016 && new Date("2016-01-01") >= startDate && new Date("2016-01-01") <= endDate) {
+                currentCommission = '7th';
+                let totalBefore7th = currentBasic + currentGP;
+                currentBasic = Math.round(totalBefore7th * 2.57); // ७वा आयोग फिटमेंट फॅक्टर २.५७
+                currentGP = 0; // ७व्या आयोगात ग्रेड पे बंद
+                addTableRow(srNo++, "01-01-2016", getCommissionLabel(currentCommission), "७वा वेतन आयोग सुधारणा (2.57 Fitment)", currentBasic, currentGP);
+            }
+
+            // ड) पदोन्नती / MACP लाभ घटना तपासणे
+            if (!benefitHandled && benefitDateInput) {
+                let bDate = new Date(benefitDateInput);
+                if (bDate.getFullYear() === yr && bDate >= startDate && bDate <= endDate) {
+                    currentBasic = currentBasic + Math.round(currentBasic * 0.03); // पदोन्नती वाढ
+                    let desc = (benefit === 'Promotion') ? "पदोन्नती वेतन निश्चिती" : macpPhase + " वेतन निश्चिती";
+                    addTableRow(srNo++, formatDateToDDMMYYYY(benefitDateInput), getCommissionLabel(currentCommission), desc, currentBasic, currentGP);
+                    benefitHandled = true;
+                }
+            }
+
+            // इ) वार्षिक नियमित वेतनवाढ (प्रत्येक वर्षी जुलै/नियुक्ती महिना)
+            let incMonth = (currentCommission === '6th' || currentCommission === '7th') ? "07" : "07";
+            let incDateStr = `${yr}-${incMonth}-01`;
+            let incDate = new Date(incDateStr);
+
+            if (incDate > startDate && incDate <= endDate) {
+                currentBasic = currentBasic + Math.round(currentBasic * 0.03); // ३% वार्षिक वेतनवाढ
+                addTableRow(srNo++, formatDateToDDMMYYYY(incDateStr), getCommissionLabel(currentCommission), "नियमित वार्षिक वेतनवाढ", currentBasic, currentGP);
+            }
         }
 
         document.getElementById('outputBox').classList.remove('hidden');
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function addTableRow(sr, dateStr, comm, eventDesc, basic, gp) {
+        const tableBody = document.getElementById('tableBody');
+        let tr = document.createElement('tr');
+        let total = basic + gp;
+        let gpDisplay = gp > 0 ? gp : "-";
+
+        tr.innerHTML = `
+            <td>${sr}</td>
+            <td>${dateStr}</td>
+            <td>${comm}</td>
+            <td class="event-cell">${eventDesc}</td>
+            <td>${basic}</td>
+            <td>${gpDisplay}</td>
+            <td><b>${total}</b></td>
+        `;
+        tableBody.appendChild(tr);
+    }
+
+    function getCommissionLabel(comm) {
+        if(comm === '4th') return "४था आयोग";
+        if(comm === '5th') return "५वा आयोग";
+        if(comm === '6th') return "६वा आयोग";
+        if(comm === '7th') return "७वा आयोग";
+        return comm;
     }
 </script>
 
