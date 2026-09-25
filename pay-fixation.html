@@ -300,23 +300,29 @@
             </select>
         </div>
 
-        <!-- ५. सध्याची वेतनश्रेणी (इन-प्लेस कस्टम ड्रॉपडाऊन व एडिटेबल) -->
+        <!-- ५. सध्याची वेतनश्रेणी (इन-प्लेस कस्टम ड्रॉपडाऊन) -->
         <div class="form-group">
             <label for="currentPayScale">५. वेतनश्रेणी:</label>
-            <div class="custom-combobox-wrapper">
+            <div class="custom-combobox-wrapper" id="scaleWrapper">
                 <div class="custom-combobox-input-box">
                     <input type="text" id="currentPayScale" placeholder="वेतनश्रेणी निवडा किंवा लिहा" autocomplete="off" onfocus="showScaleDropdown()" oninput="filterScaleDropdown()" required>
                     <span class="custom-dropdown-arrow" onclick="toggleScaleDropdown()">▼</span>
                 </div>
-                <!-- याच बॉक्सखाली ओपन होणारी यादी -->
                 <div id="customScaleDropdown" class="custom-dropdown-list hidden"></div>
             </div>
         </div>
 
-        <!-- ६. मूळ वेतन -->
+        <!-- ६. मूळ वेतन (इन-प्लेस कस्टम ड्रॉपडाऊन व 'मूळ वेतन टाका' प्लेसहोल्डर) -->
         <div class="form-group">
             <label for="basicPay">६. मूळ वेतन (Basic):</label>
-            <input type="number" id="basicPay" placeholder="उदा. 950 किंवा 5830" required>
+            <div class="custom-combobox-wrapper" id="basicWrapper">
+                <div class="custom-combobox-input-box">
+                    <input type="number" id="basicPay" placeholder="मूळ वेतन टाका" autocomplete="off" onfocus="showBasicDropdown()" oninput="filterBasicDropdown()" required>
+                    <span class="custom-dropdown-arrow" onclick="toggleBasicDropdown()">▼</span>
+                </div>
+                <!-- येथे वेतनश्रेणीनुसार टप्प्यांची यादी दिसेल -->
+                <div id="customBasicDropdown" class="custom-dropdown-list hidden"></div>
+            </div>
         </div>
 
         <!-- ७. ग्रेड पे -->
@@ -508,7 +514,7 @@
         }
     }
 
-    // १. चौथ्या वेतन आयोगातील सर्व वेतनश्रेण्या (कनिष्ठ ते वरिष्ठ)
+    // १. चौथ्या वेतन आयोगातील सर्व वेतनश्रेण्या
     const payScales4th = [
         "रु. 750 - 12 - 870 - EB - 14 - 940 (शिपाई / चतुर्थश्रेणी)",
         "रु. 775 - 12 - 871 - EB - 14 - 1025 (दफ्तरी / नाईक)",
@@ -636,15 +642,135 @@
         }
     }
 
-    // इन-प्लेस ड्रॉपडाऊन यादी लोड करणे
+    // वेतनश्रेणी स्ट्रिंगमधून सर्व वेतनवाढ टप्पे (Stages) काढण्याचे अल्गोरिदम
+    function parsePayScaleStages(scaleStr, commission) {
+        if (!scaleStr) return [];
+        
+        // ७वा वेतन आयोग
+        if (commission === '7th' || scaleStr.includes('S-')) {
+            let match = scaleStr.match(/S-(\d+)/);
+            if (match) {
+                let levelKey = "S-" + match[1];
+                if (fullPayMatrix7th[levelKey]) return fullPayMatrix7th[levelKey];
+            }
+        }
+
+        // कंसातील भाग वगळणे
+        let cleanStr = scaleStr.replace(/\(.*?\)/g, '');
+        const marathiDigits = ['०','१','२','३','४','५','६','७','८','९'];
+        marathiDigits.forEach((d, i) => {
+            cleanStr = cleanStr.replaceAll(d, i.toString());
+        });
+
+        let matches = cleanStr.match(/\d+/g);
+        if (!matches || matches.length < 3) {
+            if (matches && matches.length === 2) {
+                let start = parseInt(matches[0]);
+                let end = parseInt(matches[1]);
+                let stages = [start];
+                let curr = start;
+                while (curr < end) {
+                    curr = Math.round((curr * 1.03) / 10) * 10;
+                    if (curr > end) curr = end;
+                    stages.push(curr);
+                    if (curr === end) break;
+                }
+                return stages;
+            }
+            return [];
+        }
+
+        let nums = matches.map(n => parseInt(n, 10));
+        let stages = [nums[0]];
+        let current = nums[0];
+
+        // उदा. [950, 20, 1150, 25, 1400]
+        for (let i = 1; i < nums.length - 1; i += 2) {
+            let inc = nums[i];
+            let target = nums[i + 1];
+            while (current < target) {
+                current += inc;
+                if (current > target) current = target;
+                stages.push(current);
+            }
+        }
+        return stages;
+    }
+
+    // ५व्या वेतनश्रेणीनुसार ६व्या रकान्यातील मूळ वेतन टप्पे लोड करणे
+    function updateBasicPayDropdownList() {
+        const commission = document.getElementById('payCommission').value;
+        const scaleStr = document.getElementById('currentPayScale').value;
+        const basicDropdownList = document.getElementById('customBasicDropdown');
+        const basicInput = document.getElementById('basicPay');
+
+        basicDropdownList.innerHTML = "";
+        let stages = parsePayScaleStages(scaleStr, commission);
+
+        if (stages.length === 0) {
+            basicDropdownList.innerHTML = `<div class="dropdown-item" style="color:#888;">कृपया प्रथम वैध वेतनश्रेणी निवडा</div>`;
+            return;
+        }
+
+        stages.forEach(amount => {
+            let div = document.createElement('div');
+            div.className = 'dropdown-item';
+            div.textContent = amount;
+            div.onclick = function() {
+                basicInput.value = amount;
+                hideBasicDropdown();
+            };
+            basicDropdownList.appendChild(div);
+        });
+    }
+
+    function showBasicDropdown() {
+        const scaleStr = document.getElementById('currentPayScale').value;
+        if (!scaleStr) {
+            alert("कृपया प्रथम ५. वेतनश्रेणी निवडा!");
+            document.getElementById('currentPayScale').focus();
+            return;
+        }
+        updateBasicPayDropdownList();
+        document.getElementById('customBasicDropdown').classList.remove('hidden');
+    }
+
+    function hideBasicDropdown() {
+        document.getElementById('customBasicDropdown').classList.add('hidden');
+    }
+
+    function toggleBasicDropdown() {
+        const dropdown = document.getElementById('customBasicDropdown');
+        if (dropdown.classList.contains('hidden')) {
+            showBasicDropdown();
+        } else {
+            hideBasicDropdown();
+        }
+    }
+
+    function filterBasicDropdown() {
+        const filter = document.getElementById('basicPay').value;
+        const items = document.querySelectorAll('#customBasicDropdown .dropdown-item');
+        items.forEach(item => {
+            if (item.textContent.includes(filter)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        showBasicDropdown();
+    }
+
     function updateCommissionRules() {
         const commission = document.getElementById('payCommission').value;
         const gradePayGroup = document.getElementById('gradePayGroup');
         const initialLevelDiv = document.getElementById('initialLevelDiv');
         const dropdownList = document.getElementById('customScaleDropdown');
         const currentPayScaleInput = document.getElementById('currentPayScale');
+        const basicInput = document.getElementById('basicPay');
 
         currentPayScaleInput.value = "";
+        basicInput.value = "";
         dropdownList.innerHTML = "";
 
         if (commission === '6th') {
@@ -672,13 +798,14 @@
                 currentPayScaleInput.value = scale;
                 hideScaleDropdown();
 
-                // ६व्या आयोगात ग्रेड पे ऑटो-डिटेक्ट करणे
                 if (commission === '6th' && scale.includes('GP')) {
                     let gpMatch = scale.match(/GP\s*(\d+)/);
                     if (gpMatch && gpMatch[1]) {
                         document.getElementById('gradePay').value = gpMatch[1];
                     }
                 }
+                // वेतनश्रेणी निवडल्यावर मूळ वेतनाचे टप्पे त्वरित तयार करणे
+                updateBasicPayDropdownList();
             };
             dropdownList.appendChild(div);
         });
@@ -720,11 +847,15 @@
         showScaleDropdown();
     }
 
-    // बाहेर क्लिक केल्यास ड्रॉपडाऊन बंद करणे
+    // बाहेर क्लिक केल्यावर दोन्ही ड्रॉपडाउन्स बंद करणे
     document.addEventListener('click', function(e) {
-        const wrapper = document.querySelector('.custom-combobox-wrapper');
-        if (wrapper && !wrapper.contains(e.target)) {
+        const scaleWrapper = document.getElementById('scaleWrapper');
+        const basicWrapper = document.getElementById('basicWrapper');
+        if (scaleWrapper && !scaleWrapper.contains(e.target)) {
             hideScaleDropdown();
+        }
+        if (basicWrapper && !basicWrapper.contains(e.target)) {
+            hideBasicDropdown();
         }
     });
 
