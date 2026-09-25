@@ -162,7 +162,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 </div>
 </div>
 
-<!-- Form टॅब क्लिक केल्यावर उघडणारे उप-टॅब्स -->
+<!-- Form टॅब क्लिक केल्यावर उघडणारे उप-टॅब्स (Difference मधील ५ फाईल्ससह) -->
 <div id="formModal" class="modal-overlay" style="z-index:3000;">
 <div class="modal-card" style="max-width:440px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:12px;">
@@ -172,10 +172,27 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div style="display:flex; flex-direction:column; gap:8px;">
 <div style="display:flex; gap:6px;">
 <a href="pay-fixation.html" class="tab-card btn-form" style="flex:1; height:40px; font-size:10px; text-decoration:none; display:flex; align-items:center; justify-content:center;">Pay Fixation</a>
-<a href="difference.html" class="tab-card btn-form" style="flex:1; height:40px; font-size:10px; text-decoration:none; display:flex; align-items:center; justify-content:center;">Difference</a>
+<div class="tab-card btn-form" style="flex:1; height:40px; font-size:10px;" onclick="openDifferenceSubModal()">Difference</div>
 <div class="tab-card btn-form" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Form Tab 3')">Form-3</div>
 <div class="tab-card btn-form" style="flex:1; height:40px; font-size:10px;" onclick="showAlert('Form Tab 4')">Form-4</div>
 </div>
+</div>
+</div>
+</div>
+
+<!-- Difference उप-मोडल (५ वेगवेगळ्या फाईल्ससाठी) -->
+<div id="differenceSubModal" class="modal-overlay" style="z-index:3500;">
+<div class="modal-card" style="max-width:380px; text-align:center;">
+<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:12px;">
+<h3 style="font-size:14px; color:#0d47a1;">📊 Difference - वेतन फरक पर्याय</h3>
+<button class="btn-close" onclick="closeDifferenceSubModal()">X</button>
+</div>
+<div style="display:flex; flex-direction:column; gap:8px;">
+<a href="difference.html" class="btn-report" style="background:#1976d2; text-decoration:none; display:block; padding:10px; border-radius:6px; color:#fff; font-weight:700; font-size:12px;">1. Difference (मुख्य पेज)</a>
+<a href="diff_4th_commission.html" class="btn-report" style="background:#2e7d32; text-decoration:none; display:block; padding:10px; border-radius:6px; color:#fff; font-weight:700; font-size:12px;">2. ४ था आयोग फरक (4th Commission)</a>
+<a href="diff_5th_commission.html" class="btn-report" style="background:#f57c00; text-decoration:none; display:block; padding:10px; border-radius:6px; color:#fff; font-weight:700; font-size:12px;">3. ५ वा आयोग फरक (5th Commission)</a>
+<a href="diff_6th_commission.html" class="btn-report" style="background:#7b1fa2; text-decoration:none; display:block; padding:10px; border-radius:6px; color:#fff; font-weight:700; font-size:12px;">4. ६ वा आयोग फरक (6th Commission)</a>
+<a href="diff_7th_commission.html" class="btn-report" style="background:#c2185b; text-decoration:none; display:block; padding:10px; border-radius:6px; color:#fff; font-weight:700; font-size:12px;">5. ७ वा आयोग फरक (7th Commission)</a>
 </div>
 </div>
 </div>
@@ -677,6 +694,15 @@ function closeFormModal() {
 document.getElementById('formModal').style.display = 'none';
 }
 
+/* Difference उप-मोडल उघडणे व बंद करण्याचे फंक्शन्स */
+function openDifferenceSubModal() {
+    closeFormModal();
+    document.getElementById('differenceSubModal').style.display = 'flex';
+}
+function closeDifferenceSubModal() {
+    document.getElementById('differenceSubModal').style.display = 'none';
+}
+
 const marathiSuvicharList = [
 "✨ कष्टाशिवाय यशाला मोल नाही, सातत्य आणि प्रामाणिकपणा हीच यशाची खरी गुरुकिल्ली आहे! ✨",
 "🌟 यश हे एका रात्रीत मिळत नाही, त्यासाठी दररोज घेतलेली मेहनत महत्त्वाची असते! 🌟",
@@ -696,7 +722,6 @@ function setData(key, data) {
     localStorage.setItem(key, JSON.stringify(data)); 
 }
 
-/* ऑटो-सिंक: जेव्हा इतर टॅब किंवा विндоमध्ये डेटा बदलेल, तेव्हा इथे आपोआप रिफ्रेश होईल */
 window.addEventListener('storage', function(e) {
     refreshAll();
 });
@@ -846,7 +871,6 @@ html += '</tbody></table>';
 printA4Document(html);
 }
 
-/* मिळालेली M.B., दिलेली M.B., उपलब्ध M.B. कार्ड क्लिकवर पॉपअप उघडणे व डायनॅमिक फिल्टरिंग */
 var currentQuickModalType = '';
 
 function openQuickInfoModal(type) {
