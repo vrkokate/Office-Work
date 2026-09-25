@@ -117,48 +117,55 @@
             font-weight: bold;
         }
 
-        /* पॉप-अप (Modal) स्टाईल्स */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.65);
+        /* नवीन आकर्षक पदोन्नती / MACP कार्ड */
+        .benefit-card {
+            background: #f1f8e9;
+            border: 1.5px solid #81c784;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 10px 0 12px 0;
+            box-shadow: 0 2px 6px rgba(46, 125, 50, 0.1);
+        }
+        .benefit-card-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #1b5e20;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            padding: 12px;
+            gap: 5px;
+            border-bottom: 1px dashed #a5d6a7;
+            padding-bottom: 4px;
         }
-        .modal-box {
-            background: #fff;
-            width: 100%;
-            max-width: 440px;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            animation: fadeIn 0.2s ease-in-out;
-        }
-        .modal-header {
+        .card-row {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #2e7d32;
-            padding-bottom: 6px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 8px;
         }
-        .modal-header h3 {
-            margin: 0;
-            font-size: 15px;
+        .card-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .card-col label {
+            font-size: 11px;
+            font-weight: bold;
             color: #2e7d32;
         }
-        .modal-close-btn {
-            background: #d32f2f;
-            color: #fff;
-            border: none;
-            padding: 2px 7px;
-            font-weight: bold;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 13px;
+        .card-col input, .card-col select {
+            width: 100%;
+            border: 1px solid #81c784;
+            background: #ffffff;
+            border-radius: 4px;
+            padding: 6px 8px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .card-col input:focus, .card-col select:focus {
+            border-color: #2e7d32;
+            outline: none;
+            box-shadow: 0 0 4px rgba(46, 125, 50, 0.3);
         }
 
         .date-range-container {
@@ -391,41 +398,69 @@
             </select>
         </div>
 
-        <!-- MACP टप्पा (MACP निवडल्यास) -->
-        <div class="form-group hidden" id="macpBenefitDiv">
-            <label for="macpPhase">MACP लाभ टप्पा:</label>
-            <select id="macpPhase">
-                <option value="पहिला लाभ (1st MACP)" selected>पहिला लाभ (1st MACP)</option>
-                <option value="दुसरा लाभ (2nd MACP)">दुसरा लाभ (2nd MACP)</option>
-                <option value="तिसरा लाभ (3rd MACP)">तिसरा लाभ (3rd MACP)</option>
-            </select>
-        </div>
+        <!-- पदोन्नती विभाग (सुंदर डिझाइन: दोन बॉक्स - पदोन्नती टप्पा आणि दिनांक) -->
+        <div id="promotionCard" class="benefit-card hidden">
+            <div class="benefit-card-title">🎖️ पदोन्नती तपशील व दिनांक</div>
+            
+            <!-- पहिली/दुसरी/तिसरी/चौथी पदोन्नती आणि दिनांक चे २ बॉक्सेस -->
+            <div class="card-row">
+                <div class="card-col">
+                    <label for="promoPhaseSelect">पदोन्नती टप्पा निवडा:</label>
+                    <select id="promoPhaseSelect">
+                        <option value="पहिली पदोन्नती" selected>पहिली पदोन्नती</option>
+                        <option value="दुसरी पदोन्नती">दुसरी पदोन्नती</option>
+                        <option value="तिसरी पदोन्नती">तिसरी पदोन्नती</option>
+                        <option value="चौथी पदोन्नती">चौथी पदोन्नती</option>
+                    </select>
+                </div>
+                <div class="card-col">
+                    <label for="promoDateInput">पदोन्नती दिनांक:</label>
+                    <input type="date" id="promoDateInput" onclick="openPicker(this)" onchange="syncPromoOptionDate()">
+                </div>
+            </div>
 
-        <!-- पदोन्नती टप्पा व पद (पदोन्नती निवडल्यास) -->
-        <div class="form-group hidden" id="promoInfoDiv">
-            <label id="promoPhaseLabel">पदोन्नती टप्पा व पद:</label>
-            <div style="flex: 1.4; display: flex; gap: 5px;">
-                <input type="text" id="promoSummaryInput" readonly placeholder="पदोन्नती तपशील" style="flex: 1; background-color: #f1f8e9; font-weight: bold; cursor: pointer;" onclick="openPromotionModal()">
-                <button type="button" onclick="openPromotionModal()" style="background:#2e7d32; color:#fff; border:none; border-radius:4px; padding:0 8px; font-size:11px; cursor:pointer;">बदला</button>
+            <!-- पदोन्नतीचे पद आणि मंजूर वरिष्ठ वेतन स्तर -->
+            <div class="card-row" style="margin-bottom: 0;">
+                <div class="card-col">
+                    <label for="promoDesignationInput">पदोन्नतीचे पद:</label>
+                    <input type="text" id="promoDesignationInput" placeholder="उदा. वरिष्ठ लिपिक / उपअभियंता">
+                </div>
+                <div class="card-col">
+                    <label for="promotionalLevelPromo">मंजूर वरिष्ठ वेतन स्तर:</label>
+                    <select id="promotionalLevelPromo"></select>
+                </div>
             </div>
         </div>
 
-        <!-- लाभाचा / पदोन्नतीचा दिनांक -->
-        <div class="form-group hidden" id="benefitDateDiv">
-            <label for="benefitDate" id="benefitDateLabel">लाभाचा दिनांक:</label>
-            <input type="date" id="benefitDate" onclick="openPicker(this)" onchange="syncOptionDateDefault()">
+        <!-- MACP विभाग (MACP निवडल्यास २ बॉक्सेस) -->
+        <div id="macpCard" class="benefit-card hidden">
+            <div class="benefit-card-title">⭐ आश्वासित प्रगती योजना (MACP) तपशील</div>
+            <div class="card-row">
+                <div class="card-col">
+                    <label for="macpPhase">MACP लाभ टप्पा:</label>
+                    <select id="macpPhase">
+                        <option value="पहिला लाभ (1st MACP)" selected>पहिला लाभ (1st MACP)</option>
+                        <option value="दुसरा लाभ (2nd MACP)">दुसरा लाभ (2nd MACP)</option>
+                        <option value="तिसरा लाभ (3rd MACP)">तिसरा लाभ (3rd MACP)</option>
+                    </select>
+                </div>
+                <div class="card-col">
+                    <label for="macpDateInput">लाभाचा दिनांक:</label>
+                    <input type="date" id="macpDateInput" onclick="openPicker(this)" onchange="syncMacpOptionDate()">
+                </div>
+            </div>
+            <div class="card-row" style="margin-bottom: 0;">
+                <div class="card-col">
+                    <label for="promotionalLevelMacp">मंजूर वरिष्ठ वेतन स्तर:</label>
+                    <select id="promotionalLevelMacp"></select>
+                </div>
+            </div>
         </div>
 
         <!-- विकल्पाचा दिनांक -->
         <div class="form-group hidden" id="optionDateGroup">
             <label for="optionDate">विकल्पाचा दिनांक (Option Date):</label>
             <input type="date" id="optionDate" onclick="openPicker(this)">
-        </div>
-
-        <!-- वरिष्ठ वेतन स्तर -->
-        <div class="form-group hidden" id="promotionalLevelDiv">
-            <label for="promotionalLevel">मंजूर वरिष्ठ वेतन स्तर:</label>
-            <select id="promotionalLevel"></select>
         </div>
 
         <!-- १०. कालावधी दिनांक -->
@@ -541,36 +576,6 @@
     </div>
 </div>
 
-<!-- पदोन्नती तपशील पॉप-अप विंडो (Modal Popup) -->
-<div id="promotionModal" class="modal-overlay hidden">
-    <div class="modal-box">
-        <div class="modal-header">
-            <h3>🎖️ पदोन्नती तपशील निवडा</h3>
-            <button type="button" class="modal-close-btn" onclick="closePromotionModal()">X</button>
-        </div>
-        <div style="margin-top: 10px;">
-            <div class="form-group">
-                <label for="modalPromotionPhase">पदोन्नती टप्पा:</label>
-                <select id="modalPromotionPhase">
-                    <option value="पहिली पदोन्नती">पहिली पदोन्नती</option>
-                    <option value="दुसरी पदोन्नती">दुसरी पदोन्नती</option>
-                    <option value="तिसरी पदोन्नती">तिसरी पदोन्नती</option>
-                    <option value="चौथी पदोन्नती">चौथी पदोन्नती</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="modalPromotedPost">पदोन्नतीचे पद:</label>
-                <input type="text" id="modalPromotedPost" placeholder="उदा. वरिष्ठ लिपिक / उपअभियंता">
-            </div>
-            <div class="form-group">
-                <label for="modalPromotionDate">पदोन्नती दिनांक:</label>
-                <input type="date" id="modalPromotionDate" onclick="openPicker(this)">
-            </div>
-            <button type="button" class="submit-btn" style="margin-top: 12px;" onclick="savePromotionModal()">जतन करा (Save)</button>
-        </div>
-    </div>
-</div>
-
 <script>
     function openPicker(input) {
         if (input.showPicker) {
@@ -597,69 +602,38 @@
         }
     }
 
-    // पदोन्नती पॉप-अप उघडणे व बंद करणे
-    function openPromotionModal() {
-        document.getElementById('promotionModal').classList.remove('hidden');
-        if (document.getElementById('benefitDate').value) {
-            document.getElementById('modalPromotionDate').value = document.getElementById('benefitDate').value;
+    function syncPromoOptionDate() {
+        const pDate = document.getElementById('promoDateInput').value;
+        if (pDate && !document.getElementById('optionDate').value) {
+            document.getElementById('optionDate').value = pDate;
         }
     }
 
-    function closePromotionModal() {
-        document.getElementById('promotionModal').classList.add('hidden');
-    }
-
-    function savePromotionModal() {
-        const phase = document.getElementById('modalPromotionPhase').value;
-        const post = document.getElementById('modalPromotedPost').value.trim();
-        const date = document.getElementById('modalPromotionDate').value;
-
-        if (!post) {
-            alert("कृपया पदोन्नतीचे पद प्रविष्ट करा!");
-            return;
+    function syncMacpOptionDate() {
+        const mDate = document.getElementById('macpDateInput').value;
+        if (mDate && !document.getElementById('optionDate').value) {
+            document.getElementById('optionDate').value = mDate;
         }
-
-        document.getElementById('promoSummaryInput').value = `${phase} - ${post}`;
-        if (date) {
-            document.getElementById('benefitDate').value = date;
-            syncOptionDateDefault();
-        }
-
-        closePromotionModal();
     }
 
     function handleBenefitTypeChange() {
         const benefit = document.getElementById('benefitType').value;
-        const macpDiv = document.getElementById('macpBenefitDiv');
-        const promoDiv = document.getElementById('promoInfoDiv');
-        const benefitDateDiv = document.getElementById('benefitDateDiv');
-        const benefitDateLabel = document.getElementById('benefitDateLabel');
+        const promoCard = document.getElementById('promotionCard');
+        const macpCard = document.getElementById('macpCard');
         const optionDateGroup = document.getElementById('optionDateGroup');
-        const promotionalLevelDiv = document.getElementById('promotionalLevelDiv');
 
         if (benefit === 'Promotion') {
-            promoDiv.classList.remove('hidden');
-            macpDiv.classList.add('hidden');
-            benefitDateDiv.classList.remove('hidden');
-            benefitDateLabel.textContent = "पदोन्नती दिनांक:";
+            promoCard.classList.remove('hidden');
+            macpCard.classList.add('hidden');
             optionDateGroup.classList.remove('hidden');
-            promotionalLevelDiv.classList.remove('hidden');
-            
-            // पदोन्नती निवडताच स्क्रीनवर पॉपअप उघडणे
-            openPromotionModal();
         } else if (benefit === 'MACP') {
-            macpDiv.classList.remove('hidden');
-            promoDiv.classList.add('hidden');
-            benefitDateDiv.classList.remove('hidden');
-            benefitDateLabel.textContent = "लाभाचा दिनांक (MACP Date):";
+            macpCard.classList.remove('hidden');
+            promoCard.classList.add('hidden');
             optionDateGroup.classList.remove('hidden');
-            promotionalLevelDiv.classList.remove('hidden');
         } else {
-            macpDiv.classList.add('hidden');
-            promoDiv.classList.add('hidden');
-            benefitDateDiv.classList.add('hidden');
+            promoCard.classList.add('hidden');
+            macpCard.classList.add('hidden');
             optionDateGroup.classList.add('hidden');
-            promotionalLevelDiv.classList.add('hidden');
         }
     }
 
@@ -768,9 +742,12 @@
 
     function populate7thLevelDropdowns() {
         const initSelect = document.getElementById('initial7thLevel');
-        const promoSelect = document.getElementById('promotionalLevel');
+        const promoSelect1 = document.getElementById('promotionalLevelPromo');
+        const promoSelect2 = document.getElementById('promotionalLevelMacp');
+        
         initSelect.innerHTML = "";
-        promoSelect.innerHTML = "";
+        promoSelect1.innerHTML = "";
+        promoSelect2.innerHTML = "";
 
         for (const [key, val] of Object.entries(level7thStartPay)) {
             let opt1 = document.createElement('option');
@@ -783,7 +760,13 @@
             opt2.value = key;
             opt2.textContent = val.desc;
             if (key === "S-8") opt2.selected = true;
-            promoSelect.appendChild(opt2);
+            promoSelect1.appendChild(opt2);
+
+            let opt3 = document.createElement('option');
+            opt3.value = key;
+            opt3.textContent = val.desc;
+            if (key === "S-8") opt3.selected = true;
+            promoSelect2.appendChild(opt3);
         }
     }
 
@@ -1006,13 +989,6 @@
         return dateString;
     }
 
-    function syncOptionDateDefault() {
-        const bDate = document.getElementById('benefitDate').value;
-        if (bDate && !document.getElementById('optionDate').value) {
-            document.getElementById('optionDate').value = bDate;
-        }
-    }
-
     function toggleWithheldOptions() {
         const withheld = document.getElementById('incrementWithheld').value;
         const withheldEffectDiv = document.getElementById('withheldEffectDiv');
@@ -1050,24 +1026,36 @@
         let basic = parseFloat(document.getElementById('basicPay').value);
         let gradePay = parseFloat(document.getElementById('gradePay').value) || 0;
         const benefit = document.getElementById('benefitType').value || 'None';
-        const macpPhase = document.getElementById('macpPhase').value;
-        const promoSummary = document.getElementById('promoSummaryInput').value;
-        const benefitDateInput = document.getElementById('benefitDate').value;
+        
+        let benefitPhase = "";
+        let benefitPost = "";
+        let benefitDateInput = "";
+        let promoLevel = "";
+
+        if (benefit === 'Promotion') {
+            benefitPhase = document.getElementById('promoPhaseSelect').value;
+            benefitPost = document.getElementById('promoDesignationInput').value.trim() || "वरिष्ठ पद";
+            benefitDateInput = document.getElementById('promoDateInput').value;
+            promoLevel = document.getElementById('promotionalLevelPromo').value;
+        } else if (benefit === 'MACP') {
+            benefitPhase = document.getElementById('macpPhase').value;
+            benefitDateInput = document.getElementById('macpDateInput').value;
+            promoLevel = document.getElementById('promotionalLevelMacp').value;
+        }
+
         const optionDateInput = document.getElementById('optionDate').value;
         const fromDateInput = document.getElementById('fixationFrom').value;
         const toDateInput = document.getElementById('fixationTo').value;
         const autoUpgrade = document.getElementById('autoCommissionChange').value === 'Yes';
-        
         let initialLevel = document.getElementById('initial7thLevel').value;
-        let promoLevel = document.getElementById('promotionalLevel').value;
 
         const joinDateFormatted = formatDateToDDMMYYYY(joinDateInput);
         const fromDateFormatted = formatDateToDDMMYYYY(fromDateInput);
         const toDateFormatted = formatDateToDDMMYYYY(toDateInput);
 
         let benefitLabel = "कोणताही नाही";
-        if (benefit === 'Promotion') benefitLabel = `पदोन्नती (${promoSummary} - मंजूर स्तर: ${promoLevel})`;
-        else if (benefit === 'MACP') benefitLabel = `${macpPhase} (मंजूर वरिष्ठ वेतन स्तर: ${promoLevel})`;
+        if (benefit === 'Promotion') benefitLabel = `${benefitPhase} (${benefitPost} - मंजूर स्तर: ${promoLevel})`;
+        else if (benefit === 'MACP') benefitLabel = `${benefitPhase} (मंजूर वरिष्ठ वेतन स्तर: ${promoLevel})`;
 
         const summaryHtml = `
             <div><b>कर्मचाऱ्याचे नाव:</b> ${name}</div>
@@ -1127,7 +1115,7 @@
         let bDate = benefitDateInput ? new Date(benefitDateInput) : null;
         let optDate = optionDateInput ? new Date(optionDateInput) : (bDate ? bDate : null);
 
-        let eventTitle = (benefit === 'Promotion') ? promoSummary : macpPhase;
+        let eventTitle = (benefit === 'Promotion') ? `${benefitPhase} (${benefitPost})` : benefitPhase;
 
         if (benefit !== 'None' && bDate && bDate >= startDate && bDate <= endDate) {
             if (optDate && optDate.getTime() === bDate.getTime()) {
