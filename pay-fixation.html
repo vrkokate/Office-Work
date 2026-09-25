@@ -300,7 +300,7 @@
             </select>
         </div>
 
-        <!-- ५. सध्याची वेतनश्रेणी (इन-प्लेस कस्टम ड्रॉपडाऊन) -->
+        <!-- ५. सध्याची वेतनश्रेणी -->
         <div class="form-group">
             <label for="currentPayScale">५. वेतनश्रेणी:</label>
             <div class="custom-combobox-wrapper" id="scaleWrapper">
@@ -312,7 +312,7 @@
             </div>
         </div>
 
-        <!-- ६. मूळ वेतन (इन-प्लेस कस्टम ड्रॉपडाऊन व 'मूळ वेतन टाका' प्लेसहोल्डर) -->
+        <!-- ६. मूळ वेतन -->
         <div class="form-group">
             <label for="basicPay">६. मूळ वेतन (Basic):</label>
             <div class="custom-combobox-wrapper" id="basicWrapper">
@@ -320,7 +320,6 @@
                     <input type="number" id="basicPay" placeholder="मूळ वेतन टाका" autocomplete="off" onfocus="showBasicDropdown()" oninput="filterBasicDropdown()" required>
                     <span class="custom-dropdown-arrow" onclick="toggleBasicDropdown()">▼</span>
                 </div>
-                <!-- येथे वेतनश्रेणीनुसार टप्प्यांची यादी दिसेल -->
                 <div id="customBasicDropdown" class="custom-dropdown-list hidden"></div>
             </div>
         </div>
@@ -337,18 +336,19 @@
             <select id="initial7thLevel"></select>
         </div>
 
-        <!-- ९. आर्थिक लाभ प्रकार -->
+        <!-- ९. आर्थिक लाभ प्रकार (सुधारित: डीफॉल्ट प्रकार निवडा) -->
         <div class="form-group">
             <label for="benefitType">९. आर्थिक लाभ प्रकार:</label>
             <select id="benefitType" onchange="toggleBenefitOptions()">
+                <option value="" disabled selected>प्रकार निवडा</option>
                 <option value="None">कोणताही लाभ नाही (नियमित)</option>
-                <option value="MACP" selected>आश्वासित प्रगती योजना (MACP)</option>
+                <option value="MACP">आश्वासित प्रगती योजना (MACP)</option>
                 <option value="Promotion">पदोन्नती (Promotion)</option>
             </select>
         </div>
 
         <!-- MACP टप्पा -->
-        <div class="form-group" id="macpBenefitDiv">
+        <div class="form-group hidden" id="macpBenefitDiv">
             <label for="macpPhase">MACP लाभ टप्पा:</label>
             <select id="macpPhase">
                 <option value="पहिला लाभ (1st MACP)" selected>पहिला लाभ (1st MACP)</option>
@@ -358,19 +358,19 @@
         </div>
 
         <!-- लाभाचा दिनांक -->
-        <div class="form-group" id="benefitDateDiv">
+        <div class="form-group hidden" id="benefitDateDiv">
             <label for="benefitDate">लाभाचा दिनांक (MACP Date):</label>
             <input type="date" id="benefitDate" onclick="openPicker(this)" onchange="syncOptionDateDefault()">
         </div>
 
         <!-- विकल्पाचा दिनांक -->
-        <div class="form-group" id="optionDateGroup">
+        <div class="form-group hidden" id="optionDateGroup">
             <label for="optionDate">विकल्पाचा दिनांक (Option Date):</label>
             <input type="date" id="optionDate" onclick="openPicker(this)">
         </div>
 
         <!-- वरिष्ठ वेतन स्तर -->
-        <div class="form-group" id="promotionalLevelDiv">
+        <div class="form-group hidden" id="promotionalLevelDiv">
             <label for="promotionalLevel">मंजूर वरिष्ठ वेतन स्तर:</label>
             <select id="promotionalLevel"></select>
         </div>
@@ -514,7 +514,6 @@
         }
     }
 
-    // १. चौथ्या वेतन आयोगातील सर्व वेतनश्रेण्या
     const payScales4th = [
         "रु. 750 - 12 - 870 - EB - 14 - 940 (शिपाई / चतुर्थश्रेणी)",
         "रु. 775 - 12 - 871 - EB - 14 - 1025 (दफ्तरी / नाईक)",
@@ -536,7 +535,6 @@
         "रु. 7300 - 100 - 7600 (मुख्य सचिव / CS)"
     ];
 
-    // २. पाचव्या वेतन आयोगातील सर्व वेतनश्रेण्या
     const payScales5th = [
         "रु. 2550 - 55 - 2660 - 60 - 3200 (शिपाई / चतुर्थश्रेणी)",
         "रु. 2610 - 60 - 3150 - 65 - 3540 (नाईक)",
@@ -557,7 +555,6 @@
         "रु. 22400 - 525 - 24500 (मुख्य सचिव / CS)"
     ];
 
-    // ३. सहाव्या वेतन आयोगातील सर्व वेतनश्रेण्या
     const payScales6th = [
         "PB-1 : 4440 - 7440 (GP 1300) - शिपाई",
         "PB-1 : 4440 - 7440 (GP 1400) - नाईक",
@@ -580,7 +577,6 @@
         "PB-4 : 37400 - 67000 (GP 12000) - सचिव (Secretary)"
     ];
 
-    // ४. सातव्या वेतन आयोगातील स्तर माहिती
     const level7thStartPay = {
         "S-1": { start: 15000, max: 47600, desc: "S-1 (15000 - 47600) - शिपाई / चतुर्थश्रेणी" },
         "S-2": { start: 15700, max: 50000, desc: "S-2 (15700 - 50000) - नाईक" },
@@ -642,11 +638,9 @@
         }
     }
 
-    // वेतनश्रेणी स्ट्रिंगमधून सर्व वेतनवाढ टप्पे (Stages) काढण्याचे अल्गोरिदम
     function parsePayScaleStages(scaleStr, commission) {
         if (!scaleStr) return [];
         
-        // ७वा वेतन आयोग
         if (commission === '7th' || scaleStr.includes('S-')) {
             let match = scaleStr.match(/S-(\d+)/);
             if (match) {
@@ -655,7 +649,6 @@
             }
         }
 
-        // कंसातील भाग वगळणे
         let cleanStr = scaleStr.replace(/\(.*?\)/g, '');
         const marathiDigits = ['०','१','२','३','४','५','६','७','८','९'];
         marathiDigits.forEach((d, i) => {
@@ -684,7 +677,6 @@
         let stages = [nums[0]];
         let current = nums[0];
 
-        // उदा. [950, 20, 1150, 25, 1400]
         for (let i = 1; i < nums.length - 1; i += 2) {
             let inc = nums[i];
             let target = nums[i + 1];
@@ -697,7 +689,6 @@
         return stages;
     }
 
-    // ५व्या वेतनश्रेणीनुसार ६व्या रकान्यातील मूळ वेतन टप्पे लोड करणे
     function updateBasicPayDropdownList() {
         const commission = document.getElementById('payCommission').value;
         const scaleStr = document.getElementById('currentPayScale').value;
@@ -804,7 +795,6 @@
                         document.getElementById('gradePay').value = gpMatch[1];
                     }
                 }
-                // वेतनश्रेणी निवडल्यावर मूळ वेतनाचे टप्पे त्वरित तयार करणे
                 updateBasicPayDropdownList();
             };
             dropdownList.appendChild(div);
@@ -847,7 +837,6 @@
         showScaleDropdown();
     }
 
-    // बाहेर क्लिक केल्यावर दोन्ही ड्रॉपडाउन्स बंद करणे
     document.addEventListener('click', function(e) {
         const scaleWrapper = document.getElementById('scaleWrapper');
         const basicWrapper = document.getElementById('basicWrapper');
@@ -933,7 +922,7 @@
         const scale = document.getElementById('currentPayScale').value;
         let basic = parseFloat(document.getElementById('basicPay').value);
         let gradePay = parseFloat(document.getElementById('gradePay').value) || 0;
-        const benefit = document.getElementById('benefitType').value;
+        const benefit = document.getElementById('benefitType').value || 'None';
         const macpPhase = document.getElementById('macpPhase').value;
         const benefitDateInput = document.getElementById('benefitDate').value;
         const optionDateInput = document.getElementById('optionDate').value;
