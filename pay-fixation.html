@@ -323,7 +323,7 @@
         .custom-dropdown-list {
             position: absolute;
             top: 100%; left: 0; right: 0;
-            max-height: 200px;
+            max-height: 220px;
             overflow-y: auto;
             background: #ffffff;
             border: 1.5px solid var(--primary);
@@ -346,7 +346,7 @@
             font-weight: bold;
         }
 
-        /* पदोन्नती २+२+१ कार्ड */
+        /* पदोन्नती कार्ड */
         .benefit-sub-card {
             background: #fbfdfb;
             border: 1.5px solid #a5d6a7;
@@ -779,7 +779,7 @@
             </div>
         </div>
 
-        <!-- ६. मूळ वेतन (६व्या आयोगासाठी सुधारित ३% + १० च्या पटीतील गणना) -->
+        <!-- ६. मूळ वेतन (Annexure-III व ३% १० च्या पटीतील सुधारित ड्रॉपडाऊन) -->
         <div class="field-group">
             <label>६. मूळ वेतन (Basic):</label>
             <div class="combobox-container" id="basicWrapper">
@@ -1182,6 +1182,9 @@
         closeModal('rulesModal');
     }
 
+    // =========================================================================
+    // 📚 अधिकृत वेतनश्रेण्या (४था, ५वा व ६वा वेतन आयोग)
+    // =========================================================================
     const payScales4th = [
         "रु. 750 - 12 - 870 - EB - 14 - 940 (शिपाई / चतुर्थश्रेणी)",
         "रु. 775 - 12 - 871 - EB - 14 - 1025 (दफ्तरी / नाईक)",
@@ -1198,31 +1201,123 @@
         "रु. 3000 - 100 - 3500 - 125 - 4500 (कार्यकारी अभियंता / EE)"
     ];
 
+    // Annexure - I मधील सर्व २७ अधिकृत वेतनश्रेण्या
     const payScales5th = [
-        "रु. 2550 - 55 - 2660 - 60 - 3200 (शिपाई / चतुर्थश्रेणी)",
-        "रु. 2610 - 60 - 3150 - 65 - 3540 (नाईक)",
-        "रु. 2650 - 65 - 3300 - 70 - 4000 (दफ्तरी)",
-        "रु. 2750 - 70 - 3800 - 75 - 4400 (जमादार)",
+        "रु. 2550 - 55 - 2660 - 60 - 3200",
+        "रु. 2610 - 60 - 2910 - 65 - 3300 - 70 - 4000",
+        "रु. 2650 - 65 - 3300 - 70 - 4000",
+        "रु. 2750 - 70 - 3800 - 75 - 4400",
         "रु. 3050 - 75 - 3950 - 80 - 4590 (कनिष्ठ लिपिक / टंकलेखक)",
         "रु. 3200 - 85 - 4900 (वाहनचालक)",
         "रु. 4000 - 100 - 6000 (वरिष्ठ लिपिक)",
         "रु. 4500 - 125 - 7000 (मुख्य लिपिक)",
         "रु. 5000 - 150 - 8000 (शाखा अभियंता / JE)",
+        "रु. 5500 - 175 - 9000",
+        "रु. 6000 - 175 - 9850 - 150 - 10000",
         "रु. 6500 - 200 - 10500 (उपअभियंता / AE-2)",
+        "रु. 7225 - 225 - 11050",
+        "रु. 7450 - 225 - 11050",
+        "रु. 7450 - 225 - 11500",
+        "रु. 7500 - 250 - 12000",
         "रु. 8000 - 275 - 13500 (सहाय्यक अभियंता श्रेणी-१ / AE-1)",
-        "रु. 10000 - 325 - 15200 (कार्यकारी अभियंता / EE)"
+        "रु. 9125 - 275 - 14075",
+        "रु. 10000 - 325 - 15200 (कार्यकारी अभियंता / EE)",
+        "रु. 10650 - 325 - 15850",
+        "रु. 12000 - 375 - 16500 (अधीक्षक अभियंता / SE)",
+        "रु. 14300 - 400 - 18300 (मुख्य अभियंता / CE)",
+        "रु. 15100 - 400 - 18300",
+        "रु. 16400 - 450 - 20000 (सचिव / Secretary)",
+        "रु. 16400 - 450 - 20900",
+        "रु. 18400 - 500 - 22400",
+        "रु. 22400 - 525 - 24500 (मुख्य सचिव / CS)"
     ];
 
+    // Annexure - II मधील सर्व सुधारित पे बँड्स व ग्रेड पे
     const payScales6th = [
+        "-1S : 4440 - 7440 (GP 1300) - शिपाई / चतुर्थश्रेणी",
+        "-1S : 4440 - 7440 (GP 1400) - नाईक",
+        "-1S : 4440 - 7440 (GP 1600) - दफ्तरी",
+        "-1S : 4440 - 7440 (GP 1650) - जमादार",
+        "-1S : 4440 - 7440 (GP 1700)",
+        "PB-1 : 5200 - 20200 (GP 1800)",
         "PB-1 : 5200 - 20200 (GP 1900) - कनिष्ठ लिपिक",
-        "PB-1 : 5200 - 20200 (GP 2400) - वरिष्ठ लिपिक",
+        "PB-1 : 5200 - 20200 (GP 2000)",
+        "PB-1 : 5200 - 20200 (GP 2400) - वरिष्ठ लिपिक / वाहनचालक",
+        "PB-1 : 5200 - 20200 (GP 2500)",
         "PB-1 : 5200 - 20200 (GP 2800) - मुख्य लिपिक",
-        "PB-1 : 4440 - 7440 (GP 1300) - शिपाई",
+        "PB-1 : 5200 - 20200 (GP 2900)",
+        "PB-1 : 5200 - 20200 (GP 3000)",
+        "PB-1 : 5200 - 20200 (GP 3500)",
         "PB-2 : 9300 - 34800 (GP 4200) - शाखा अभियंता (JE)",
+        "PB-2 : 9300 - 34800 (GP 4300)",
+        "PB-2 : 9300 - 34800 (GP 4400) - सहाय्यक अधीक्षक",
+        "PB-2 : 9300 - 34800 (GP 4500)",
+        "PB-2 : 9300 - 34800 (GP 4600) - प्रशासनिक अधिकारी",
+        "PB-2 : 9300 - 34800 (GP 4800)",
+        "PB-2 : 9300 - 34800 (GP 4900)",
+        "PB-2 : 9300 - 34800 (GP 5000)",
         "PB-2 : 9300 - 34800 (GP 5400) - उपअभियंता (AE-2)",
+        "PB-3 : 15600 - 39100 (GP 5000)",
+        "PB-3 : 15600 - 39100 (GP 5400) - सहाय्यक अभियंता श्रेणी-१ (AE-1)",
+        "PB-3 : 15600 - 39100 (GP 5500)",
+        "PB-3 : 15600 - 39100 (GP 5700)",
+        "PB-3 : 15600 - 39100 (GP 5800)",
         "PB-3 : 15600 - 39100 (GP 6600) - कार्यकारी अभियंता (EE)",
-        "PB-4 : 37400 - 67000 (GP 8700) - अधीक्षक अभियंता (SE)"
+        "PB-3 : 15600 - 39100 (GP 6900)",
+        "PB-3 : 15600 - 39100 (GP 7600) - वरिष्ठ कार्यकारी अभियंता",
+        "PB-3 : 15600 - 39100 (GP 7900)",
+        "PB-4 : 37400 - 67000 (GP 8700) - अधीक्षक अभियंता (SE)",
+        "PB-4 : 37400 - 67000 (GP 8800)",
+        "PB-4 : 37400 - 67000 (GP 8900)",
+        "PB-4 : 37400 - 67000 (GP 10000) - मुख्य अभियंता (CE)",
+        "PB-4 : 37400 - 67000 (GP 12000) - सचिव (Secretary)"
     ];
+
+    // Annexure - III मधील अधिकृत Entry Pay (Pay in Pay Band for Direct Recruits)
+    const entryPayAnnexureIII = {
+        1300: 4440,
+        1400: 4440,
+        1600: 4840,
+        1650: 4920,
+        1700: 4920,
+        1800: 5200,
+        1900: 5830, // GP 1900 -> 5830 (शासकीय परिपत्रकानुसार)
+        2000: 6460,
+        2400: 7510,
+        2500: 7770,
+        2800: 8560,
+        2900: 8620,
+        3000: 8680,
+        3500: 8920,
+        4200: 9300,
+        4300: 10100,
+        4400: 10900,
+        4500: 11700,
+        4600: 12540,
+        4800: 13350,
+        4900: 13530,
+        5000: 13710,
+        5400: 14450,
+        5500: 15870,
+        5700: 16390,
+        5800: 16660,
+        6600: 18750,
+        6900: 19700,
+        7600: 21900,
+        7900: 22850,
+        8700: 37400,
+        8800: 38800,
+        8900: 40200,
+        10000: 43000,
+        12000: 47100
+    };
+
+    function get6thEntryPay(scaleStr, gp) {
+        if (scaleStr && scaleStr.includes("PB-3")) {
+            if (gp === 5000 || gp === 5400) return 15600;
+        }
+        return entryPayAnnexureIII[gp] || 0;
+    }
 
     const level7thStartPay = {
         "S-1": { start: 15000, max: 47600, desc: "S-1 (15000 - 47600) - शिपाई" },
@@ -1268,29 +1363,49 @@
             return fullPayMatrix7th["S-6"];
         }
 
-        // ६वा वेतन आयोग (३% काढून पुढील १० च्या पटीत राउंडिंग - उदा. ५२००, ५४२०, ५६४०...)
-        if (commission === '6th' || scaleStr.includes('PB') || scaleStr.includes('GP')) {
+        // ६वा वेतन आयोग (३% काढून पुढील १० च्या पटीत राउंडिंग)
+        if (commission === '6th' || scaleStr.includes('PB') || scaleStr.includes('GP') || scaleStr.includes('-1S')) {
             let clean = scaleStr.replace(/\(.*?\)/g, '');
             let bandMatch = clean.match(/(\d{4,6})\s*-\s*(\d{4,6})/);
             let gpMatch = scaleStr.match(/GP\s*(\d+)/i);
             let gp = gpMatch ? parseInt(gpMatch[1], 10) : (gradePayOverride || 0);
 
             if (bandMatch) {
-                let startPay = parseInt(bandMatch[1], 10);
-                let endPay = parseInt(bandMatch[2], 10);
-                let stages = [];
-                let curr = startPay;
-                let safety = 0;
-                while (curr <= endPay && safety < 80) {
-                    stages.push(curr);
-                    let total = curr + gp;
-                    // ३% काढून पुढील १० च्या पटीत राउंडिंग
-                    let inc = Math.ceil((total * 0.03) / 10) * 10;
-                    if (inc < 10) inc = 10;
-                    curr += inc;
-                    safety++;
+                let bandMin = parseInt(bandMatch[1], 10);
+                let bandMax = parseInt(bandMatch[2], 10);
+                let entryPay = get6thEntryPay(scaleStr, gp);
+
+                let stagesSet = new Set();
+
+                // १. प्रथम भरती वेतन (Annexure-III Entry Pay) साखळी
+                if (entryPay && entryPay >= bandMin && entryPay <= bandMax) {
+                    let curr = entryPay;
+                    let safety = 0;
+                    while (curr <= bandMax && safety < 80) {
+                        stagesSet.add(curr);
+                        let total = curr + gp;
+                        let inc = Math.ceil((total * 0.03) / 10) * 10;
+                        if (inc < 10) inc = 10;
+                        curr += inc;
+                        safety++;
+                    }
                 }
-                return stages;
+
+                // २. पे बँड किमान वेतन (Band Minimum Pay) साखळी
+                if (bandMin && bandMin <= bandMax) {
+                    let curr = bandMin;
+                    let safety = 0;
+                    while (curr <= bandMax && safety < 80) {
+                        stagesSet.add(curr);
+                        let total = curr + gp;
+                        let inc = Math.ceil((total * 0.03) / 10) * 10;
+                        if (inc < 10) inc = 10;
+                        curr += inc;
+                        safety++;
+                    }
+                }
+
+                return Array.from(stagesSet).sort((a, b) => a - b);
             }
         }
 
@@ -1380,12 +1495,21 @@
 
         let gp = 0;
         if (comm === '6th') {
-            let gpInput = document.getElementById('gradePay');
-            if (gpInput && gpInput.value) gp = parseFloat(gpInput.value) || 0;
+            let gpMatch = scaleStr.match(/GP\s*(\d+)/i);
+            if (gpMatch) gp = parseInt(gpMatch[1], 10);
+            else {
+                let gpInput = document.getElementById('gradePay');
+                if (gpInput && gpInput.value) gp = parseFloat(gpInput.value) || 0;
+            }
         }
 
         dropdown.innerHTML = "";
         let stages = parsePayScaleStages(scaleStr, comm, gp);
+
+        let entryPayVal = 0;
+        if (comm === '6th') {
+            entryPayVal = get6thEntryPay(scaleStr, gp);
+        }
 
         if (stages.length === 0) {
             dropdown.innerHTML = `<div class="dropdown-item" style="color:#888;">वैध वेतनश्रेणी उपलब्ध नाही</div>`;
@@ -1393,11 +1517,21 @@
             stages.forEach(amount => {
                 let div = document.createElement('div');
                 div.className = 'dropdown-item';
-                div.textContent = amount;
+                
+                if (comm === '6th' && amount === entryPayVal) {
+                    div.innerHTML = `<b>${amount}</b> <span style="font-size:10.5px; color:#2e7d32; font-weight:bold;">★ Annexure-III प्रथम भरती वेतन</span>`;
+                } else {
+                    div.textContent = amount;
+                }
+
                 div.onclick = function(e) {
                     e.stopPropagation();
                     basicInput.value = amount;
                     dropdown.classList.add('hidden');
+                    
+                    if (basicInputId === 'basicPay') {
+                        validateCard1();
+                    }
                 };
                 dropdown.appendChild(div);
             });
@@ -1909,11 +2043,18 @@
                     let targetCells = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
                     currentScaleLabel = `${currentLevel} (${targetCells[0]} - ${targetCells[targetCells.length - 1]})`;
                 } else if (currentCommission === '6th') {
-                    let inc = Math.round(((currentBasic + currentGP) * 0.03) / 10) * 10;
+                    let totalBefore = currentBasic + currentGP;
+                    let inc = Math.ceil((totalBefore * 0.03) / 10) * 10;
+                    if (inc < 10) inc = 10;
                     currentBasic += inc;
+
                     if (b.scale.includes('GP')) {
-                        let gpMatch = b.scale.match(/GP\s*(\d+)/);
-                        if (gpMatch) currentGP = parseInt(gpMatch[1]);
+                        let gpMatch = b.scale.match(/GP\s*(\d+)/i);
+                        if (gpMatch) currentGP = parseInt(gpMatch[1], 10);
+                    }
+                    let pEntry = get6thEntryPay(b.scale, currentGP);
+                    if (pEntry && currentBasic < pEntry) {
+                        currentBasic = pEntry;
                     }
                 } else {
                     let stages = parsePayScaleStages(b.scale, currentCommission);
@@ -1943,7 +2084,9 @@
                         currentBasic = cells[currentMatrixIndex];
                     }
                 } else if (currentCommission === '6th') {
-                    let inc = Math.round(((currentBasic + currentGP) * 0.03) / 10) * 10;
+                    let total = currentBasic + currentGP;
+                    let inc = Math.ceil((total * 0.03) / 10) * 10;
+                    if (inc < 10) inc = 10;
                     currentBasic += inc;
                 } else {
                     let inc = (currentCommission === '5th') ? 100 : 30;
