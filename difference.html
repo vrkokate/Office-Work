@@ -1,274 +1,253 @@
-<!DOCTYPE html>
-<html lang="mr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>वेतन व फरक व्यवस्थापन प्रणाली</title>
+<!-- =========================================================
+     नवीन २ भागांतील पॉपअप: वेतन व फरक प्रणाली
+========================================================= -->
+<div id="differenceModal" class="diff-modal-overlay">
+    <div class="diff-modal-card">
 
+        <!-- १. हेडर बार: Back (डावीकडे), शीर्षक (मध्यभागी), Close (उजवीकडे) -->
+        <div class="diff-header-bar">
+            <button type="button" class="btn-back" onclick="handleDiffBack()" title="मागे जा">
+                ⬅ Back
+            </button>
+            <div class="diff-header-title">
+                वेतन व फरक प्रणाली
+            </div>
+            <button type="button" class="btn-close" onclick="closeDiffModal()" title="बंद करा">
+                ✕
+            </button>
+        </div>
+
+        <!-- ================= भाग - १ : आयोग संबंधित गणना ================= -->
+        <div class="section-banner sec-1">
+            <span>🏛️ भाग - १ : आयोग संबंधित गणना</span>
+        </div>
+        
+        <div class="grid-part-1">
+            <button type="button" class="card-btn btn-c4" onclick="location.href='diff_4th_commission.html'">
+                ४ था आयोग फरक
+            </button>
+            <button type="button" class="card-btn btn-c5" onclick="location.href='diff_5th_commission.html'">
+                ५ वा आयोग फरक
+            </button>
+            <button type="button" class="card-btn btn-c6" onclick="location.href='diff_6th_commission.html'">
+                ६ वा आयोग फरक
+            </button>
+            <button type="button" class="card-btn btn-c7" onclick="location.href='diff_7th_commission.html'">
+                ७ वा आयोग फरक
+            </button>
+        </div>
+
+        <!-- ================= भाग - २ : भत्ते, दर व इतर ================= -->
+        <div class="section-banner sec-2">
+            <span>📊 भाग - २ : भत्ते, दर व इतर</span>
+        </div>
+
+        <!-- वर ४ आणि खाली ४ टॅब्स -->
+        <div class="grid-part-2">
+            <!-- वरचे ४ टॅब -->
+            <button type="button" class="card-btn btn-p2" onclick="openModule('da')">१. DA दर</button>
+            <button type="button" class="card-btn btn-p2" onclick="openModule('hra')">२. HRA दर</button>
+            <button type="button" class="card-btn btn-p2" onclick="openModule('tada')">३. TA / DA</button>
+            <button type="button" class="card-btn btn-p2" onclick="openModule('other_rates')">४. इतर दर</button>
+
+            <!-- खालचे ४ टॅब -->
+            <button type="button" class="card-btn btn-diff-main" onclick="location.href='difference.html'">५. वेतन फरक</button>
+            <button type="button" class="card-btn btn-p2" onclick="openModule('other_allowance')">६. इतर भत्ते</button>
+            <button type="button" class="card-btn btn-p2" onclick="openModule('settings')">७. सेटिंग</button>
+            <button type="button" class="card-btn btn-p2" onclick="openModule('etc')">८. etc</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- =========================================================
+     CSS स्टाईल (हे तुमच्या <style> टॅगमध्ये टाका)
+========================================================= -->
 <style>
-* {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
-
-html, body {
-    margin: 0;
-    padding: 0;
+/* पार्श्वभूमी ओव्हरले */
+.diff-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    min-height: 100%;
-    font-family: "Noto Sans Devanagari", "Segoe UI", Arial, sans-serif;
-    background: radial-gradient(circle at 50% 25%, #173b69 0%, #071a32 45%, #020914 100%);
-    color: white;
-    overflow-x: hidden;
-}
-
-.main-wrapper {
-    width: min(1050px, 96%);
-    margin: 12px auto;
-    background: #0f1c30;
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-    overflow: hidden;
-}
-
-/* ================= HEADER ================= */
-.header {
-    height: 62px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 16px;
-    background: linear-gradient(135deg, #ff9800, #ff6d00 55%, #e65100);
-    box-shadow: 0 8px 25px rgba(255, 111, 0, 0.35);
-}
-
-.header-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: clamp(16px, 3.8vw, 22px);
-    font-weight: 900;
-}
-
-.close-btn {
-    width: 38px;
-    height: 38px;
-    border: none;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.95);
-    color: #d32f2f;
-    font-size: 24px;
-    font-weight: 900;
-    cursor: pointer;
-}
-
-/* ================= मॅजिक ॲनिमेशन एरिया (फक्त फिरणारे रिंग्स) ================= */
-.magic-area {
-    width: 100%;
-    height: 140px;
-    position: relative;
+    height: 100%;
+    background: rgba(2, 9, 20, 0.75);
+    backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    background: radial-gradient(circle at 50% 50%, rgba(23, 59, 105, 0.6) 0%, transparent 70%);
+    z-index: 9999;
+    padding: 12px;
 }
 
-.magic-portal {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,193,7,0.4) 20%, transparent 70%);
-    box-shadow: 0 0 25px #ff9800, 0 0 50px #ff6d00;
+/* मुख्य पॉपअप कार्ड */
+.diff-modal-card {
+    width: min(520px, 98%);
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: zoomModal 0.25s ease-out;
 }
 
-.magic-ring {
-    position: absolute;
-    width: 125px;
-    height: 125px;
-    border-radius: 50%;
-    border: 3px solid rgba(255,193,7,0.9);
-    border-top-color: #fff;
-    border-right-color: #ff6d00;
-    animation: spin 6s linear infinite;
+@keyframes zoomModal {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
 }
 
-.magic-ring.two {
-    width: 88px;
-    height: 88px;
-    border-color: #00e5ff;
-    border-left-color: #fff;
-    animation: spin-rev 4s linear infinite;
+/* हेडर: Back (डावीकडे), मध्यभागी शीर्षक, Close (उजवीकडे) */
+.diff-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
-@keyframes spin { 100% { transform: rotate(360deg); } }
-@keyframes spin-rev { 100% { transform: rotate(-360deg); } }
+.diff-header-title {
+    font-size: clamp(16px, 4.2vw, 20px);
+    font-weight: 900;
+    color: #0f172a;
+    text-align: center;
+    flex-grow: 1;
+}
 
-/* ================= १० टॅब्स ग्रिड ================= */
-.tabs-grid {
+/* 🟢 डावीकडचे हिरवे Back बटण */
+.btn-back {
+    background: #16a34a;
+    color: #ffffff;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(22, 163, 74, 0.35);
+    transition: 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.btn-back:active { transform: scale(0.94); }
+
+/* 🔴 उजवीकडचे लाल Close बटण */
+.btn-close {
+    width: 34px;
+    height: 34px;
+    background: #dc2626;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 8px rgba(220, 38, 38, 0.35);
+    transition: 0.15s;
+}
+.btn-close:active { transform: scale(0.94); }
+
+/* लांब पट्टी हेडिंग्स (Section Banners) */
+.section-banner {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 10px;
+    letter-spacing: 0.3px;
+}
+.sec-1 { background: linear-gradient(135deg, #0284c7, #0369a1); }
+.sec-2 { background: linear-gradient(135deg, #d97706, #b45309); margin-top: 14px; }
+
+/* भाग १ - २ बाय २ ची ग्रिड (४ टॅब्स) */
+.grid-part-1 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
-    background-color: #08111e;
-    padding: 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
-@media (min-width: 768px) {
-    .tabs-grid {
-        grid-template-columns: repeat(5, 1fr);
-    }
+/* भाग २ - ४ बाय २ ची ग्रिड (वर ४, खाली ४) */
+.grid-part-2 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
 }
 
-.tab-btn {
-    background: #15253d;
-    color: #cbd5e1;
-    border: 1px solid #233b5d;
-    padding: 12px 6px;
+/* सर्व बटणांची मूळ डिझाईन */
+.card-btn {
+    border: none;
     border-radius: 8px;
-    font-size: 13px;
+    padding: 10px 4px;
+    color: #ffffff;
+    font-size: 12px;
     font-weight: 700;
     cursor: pointer;
     text-align: center;
-    transition: 0.25s all ease;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    transition: transform 0.15s, box-shadow 0.15s;
+    line-height: 1.25;
 }
+.card-btn:active { transform: scale(0.95); }
 
-.tab-btn:hover {
-    background: #1f3659;
+/* भाग १ मधील आयोगांचे रंग */
+.btn-c4 { background: linear-gradient(135deg, #15803d, #16a34a); padding: 12px 6px; font-size: 13px; }
+.btn-c5 { background: linear-gradient(135deg, #ea580c, #f97316); padding: 12px 6px; font-size: 13px; }
+.btn-c6 { background: linear-gradient(135deg, #7c3aed, #9333ea); padding: 12px 6px; font-size: 13px; }
+.btn-c7 { background: linear-gradient(135deg, #db2777, #e11d48); padding: 12px 6px; font-size: 13px; }
+
+/* भाग २ मधील बटणांचे रंग */
+.btn-p2 {
+    background: #0f172a;
+    color: #f1f5f9;
+    border: 1px solid #cbd5e1;
+}
+.btn-p2:hover { background: #1e293b; }
+
+/* ५. वेतन फरक हे विशेष बटण */
+.btn-diff-main {
+    background: linear-gradient(135deg, #0284c7, #2563eb);
     color: #ffffff;
-}
-
-.tab-btn.active {
-    background: linear-gradient(135deg, #ff9800, #e65100);
-    color: #ffffff;
-    border-color: #ff9800;
-    box-shadow: 0 0 12px rgba(255, 152, 0, 0.45);
-}
-
-/* ================= टॅब पॅनेल्स ================= */
-.tab-content {
-    display: none;
-    padding: 16px;
-    animation: fadeIn 0.3s ease;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.card-box {
-    background: #142238;
-    border: 1px solid #233b5d;
-    border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 14px;
-}
-
-.box-title {
-    color: #00e5ff;
-    font-size: 17px;
-    margin-top: 0;
-    margin-bottom: 12px;
+    font-weight: 800;
 }
 </style>
-</head>
 
-<body>
-
-<div class="main-wrapper">
-    <!-- शीर्षलेख -->
-    <div class="header">
-        <div class="header-title">
-            <span>⚡</span>
-            <span>वेतन व फरक व्यवस्थापन प्रणाली</span>
-        </div>
-        <button class="close-btn" onclick="history.back()" title="मागे जा">×</button>
-    </div>
-
-    <!-- मॅजिक ॲनिमेशन एरिया (यातून मजकूर पूर्णपणे काढला आहे) -->
-    <div class="magic-area">
-        <div class="magic-portal"></div>
-        <div class="magic-ring"></div>
-        <div class="magic-ring two"></div>
-    </div>
-
-    <!-- १० टॅब्स बटणे -->
-    <div class="tabs-grid">
-        <button class="tab-btn active" onclick="switchTab(1)">१. ४ था आयोग</button>
-        <button class="tab-btn" onclick="switchTab(2)">२. ५ वा आयोग</button>
-        <button class="tab-btn" onclick="switchTab(3)">३. ६ वा आयोग</button>
-        <button class="tab-btn" onclick="switchTab(4)">४. ७ वा आयोग</button>
-        <button class="tab-btn" onclick="switchTab(5)">५. ८ वा आयोग</button>
-        <button class="tab-btn" onclick="switchTab(6)" style="border-color:#00e5ff;">६. वेतन फरक</button>
-        <button class="tab-btn" onclick="switchTab(7)">७. DA दर</button>
-        <button class="tab-btn" onclick="switchTab(8)">८. HRA दर</button>
-        <button class="tab-btn" onclick="switchTab(9)">९. इतर भत्ते</button>
-        <button class="tab-btn" onclick="switchTab(10)">१०. सेटिंग्ज</button>
-    </div>
-
-    <!-- टॅब १: ४ था आयोग -->
-    <div id="tab-1" class="tab-content active">
-        <div class="card-box">
-            <h3 class="box-title">४ था वेतन आयोग (4th Pay Commission)</h3>
-            <p style="color:#94a3b8;">४ थ्या आयोगातील वेतनश्रेणी व बेसिक इनपुट फॉर्म.</p>
-        </div>
-    </div>
-
-    <!-- टॅब २: ५ वा आयोग -->
-    <div id="tab-2" class="tab-content">
-        <div class="card-box">
-            <h3 class="box-title">५ वा वेतन आयोग (5th Pay Commission)</h3>
-            <p style="color:#94a3b8;">५ व्या आयोगातील Pay Scale व त्यावेळचे नियम.</p>
-        </div>
-    </div>
-
-    <!-- टॅब ३: ६ वा आयोग -->
-    <div id="tab-3" class="tab-content">
-        <div class="card-box">
-            <h3 class="box-title">६ वा वेतन आयोग (6th Pay Commission)</h3>
-            <p style="color:#94a3b8;">Pay Band + Grade Pay = Basic Pay रचना व हिशोब.</p>
-        </div>
-    </div>
-
-    <!-- टॅब ४: ७ वा आयोग -->
-    <div id="tab-4" class="tab-content">
-        <div class="card-box">
-            <h3 class="box-title">७ वा वेतन आयोग (7th Pay Commission)</h3>
-            <p style="color:#94a3b8;">Pay Matrix Level, मूळ वेतन आणि चालू भत्त्यांची गणना.</p>
-        </div>
-    </div>
-
-    <!-- टॅब ५ ते १० -->
-    <div id="tab-5" class="tab-content"><div class="card-box"><h3 class="box-title">८ वा वेतन आयोग (प्रस्तावित)</h3></div></div>
-    <div id="tab-6" class="tab-content"><div class="card-box"><h3 class="box-title">वेतन फरक तुलना (Due-Drawn)</h3></div></div>
-    <div id="tab-7" class="tab-content"><div class="card-box"><h3 class="box-title">महागाई भत्ता (DA) मास्टर दर</h3></div></div>
-    <div id="tab-8" class="tab-content"><div class="card-box"><h3 class="box-title">घरभाडे भत्ता (HRA) दर</h3></div></div>
-    <div id="tab-9" class="tab-content"><div class="card-box"><h3 class="box-title">इतर भत्ते (TA, CLA, WA)</h3></div></div>
-    <div id="tab-10" class="tab-content"><div class="card-box"><h3 class="box-title">डेटा बॅकअप व सेटिंग्ज</h3></div></div>
-</div>
-
+<!-- =========================================================
+     JavaScript फंक्शन्स
+========================================================= -->
 <script>
-function switchTab(index) {
-    // सर्व कंटेंट्स लपवणे
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    // सर्व बटणे इन-एक्टिव्ह करणे
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+// बॅक बटण दाबल्यावर मागील मेनू उघडणे
+function handleDiffBack() {
+    closeDiffModal();
+    // जर तुम्हाला पुन्हा आधीचा Form मेनू उघडायचा असेल, तर त्याचे फंक्शन येथे कॉल करा:
+    if (typeof openFormModal === "function") {
+        openFormModal();
+    }
+}
 
-    // निवडलेला टॅब सक्रिय करणे
-    const target = document.getElementById('tab-' + index);
-    if(target) target.classList.add('active');
+// पॉपअप बंद करणे
+function closeDiffModal() {
+    const modal = document.getElementById('differenceModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
 
-    const btns = document.querySelectorAll('.tab-btn');
-    if(btns[index - 1]) btns[index - 1].classList.add('active');
+// पॉपअप उघडणे (Difference वर क्लिक झाल्यावर हे कॉल करा)
+function openDiffModal() {
+    const modal = document.getElementById('differenceModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+// भाग २ मधील इतर टॅब्ससाठी सूचना/ॲक्शन
+function openModule(moduleName) {
+    alert(moduleName.toUpperCase() + ' चे पेज लवकरच जोडले जाईल!');
 }
 </script>
-
-</body>
-</html>
