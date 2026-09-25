@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>महाराष्ट्र शासन - घर भाड्या भत्ता (HRA) व्यवस्थापन</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #1b5e20;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #c8e6c9;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2e7d32;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input:focus, select:focus {
+            border-color: #4caf50;
+            outline: none;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .btn-save {
+            background-color: #2e7d32;
+            color: white;
+        }
+        .btn-save:hover {
+            background-color: #1b5e20;
+        }
+        .btn-reset {
+            background-color: #d32f2f;
+            color: white;
+        }
+        .btn-reset:hover {
+            background-color: #c62828;
+        }
+        .output-section {
+            margin-top: 40px;
+            border-top: 2px dashed #ccc;
+            padding-top: 25px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #e8f5e9;
+            color: #1b5e20;
+        }
+        .action-btns button {
+            padding: 6px 12px;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+        .btn-edit {
+            background-color: #ff9800;
+            color: white;
+        }
+        .btn-delete {
+            background-color: #e53935;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>महाराष्ट्र शासन - घर भाड्या भत्ता (HRA) व्यवस्थापन</h2>
+
+    <form id="hraForm">
+        <input type="hidden" id="recordIndex" value="">
+
+        <div class="form-group">
+            <label for="employeeName">कर्मचाऱ्याचे नाव:</label>
+            <input type="text" id="employeeName" placeholder="पूर्ण नाव प्रविष्ट करा" required>
+        </div>
+
+        <div class="form-group">
+            <label for="basicSalary">मूळ वेतन (Basic Salary):</label>
+            <input type="number" id="basicSalary" placeholder="मूळ वेतन लिहा" required>
+        </div>
+
+        <div class="form-group">
+            <label for="cityCategory">शहर प्रवर्ग (City Category):</label>
+            <select id="cityCategory" required>
+                <option value="">-- प्रवर्ग निवडा --</option>
+                <option value="X (30%)">'अ' वर्ग / X श्रेणी (30%)</option>
+                <option value="Y (20%)">'ब' वर्ग / Y श्रेणी (20%)</option>
+                <option value="Z (10%)">'क' वर्ग / Z श्रेणी (10%)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="rentPaid">प्रत्यक्षात भरलेले भाडे (मासिक):</label>
+            <input type="number" id="rentPaid" placeholder="मासिक भाडे रक्कम">
+        </div>
+
+        <div class="btn-container">
+            <button type="button" class="btn-save" onclick="saveOrUpdateRecord()">माहिती सेव्ह करा</button>
+            <button type="button" class="btn-reset" onclick="resetForm()">फॉर्म रिकामा करा</button>
+        </div>
+    </form>
+
+    <div class="output-section">
+        <h3>नोंदवलेली माहिती आणि बदल (Records & Updates)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>अ.क्र.</th>
+                    <th>नाव</th>
+                    <th>मूळ वेतन</th>
+                    <th>प्रवर्ग</th>
+                    <th>भत्ता (HRA)</th>
+                    <th>कृती (Actions)</th>
+                </tr>
+            </thead>
+            <tbody id="recordTableBody">
+                <!-- डेटा इथे जावास्क्रिप्ट द्वारे येईल -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", displayRecords);
+
+    function saveOrUpdateRecord() {
+        const index = document.getElementById('recordIndex').value;
+        const name = document.getElementById('employeeName').value;
+        const basic = document.getElementById('basicSalary').value;
+        const category = document.getElementById('cityCategory').value;
+        const rent = document.getElementById('rentPaid').value;
+
+        if (!name || !basic || !category) {
+            alert('कृपया सर्व आवश्यक माहिती भरा!');
+            return;
+        }
+
+        let rate = 0.10;
+        if (category.includes('30%')) rate = 0.30;
+        else if (category.includes('20%')) rate = 0.20;
+        
+        let calculatedHRA = basic * rate;
+
+        const record = {
+            name,
+            basic,
+            category,
+            rent: rent || 0,
+            hra: calculatedHRA
+        };
+
+        let records = JSON.parse(localStorage.getItem('hraRecords')) || [];
+
+        if (index === "") {
+            records.push(record);
+        } else {
+            records[index] = record;
+            document.getElementById('recordIndex').value = "";
+        }
+
+        localStorage.setItem('hraRecords', JSON.stringify(records));
+        displayRecords();
+        resetForm();
+        alert('माहिती यशस्वीरित्या सेव्ह झाली!');
+    }
+
+    function displayRecords() {
+        const tbody = document.getElementById('recordTableBody');
+        tbody.innerHTML = "";
+        let records = JSON.parse(localStorage.getItem('hraRecords')) || [];
+
+        if (records.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#777;">कोणतीही माहिती उपलब्ध नाही.</td></tr>`;
+            return;
+        }
+
+        records.forEach((rec, idx) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td>${rec.name}</td>
+                    <td>₹${rec.basic}</td>
+                    <td>${rec.category}</td>
+                    <td>₹${rec.hra}</td>
+                    <td class="action-btns">
+                        <button class="btn-edit" onclick="editRecord(${idx})">बदल करा</button>
+                        <button class="btn-delete" onclick="deleteRecord(${idx})">डिटेल काढा</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function editRecord(index) {
+        let records = JSON.parse(localStorage.getItem('hraRecords')) || [];
+        let rec = records[index];
+
+        document.getElementById('employeeName').value = rec.name;
+        document.getElementById('basicSalary').value = rec.basic;
+        document.getElementById('cityCategory').value = rec.category;
+        document.getElementById('rentPaid').value = rec.rent;
+        document.getElementById('recordIndex').value = index;
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteRecord(index) {
+        if (confirm('तुम्हाला ही नोंद डिलीट करायची आहे का?')) {
+            let records = JSON.parse(localStorage.getItem('hraRecords')) || [];
+            records.splice(index, 1);
+            localStorage.setItem('hraRecords', JSON.stringify(records));
+            displayRecords();
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('hraForm').reset();
+        document.getElementById('recordIndex').value = "";
+    }
+</script>
+
+</body>
+</html>
