@@ -66,6 +66,57 @@
         select:invalid, select option[value=""] {
             color: #888;
         }
+
+        /* इन-प्लेस कस्टम ड्रॉपडाऊन रकाना */
+        .custom-combobox-wrapper {
+            flex: 1.4;
+            position: relative;
+        }
+        .custom-combobox-input-box {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .custom-combobox-input-box input {
+            width: 100%;
+            padding-right: 25px;
+        }
+        .custom-dropdown-arrow {
+            position: absolute;
+            right: 8px;
+            cursor: pointer;
+            color: #666;
+            font-size: 11px;
+            user-select: none;
+        }
+        .custom-dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 220px;
+            overflow-y: auto;
+            background: #ffffff;
+            border: 1.5px solid #2e7d32;
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+            z-index: 9999;
+            margin-top: 2px;
+        }
+        .dropdown-item {
+            padding: 8px 10px;
+            font-size: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            text-align: left;
+            color: #333;
+        }
+        .dropdown-item:hover, .dropdown-item:active {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
         .date-range-container {
             flex: 1.4;
             display: flex;
@@ -95,7 +146,6 @@
             display: none !important;
         }
         
-        /* अहवाल व टॅब स्टाईल्स */
         .output-box {
             margin-top: 20px;
             padding: 12px;
@@ -238,7 +288,7 @@
             <input type="date" id="empJoinDate" onclick="openPicker(this)" required>
         </div>
 
-        <!-- ४. वेतन आयोग (सुधारित) -->
+        <!-- ४. वेतन आयोग -->
         <div class="form-group">
             <label for="payCommission">४. वेतन आयोग:</label>
             <select id="payCommission" onchange="updateCommissionRules()" required>
@@ -250,17 +300,23 @@
             </select>
         </div>
 
-        <!-- ५. सध्याची वेतनश्रेणी -->
+        <!-- ५. सध्याची वेतनश्रेणी (इन-प्लेस कस्टम ड्रॉपडाऊन व एडिटेबल) -->
         <div class="form-group">
             <label for="currentPayScale">५. वेतनश्रेणी:</label>
-            <input type="text" id="currentPayScale" list="payScaleList" placeholder="सर्च करा किंवा निवडा / लिहा" required>
-            <datalist id="payScaleList"></datalist>
+            <div class="custom-combobox-wrapper">
+                <div class="custom-combobox-input-box">
+                    <input type="text" id="currentPayScale" placeholder="वेतनश्रेणी निवडा किंवा लिहा" autocomplete="off" onfocus="showScaleDropdown()" oninput="filterScaleDropdown()" required>
+                    <span class="custom-dropdown-arrow" onclick="toggleScaleDropdown()">▼</span>
+                </div>
+                <!-- याच बॉक्सखाली ओपन होणारी यादी -->
+                <div id="customScaleDropdown" class="custom-dropdown-list hidden"></div>
+            </div>
         </div>
 
         <!-- ६. मूळ वेतन -->
         <div class="form-group">
             <label for="basicPay">६. मूळ वेतन (Basic):</label>
-            <input type="number" id="basicPay" placeholder="उदा. 5830" required>
+            <input type="number" id="basicPay" placeholder="उदा. 950 किंवा 5830" required>
         </div>
 
         <!-- ७. ग्रेड पे -->
@@ -336,6 +392,7 @@
             <label for="incrementMonthRule">१२. वार्षिक वेतनवाढ नियम:</label>
             <select id="incrementMonthRule">
                 <option value="july" selected>प्रत्येक वर्षाची १ जुलै</option>
+                <option value="appointment_month">नियुक्ती महिन्याची १ तारीख</option>
                 <option value="january">प्रत्येक वर्षाची १ जानेवारी</option>
             </select>
         </div>
@@ -451,17 +508,103 @@
         }
     }
 
+    // १. चौथ्या वेतन आयोगातील सर्व वेतनश्रेण्या (कनिष्ठ ते वरिष्ठ)
+    const payScales4th = [
+        "रु. 750 - 12 - 870 - EB - 14 - 940 (शिपाई / चतुर्थश्रेणी)",
+        "रु. 775 - 12 - 871 - EB - 14 - 1025 (दफ्तरी / नाईक)",
+        "रु. 800 - 15 - 1010 - EB - 20 - 1150 (मुकादम / जमादार)",
+        "रु. 950 - 20 - 1150 - EB - 25 - 1400 (कनिष्ठ लिपिक / टंकलेखक)",
+        "रु. 975 - 25 - 1150 - EB - 30 - 1540 (वाहनचालक)",
+        "रु. 1150 - 25 - 1500 (वरिष्ठ वाहनचालक)",
+        "रु. 1200 - 30 - 1560 - EB - 40 - 2040 (वरिष्ठ लिपिक / कनिष्ठ लेखापाल)",
+        "रु. 1350 - 30 - 1440 - 40 - 1800 - EB - 50 - 2200 (मुख्य लिपिक)",
+        "रु. 1400 - 40 - 1600 - 50 - 2300 - EB - 60 - 2600 (अधीक्षक / हेड क्लार्क)",
+        "रु. 1640 - 60 - 2600 - EB - 75 - 2900 (शाखा अभियंता / JE)",
+        "रु. 2000 - 60 - 2300 - EB - 75 - 3200 (उपअभियंता / AE-2)",
+        "रु. 2200 - 75 - 2800 - EB - 100 - 4000 (सहाय्यक अभियंता श्रेणी-१ / AE-1)",
+        "रु. 3000 - 100 - 3500 - 125 - 4500 (कार्यकारी अभियंता / EE)",
+        "रु. 3700 - 125 - 4700 - 150 - 5000 (अधीक्षक अभियंता / SE)",
+        "रु. 4500 - 150 - 5700 (मुख्य अभियंता / CE)",
+        "रु. 5100 - 150 - 5700 - 200 - 6700 (सचिव / Secretary)",
+        "रु. 5900 - 200 - 6700 (अप्पर मुख्य सचिव)",
+        "रु. 7300 - 100 - 7600 (मुख्य सचिव / CS)"
+    ];
+
+    // २. पाचव्या वेतन आयोगातील सर्व वेतनश्रेण्या
+    const payScales5th = [
+        "रु. 2550 - 55 - 2660 - 60 - 3200 (शिपाई / चतुर्थश्रेणी)",
+        "रु. 2610 - 60 - 3150 - 65 - 3540 (नाईक)",
+        "रु. 2650 - 65 - 3300 - 70 - 4000 (दफ्तरी)",
+        "रु. 2750 - 70 - 3800 - 75 - 4400 (जमादार)",
+        "रु. 3050 - 75 - 3950 - 80 - 4590 (कनिष्ठ लिपिक / टंकलेखक)",
+        "रु. 3200 - 85 - 4900 (वाहनचालक)",
+        "रु. 4000 - 100 - 6000 (वरिष्ठ लिपिक)",
+        "रु. 4500 - 125 - 7000 (मुख्य लिपिक / सहाय्यक)",
+        "रु. 5000 - 150 - 8000 (शाखा अभियंता / JE)",
+        "रु. 5500 - 175 - 9000 (प्रशासनिक अधिकारी)",
+        "रु. 6500 - 200 - 10500 (उपअभियंता / AE-2)",
+        "रु. 8000 - 275 - 13500 (सहाय्यक अभियंता श्रेणी-१ / AE-1)",
+        "रु. 10000 - 325 - 15200 (कार्यकारी अभियंता / EE)",
+        "रु. 12000 - 375 - 16500 (अधीक्षक अभियंता / SE)",
+        "रु. 14300 - 400 - 18300 (मुख्य अभियंता / CE)",
+        "रु. 16400 - 450 - 20000 (सचिव / Secretary)",
+        "रु. 22400 - 525 - 24500 (मुख्य सचिव / CS)"
+    ];
+
+    // ३. सहाव्या वेतन आयोगातील सर्व वेतनश्रेण्या
+    const payScales6th = [
+        "PB-1 : 4440 - 7440 (GP 1300) - शिपाई",
+        "PB-1 : 4440 - 7440 (GP 1400) - नाईक",
+        "PB-1 : 4440 - 7440 (GP 1600) - दफ्तरी",
+        "PB-1 : 4440 - 7440 (GP 1650) - जमादार",
+        "PB-1 : 5200 - 20200 (GP 1900) - कनिष्ठ लिपिक",
+        "PB-1 : 5200 - 20200 (GP 2400) - वरिष्ठ लिपिक / वाहनचालक",
+        "PB-1 : 5200 - 20200 (GP 2800) - मुख्य लिपिक",
+        "PB-2 : 9300 - 34800 (GP 4200) - शाखा अभियंता (JE)",
+        "PB-2 : 9300 - 34800 (GP 4300) - वरिष्ठ शाखा अभियंता",
+        "PB-2 : 9300 - 34800 (GP 4400) - सहाय्यक अधीक्षक",
+        "PB-2 : 9300 - 34800 (GP 4600) - प्रशासनिक अधिकारी",
+        "PB-2 : 9300 - 34800 (GP 5400) - उपअभियंता (AE-2)",
+        "PB-3 : 15600 - 39100 (GP 5400) - सहाय्यक अभियंता श्रेणी-१ (AE-1)",
+        "PB-3 : 15600 - 39100 (GP 6600) - कार्यकारी अभियंता (EE)",
+        "PB-3 : 15600 - 39100 (GP 7600) - वरिष्ठ कार्यकारी अभियंता",
+        "PB-4 : 37400 - 67000 (GP 8700) - अधीक्षक अभियंता (SE)",
+        "PB-4 : 37400 - 67000 (GP 8900) - सह मुख्य अभियंता",
+        "PB-4 : 37400 - 67000 (GP 10000) - मुख्य अभियंता (CE)",
+        "PB-4 : 37400 - 67000 (GP 12000) - सचिव (Secretary)"
+    ];
+
+    // ४. सातव्या वेतन आयोगातील स्तर माहिती
     const level7thStartPay = {
         "S-1": { start: 15000, max: 47600, desc: "S-1 (15000 - 47600) - शिपाई / चतुर्थश्रेणी" },
+        "S-2": { start: 15700, max: 50000, desc: "S-2 (15700 - 50000) - नाईक" },
+        "S-3": { start: 16600, max: 52400, desc: "S-3 (16600 - 52400) - दफ्तरी" },
+        "S-4": { start: 17300, max: 54900, desc: "S-4 (17300 - 54900) - जमादार" },
+        "S-5": { start: 18000, max: 56900, desc: "S-5 (18000 - 56900)" },
         "S-6": { start: 19900, max: 63200, desc: "S-6 (19900 - 63200) - कनिष्ठ लिपिक" },
         "S-7": { start: 21700, max: 69100, desc: "S-7 (21700 - 69100) - वाहनचालक" },
         "S-8": { start: 25500, max: 81100, desc: "S-8 (25500 - 81100) - वरिष्ठ लिपिक" },
+        "S-9": { start: 27600, max: 87400, desc: "S-9 (27600 - 87400)" },
         "S-10": { start: 29200, max: 92300, desc: "S-10 (29200 - 92300) - मुख्य लिपिक" },
+        "S-11": { start: 30100, max: 95100, desc: "S-11 (30100 - 95100)" },
+        "S-12": { start: 32000, max: 101600, desc: "S-12 (32000 - 101600)" },
         "S-13": { start: 35400, max: 112400, desc: "S-13 (35400 - 112400) - शाखा अभियंता (JE)" },
+        "S-14": { start: 38600, max: 122800, desc: "S-14 (38600 - 122800)" },
         "S-15": { start: 41800, max: 132300, desc: "S-15 (41800 - 132300) - उपअभियंता (AE-2)" },
+        "S-16": { start: 44900, max: 142400, desc: "S-16 (44900 - 142400)" },
+        "S-17": { start: 47600, max: 151100, desc: "S-17 (47600 - 151100)" },
+        "S-18": { start: 50400, max: 159900, desc: "S-18 (50400 - 159900)" },
+        "S-19": { start: 53100, max: 167800, desc: "S-19 (53100 - 167800)" },
         "S-20": { start: 56100, max: 177500, desc: "S-20 (56100 - 177500) - उपअभियंता (AE-1)" },
+        "S-21": { start: 60900, max: 192900, desc: "S-21 (60900 - 192900)" },
+        "S-22": { start: 64100, max: 203100, desc: "S-22 (64100 - 203100)" },
         "S-23": { start: 67700, max: 208700, desc: "S-23 (67700 - 208700) - कार्यकारी अभियंता (EE)" },
+        "S-24": { start: 78800, max: 209200, desc: "S-24 (78800 - 209200)" },
+        "S-25": { start: 118500, max: 214100, desc: "S-25 (118500 - 214100)" },
         "S-26": { start: 123100, max: 215900, desc: "S-26 (123100 - 215900) - अधीक्षक अभियंता (SE)" },
+        "S-27": { start: 127100, max: 216300, desc: "S-27 (127100 - 216300)" },
+        "S-28": { start: 131100, max: 216600, desc: "S-28 (131100 - 216600)" },
+        "S-29": { start: 135100, max: 217100, desc: "S-29 (135100 - 217100)" },
         "S-30": { start: 144200, max: 218200, desc: "S-30 (144200 - 218200) - मुख्य अभियंता (CE)" },
         "S-31": { start: 182200, max: 224100, desc: "S-31 (182200 - 224100) - सचिव (Secretary)" }
     };
@@ -493,21 +636,17 @@
         }
     }
 
-    function formatDateToDDMMYYYY(dateString) {
-        if (!dateString) return '';
-        let parts = dateString.split('-');
-        if (parts.length === 3) {
-            return `${parts[2]}-${parts[1]}-${parts[0]}`;
-        }
-        return dateString;
-    }
-
+    // इन-प्लेस ड्रॉपडाऊन यादी लोड करणे
     function updateCommissionRules() {
         const commission = document.getElementById('payCommission').value;
         const gradePayGroup = document.getElementById('gradePayGroup');
         const initialLevelDiv = document.getElementById('initialLevelDiv');
-        const payScaleList = document.getElementById('payScaleList');
-        
+        const dropdownList = document.getElementById('customScaleDropdown');
+        const currentPayScaleInput = document.getElementById('currentPayScale');
+
+        currentPayScaleInput.value = "";
+        dropdownList.innerHTML = "";
+
         if (commission === '6th') {
             gradePayGroup.classList.remove('hidden');
             initialLevelDiv.classList.remove('hidden');
@@ -519,20 +658,83 @@
             initialLevelDiv.classList.add('hidden');
         }
 
-        payScaleList.innerHTML = '';
-        if (commission === '6th') {
-            payScaleList.innerHTML = `
-                <option value="PB-1 : 5200 - 20200 (GP 1900) - कनिष्ठ लिपिक">
-                <option value="PB-1 : 5200 - 20200 (GP 2400) - वरिष्ठ लिपिक">
-                <option value="PB-2 : 9300 - 34800 (GP 4200) - शाखा अभियंता">
-            `;
-        } else if (commission === '7th') {
-            for (const val of Object.values(level7thStartPay)) {
-                let opt = document.createElement('option');
-                opt.value = val.desc;
-                payScaleList.appendChild(opt);
-            }
+        let scales = [];
+        if (commission === '4th') scales = payScales4th;
+        else if (commission === '5th') scales = payScales5th;
+        else if (commission === '6th') scales = payScales6th;
+        else if (commission === '7th') scales = Object.values(level7thStartPay).map(v => v.desc);
+
+        scales.forEach(scale => {
+            let div = document.createElement('div');
+            div.className = 'dropdown-item';
+            div.textContent = scale;
+            div.onclick = function() {
+                currentPayScaleInput.value = scale;
+                hideScaleDropdown();
+
+                // ६व्या आयोगात ग्रेड पे ऑटो-डिटेक्ट करणे
+                if (commission === '6th' && scale.includes('GP')) {
+                    let gpMatch = scale.match(/GP\s*(\d+)/);
+                    if (gpMatch && gpMatch[1]) {
+                        document.getElementById('gradePay').value = gpMatch[1];
+                    }
+                }
+            };
+            dropdownList.appendChild(div);
+        });
+    }
+
+    function showScaleDropdown() {
+        const commission = document.getElementById('payCommission').value;
+        if (!commission) {
+            alert("कृपया प्रथम वेतन आयोग निवडा!");
+            document.getElementById('payCommission').focus();
+            return;
         }
+        document.getElementById('customScaleDropdown').classList.remove('hidden');
+    }
+
+    function hideScaleDropdown() {
+        document.getElementById('customScaleDropdown').classList.add('hidden');
+    }
+
+    function toggleScaleDropdown() {
+        const dropdown = document.getElementById('customScaleDropdown');
+        if (dropdown.classList.contains('hidden')) {
+            showScaleDropdown();
+        } else {
+            hideScaleDropdown();
+        }
+    }
+
+    function filterScaleDropdown() {
+        const filter = document.getElementById('currentPayScale').value.toLowerCase();
+        const items = document.querySelectorAll('#customScaleDropdown .dropdown-item');
+        items.forEach(item => {
+            if (item.textContent.toLowerCase().includes(filter)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        showScaleDropdown();
+    }
+
+    // बाहेर क्लिक केल्यास ड्रॉपडाऊन बंद करणे
+    document.addEventListener('click', function(e) {
+        const wrapper = document.querySelector('.custom-combobox-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            hideScaleDropdown();
+        }
+    });
+
+    function formatDateToDDMMYYYY(dateString) {
+        if (!dateString) return '';
+        let parts = dateString.split('-');
+        if (parts.length === 3) {
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+        return dateString;
     }
 
     function syncOptionDateDefault() {
@@ -572,7 +774,6 @@
 
     window.onload = function() {
         populate7thLevelDropdowns();
-        updateCommissionRules();
         toggleBenefitOptions();
     };
 
@@ -684,7 +885,7 @@
                     date: bDate,
                     dateStr: formatDateToDDMMYYYY(benefitDateInput),
                     type: 'BENEFIT_SAME_DAY',
-                    desc: `${macpPhase} (विकल्पानुसार ${promoLevel} वरिष्ठ लिपिक फिक्सेशन)`
+                    desc: `${macpPhase} (विकल्पानुसार ${promoLevel} फिक्सेशन)`
                 });
             } else if (optDate && optDate > bDate && optDate <= endDate) {
                 events.push({
@@ -697,7 +898,7 @@
                     date: optDate,
                     dateStr: formatDateToDDMMYYYY(optionDateInput),
                     type: 'OPTION_DNI',
-                    desc: `नियम ११(१) विकल्पानुसार वेतन निश्चिती (${promoLevel} वरिष्ठ लिपिक फिक्सेशन)`
+                    desc: `नियम ११(१) विकल्पानुसार वेतन निश्चिती (${promoLevel} फिक्सेशन)`
                 });
             }
         }
@@ -778,7 +979,6 @@
 
         document.getElementById('payFixationForm').reset();
         populate7thLevelDropdowns();
-        updateCommissionRules();
         toggleBenefitOptions();
 
         document.getElementById('outputBox').scrollIntoView({ behavior: 'smooth' });
