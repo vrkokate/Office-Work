@@ -1,318 +1,269 @@
-<!DOCTYPE html>
-<html lang="mr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>वेतन व फरक प्रणाली</title>
+<!-- ========================================================
+     थेट उघडणारा पॉपअप: वेतन व फरक प्रणाली (२ विभाग)
+======================================================== -->
 
 <style>
-* {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
-
-html, body {
-    margin: 0;
-    padding: 0;
+/* मोडल बॅकड्रॉप */
+#differenceModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-    min-height: 100%;
-    font-family: "Noto Sans Devanagari", "Segoe UI", Arial, sans-serif;
-    background: radial-gradient(circle at 50% 25%, #173b69 0%, #071a32 45%, #020914 100%);
-    color: white;
-    overflow-x: hidden;
+    height: 100%;
+    background: rgba(0, 8, 20, 0.78);
+    backdrop-filter: blur(4px);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
 }
 
-/* मुख्य कंटेनर */
-.page-container {
-    width: min(750px, 96%);
-    margin: 10px auto 25px auto;
-    background: #0f1c30;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+/* मुख्य मोडल कार्ड (मोबाईलवर स्क्रीनशॉट १ सारखा योग्य आकार) */
+.diff-card-box {
+    width: 100%;
+    max-width: 440px;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
     overflow: hidden;
+    animation: popupScale 0.22s ease-out;
 }
 
-/* =========================================
-   शीर्षलेख (HEADER): 🟢 Back | Title | 🔴 Close
-========================================= */
-.top-header {
-    height: 60px;
+@keyframes popupScale {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* ================= शीर्षलेख (HEADER) ================= */
+.diff-header-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 12px;
-    background: #08111e;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 14px;
+    background: #f1f5f9;
+    border-bottom: 2px solid #e2e8f0;
 }
 
 /* 🟢 डावीकडे हिरवे Back बटण */
-.btn-back {
-    display: flex;
+.btn-back-green {
+    display: inline-flex;
     align-items: center;
     gap: 4px;
     background: linear-gradient(135deg, #10b981, #059669);
     color: #ffffff;
     border: none;
-    padding: 8px 12px;
-    border-radius: 9px;
+    padding: 6px 12px;
+    border-radius: 8px;
     font-size: 13px;
     font-weight: 800;
     cursor: pointer;
-    box-shadow: 0 3px 8px rgba(16, 185, 129, 0.4);
-    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
 }
-.btn-back:active { transform: scale(0.93); }
+.btn-back-green:active { transform: scale(0.93); }
 
-/* मध्यभागी मुख्य शीर्षक */
-.header-title {
-    font-size: clamp(16px, 4vw, 20px);
+/* मध्यभागी शीर्षक */
+.diff-center-title {
+    font-size: 16px;
     font-weight: 900;
-    color: #ffffff;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    letter-spacing: 0.3px;
+    color: #0f172a;
     text-align: center;
+    letter-spacing: 0.2px;
 }
 
 /* 🔴 उजवीकडे लाल Close बटण */
-.btn-close {
-    width: 34px;
-    height: 34px;
+.btn-close-red {
+    width: 32px;
+    height: 32px;
     background: linear-gradient(135deg, #ef4444, #dc2626);
     color: #ffffff;
     border: none;
-    border-radius: 9px;
-    font-size: 17px;
+    border-radius: 8px;
+    font-size: 16px;
     font-weight: 900;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 3px 8px rgba(239, 68, 68, 0.4);
-    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.35);
 }
-.btn-close:active { transform: scale(0.93); }
+.btn-close-red:active { transform: scale(0.93); }
 
-/* =========================================
-   मॅजिक फिरणारे रिंग्स (मजकुराशिवाय)
-========================================= */
-.magic-area {
+/* मोडल आतील बॉडी */
+.diff-body-content {
+    padding: 12px 14px 16px 14px;
+}
+
+/* लांब पट्टी हेडिंग (Strip) */
+.strip-heading {
     width: 100%;
-    height: 120px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    background: radial-gradient(circle at 50% 50%, rgba(23, 59, 105, 0.5) 0%, transparent 70%);
-}
-
-.magic-portal {
-    position: absolute;
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,193,7,0.4) 20%, transparent 70%);
-    box-shadow: 0 0 20px #ff9800, 0 0 45px #ff6d00;
-}
-
-.magic-ring {
-    position: absolute;
-    width: 105px;
-    height: 105px;
-    border-radius: 50%;
-    border: 3px solid rgba(255,193,7,0.9);
-    border-top-color: #fff;
-    border-right-color: #ff6d00;
-    animation: spinRing 5s linear infinite;
-}
-
-.magic-ring.two {
-    width: 72px;
-    height: 72px;
-    border-color: #00e5ff;
-    border-left-color: #fff;
-    animation: spinRingRev 3.5s linear infinite;
-}
-
-@keyframes spinRing { 100% { transform: rotate(360deg); } }
-@keyframes spinRingRev { 100% { transform: rotate(-360deg); } }
-
-/* =========================================
-   पॅनेल व टॅब रचना
-========================================= */
-.content-body {
-    padding: 12px 14px 20px 14px;
-}
-
-/* लांब पट्टी हेडिंग (Strip Header) */
-.section-strip {
-    width: 100%;
-    padding: 8px 12px;
-    background: linear-gradient(135deg, #1e293b, #0d1726);
+    padding: 7px 10px;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
     color: #38bdf8;
-    font-size: 13.5px;
+    font-size: 12.5px;
     font-weight: 800;
-    border-radius: 8px;
-    margin: 12px 0 10px 0;
+    border-radius: 7px;
+    margin-bottom: 8px;
     border-left: 4px solid #ff9800;
-    letter-spacing: 0.3px;
     display: flex;
     align-items: center;
     gap: 6px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.25);
 }
 
-/* =========================================
-   भाग-१: ४ टॅब (२ x २ ग्रिड)
-========================================= */
-.part1-grid {
+/* ================= भाग-१ ग्रिड (४ टॅब: २ x २) ================= */
+.part1-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
     margin-bottom: 14px;
 }
 
-.btn-part1 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 8px;
+.part1-box-btn {
+    padding: 12px 6px;
     border: none;
-    border-radius: 10px;
+    border-radius: 9px;
     color: #ffffff;
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 800;
     cursor: pointer;
     text-align: center;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
     text-decoration: none;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-    transition: transform 0.15s ease;
+    display: block;
 }
-.btn-part1:active { transform: scale(0.95); }
+.part1-box-btn:active { transform: scale(0.95); }
 
-/* भाग-१ बटणांचे रंग */
-.c4-color { background: linear-gradient(135deg, #2e7d32, #1b5e20); } /* हिरवा */
-.c5-color { background: linear-gradient(135deg, #f57c00, #e65100); } /* नारंगी */
-.c6-color { background: linear-gradient(135deg, #7b1fa2, #4a148c); } /* जांभळा */
-.c7-color { background: linear-gradient(135deg, #c2185b, #880e4f); } /* गुलाबी/लाल */
+/* रंग */
+.btn-col-4 { background: linear-gradient(135deg, #2e7d32, #1b5e20); } /* ४ था - हिरवा */
+.btn-col-5 { background: linear-gradient(135deg, #f57c00, #e65100); } /* ५ वा - नारंगी */
+.btn-col-6 { background: linear-gradient(135deg, #7b1fa2, #4a148c); } /* ६ वा - जांभळा */
+.btn-col-7 { background: linear-gradient(135deg, #c2185b, #880e4f); } /* ७ वा - गुलाबी/लाल */
 
-/* =========================================
-   भाग-२: ८ टॅब (वर ४ आणि खाली ४ = ४ कॉलम ग्रिड)
-========================================= */
-.part2-grid {
+/* ================= भाग २ ग्रिड (८ टॅब: वर ४ आणि खाली ४) ================= */
+.part2-container {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* मोबाईलवरही बरोबर ४-४ टॅब */
-    gap: 6px;
+    grid-template-columns: repeat(4, 1fr); /* मोबाईलवर तंतोतंत ४ कॉलम्स */
+    gap: 5px;
 }
 
-.btn-part2 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 10px 3px;
+.part2-box-btn {
+    padding: 9px 2px;
     background: linear-gradient(135deg, #0284c7, #0369a1);
     color: #ffffff;
     border: none;
-    border-radius: 8px;
-    font-size: clamp(10.5px, 2.7vw, 13px);
+    border-radius: 7px;
+    font-size: 11px;
     font-weight: 700;
     cursor: pointer;
-    min-height: 48px;
+    text-align: center;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     line-height: 1.2;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-    text-decoration: none;
-    word-break: break-word;
-    transition: transform 0.15s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.12);
 }
-.btn-part2:active { transform: scale(0.94); }
+.part2-box-btn:active { transform: scale(0.94); }
 
-/* भाग-२ मधील खास रंग */
-.btn-diff-active { background: linear-gradient(135deg, #0d9488, #0f766e); border: 1px solid #14b8a6; }
-.btn-set-color   { background: linear-gradient(135deg, #475569, #334155); }
-.btn-etc-color   { background: linear-gradient(135deg, #64748b, #475569); }
+.btn-part2-diff { background: linear-gradient(135deg, #0d9488, #0f766e); }
+.btn-part2-set  { background: linear-gradient(135deg, #475569, #334155); }
+.btn-part2-etc  { background: linear-gradient(135deg, #64748b, #475569); }
 </style>
-</head>
 
-<body>
-
-<div class="page-container">
-    
-    <!-- १. शीर्षलेख (Header) -->
-    <div class="top-header">
-        <!-- 🟢 डावीकडे Back बटण -->
-        <a href="index.html" class="btn-back">
-            <span>⬅</span>
-            <span>Back</span>
-        </a>
-
-        <!-- मध्यभागी शीर्षक -->
-        <div class="header-title">
-            वेतन व फरक प्रणाली
-        </div>
-
-        <!-- 🔴 उजवीकडे Close बटण -->
-        <a href="index.html" class="btn-close" title="बंद करा">
-            ✖
-        </a>
-    </div>
-
-    <!-- २. मॅजिक फिरणारे रिंग्स (मजकुराशिवाय) -->
-    <div class="magic-area">
-        <div class="magic-portal"></div>
-        <div class="magic-ring"></div>
-        <div class="magic-ring two"></div>
-    </div>
-
-    <!-- ३. मुख्य टॅब विभाग -->
-    <div class="content-body">
+<!-- प्रत्यक्ष मोडल स्ट्रक्चर -->
+<div id="differenceModal">
+    <div class="diff-card-box">
         
-        <!-- ===== भाग-१ आयोग संबंधित गणना ===== -->
-        <div class="section-strip">
-            <span>📁</span>
-            <span>भाग-१ आयोग संबंधित गणना</span>
+        <!-- १. शीर्षलेख: 🟢 Back | मध्यभागी शीर्षक | 🔴 Close -->
+        <div class="diff-header-bar">
+            <button class="btn-back-green" onclick="backToFormSubTabs()">
+                <span>⬅</span>
+                <span>Back</span>
+            </button>
+
+            <div class="diff-center-title">
+                वेतन व फरक प्रणाली
+            </div>
+
+            <button class="btn-close-red" onclick="closeAllPopups()">
+                ✖
+            </button>
         </div>
 
-        <div class="part1-grid">
-            <a href="diff_4th_commission.html" class="btn-part1 c4-color">
-                ४ था आयोग फरक
-            </a>
-            <a href="diff_5th_commission.html" class="btn-part1 c5-color">
-                ५ वा आयोग फरक
-            </a>
-            <a href="diff_6th_commission.html" class="btn-part1 c6-color">
-                ६ वा आयोग फरक
-            </a>
-            <a href="diff_7th_commission.html" class="btn-part1 c7-color">
-                ७ वा आयोग फरक
-            </a>
-        </div>
+        <!-- २. मोडल मधील घटक -->
+        <div class="diff-body-content">
+            
+            <!-- भाग-१ हेडिंग -->
+            <div class="strip-heading">
+                <span>📁</span>
+                <span>भाग-१ आयोग संबंधित गणना</span>
+            </div>
 
-        <!-- ===== भाग २ — भत्ते, दर व इतर ===== -->
-        <div class="section-strip" style="border-left-color: #00e5ff;">
-            <span>⚙️</span>
-            <span>भाग २ — भत्ते, दर व इतर</span>
-        </div>
+            <!-- भाग-१ (४ टॅब) -->
+            <div class="part1-container">
+                <button class="part1-box-btn btn-col-4" onclick="location.href='diff_4th_commission.html'">
+                    ४ था आयोग फरक
+                </button>
+                <button class="part1-box-btn btn-col-5" onclick="location.href='diff_5th_commission.html'">
+                    ५ वा आयोग फरक
+                </button>
+                <button class="part1-box-btn btn-col-6" onclick="location.href='diff_6th_commission.html'">
+                    ६ वा आयोग फरक
+                </button>
+                <button class="part1-box-btn btn-col-7" onclick="location.href='diff_7th_commission.html'">
+                    ७ वा आयोग फरक
+                </button>
+            </div>
 
-        <!-- वर ४ आणि खाली ४ टॅब (४x२ ग्रिड) -->
-        <div class="part2-grid">
-            <!-- वरचे ४ टॅब -->
-            <button class="btn-part2" onclick="alert('१. DA दर लवकरच उपलब्ध होईल!')">1. DA दर</button>
-            <button class="btn-part2" onclick="alert('२. HRA दर लवकरच उपलब्ध होईल!')">2. HRA दर</button>
-            <button class="btn-part2" onclick="alert('३. TA / DA लवकरच उपलब्ध होईल!')">3. TA / DA</button>
-            <button class="btn-part2" onclick="alert('४. इतर दर लवकरच उपलब्ध होईल!')">4. इतर दर</button>
+            <!-- भाग २ हेडिंग -->
+            <div class="strip-heading" style="border-left-color: #00e5ff;">
+                <span>⚙️</span>
+                <span>भाग २ — भत्ते, दर व इतर</span>
+            </div>
 
-            <!-- खालचे ४ टॅब -->
-            <button class="btn-part2 btn-diff-active" onclick="alert('५. वेतन फरक तुलना मॉड्युल')">5. वेतन फरक</button>
-            <button class="btn-part2" onclick="alert('६. इतर भत्ते लवकरच उपलब्ध होईल!')">6. इतर भत्ते</button>
-            <button class="btn-part2 btn-set-color" onclick="alert('७. सेटिंग्ज')">7. सेटिंग</button>
-            <button class="btn-part2 btn-etc-color" onclick="alert('८. इतर (etc)')">8. etc</button>
+            <!-- भाग २ (वर ४ आणि खाली ४ = ८ टॅब) -->
+            <div class="part2-container">
+                <!-- वरचे ४ टॅब -->
+                <button class="part2-box-btn" onclick="alert('१. DA दर')">1. DA दर</button>
+                <button class="part2-box-btn" onclick="alert('२. HRA दर')">2. HRA दर</button>
+                <button class="part2-box-btn" onclick="alert('३. TA / DA')">3. TA / DA</button>
+                <button class="part2-box-btn" onclick="alert('४. इतर दर')">4. इतर दर</button>
+
+                <!-- खालचे ४ टॅब -->
+                <button class="part2-box-btn btn-part2-diff" onclick="location.href='difference.html'">5. वेतन फरक</button>
+                <button class="part2-box-btn" onclick="alert('६. इतर भत्ते')">6. इतर भत्ते</button>
+                <button class="part2-box-btn btn-part2-set" onclick="alert('७. सेटिंग्ज')">7. सेटिंग</button>
+                <button class="part2-box-btn btn-part2-etc" onclick="alert('८. etc')">8. etc</button>
+            </div>
+
         </div>
 
     </div>
-
 </div>
 
-</body>
-</html>
+<script>
+// १. 'Form - उप-टॅब व्यवस्थापन' मधील 'Difference' बटणावर क्लिक केल्यावर हे फंक्शन कॉल करा:
+function openDifferenceDirectly() {
+    // पहिला Form पॉपअप लपवणे
+    const formModal = document.getElementById('formModal') || document.querySelector('.modal');
+    if (formModal) formModal.style.display = 'none';
+
+    // थेट हा २ भागांचा पॉपअप उघडणे
+    const diffModal = document.getElementById('differenceModal');
+    if (diffModal) diffModal.style.display = 'flex';
+}
+
+// 🟢 Back बटण: पुन्हा 'Form - उप-टॅब व्यवस्थापन' वर जाणे
+function backToFormSubTabs() {
+    document.getElementById('differenceModal').style.display = 'none';
+    const formModal = document.getElementById('formModal') || document.querySelector('.modal');
+    if (formModal) formModal.style.display = 'flex';
+}
+
+// 🔴 Close बटण: सर्व काही बंद करणे
+function closeAllPopups() {
+    document.getElementById('differenceModal').style.display = 'none';
+    const formModal = document.getElementById('formModal') || document.querySelector('.modal');
+    if (formModal) formModal.style.display = 'none';
+}
+</script>
