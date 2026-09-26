@@ -16,6 +16,7 @@
             --text-main: #263238;
         }
 
+        /* पेज स्क्रीनबाहेर आडवे सरकणे १००% रोखणे */
         html, body {
             width: 100%;
             max-width: 100vw;
@@ -317,7 +318,7 @@
 
         <div class="field-group">
             <label>२. पदनाम:</label>
-            <input type="text" id="empDesignation" placeholder="कर्मचारी पदनाम टाका (उदा. कनिष्ठ लिपिक / कनिष्ठ अभियंता)">
+            <input type="text" id="empDesignation" placeholder="कर्मचारी पदनाम टाका (उदा. कनिष्ठ लिपिक)">
         </div>
 
         <div class="field-group">
@@ -752,7 +753,6 @@
 
     function saveRulesModal() { validateCard3(); closeModal('rulesModal'); }
 
-    // ==================== वेतनश्रेणी डेटा ====================
     const payScales4th = [
         "रु. 750 - 12 - 870 - EB - 14 - 940", "रु. 775 - 12 - 871 - EB - 14 - 1025",
         "रु. 800 - 15 - 1010 - EB - 20 - 1150", "रु. 950 - 20 - 1150 - EB - 25 - 1400",
@@ -956,11 +956,71 @@
             let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
             return fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
         }
-        return [];
+
+        if (commission === '6th' || scaleStr.includes('PB') || scaleStr.includes('GP') || scaleStr.includes('-1S')) {
+            let clean = scaleStr.replace(/\(.*?\)/g, '');
+            let bandMatch = clean.match(/(\d{4,6})\s*-\s*(\d{4,6})/);
+            let gpMatch = scaleStr.match(/GP\s*(\d+)/i);
+            let gp = gpMatch ? parseInt(gpMatch[1], 10) : (gradePayOverride || 0);
+
+            if (bandMatch) {
+                let bandMin = parseInt(bandMatch[1], 10);
+                let bandMax = parseInt(bandMatch[2], 10);
+                let entryPay = get6thEntryPay(scaleStr, gp);
+
+                let stagesSet = new Set();
+                if (entryPay && entryPay >= bandMin && entryPay <= bandMax) {
+                    let curr = entryPay;
+                    let safety = 0;
+                    while (curr <= bandMax && safety < 80) {
+                        stagesSet.add(curr);
+                        let total = curr + gp;
+                        let inc = Math.ceil((total * 0.03) / 10) * 10;
+                        if (inc < 10) inc = 10;
+                        curr += inc;
+                        safety++;
+                    }
+                }
+
+                if (bandMin && bandMin <= bandMax) {
+                    let curr = bandMin;
+                    let safety = 0;
+                    while (curr <= bandMax && safety < 80) {
+                        stagesSet.add(curr);
+                        let total = curr + gp;
+                        let inc = Math.ceil((total * 0.03) / 10) * 10;
+                        if (inc < 10) inc = 10;
+                        curr += inc;
+                        safety++;
+                    }
+                }
+                return Array.from(stagesSet).sort((a, b) => a - b);
+            }
+        }
+
+        let cleanStr = scaleStr.replace(/\(.*?\)/g, '').replace(/PB\s*-\s*\d+/gi, '').replace(/श्रेणी\s*-\s*\d+/gi, '');
+        const marathiDigits = ['०','१','२','३','४','५','६','७','८','९'];
+        marathiDigits.forEach((d, i) => cleanStr = cleanStr.replaceAll(d, i.toString()));
+        let matches = cleanStr.match(/\d+/g);
+        if (!matches || matches.length < 3) return [];
+
+        let nums = matches.map(n => parseInt(n, 10));
+        let stages = [nums[0]];
+        let current = nums[0];
+        for (let i = 1; i < nums.length - 1; i += 2) {
+            let inc = nums[i];
+            let target = nums[i + 1];
+            while (current < target) {
+                current += inc;
+                if (current > target) current = target;
+                stages.push(current);
+            }
+        }
+        return stages;
     }
 
     // =========================================================================
-    // 🚀 पदोन्नती मूळ वेतनाशिवाय स्वयंचलित नियम ११(१) वेतन निश्चिती (Auto-Fixation)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (पदोन्नती मूळ वेतनाशिवाय स्वयंचलित गणना)
     // =========================================================================
     function processFixation() {
         const isC1Valid = validateCard1();
@@ -1261,6 +1321,7 @@
                 let b = ev.data;
                 let targetComm = b.commission;
 
+                // जर लाभाच्या वेळी आयोग बदलत असेल (उदा. ६ व्या वरून ७ व्या आयोगात पदोन्नती)
                 if (targetComm !== currentCommission) {
                     if (currentCommission === '6th' && targetComm === '7th') {
                         let totalBefore7th = currentBasic + currentGP;
