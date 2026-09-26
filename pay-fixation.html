@@ -325,10 +325,13 @@
         .combobox-container { 
             position: relative; 
             width: 100%; 
+            cursor: pointer;
         }
         .combobox-container input { 
+            width: 100%;
             padding-right: 28px; 
             cursor: pointer;
+            pointer-events: none;
         }
         .combobox-arrow {
             position: absolute;
@@ -337,7 +340,6 @@
             transform: translateY(-50%);
             color: #616161;
             font-size: 12px;
-            cursor: pointer;
             pointer-events: none;
         }
         .custom-dropdown-list {
@@ -351,9 +353,10 @@
             box-shadow: 0 6px 16px rgba(0,0,0,0.25);
             z-index: 10005;
             margin-top: 3px;
+            pointer-events: auto;
         }
         .dropdown-item {
-            padding: 8px 10px;
+            padding: 9px 10px;
             font-size: 12px;
             border-bottom: 1px solid #f0f0f0;
             cursor: pointer;
@@ -571,7 +574,6 @@
 
         .hidden { display: none !important; }
 
-        /* 🖨️ परिपूर्ण मल्टी-पेज प्रिंट व PDF नियम */
         @media print {
             html, body {
                 background: #ffffff !important;
@@ -744,8 +746,8 @@
                             <th>अ.क्र.</th>
                             <th>दिनांक</th>
                             <th>वेतन आयोग</th>
-                            <th>तपशील / सेवा घटना</th> <!-- कॉलम ४ वर बदलला -->
-                            <th>वेतन स्तर / श्रेणी</th> <!-- कॉलम ५ वर बदलला -->
+                            <th>तपशील / सेवा घटना</th>
+                            <th>वेतन स्तर / श्रेणी</th>
                             <th>मूळ वेतन</th>
                             <th>ग्रेड पे</th>
                             <th>एकूण वेतन</th>
@@ -773,7 +775,7 @@
 
         <div class="field-group">
             <label>२. पदनाम:</label>
-            <input type="text" id="empDesignation" placeholder="कर्मचारी पदनाम टाका (उदा. कनिष्ठ लिपिक / कनिष्ठ अभियंता)">
+            <input type="text" id="empDesignation" placeholder="कर्मचारी पदनाम टाका (उदा. कनिष्ठ लिपिक / कनिष्ठ अभियंता / आरेखक)">
         </div>
 
         <div class="field-group">
@@ -798,8 +800,8 @@
 
         <div class="field-group">
             <label>५. वेतनश्रेणी (ग्रेड पे / स्तर सह):</label>
-            <div class="combobox-container" id="scaleWrapper">
-                <input type="text" id="currentPayScale" placeholder="वेतनश्रेणी निवडा किंवा लिहा" autocomplete="off" readonly onclick="toggleScaleDropdown('currentPayScale', 'customScaleDropdown')">
+            <div class="combobox-container" id="scaleWrapper" onclick="toggleScaleDropdown('currentPayScale', 'customScaleDropdown', 'payCommission', event)">
+                <input type="text" id="currentPayScale" placeholder="वेतनश्रेणी निवडा किंवा लिहा" autocomplete="off" readonly>
                 <span class="combobox-arrow">▼</span>
                 <div id="customScaleDropdown" class="custom-dropdown-list hidden"></div>
             </div>
@@ -807,8 +809,8 @@
 
         <div class="field-group">
             <label>६. मूळ वेतन (Basic):</label>
-            <div class="combobox-container" id="basicWrapper">
-                <input type="number" id="basicPay" placeholder="मूळ वेतन निवडा किंवा टाका" autocomplete="off" onclick="toggleBasicDropdown('basicPay', 'customBasicDropdown', 'currentPayScale', 'payCommission')">
+            <div class="combobox-container" id="basicWrapper" onclick="toggleBasicDropdown('basicPay', 'customBasicDropdown', 'currentPayScale', 'payCommission', event)">
+                <input type="number" id="basicPay" placeholder="मूळ वेतन निवडा किंवा टाका" autocomplete="off" readonly>
                 <span class="combobox-arrow">▼</span>
                 <div id="customBasicDropdown" class="custom-dropdown-list hidden"></div>
             </div>
@@ -865,15 +867,15 @@
                     <input type="text" id="b1_post" placeholder="पदोन्नतीचे पद टाका">
                 </div>
                 <div class="card-grid-1">
-                    <div class="combobox-container">
-                        <input type="text" id="b1_scale" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा" readonly onclick="toggleScaleDropdown('b1_scale', 'b1_scaleDropdown', 'b1_comm')">
+                    <div class="combobox-container" onclick="toggleScaleDropdown('b1_scale', 'b1_scaleDropdown', 'b1_comm', event)">
+                        <input type="text" id="b1_scale" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा" readonly>
                         <span class="combobox-arrow">▼</span>
                         <div id="b1_scaleDropdown" class="custom-dropdown-list hidden"></div>
                     </div>
                 </div>
                 <div class="card-grid-1">
-                    <div class="combobox-container">
-                        <input type="number" id="b1_basic" placeholder="पदोन्नती मूळ वेतन निवडा किंवा टाका" onclick="toggleBasicDropdown('b1_basic', 'b1_basicDropdown', 'b1_scale', 'b1_comm')">
+                    <div class="combobox-container" onclick="toggleBasicDropdown('b1_basic', 'b1_basicDropdown', 'b1_scale', 'b1_comm', event)">
+                        <input type="number" id="b1_basic" placeholder="पदोन्नती मूळ वेतन निवडा किंवा टाका" readonly>
                         <span class="combobox-arrow">▼</span>
                         <div id="b1_basicDropdown" class="custom-dropdown-list hidden"></div>
                     </div>
@@ -918,15 +920,15 @@
                     <input type="text" id="b2_post" placeholder="पदोन्नतीचे पद टाका">
                 </div>
                 <div class="card-grid-1">
-                    <div class="combobox-container">
-                        <input type="text" id="b2_scale" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा" readonly onclick="toggleScaleDropdown('b2_scale', 'b2_scaleDropdown', 'b2_comm')">
+                    <div class="combobox-container" onclick="toggleScaleDropdown('b2_scale', 'b2_scaleDropdown', 'b2_comm', event)">
+                        <input type="text" id="b2_scale" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा" readonly>
                         <span class="combobox-arrow">▼</span>
                         <div id="b2_scaleDropdown" class="custom-dropdown-list hidden"></div>
                     </div>
                 </div>
                 <div class="card-grid-1">
-                    <div class="combobox-container">
-                        <input type="number" id="b2_basic" placeholder="पदोन्नती मूळ वेतन निवडा किंवा टाका" onclick="toggleBasicDropdown('b2_basic', 'b2_basicDropdown', 'b2_scale', 'b2_comm')">
+                    <div class="combobox-container" onclick="toggleBasicDropdown('b2_basic', 'b2_basicDropdown', 'b2_scale', 'b2_comm', event)">
+                        <input type="number" id="b2_basic" placeholder="पदोन्नती मूळ वेतन निवडा किंवा टाका" readonly>
                         <span class="combobox-arrow">▼</span>
                         <div id="b2_basicDropdown" class="custom-dropdown-list hidden"></div>
                     </div>
@@ -971,15 +973,15 @@
                     <input type="text" id="b3_post" placeholder="पदोन्नतीचे पद टाका">
                 </div>
                 <div class="card-grid-1">
-                    <div class="combobox-container">
-                        <input type="text" id="b3_scale" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा" readonly onclick="toggleScaleDropdown('b3_scale', 'b3_scaleDropdown', 'b3_comm')">
+                    <div class="combobox-container" onclick="toggleScaleDropdown('b3_scale', 'b3_scaleDropdown', 'b3_comm', event)">
+                        <input type="text" id="b3_scale" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा" readonly>
                         <span class="combobox-arrow">▼</span>
                         <div id="b3_scaleDropdown" class="custom-dropdown-list hidden"></div>
                     </div>
                 </div>
                 <div class="card-grid-1">
-                    <div class="combobox-container">
-                        <input type="number" id="b3_basic" placeholder="पदोन्नती मूळ वेतन निवडा किंवा टाका" onclick="toggleBasicDropdown('b3_basic', 'b3_basicDropdown', 'b3_scale', 'b3_comm')">
+                    <div class="combobox-container" onclick="toggleBasicDropdown('b3_basic', 'b3_basicDropdown', 'b3_scale', 'b3_comm', event)">
+                        <input type="number" id="b3_basic" placeholder="पदोन्नती मूळ वेतन निवडा किंवा टाका" readonly>
                         <span class="combobox-arrow">▼</span>
                         <div id="b3_basicDropdown" class="custom-dropdown-list hidden"></div>
                     </div>
@@ -2057,9 +2059,6 @@
         outputBox.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // =========================================================================
-    // 🔄 अदलाबदल केलेले कॉलम: आता तपशील (कॉलम ४) आणि वेतन स्तर (कॉलम ५) वर आहेत
-    // =========================================================================
     function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp) {
         let total = basic + gp;
         let gpDisplay = gp > 0 ? gp : "-";
@@ -2069,8 +2068,8 @@
             <td>${sr}</td>
             <td>${dateStr}</td>
             <td>${comm}</td>
-            <td class="event-cell">${eventDesc}</td> <!-- कॉलम ४ वर तपशील -->
-            <td><small><b>${scaleStr}</b></small></td> <!-- कॉलम ५ वर वेतन स्तर -->
+            <td class="event-cell">${eventDesc}</td>
+            <td><small><b>${scaleStr}</b></small></td>
             <td><b>${basic}</b></td>
             <td>${gpDisplay}</td>
             <td><b>${total}</b></td>
