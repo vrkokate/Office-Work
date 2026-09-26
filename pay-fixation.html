@@ -316,7 +316,6 @@
             margin: 0; padding: 0; border: none;
         }
 
-        /* इन-प्लेस कस्टम ड्रॉपडाऊन (मोबाईलसाठी उत्तम व सुरक्षित) */
         .combobox-container { 
             position: relative; 
             width: 100%; 
@@ -736,7 +735,9 @@
                             <th>अ.क्र.</th>
                             <th>दिनांक</th>
                             <th>वेतन आयोग</th>
+                            <!-- चतुर्थ कॉलम: वेतन स्तर / श्रेणी -->
                             <th>वेतन स्तर / श्रेणी</th>
+                            <!-- पंचम कॉलम: तपशील / सेवा घटना -->
                             <th>तपशील / सेवा घटना</th>
                             <th>मूळ वेतन</th>
                             <th>ग्रेड पे</th>
@@ -788,7 +789,6 @@
             </select>
         </div>
 
-        <!-- ५. वेतनश्रेणी (कस्टम इन-प्लेस ड्रॉपडाऊन - मोबाईलसाठी १००% सुरक्षित) -->
         <div class="field-group">
             <label>५. वेतनश्रेणी (ग्रेड पे / स्तर सह):</label>
             <div class="combobox-container" id="scaleWrapper">
@@ -798,7 +798,6 @@
             </div>
         </div>
 
-        <!-- ६. मूळ वेतन (कस्टम इन-प्लेस ड्रॉपडाऊन - मोबाईलसाठी १००% सुरक्षित) -->
         <div class="field-group">
             <label>६. मूळ वेतन (Basic):</label>
             <div class="combobox-container" id="basicWrapper">
@@ -865,13 +864,6 @@
                         <div id="b1_scaleDropdown" class="custom-dropdown-list hidden"></div>
                     </div>
                 </div>
-                <div class="card-grid-1">
-                    <div class="combobox-container">
-                        <input type="number" id="b1_basic" placeholder="पदोन्नती मूळ वेतन निवडा किंवा टाका" onclick="toggleBasicDropdown('b1_basic', 'b1_basicDropdown', 'b1_scale', 'b1_comm')">
-                        <span class="combobox-arrow">▼</span>
-                        <div id="b1_basicDropdown" class="custom-dropdown-list hidden"></div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -918,13 +910,6 @@
                         <div id="b2_scaleDropdown" class="custom-dropdown-list hidden"></div>
                     </div>
                 </div>
-                <div class="card-grid-1">
-                    <div class="combobox-container">
-                        <input type="number" id="b2_basic" placeholder="पदोन्नती मूळ वेतन निवडा किंवा टाका" onclick="toggleBasicDropdown('b2_basic', 'b2_basicDropdown', 'b2_scale', 'b2_comm')">
-                        <span class="combobox-arrow">▼</span>
-                        <div id="b2_basicDropdown" class="custom-dropdown-list hidden"></div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -969,13 +954,6 @@
                         <input type="text" id="b3_scale" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा" readonly onclick="toggleScaleDropdown('b3_scale', 'b3_scaleDropdown', 'b3_comm')">
                         <span class="combobox-arrow">▼</span>
                         <div id="b3_scaleDropdown" class="custom-dropdown-list hidden"></div>
-                    </div>
-                </div>
-                <div class="card-grid-1">
-                    <div class="combobox-container">
-                        <input type="number" id="b3_basic" placeholder="पदोन्नती मूळ वेतन निवडा किंवा टाका" onclick="toggleBasicDropdown('b3_basic', 'b3_basicDropdown', 'b3_scale', 'b3_comm')">
-                        <span class="combobox-arrow">▼</span>
-                        <div id="b3_basicDropdown" class="custom-dropdown-list hidden"></div>
                     </div>
                 </div>
             </div>
@@ -1127,7 +1105,6 @@
                 document.getElementById(`b${i}_comm`).value = "";
                 document.getElementById(`b${i}_post`).value = "";
                 document.getElementById(`b${i}_scale`).value = "";
-                document.getElementById(`b${i}_basic`).value = "";
             }
 
             document.getElementById('fixationFrom').value = "";
@@ -1176,6 +1153,7 @@
         closeModal('employeeModal');
     }
 
+    // लाभ कार्डाच्या तपासणीतून मूळ वेतन काढून टाकले आहे
     function validateCard2() {
         let hasIncomplete = false;
         let anyActive = false;
@@ -1734,19 +1712,20 @@
         document.getElementById('gradePay').value = "0";
     }
 
+    // =========================================================================
+    // 🎖️ पदोन्नती / MACP लाभ कार्ड (मूळ वेतन इनपुट पूर्णपणे काढून टाकलेला)
+    // =========================================================================
     function toggleBenefitRow(idx) {
         const type = document.getElementById(`b${idx}_type`).value;
         const fields = document.getElementById(`b${idx}_fields`);
         const postInput = document.getElementById(`b${idx}_post`);
         const scaleInput = document.getElementById(`b${idx}_scale`);
-        const basicInput = document.getElementById(`b${idx}_basic`);
 
         if (type !== 'None') {
             fields.classList.remove('hidden');
             let isPromo = (type === 'Promotion');
             postInput.placeholder = isPromo ? "पदोन्नतीचे पद टाका" : "वरिष्ठ पद टाका";
             scaleInput.value = "";
-            basicInput.value = "";
         } else {
             fields.classList.add('hidden');
         }
@@ -1754,7 +1733,6 @@
 
     function updatePromoScaleDropdown(idx) {
         document.getElementById(`b${idx}_scale`).value = "";
-        document.getElementById(`b${idx}_basic`).value = "";
         evaluateOptionSuggestion(idx);
     }
 
@@ -1897,6 +1875,22 @@
         }
     }
 
+    function onBenefitDateChange(idx) {
+        const dVal = document.getElementById(`b${idx}_date`).value;
+        if (!dVal) return;
+
+        const dt = parseLocalDate(dVal);
+        const commSelect = document.getElementById(`b${idx}_comm`);
+
+        if (dt < new Date(1996, 0, 1)) commSelect.value = "4th";
+        else if (dt >= new Date(1996, 0, 1) && dt < new Date(2006, 0, 1)) commSelect.value = "5th";
+        else if (dt >= new Date(2006, 0, 1) && dt < new Date(2016, 0, 1)) commSelect.value = "6th";
+        else commSelect.value = "7th";
+
+        updatePromoScaleDropdown(idx);
+        evaluateOptionSuggestion(idx);
+    }
+
     function toggleWithheldOption() {
         const withheld = document.getElementById('incrementWithheld').value;
         const div = document.getElementById('withheldEffectDiv');
@@ -1931,7 +1925,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनवाढीत मूळ वेतन अचूक बदलणारी)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (कॉलम ४ वर 'वेतन स्तर / श्रेणी' आणि ५ वर 'तपशील')
     // =========================================================================
     function processFixation() {
         const isC1Valid = validateCard1();
@@ -1978,7 +1972,6 @@
         const autoUpgrade = document.getElementById('autoCommissionChange').value === 'Yes';
         const rule7th = document.getElementById('incrementMonthRule7th').value;
         
-        // ७व्या आयोगाचा स्तर वेतनश्रेणीवरूनच अचूक काढणे
         let initialLevel = "S-6";
         if (startCommission === '7th') {
             let m = scale.match(/S-(\d+)/i);
@@ -1999,13 +1992,15 @@
 
         for (let i = 1; i <= 3; i++) {
             let bType = document.getElementById(`b${i}_type`).value;
+            if (type !== 'None') { // fixed below to bType
+                // handled below
+            }
             if (bType !== 'None') {
                 let bDate = document.getElementById(`b${i}_date`).value;
                 let bOptDate = document.getElementById(`b${i}_optDate`).value || bDate;
                 let bComm = document.getElementById(`b${i}_comm`).value;
                 let bPost = document.getElementById(`b${i}_post`).value.trim() || `वरिष्ठ पद-${i}`;
                 let bScale = document.getElementById(`b${i}_scale`).value;
-                let bBasic = parseFloat(document.getElementById(`b${i}_basic`).value) || 0;
 
                 if (bDate) {
                     activeBenefits.push({
@@ -2018,7 +2013,7 @@
                         commission: bComm,
                         post: bPost,
                         scale: bScale,
-                        customBasic: bBasic
+                        customBasic: 0
                     });
                     let label = (bType === 'Promotion') ? `पदोन्नती-${i}` : `MACP-${i}`;
                     summaryBenefitsText.push(`${label} (${formatDateToDDMMYYYY(bDate)} | ${bComm} आयोग: ${bScale})`);
@@ -2170,7 +2165,6 @@
         let currentLevel = initialLevel;
         let currentMatrixIndex = -1;
 
-        // ७व्या आयोगातील मूळ वेतनाचा टप्पा (Index) अचूक शोधणे
         if (currentCommission === '7th') {
             let match = String(currentLevel).match(/S-(\d+)/i);
             let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
@@ -2238,9 +2232,7 @@
                 let b = ev.data;
                 currentCommission = b.commission;
 
-                if (b.customBasic > 0) {
-                    currentBasic = b.customBasic;
-                } else if (currentCommission === '7th') {
+                if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
 
@@ -2341,7 +2333,7 @@
 
                     let cellsLower = fullPayMatrix7th[lLevel] || fullPayMatrix7th["S-6"];
 
-                    let notionalIdx = lIndex + 1 + 1; // नियमित वाढ + पदोन्नती वाढ
+                    let notionalIdx = lIndex + 1 + 1; // नियम ११(१) नुसार २ वाढी
 
                     let notionalPay = cellsLower[Math.min(notionalIdx, cellsLower.length - 1)];
 
@@ -2382,7 +2374,7 @@
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             // =========================================================================
-            // 🔹 नियमित वार्षिक वेतनवाढ (मूळ वेतन अचूक बदलणारी)
+            // 🔹 नियमित वार्षिक वेतनवाढ
             // =========================================================================
             else if (ev.type === 'ANNUAL_INC') {
                 if (currentCommission === '7th') {
@@ -2444,6 +2436,9 @@
         outputBox.scrollIntoView({ behavior: 'smooth' });
     }
 
+    // =========================================================================
+    // 🔄 तक्त्यामध्ये चौथी व पाचवी कॉलम अदलाबदल (मुद्दा ७ नुसार)
+    // =========================================================================
     function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp) {
         let total = basic + gp;
         let gpDisplay = gp > 0 ? gp : "-";
@@ -2453,7 +2448,9 @@
             <td>${sr}</td>
             <td>${dateStr}</td>
             <td>${comm}</td>
+            <!-- चौथा कॉलम: वेतन स्तर / श्रेणी -->
             <td><small><b>${scaleStr}</b></small></td>
+            <!-- पाचवा कॉलम: तपशील / सेवा घटना -->
             <td class="event-cell">${eventDesc}</td>
             <td><b>${basic}</b></td>
             <td>${gpDisplay}</td>
