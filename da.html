@@ -304,7 +304,7 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="daDate">महागाई भत्ता दिनांक *</label>
-                        <input type="date" id="daDate" required>
+                        <input type="date" id="daDate" required title="दिनांक निवडा">
                     </div>
                     <div class="form-group">
                         <label for="currentDa">सध्याचे डीए रेट (%) *</label>
@@ -331,7 +331,7 @@
                 <tbody id="tableBody">
                     <tr>
                         <td>१</td>
-                        <td><b>[७ वा वेतन आयोग]</b><br>01.07.2024</td>
+                        <td>01.07.2024</td>
                         <td>53%</td>
                         <td>50%</td>
                         <td>
@@ -364,7 +364,6 @@
     function saveEntry(event) {
         event.preventDefault();
         
-        const commission = document.getElementById("commissionSelect").value;
         const rawDate = document.getElementById("daDate").value;
         const currentDa = document.getElementById("currentDa").value;
         const editIndex = document.getElementById("editIndex").value;
@@ -382,7 +381,7 @@
             const newRow = tbody.insertRow();
             newRow.innerHTML = `
                 <td>${rowCount + 1}</td>
-                <td><b>[${commission}]</b><br>${formattedDate}</td>
+                <td>${formattedDate}</td>
                 <td>${currentDa}</td>
                 <td>${prevDa}</td>
                 <td>
@@ -393,7 +392,7 @@
             alert("माहिती यशस्वीरित्या जतन (Save) करण्यात आली आहे!");
         } else {
             const row = tbody.rows[parseInt(editIndex)];
-            row.cells[1].innerHTML = `<b>[${commission}]</b><br>${formattedDate}`;
+            row.cells[1].innerText = formattedDate;
             row.cells[2].innerText = currentDa;
             
             document.getElementById("editIndex").value = "-1";
