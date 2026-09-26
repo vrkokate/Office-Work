@@ -318,7 +318,6 @@
             margin: 0; padding: 0; border: none;
         }
 
-        /* मोबाईल टच-सक्रिय ड्रॉपडाऊन (<select>) */
         .field-group select {
             cursor: pointer;
             background-color: #fff;
@@ -529,7 +528,6 @@
 
         .hidden { display: none !important; }
 
-        /* 🖨️ परिपूर्ण मल्टी-पेज प्रिंट व PDF नियम (बाहेरील डबा पूर्णपणे काढलेला) */
         @media print {
             html, body {
                 background: #ffffff !important;
@@ -674,7 +672,6 @@
 
     </div>
 
-    <!-- सबमिट आणि रिसेट बटण ग्रुप -->
     <div class="action-button-group">
         <button type="button" class="submit-btn" onclick="processFixation()">Submit Data</button>
         <button type="button" class="reset-btn" onclick="resetAllData()">Reset Data</button>
@@ -752,7 +749,7 @@
             </select>
         </div>
 
-        <!-- ५. वेतनश्रेणी (<select> घटकासह मोबाईल टच-सक्रिय ड्रॉपडाऊन) -->
+        <!-- ५. वेतनश्रेणी (फक्त वेतनश्रेणी व स्तर, पदाचे नाव नाही) -->
         <div class="field-group">
             <label>५. वेतनश्रेणी (ग्रेड पे / स्तर सह):</label>
             <select id="currentPayScale" onchange="onEmpScaleSelect()" required>
@@ -760,7 +757,7 @@
             </select>
         </div>
 
-        <!-- ६. मूळ वेतन (<select> घटकासह मोबाईल टच-सक्रिय ड्रॉपडाऊन) -->
+        <!-- ६. मूळ वेतन -->
         <div class="field-group">
             <label>६. मूळ वेतन (Basic):</label>
             <select id="basicPay" required>
@@ -1404,398 +1401,8 @@
         "S-31": [182200, 187700, 193300, 199100, 205100, 211300, 217600, 224100]
     };
 
-    function parsePayScaleStages(scaleStr, commission, gradePayOverride = 0) {
-        if (!scaleStr) return [];
-
-        if (commission === '7th' || scaleStr.includes('S-')) {
-            let match = scaleStr.match(/S-(\d+)/i);
-            if (match) {
-                let key = "S-" + parseInt(match[1], 10);
-                if (fullPayMatrix7th[key]) return fullPayMatrix7th[key];
-            }
-            return fullPayMatrix7th["S-6"];
-        }
-
-        if (commission === '6th' || scaleStr.includes('PB') || scaleStr.includes('GP') || scaleStr.includes('-1S')) {
-            let clean = scaleStr.replace(/\(.*?\)/g, '');
-            let bandMatch = clean.match(/(\d{4,6})\s*-\s*(\d{4,6})/);
-            let gpMatch = scaleStr.match(/GP\s*(\d+)/i);
-            let gp = gpMatch ? parseInt(gpMatch[1], 10) : (gradePayOverride || 0);
-
-            if (bandMatch) {
-                let bandMin = parseInt(bandMatch[1], 10);
-                let bandMax = parseInt(bandMatch[2], 10);
-                let entryPay = get6thEntryPay(scaleStr, gp);
-
-                let stagesSet = new Set();
-
-                if (entryPay && entryPay >= bandMin && entryPay <= bandMax) {
-                    let curr = entryPay;
-                    let safety = 0;
-                    while (curr <= bandMax && safety < 80) {
-                        stagesSet.add(curr);
-                        let total = curr + gp;
-                        let inc = Math.ceil((total * 0.03) / 10) * 10;
-                        if (inc < 10) inc = 10;
-                        curr += inc;
-                        safety++;
-                    }
-                }
-
-                if (bandMin && bandMin <= bandMax) {
-                    let curr = bandMin;
-                    let safety = 0;
-                    while (curr <= bandMax && safety < 80) {
-                        stagesSet.add(curr);
-                        let total = curr + gp;
-                        let inc = Math.ceil((total * 0.03) / 10) * 10;
-                        if (inc < 10) inc = 10;
-                        curr += inc;
-                        safety++;
-                    }
-                }
-
-                return Array.from(stagesSet).sort((a, b) => a - b);
-            }
-        }
-
-        let cleanStr = scaleStr.replace(/\(.*?\)/g, '');
-        cleanStr = cleanStr.replace(/PB\s*-\s*\d+/gi, '').replace(/श्रेणी\s*-\s*\d+/gi, '');
-
-        const marathiDigits = ['०','१','२','३','४','५','६','७','८','९'];
-        marathiDigits.forEach((d, i) => cleanStr = cleanStr.replaceAll(d, i.toString()));
-        let matches = cleanStr.match(/\d+/g);
-        if (!matches || matches.length < 3) return [];
-
-        let nums = matches.map(n => parseInt(n, 10));
-        let stages = [nums[0]];
-        let current = nums[0];
-        for (let i = 1; i < nums.length - 1; i += 2) {
-            let inc = nums[i];
-            let target = nums[i + 1];
-            while (current < target) {
-                current += inc;
-                if (current > target) current = target;
-                stages.push(current);
-            }
-        }
-        return stages;
-    }
-
     // =========================================================================
-    // 📱 <select> घटकांचा वापर करून टच-सक्रिय ड्रॉपडाऊन भरण्याची सोय
-    // =========================================================================
-    function updateCommissionRules() {
-        const comm = document.getElementById('payCommission').value;
-        const scaleSelect = document.getElementById('currentPayScale');
-        const basicSelect = document.getElementById('basicPay');
-
-        scaleSelect.innerHTML = '<option value="" disabled selected>वेतनश्रेणी निवडा</option>';
-        basicSelect.innerHTML = '<option value="" disabled selected>प्रथम वेतनश्रेणी निवडा</option>';
-        document.getElementById('gradePay').value = "0";
-
-        let scales = [];
-        if (comm === '4th') scales = payScales4th;
-        else if (comm === '5th') scales = payScales5th;
-        else if (comm === '6th') scales = payScales6th;
-        else scales = levelConfig7th.map(cfg => level7thStartPay[cfg.id].desc);
-
-        scales.forEach(scale => {
-            let opt = document.createElement('option');
-            opt.value = scale;
-            opt.textContent = scale;
-            scaleSelect.appendChild(opt);
-        });
-
-        validateCard1();
-    }
-
-    function onEmpScaleSelect() {
-        const comm = document.getElementById('payCommission').value;
-        const scaleStr = document.getElementById('currentPayScale').value;
-        const basicSelect = document.getElementById('basicPay');
-
-        basicSelect.innerHTML = '<option value="" disabled selected>मूळ वेतन निवडा</option>';
-
-        if (comm === '6th' && scaleStr.includes('GP')) {
-            let gpMatch = scaleStr.match(/GP\s*(\d+)/i);
-            if (gpMatch && gpMatch[1]) {
-                document.getElementById('gradePay').value = gpMatch[1];
-            }
-        }
-
-        let gp = parseFloat(document.getElementById('gradePay').value) || 0;
-        let stages = parsePayScaleStages(scaleStr, comm, gp);
-        let entryPayVal = (comm === '6th') ? get6thEntryPay(scaleStr, gp) : 0;
-
-        stages.forEach((amount, idx) => {
-            let opt = document.createElement('option');
-            opt.value = amount;
-            if (comm === '6th' && amount === entryPayVal) {
-                opt.textContent = `${amount} (★ Annexure-III प्रथम भरती वेतन)`;
-            } else if (comm === '7th') {
-                opt.textContent = `${amount} (टप्पा ${idx + 1})`;
-            } else {
-                opt.textContent = amount;
-            }
-            basicSelect.appendChild(opt);
-        });
-
-        validateCard1();
-    }
-
-    function toggleBenefitRow(idx) {
-        const type = document.getElementById(`b${idx}_type`).value;
-        const fields = document.getElementById(`b${idx}_fields`);
-        const scaleSelect = document.getElementById(`b${idx}_scale`);
-        const basicSelect = document.getElementById(`b${idx}_basic`);
-
-        if (type !== 'None') {
-            fields.classList.remove('hidden');
-            let isPromo = (type === 'Promotion');
-            document.getElementById(`b${idx}_post`).placeholder = isPromo ? "पदोन्नतीचे पद टाका" : "वरिष्ठ पद टाका";
-            scaleSelect.innerHTML = '<option value="" disabled selected>वेतन आयोग निवडा</option>';
-            basicSelect.innerHTML = '<option value="" disabled selected>प्रथम वेतनश्रेणी निवडा</option>';
-        } else {
-            fields.classList.add('hidden');
-        }
-    }
-
-    function updatePromoScaleDropdown(idx) {
-        const comm = document.getElementById(`b${idx}_comm`).value;
-        const scaleSelect = document.getElementById(`b${idx}_scale`);
-        const basicSelect = document.getElementById(`b${idx}_basic`);
-
-        scaleSelect.innerHTML = '<option value="" disabled selected>मंजूर वेतनश्रेणी निवडा</option>';
-        basicSelect.innerHTML = '<option value="" disabled selected>प्रथम वेतनश्रेणी निवडा</option>';
-
-        let scales = [];
-        if (comm === '4th') scales = payScales4th;
-        else if (comm === '5th') scales = payScales5th;
-        else if (comm === '6th') scales = payScales6th;
-        else scales = levelConfig7th.map(cfg => level7thStartPay[cfg.id].desc);
-
-        scales.forEach(scale => {
-            let opt = document.createElement('option');
-            opt.value = scale;
-            opt.textContent = scale;
-            scaleSelect.appendChild(opt);
-        });
-
-        evaluateOptionSuggestion(idx);
-    }
-
-    function updatePromoBasicDropdown(idx) {
-        const comm = document.getElementById(`b${idx}_comm`).value;
-        const scaleStr = document.getElementById(`b${idx}_scale`).value;
-        const basicSelect = document.getElementById(`b${idx}_basic`);
-
-        basicSelect.innerHTML = '<option value="" disabled selected>पदोन्नती मूळ वेतन निवडा</option>';
-
-        let gp = 0;
-        if (comm === '6th') {
-            let gpMatch = scaleStr.match(/GP\s*(\d+)/i);
-            if (gpMatch) gp = parseInt(gpMatch[1], 10);
-        }
-
-        let stages = parsePayScaleStages(scaleStr, comm, gp);
-        let entryPayVal = (comm === '6th') ? get6thEntryPay(scaleStr, gp) : 0;
-
-        stages.forEach((amount, sIdx) => {
-            let opt = document.createElement('option');
-            opt.value = amount;
-            if (comm === '6th' && amount === entryPayVal) {
-                opt.textContent = `${amount} (★ Annexure-III प्रथम भरती वेतन)`;
-            } else if (comm === '7th') {
-                opt.textContent = `${amount} (टप्पा ${sIdx + 1})`;
-            } else {
-                opt.textContent = amount;
-            }
-            basicSelect.appendChild(opt);
-        });
-    }
-
-    function getBestOptionRecommendation(benefitDateStr, comm) {
-        if (!benefitDateStr) return null;
-        let bDate = parseLocalDate(benefitDateStr);
-        let bYear = bDate.getFullYear();
-        let bMonth = bDate.getMonth();
-        let bDay = bDate.getDate();
-
-        let joinDateVal = document.getElementById('empJoinDate').value;
-        let joinMonth = joinDateVal ? parseLocalDate(joinDateVal).getMonth() : 6;
-
-        let nextIncDate = null;
-        let isWithin6MonthsBeforeInc = false;
-
-        if (comm === '4th' || comm === '5th') {
-            let incThisYear = new Date(bYear, joinMonth, 1);
-            if (bDate < incThisYear) {
-                nextIncDate = incThisYear;
-            } else {
-                nextIncDate = new Date(bYear + 1, joinMonth, 1);
-            }
-            let diffDays = Math.round((nextIncDate - bDate) / (1000 * 60 * 60 * 24));
-            isWithin6MonthsBeforeInc = (diffDays > 0 && diffDays < 182);
-        } else if (comm === '6th') {
-            let julyThisYear = new Date(bYear, 6, 1);
-            if (bDate <= julyThisYear) {
-                nextIncDate = julyThisYear;
-                if (bMonth >= 0 && (bMonth < 6 || (bMonth === 6 && bDay === 1))) {
-                    isWithin6MonthsBeforeInc = !(bMonth === 0 && bDay === 1);
-                }
-            } else {
-                nextIncDate = new Date(bYear + 1, 6, 1);
-                isWithin6MonthsBeforeInc = false;
-            }
-        } else {
-            let rule7th = document.getElementById('incrementMonthRule7th').value;
-            if (rule7th === 'january') {
-                let janNextYear = new Date(bYear + 1, 0, 1);
-                nextIncDate = janNextYear;
-                let diffDays = Math.round((nextIncDate - bDate) / (1000 * 60 * 60 * 24));
-                isWithin6MonthsBeforeInc = (diffDays > 0 && diffDays < 182);
-            } else {
-                let julyThisYear = new Date(bYear, 6, 1);
-                if (bDate <= julyThisYear) {
-                    nextIncDate = julyThisYear;
-                    if (bMonth >= 0 && (bMonth < 6 || (bMonth === 6 && bDay === 1))) {
-                        isWithin6MonthsBeforeInc = !(bMonth === 0 && bDay === 1);
-                    }
-                } else {
-                    let nextIncYear = bDate.getMonth() >= 6 ? bYear + 1 : bYear;
-                    nextIncDate = new Date(nextIncYear, 6, 1);
-                    isWithin6MonthsBeforeInc = false;
-                }
-            }
-        }
-
-        let bestDateStr = "";
-        let adviceHtml = "";
-
-        let dNext = String(nextIncDate.getDate()).padStart(2, '0');
-        let mNext = String(nextIncDate.getMonth() + 1).padStart(2, '0');
-        let yNext = nextIncDate.getFullYear();
-        let nextIncFormatted = `${dNext}-${mNext}-${yNext}`;
-        let nextIncIso = `${yNext}-${mNext}-${dNext}`;
-
-        if (isWithin6MonthsBeforeInc) {
-            bestDateStr = nextIncIso;
-            adviceHtml = `💡 <b>स्मार्ट शिफारस:</b> लाभाच्या दिनांकापासून पुढील वेतनवाढीपर्यंत ६ महिने पूर्ण होत नसल्याने <b>${nextIncFormatted} (पुढील वेतनवाढ दिनांक)</b> हा विकल्प निवडणे सर्वाधिक फायदेशीर ठरेल.`;
-        } else {
-            bestDateStr = benefitDateStr;
-            adviceHtml = `💡 <b>स्मार्ट शिफारस:</b> लाभाच्या दिनांकापासून पुढील वेतनवाढीपर्यंत ६ महिन्यांपेक्षा जास्त कालावधी मिळत असल्याने, <b>लाभाचा दिनांक (${formatDateToDDMMYYYY(benefitDateStr)})</b> हाच विकल्प निवडणे फायदेशीर आहे.`;
-        }
-
-        return {
-            bestIso: bestDateStr,
-            bestFormatted: formatDateToDDMMYYYY(bestDateStr),
-            adviceHtml: adviceHtml,
-            isWithin6Months: isWithin6MonthsBeforeInc
-        };
-    }
-
-    function evaluateOptionSuggestion(idx) {
-        const bDateVal = document.getElementById(`b${idx}_date`).value;
-        const comm = document.getElementById(`b${idx}_comm`).value;
-        const advisorBox = document.getElementById(`b${idx}_advisor`);
-        const optInput = document.getElementById(`b${idx}_optDate`);
-        const optDisp = document.getElementById(`b${idx}_optDate_disp`);
-
-        if (!bDateVal || !comm) {
-            advisorBox.classList.add('hidden');
-            return;
-        }
-
-        const rec = getBestOptionRecommendation(bDateVal, comm);
-        if (!rec) return;
-
-        advisorBox.classList.remove('hidden');
-
-        if (!optInput.value) {
-            optInput.value = rec.bestIso;
-            optDisp.value = rec.bestFormatted;
-        }
-
-        checkOptionDateFeedback(idx);
-    }
-
-    function checkOptionDateFeedback(idx) {
-        const bDateVal = document.getElementById(`b${idx}_date`).value;
-        const comm = document.getElementById(`b${idx}_comm`).value;
-        const optVal = document.getElementById(`b${idx}_optDate`).value;
-        const advisorBox = document.getElementById(`b${idx}_advisor`);
-
-        if (!bDateVal || !comm) return;
-        const rec = getBestOptionRecommendation(bDateVal, comm);
-        if (!rec) return;
-
-        if (optVal === rec.bestIso) {
-            advisorBox.className = "option-advisor-box advisor-good";
-            advisorBox.innerHTML = `✓ <b>उत्तम निवड!</b> (${rec.bestFormatted}) हा विकल्प फायदेशीर आहे.<br><small>${rec.adviceHtml}</small>`;
-        } else {
-            advisorBox.className = "option-advisor-box advisor-warn";
-            advisorBox.innerHTML = `⚠️ <b>लक्ष द्या:</b> निवडलेला विकल्प तोट्याचा ठरू शकतो!<br>${rec.adviceHtml}<br><button type="button" class="advisor-btn" onclick="applySuggestedOptionDate(${idx}, '${rec.bestIso}', '${rec.bestFormatted}')">👉 दिनांक [${rec.bestFormatted}] लागू करा</button>`;
-        }
-    }
-
-    function applySuggestedOptionDate(idx, isoDate, formattedDate) {
-        const optInput = document.getElementById(`b${idx}_optDate`);
-        const optDisp = document.getElementById(`b${idx}_optDate_disp`);
-        optInput.value = isoDate;
-        optDisp.value = formattedDate;
-        checkOptionDateFeedback(idx);
-    }
-
-    function reEvaluateAllOptionSuggestions() {
-        for (let i = 1; i <= 3; i++) {
-            if (document.getElementById(`b${i}_type`).value !== 'None') {
-                evaluateOptionSuggestion(i);
-            }
-        }
-    }
-
-    function onBenefitDateChange(idx) {
-        const dVal = document.getElementById(`b${idx}_date`).value;
-        if (!dVal) return;
-
-        const dt = parseLocalDate(dVal);
-        const commSelect = document.getElementById(`b${idx}_comm`);
-
-        if (dt < new Date(1996, 0, 1)) commSelect.value = "4th";
-        else if (dt >= new Date(1996, 0, 1) && dt < new Date(2006, 0, 1)) commSelect.value = "5th";
-        else if (dt >= new Date(2006, 0, 1) && dt < new Date(2016, 0, 1)) commSelect.value = "6th";
-        else commSelect.value = "7th";
-
-        updatePromoScaleDropdown(idx);
-        evaluateOptionSuggestion(idx);
-    }
-
-    function toggleWithheldOption() {
-        const withheld = document.getElementById('incrementWithheld').value;
-        const div = document.getElementById('withheldEffectDiv');
-        if (withheld === 'Yes') div.classList.remove('hidden');
-        else div.classList.add('hidden');
-    }
-
-    window.onload = function() {
-        validateCard1();
-        validateCard2();
-        validateCard3();
-    };
-
-    function fitInMatrix(levelKey, rawAmount) {
-        let match = String(levelKey).match(/S-(\d+)/i);
-        let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
-        let cells = fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
-        for (let i = 0; i < cells.length; i++) {
-            if (cells[i] >= rawAmount) return { basic: cells[i], index: i, level: key };
-        }
-        return { basic: cells[cells.length - 1], index: cells.length - 1, level: key };
-    }
-
-    // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनवाढीत मूळ वेतन बदलणारी अचूक रचना)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनवाढीत मूळ वेतन बदलण्याची त्रुटी दूर)
     // =========================================================================
     function processFixation() {
         const isC1Valid = validateCard1();
@@ -1842,7 +1449,6 @@
         const autoUpgrade = document.getElementById('autoCommissionChange').value === 'Yes';
         const rule7th = document.getElementById('incrementMonthRule7th').value;
         
-        // ७व्या आयोगाचा स्तर वेतनश्रेणीवरून थेट ओळखणे
         let initialLevel = "S-6";
         if (startCommission === '7th') {
             let m = scale.match(/S-(\d+)/i);
@@ -2034,7 +1640,6 @@
         let currentLevel = initialLevel;
         let currentMatrixIndex = -1;
 
-        // ७व्या आयोगातील मूळ वेतनाचा अचूक टप्पा (Index) शोधणे
         if (currentCommission === '7th') {
             let match = String(currentLevel).match(/S-(\d+)/i);
             let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
@@ -2245,9 +1850,6 @@
 
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
-            // =========================================================================
-            // 🔹 नियमित वार्षिक वेतनवाढ (मॅट्रिक्स इंडेक्स अपडेट करणारी सुधारित पद्धत)
-            // =========================================================================
             else if (ev.type === 'ANNUAL_INC') {
                 if (currentCommission === '7th') {
                     let match = String(currentLevel).match(/S-(\d+)/i);
@@ -2255,7 +1857,6 @@
                     currentLevel = key;
                     const cells = fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
 
-                    // सेल्फ-हीलिंग इंडेक्स शोधणे
                     if (currentMatrixIndex === -1 || currentMatrixIndex === undefined) {
                         currentMatrixIndex = cells.indexOf(currentBasic);
                         if (currentMatrixIndex === -1) {
@@ -2269,7 +1870,6 @@
                         }
                     }
 
-                    // पुढील टप्प्यावर जाणे
                     if (currentMatrixIndex < cells.length - 1) {
                         currentMatrixIndex++;
                         currentBasic = cells[currentMatrixIndex];
