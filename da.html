@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>महागाई भत्ता (DA) - महाराष्ट्र शासन</title>
+    <title>महागाई भत्ता (DA) नियंत्रण प्रणाली - महाराष्ट्र शासन</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,18 +12,18 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
+            background-color: #f0f2f5;
             color: #333;
-            padding: 8px;
+            padding: 10px;
             font-size: 14px;
         }
         .main-container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
             background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             overflow: hidden;
         }
         /* Top Header Bar */
@@ -32,15 +32,15 @@
             align-items: center;
             justify-content: space-between;
             background-color: #0d47a1;
-            padding: 10px 12px;
+            padding: 12px 15px;
             color: white;
         }
         .btn-back {
             background-color: #2e7d32;
             color: white;
             border: none;
-            width: 34px;
-            height: 34px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             font-size: 16px;
             cursor: pointer;
@@ -51,18 +51,17 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .header-title {
-            font-size: 18px;
+            font-size: 19px;
             font-weight: bold;
             text-align: center;
             flex-grow: 1;
-            padding: 0 5px;
         }
         .btn-close {
             background-color: #d32f2f;
             color: white;
             border: none;
-            width: 34px;
-            height: 34px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             font-size: 16px;
             cursor: pointer;
@@ -73,7 +72,7 @@
         }
         
         .content-body {
-            padding: 12px;
+            padding: 15px;
         }
 
         /* Print-only formal header title */
@@ -86,67 +85,76 @@
             color: #000;
         }
 
-        /* Selector Section */
-        .selector-card {
-            background: #e3f2fd;
-            border: 1px solid #90caf9;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 15px;
+        /* Form Card Styled as per screenshot */
+        .form-card {
+            background: #ffffff;
+            border: 1px solid #dcdcdc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .selector-card label {
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-group label {
             display: block;
             font-size: 13px;
-            font-weight: bold;
+            font-weight: 600;
             margin-bottom: 5px;
-            color: #0d47a1;
+            color: #333;
         }
-        .selector-card select {
+        .form-group select, .form-group input {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 5px;
             font-size: 14px;
             background: #fff;
-            font-weight: bold;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
         }
 
-        /* Commission Section */
-        .commission-section {
-            display: none;
-            margin-bottom: 15px;
-            background: #fafafa;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 10px;
-        }
-        .commission-section.active {
-            display: block;
-        }
-        .commission-title {
-            background: #1976d2;
+        /* Save Entry Button */
+        .btn-save {
+            width: 100%;
+            background-color: #2e7d32;
             color: white;
-            padding: 8px 10px;
-            font-size: 15px;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
             font-weight: bold;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-save:hover {
+            background-color: #1b5e20;
         }
 
+        /* Table Styling */
         .table-container {
             width: 100%;
-            overflow-x: hidden;
+            overflow-x: auto;
+            margin-bottom: 15px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             background: #fff;
             font-size: 13px;
+            min-width: 600px;
         }
         th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
+            border: 1px solid #dcdcdc;
+            padding: 8px 6px;
             text-align: center;
         }
         th {
@@ -158,96 +166,55 @@
             background-color: #f9f9f9;
         }
 
+        /* Action Buttons in Table */
+        .btn-edit {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 3px;
+        }
+        .btn-edit:hover {
+            background-color: #1b5e20;
+        }
         .btn-delete {
             background-color: #d32f2f;
             color: white;
             border: none;
-            padding: 5px 8px;
-            border-radius: 3px;
+            padding: 5px 10px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
         }
         .btn-delete:hover {
             background-color: #b71c1c;
         }
 
-        /* Add / Update Form Section */
-        .form-card {
-            background: #f1f8e9;
-            border: 1px solid #c8e6c9;
+        /* Report / Print Button */
+        .report-section {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .btn-report {
+            width: 100%;
+            background-color: #0d47a1;
+            color: white;
+            border: none;
             padding: 12px;
-            border-radius: 6px;
-            margin-top: 15px;
-        }
-        .form-card h3 {
-            font-size: 14px;
-            color: #2e7d32;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .form-group {
-            margin-bottom: 10px;
-        }
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 3px;
-            color: #333;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 13px;
-            background: #fff;
-        }
-        .btn-submit {
-            grid-column: span 2;
-            width: 100%;
-            background-color: #2e7d32;
-            color: white;
-            border: none;
-            padding: 10px;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
-            margin-top: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .btn-submit:hover {
-            background-color: #1b5e20;
+        .btn-report:hover {
+            background-color: #1565c0;
         }
 
-        .print-section {
-            text-align: center;
-            margin-top: 15px;
-            padding-bottom: 5px;
-        }
-        .btn-print {
-            background-color: #ff9800;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 250px;
-        }
-        .btn-print:hover {
-            background-color: #f57c00;
-        }
-
-        /* Print Styling for A4 PDF */
+        /* A4 Print Media Styles */
         @media print {
             @page {
                 size: A4;
@@ -264,25 +231,11 @@
                 border: none;
                 width: 100%;
             }
-            .header-bar, .selector-card, .form-card, .print-section, .btn-delete {
+            .header-bar, .form-card, .report-section, .btn-edit, .btn-delete {
                 display: none !important;
             }
             .print-only-title {
                 display: block !important;
-            }
-            .commission-section {
-                display: block !important;
-                border: none;
-                background: white;
-                padding: 0;
-                margin-bottom: 20px;
-            }
-            .commission-title {
-                background: #eee !important;
-                color: #000 !important;
-                border: 1px solid #000;
-                font-size: 14px;
-                padding: 5px;
             }
             table {
                 font-size: 11px;
@@ -291,7 +244,7 @@
             }
             th, td {
                 border: 1px solid #000;
-                padding: 5px;
+                padding: 6px;
                 color: #000;
             }
             th {
@@ -307,218 +260,103 @@
     <!-- Header Bar -->
     <div class="header-bar">
         <a href="index.html" class="btn-back" title="मागे जा">←</a>
-        <div class="header-title">महागाई भत्ता</div>
+        <div class="header-title">महागाई भत्ता (DA) नियंत्रण प्रणाली</div>
         <button class="btn-close" onclick="closePage()" title="बंद करा">✕</button>
     </div>
 
     <div class="content-body">
-        <!-- Print Only Heading -->
-        <div class="print-only-title">महाराष्ट्र शासन - महागाई भत्ता वाढ तक्ता</div>
-
-        <!-- Commission Selector Dropdown -->
-        <div class="selector-card">
-            <label for="commissionDropdown">प्रथम वेतन आयोग निवडा:</label>
-            <select id="commissionDropdown" onchange="showSelectedCommission()">
-                <option value="pc7" selected>७ वा वेतन आयोग</option>
-                <option value="pc6">६ वा वेतन आयोग</option>
-                <option value="pc5">५ वा वेतन आयोग</option>
-                <option value="pc4">४ था वेतन आयोग</option>
-            </select>
+        <!-- Print Only Header -->
+        <div class="print-only-title">
+            <h2>महाराष्ट्र शासन - महागाई भत्ता वाढ तक्ता</h2>
         </div>
 
-        <!-- ४ था वेतन आयोग Section -->
-        <div id="section-pc4" class="commission-section">
-            <div class="commission-title">४ था वेतन आयोग - महागाई भत्ता तक्ता</div>
-            <div class="table-container">
-                <table id="table-pc4">
-                    <thead>
-                        <tr>
-                            <th>अ.क्र.</th>
-                            <th>दिनांक पासून - ते दिनांक</th>
-                            <th>Due DA (%)</th>
-                            <th>Drawn DA (%)</th>
-                            <th class="col-action-hdr">कृती</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- ५ वा वेतन आयोग Section -->
-        <div id="section-pc5" class="commission-section">
-            <div class="commission-title">५ वा वेतन आयोग - महागाई भत्ता तक्ता</div>
-            <div class="table-container">
-                <table id="table-pc5">
-                    <thead>
-                        <tr>
-                            <th>अ.क्र.</th>
-                            <th>दिनांक पासून - ते दिनांक</th>
-                            <th>Due DA (%)</th>
-                            <th>Drawn DA (%)</th>
-                            <th class="col-action-hdr">कृती</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>१</td>
-                            <td>01.01.2005 ते 31.12.2005</td>
-                            <td>223%</td>
-                            <td>211%</td>
-                            <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- ६ वा वेतन आयोग Section -->
-        <div id="section-pc6" class="commission-section">
-            <div class="commission-title">६ वा वेतन आयोग - महागाई भत्ता तक्ता</div>
-            <div class="table-container">
-                <table id="table-pc6">
-                    <thead>
-                        <tr>
-                            <th>अ.क्र.</th>
-                            <th>दिनांक पासून - ते दिनांक</th>
-                            <th>Due DA (%)</th>
-                            <th>Drawn DA (%)</th>
-                            <th class="col-action-hdr">कृती</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>१</td>
-                            <td>01.01.2015 ते 31.12.2015</td>
-                            <td>119%</td>
-                            <td>113%</td>
-                            <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
-                        </tr>
-                        <tr>
-                            <td>२</td>
-                            <td>01.07.2015 ते 31.12.2015</td>
-                            <td>125%</td>
-                            <td>119%</td>
-                            <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- ७ वा वेतन आयोग Section -->
-        <div id="section-pc7" class="commission-section active">
-            <div class="commission-title">७ वा वेतन आयोग - महागाई भत्ता तक्ता</div>
-            <div class="table-container">
-                <table id="table-pc7">
-                    <thead>
-                        <tr>
-                            <th>अ.क्र.</th>
-                            <th>दिनांक पासून - ते दिनांक</th>
-                            <th>Due DA (%)</th>
-                            <th>Drawn DA (%)</th>
-                            <th class="col-action-hdr">कृती</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>१</td>
-                            <td>01.01.2022 ते 30.06.2022</td>
-                            <td>34%</td>
-                            <td>31%</td>
-                            <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
-                        </tr>
-                        <tr>
-                            <td>२</td>
-                            <td>01.07.2022 ते 31.12.2022</td>
-                            <td>38%</td>
-                            <td>34%</td>
-                            <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
-                        </tr>
-                        <tr>
-                            <td>३</td>
-                            <td>01.01.2023 ते 30.06.2023</td>
-                            <td>42%</td>
-                            <td>38%</td>
-                            <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
-                        </tr>
-                        <tr>
-                            <td>४</td>
-                            <td>01.07.2023 ते 31.12.2023</td>
-                            <td>46%</td>
-                            <td>42%</td>
-                            <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
-                        </tr>
-                        <tr>
-                            <td>५</td>
-                            <td>01.01.2024 ते 30.06.2024</td>
-                            <td>50%</td>
-                            <td>46%</td>
-                            <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
-                        </tr>
-                        <tr>
-                            <td>६</td>
-                            <td>01.07.2024 ते 31.12.2024</td>
-                            <td>53%</td>
-                            <td>50%</td>
-                            <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Add / Update Form Section with Two Date Pickers -->
+        <!-- Form Card for Adding / Updating DA Rates -->
         <div class="form-card">
-            <h3 id="formTitle">७ वा वेतन आयोगसाठी नवीन डीए दर जोडा</h3>
-            <form id="addDaForm" onsubmit="addNewDA(event)">
+            <h3 style="color: #0d47a1; margin-bottom: 12px; text-align: center;" id="formHeading">महागाई भत्ता नोंद (DA Entry)</h3>
+            <form id="daForm" onsubmit="saveEntry(event)">
+                <input type="hidden" id="editIndex" value="-1">
+                
+                <div class="form-group full-width">
+                    <label for="commissionSelect">वेतन आयोग निवडा *</label>
+                    <select id="commissionSelect" required>
+                        <option value="">-- वेतन आयोग निवडा --</option>
+                        <option value="७ वा वेतन आयोग">७ वा वेतन आयोग</option>
+                        <option value="६ वा वेतन आयोग">६ वा वेतन आयोग</option>
+                        <option value="५ वा वेतन आयोग">५ वा वेतन आयोग</option>
+                        <option value="४ था वेतन आयोग">४ था वेतन आयोग</option>
+                    </select>
+                </div>
+
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="startDate">दिनांक पासून</label>
+                        <label for="startDate">दिनांक पासून *</label>
                         <input type="date" id="startDate" required>
                     </div>
                     <div class="form-group">
-                        <label for="endDate">ते दिनांक</label>
+                        <label for="endDate">ते दिनांक *</label>
                         <input type="date" id="endDate" required>
                     </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="daHike">महागाई भत्ता वाढ (%) *</label>
+                    <input type="text" id="daHike" placeholder="उदा. 3% किंवा 4%" required>
+                </div>
+
+                <div class="form-grid">
                     <div class="form-group">
-                        <label for="dueInput">Due DA रेट (%)</label>
-                        <input type="text" id="dueInput" placeholder="उदा. 55%" required>
+                        <label for="currentDa">सध्याचे डीए रेट (%) *</label>
+                        <input type="text" id="currentDa" placeholder="उदा. 53%" required>
                     </div>
                     <div class="form-group">
-                        <label for="drawnInput">Drawn DA रेट (%)</label>
-                        <input type="text" id="drawnInput" placeholder="उदा. 53%" required>
+                        <label for="prevDa">मागील DA रेट (%) *</label>
+                        <input type="text" id="prevDa" placeholder="उदा. 50%" required>
                     </div>
                 </div>
-                <button type="submit" class="btn-submit">या आयोगात नोंद समाविष्ट करा</button>
+
+                <button type="submit" class="btn-save" id="saveBtn">Save Entry</button>
             </form>
         </div>
 
-        <!-- Print / PDF Report Button -->
-        <div class="print-section">
-            <button class="btn-print" onclick="window.print()">🖨️ रिपोर्ट प्रिंट / PDF सेव्ह</button>
+        <!-- Data Table -->
+        <div class="table-container">
+            <table id="daTable">
+                <thead>
+                    <tr>
+                        <th>अनुक्रमांक</th>
+                        <th>दिनांक पासून ते दिनांक पर्यंत</th>
+                        <th>महागाई भत्ता वाढ</th>
+                        <th>सध्याचे डीए रेट</th>
+                        <th>मागील DA रेट</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Default sample row -->
+                    <tr>
+                        <td>१</td>
+                        <td><b>[७ वा वेतन आयोग]</b><br>01.07.2024 ते 31.12.2024</td>
+                        <td>3%</td>
+                        <td>53%</td>
+                        <td>50%</td>
+                        <td>
+                            <button class="btn-edit" onclick="editRow(this)">Edit</button>
+                            <button class="btn-delete" onclick="deleteRow(this)">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Report / Print Button -->
+        <div class="report-section">
+            <button class="btn-report" onclick="window.print()">📄 REPORT / PRINT</button>
         </div>
 
     </div>
 </div>
 
 <script>
-    function showSelectedCommission() {
-        const selectedVal = document.getElementById("commissionDropdown").value;
-        
-        // Hide all commission sections
-        const sections = document.querySelectorAll('.commission-section');
-        sections.forEach(sec => sec.classList.remove('active'));
-        
-        // Show selected commission section
-        document.getElementById("section-" + selectedVal).classList.add('active');
-        
-        // Update form heading text
-        const dropdownText = document.getElementById("commissionDropdown");
-        const selectedText = dropdownText.options[dropdownText.selectedIndex].text;
-        document.getElementById("formTitle").innerText = selectedText + 'साठी नवीन डीए दर जोडा';
-    }
-
     function formatDate(dateString) {
         if (!dateString) return "";
         const parts = dateString.split("-");
@@ -528,41 +366,73 @@
         return dateString;
     }
 
-    function addNewDA(event) {
+    function saveEntry(event) {
         event.preventDefault();
-        const pc = document.getElementById("commissionDropdown").value;
+        
+        const commission = document.getElementById("commissionSelect").value;
         const rawStart = document.getElementById("startDate").value;
         const rawEnd = document.getElementById("endDate").value;
-        const due = document.getElementById("dueInput").value;
-        const drawn = document.getElementById("drawnInput").value;
+        const daHike = document.getElementById("daHike").value;
+        const currentDa = document.getElementById("currentDa").value;
+        const prevDa = document.getElementById("prevDa").value;
+        const editIndex = document.getElementById("editIndex").value;
 
-        const formattedStart = formatDate(rawStart);
-        const formattedEnd = formatDate(rawEnd);
-        const periodStr = `${formattedStart} ते ${formattedEnd}`;
+        const periodStr = `${formatDate(rawStart)} ते ${formatDate(rawEnd)}`;
+        const tbody = document.getElementById("tableBody");
 
-        const table = document.getElementById("table-" + pc).getElementsByTagName('tbody')[0];
-        const rowCount = table.rows.length + 1;
+        if (editIndex === "-1") {
+            // Add new row
+            const rowCount = tbody.rows.length + 1;
+            const newRow = tbody.insertRow();
+            newRow.innerHTML = `
+                <td>${rowCount}</td>
+                <td><b>[${commission}]</b><br>${periodStr}</td>
+                <td>${daHike}</td>
+                <td>${currentDa}</td>
+                <td>${prevDa}</td>
+                <td>
+                    <button class="btn-edit" onclick="editRow(this)">Edit</button>
+                    <button class="btn-delete" onclick="deleteRow(this)">Delete</button>
+                </td>
+            `;
+            alert("माहिती यशस्वीरित्या जतन (Save) करण्यात आली आहे!");
+        } else {
+            // Update existing row
+            const row = tbody.rows[parseInt(editIndex)];
+            row.cells[1].innerHTML = `<b>[${commission}]</b><br>${periodStr}`;
+            row.cells[2].innerText = daHike;
+            row.cells[3].innerText = currentDa;
+            row.cells[4].innerText = prevDa;
+            
+            document.getElementById("editIndex").value = "-1";
+            document.getElementById("saveBtn").innerText = "Save Entry";
+            alert("माहिती यशस्वीरित्या अपडेट (Update) करण्यात आली आहे!");
+        }
 
-        const newRow = table.insertRow();
-        newRow.innerHTML = `
-            <td>${rowCount}</td>
-            <td>${periodStr}</td>
-            <td>${due}</td>
-            <td>${drawn}</td>
-            <td><button class="btn-delete" onclick="deleteRow(this)">काढून टाका</button></td>
-        `;
-
-        document.getElementById("addDaForm").reset();
-        alert("निवडलेल्या वेतन आयोगानुसार नवीन डीए दर यशस्वीरित्या जोडण्यात आला आहे!");
+        document.getElementById("daForm").reset();
     }
 
-    function deleteRow(btn) {
-        const row = btn.parentNode.parentNode;
-        const tbody = row.parentNode;
-        row.parentNode.removeChild(row);
+    function editRow(button) {
+        const row = button.parentNode.parentNode;
+        const rowIndex = row.sectionRowIndex;
         
-        for (let i = 0; i < tbody.rows.length; i++) {
-            tbody.rows[i].cells[0].innerText = i + 1;
+        // For simplicity in quick demo, alert user to fill form or parse data back
+        document.getElementById("editIndex").value = rowIndex;
+        document.getElementById("saveBtn").innerText = "Update Entry";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        alert("फॉर्ममध्ये आवश्यक बदल करून 'Update Entry' वर क्लिक करा.");
+    }
+
+    function deleteRow(button) {
+        if (confirm("तुम्हाला ही नोंद डिलीट करायची आहे का?")) {
+            const row = button.parentNode.parentNode;
+            const tbody = row.parentNode;
+            row.parentNode.removeChild(row);
+            
+            // Re-index serial numbers
+            for (let i = 0; i < tbody.rows.length; i++) {
+                tbody.rows[i].cells[0].innerText = i + 1;
+            }
         }
     }
 
