@@ -19,7 +19,7 @@
         }
         .main-container {
             width: 100%;
-            max-width: 900px;
+            max-width: 950px;
             margin: 0 auto;
             background: #ffffff;
             border-radius: 10px;
@@ -139,28 +139,35 @@
             background-color: #1b5e20;
         }
 
-        /* Table Styling */
+        /* Scrollable Table Container */
         .table-container {
             width: 100%;
             overflow-x: auto;
             margin-bottom: 15px;
+            border: 1px solid #dcdcdc;
+            border-radius: 6px;
+            max-height: 350px;
+            overflow-y: auto;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             background: #fff;
             font-size: 13px;
-            min-width: 600px;
+            white-space: nowrap;
         }
         th, td {
             border: 1px solid #dcdcdc;
-            padding: 8px 6px;
+            padding: 10px 12px;
             text-align: center;
         }
         th {
             background-color: #f1f3f4;
             color: #333;
             font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
         }
         tr:nth-child(even) {
             background-color: #f9f9f9;
@@ -237,10 +244,16 @@
             .print-only-title {
                 display: block !important;
             }
+            .table-container {
+                max-height: none;
+                overflow: visible;
+                border: none;
+            }
             table {
                 font-size: 11px;
                 border-collapse: collapse;
                 width: 100%;
+                white-space: normal;
             }
             th, td {
                 border: 1px solid #000;
@@ -298,11 +311,6 @@
                     </div>
                 </div>
 
-                <div class="form-group full-width">
-                    <label for="daHike">महागाई भत्ता वाढ (%) *</label>
-                    <input type="text" id="daHike" placeholder="उदा. 3% किंवा 4%" required>
-                </div>
-
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="currentDa">सध्याचे डीए रेट (%) *</label>
@@ -318,25 +326,22 @@
             </form>
         </div>
 
-        <!-- Data Table -->
+        <!-- Data Table inside scrollable container -->
         <div class="table-container">
             <table id="daTable">
                 <thead>
                     <tr>
-                        <th>अनुक्रमांक</th>
+                        <th>अ.क्र.</th>
                         <th>दिनांक पासून ते दिनांक पर्यंत</th>
-                        <th>महागाई भत्ता वाढ</th>
                         <th>सध्याचे डीए रेट</th>
                         <th>मागील DA रेट</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <!-- Default sample row -->
                     <tr>
                         <td>१</td>
-                        <td><b>[७ वा वेतन आयोग]</b><br>01.07.2024 ते 31.12.2024</td>
-                        <td>3%</td>
+                        <td>01.07.2024 ते 31.12.2024</td>
                         <td>53%</td>
                         <td>50%</td>
                         <td>
@@ -369,10 +374,8 @@
     function saveEntry(event) {
         event.preventDefault();
         
-        const commission = document.getElementById("commissionSelect").value;
         const rawStart = document.getElementById("startDate").value;
         const rawEnd = document.getElementById("endDate").value;
-        const daHike = document.getElementById("daHike").value;
         const currentDa = document.getElementById("currentDa").value;
         const prevDa = document.getElementById("prevDa").value;
         const editIndex = document.getElementById("editIndex").value;
@@ -386,8 +389,7 @@
             const newRow = tbody.insertRow();
             newRow.innerHTML = `
                 <td>${rowCount}</td>
-                <td><b>[${commission}]</b><br>${periodStr}</td>
-                <td>${daHike}</td>
+                <td>${periodStr}</td>
                 <td>${currentDa}</td>
                 <td>${prevDa}</td>
                 <td>
@@ -399,10 +401,9 @@
         } else {
             // Update existing row
             const row = tbody.rows[parseInt(editIndex)];
-            row.cells[1].innerHTML = `<b>[${commission}]</b><br>${periodStr}`;
-            row.cells[2].innerText = daHike;
-            row.cells[3].innerText = currentDa;
-            row.cells[4].innerText = prevDa;
+            row.cells[1].innerText = periodStr;
+            row.cells[2].innerText = currentDa;
+            row.cells[3].innerText = prevDa;
             
             document.getElementById("editIndex").value = "-1";
             document.getElementById("saveBtn").innerText = "Save Entry";
@@ -416,7 +417,6 @@
         const row = button.parentNode.parentNode;
         const rowIndex = row.sectionRowIndex;
         
-        // For simplicity in quick demo, alert user to fill form or parse data back
         document.getElementById("editIndex").value = rowIndex;
         document.getElementById("saveBtn").innerText = "Update Entry";
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -429,7 +429,6 @@
             const tbody = row.parentNode;
             row.parentNode.removeChild(row);
             
-            // Re-index serial numbers
             for (let i = 0; i < tbody.rows.length; i++) {
                 tbody.rows[i].cells[0].innerText = i + 1;
             }
