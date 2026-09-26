@@ -10,21 +10,24 @@
             margin: 0;
             padding: 0;
         }
-        body {
+        html, body {
+            height: 100%;
+            overflow: hidden; /* मुख्य पेजचे स्क्रोलिंग पूर्णपणे बंद केले आहे */
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f2f5;
             color: #333;
-            padding: 10px;
-            font-size: 14px;
+            padding: 5px;
+            font-size: 13px;
         }
         .main-container {
-            width: 100%;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
             max-width: 950px;
             margin: 0 auto;
             background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         /* Top Header Bar */
         .header-bar {
@@ -32,17 +35,18 @@
             align-items: center;
             justify-content: space-between;
             background-color: #0d47a1;
-            padding: 12px 15px;
+            padding: 8px 12px;
             color: white;
+            flex-shrink: 0;
         }
         .btn-back {
             background-color: #2e7d32;
             color: white;
             border: none;
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -51,7 +55,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .header-title {
-            font-size: 19px;
+            font-size: 17px;
             font-weight: bold;
             text-align: center;
             flex-grow: 1;
@@ -60,10 +64,10 @@
             background-color: #d32f2f;
             color: white;
             border: none;
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -72,7 +76,11 @@
         }
         
         .content-body {
-            padding: 15px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            overflow: hidden;
         }
 
         /* Print-only formal header title */
@@ -89,27 +97,28 @@
         .form-card {
             background: #ffffff;
             border: 1px solid #dcdcdc;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .form-group {
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
         .form-group label {
             display: block;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
             color: #333;
         }
         .form-group select, .form-group input {
             width: 100%;
-            padding: 10px;
+            padding: 7px;
             border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
+            border-radius: 4px;
+            font-size: 13px;
             background: #fff;
         }
         /* Custom placeholder styling for date input */
@@ -129,7 +138,7 @@
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 8px;
         }
         .form-group.full-width {
             grid-column: span 2;
@@ -141,13 +150,12 @@
             background-color: #2e7d32;
             color: white;
             border: none;
-            padding: 12px;
-            font-size: 16px;
+            padding: 9px;
+            font-size: 14px;
             font-weight: bold;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            margin-top: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 3px;
         }
         .btn-save:hover {
             background-color: #1b5e20;
@@ -156,32 +164,35 @@
         /* Commission Section visibility */
         .commission-section {
             display: none;
-            margin-bottom: 20px;
+            flex-direction: column;
+            flex-grow: 1;
+            overflow: hidden;
+            margin-bottom: 10px;
         }
         .commission-section.active {
-            display: block;
+            display: flex;
         }
 
-        /* Scrollable Table Container with reduced row spacing */
+        /* Scrollable Table Container inside screen bounds */
         .table-container {
             width: 100%;
+            overflow-y: auto; /* केवळ हाच बॉक्स स्क्रोल होईल */
             overflow-x: auto;
-            margin-bottom: 15px;
             border: 1px solid #dcdcdc;
             border-radius: 6px;
-            max-height: 400px;
-            overflow-y: auto;
+            flex-grow: 1;
+            background: #fff;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             background: #fff;
-            font-size: 13px;
+            font-size: 12px;
             white-space: nowrap;
         }
         th, td {
             border: 1px solid #dcdcdc;
-            padding: 5px 8px; /* Reduced vertical padding */
+            padding: 4px 6px; /* दोन ओळींमधील अंतर कमी केले */
             text-align: center;
         }
         th {
@@ -191,7 +202,7 @@
             position: sticky;
             top: 0;
             z-index: 1;
-            padding: 7px 8px;
+            padding: 6px;
         }
         tr:nth-child(even) {
             background-color: #f9f9f9;
@@ -202,10 +213,10 @@
             background-color: #2e7d32;
             color: white;
             border: none;
-            padding: 3px 6px;
+            padding: 2px 5px;
             border-radius: 3px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 10px;
             margin-right: 2px;
         }
         .btn-edit:hover {
@@ -215,10 +226,10 @@
             background-color: #d32f2f;
             color: white;
             border: none;
-            padding: 3px 6px;
+            padding: 2px 5px;
             border-radius: 3px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 10px;
         }
         .btn-delete:hover {
             background-color: #b71c1c;
@@ -227,19 +238,20 @@
         /* Report / Print Button */
         .report-section {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 5px;
+            flex-shrink: 0;
         }
         .btn-report {
             width: 100%;
             background-color: #0d47a1;
             color: white;
             border: none;
-            padding: 12px;
-            font-size: 16px;
+            padding: 10px;
+            font-size: 15px;
             font-weight: bold;
             border-radius: 5px;
             cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .btn-report:hover {
             background-color: #1565c0;
@@ -251,16 +263,17 @@
                 size: A4;
                 margin: 15mm;
             }
-            body {
+            body, html {
+                height: auto;
+                overflow: visible;
                 background: white;
                 padding: 0;
-                font-size: 12px;
-                color: #000;
             }
             .main-container {
                 box-shadow: none;
                 border: none;
                 width: 100%;
+                height: auto;
             }
             .header-bar, .form-card, .report-section, .btn-edit, .btn-delete {
                 display: none !important;
@@ -275,7 +288,6 @@
                 max-height: none;
                 overflow: visible;
                 border: none;
-                margin-bottom: 25px;
             }
             table {
                 font-size: 11px;
@@ -313,11 +325,11 @@
 
         <!-- Form Card -->
         <div class="form-card">
-            <h3 style="color: #0d47a1; margin-bottom: 12px; text-align: center;" id="formHeading">महागाई भत्ता नोंद (DA Entry)</h3>
+            <h3 style="color: #0d47a1; margin-bottom: 8px; text-align: center; font-size: 14px;" id="formHeading">महागाई भत्ता नोंद (DA Entry)</h3>
             <form id="daForm" onsubmit="saveEntry(event)">
                 <input type="hidden" id="editIndex" value="-1">
                 
-                <div class="form-group full-width">
+                <div class="form-group full-width" style="margin-bottom: 6px;">
                     <label for="commissionSelect">वेतन आयोग निवडा *</label>
                     <select id="commissionSelect" onchange="switchCommission()" required>
                         <option value="pc7" selected>७ वा वेतन आयोग (सन २०१६ पासून)</option>
@@ -328,12 +340,12 @@
                 </div>
 
                 <!-- Single Date & Current DA Rate side by side -->
-                <div class="form-grid">
-                    <div class="form-group">
+                <div class="form-grid" style="margin-bottom: 6px;">
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label for="daDate">महागाई भत्ता दिनांक *</label>
                         <input type="date" id="daDate" required data-placeholder="दिनांक निवडा" onfocus="this.removeAttribute('data-placeholder')" onblur="if(!this.value)this.setAttribute('data-placeholder', 'दिनांक निवडा');">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label for="currentDa">सध्याचे डीए रेट (%) *</label>
                         <input type="text" id="currentDa" placeholder="उदा. 53%" required>
                     </div>
@@ -345,7 +357,7 @@
 
         <!-- 7th Pay Commission Section -->
         <div id="section-pc7" class="commission-section active">
-            <h3 style="margin-bottom: 8px; color: #1976d2; font-size: 16px;">७ वा वेतन आयोग - महागाई भत्ता तक्ता</h3>
+            <h3 style="margin-bottom: 6px; color: #1976d2; font-size: 14px;">७ वा वेतन आयोग - महागाई भत्ता तक्ता</h3>
             <div class="table-container">
                 <table id="table-pc7">
                     <thead>
@@ -383,7 +395,7 @@
 
         <!-- 6th Pay Commission Section -->
         <div id="section-pc6" class="commission-section">
-            <h3 style="margin-bottom: 8px; color: #1976d2; font-size: 16px;">६ वा वेतन आयोग - महागाई भत्ता तक्ता</h3>
+            <h3 style="margin-bottom: 6px; color: #1976d2; font-size: 14px;">६ वा वेतन आयोग - महागाई भत्ता तक्ता</h3>
             <div class="table-container">
                 <table id="table-pc6">
                     <thead>
@@ -441,7 +453,7 @@
 
         <!-- 5th Pay Commission Section -->
         <div id="section-pc5" class="commission-section">
-            <h3 style="margin-bottom: 8px; color: #1976d2; font-size: 16px;">५ वा वेतन आयोग - महागाई भत्ता तक्ता</h3>
+            <h3 style="margin-bottom: 6px; color: #1976d2; font-size: 14px;">५ वा वेतन आयोग - महागाई भत्ता तक्ता</h3>
             <div class="table-container">
                 <table id="table-pc5">
                     <thead>
@@ -462,7 +474,7 @@
 
         <!-- 4th Pay Commission Section -->
         <div id="section-pc4" class="commission-section">
-            <h3 style="margin-bottom: 8px; color: #1976d2; font-size: 16px;">४ था वेतन आयोग - महागाई भत्ता तक्ता</h3>
+            <h3 style="margin-bottom: 6px; color: #1976d2; font-size: 14px;">४ था वेतन आयोग - महागाई भत्ता तक्ता</h3>
             <div class="table-container">
                 <table id="table-pc4">
                     <thead>
