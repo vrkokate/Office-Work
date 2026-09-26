@@ -1153,7 +1153,6 @@
         closeModal('employeeModal');
     }
 
-    // लाभ कार्डाच्या तपासणीतून मूळ वेतन काढून टाकले आहे
     function validateCard2() {
         let hasIncomplete = false;
         let anyActive = false;
@@ -1712,9 +1711,6 @@
         document.getElementById('gradePay').value = "0";
     }
 
-    // =========================================================================
-    // 🎖️ पदोन्नती / MACP लाभ कार्ड (मूळ वेतन इनपुट पूर्णपणे काढून टाकलेला)
-    // =========================================================================
     function toggleBenefitRow(idx) {
         const type = document.getElementById(`b${idx}_type`).value;
         const fields = document.getElementById(`b${idx}_fields`);
@@ -1925,7 +1921,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (कॉलम ४ वर 'वेतन स्तर / श्रेणी' आणि ५ वर 'तपशील')
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (पूर्णपणे दुरुस्त व सुरळीत कार्य करणारी)
     // =========================================================================
     function processFixation() {
         const isC1Valid = validateCard1();
@@ -1992,9 +1988,6 @@
 
         for (let i = 1; i <= 3; i++) {
             let bType = document.getElementById(`b${i}_type`).value;
-            if (type !== 'None') { // fixed below to bType
-                // handled below
-            }
             if (bType !== 'None') {
                 let bDate = document.getElementById(`b${i}_date`).value;
                 let bOptDate = document.getElementById(`b${i}_optDate`).value || bDate;
@@ -2436,9 +2429,6 @@
         outputBox.scrollIntoView({ behavior: 'smooth' });
     }
 
-    // =========================================================================
-    // 🔄 तक्त्यामध्ये चौथी व पाचवी कॉलम अदलाबदल (मुद्दा ७ नुसार)
-    // =========================================================================
     function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp) {
         let total = basic + gp;
         let gpDisplay = gp > 0 ? gp : "-";
@@ -2448,9 +2438,7 @@
             <td>${sr}</td>
             <td>${dateStr}</td>
             <td>${comm}</td>
-            <!-- चौथा कॉलम: वेतन स्तर / श्रेणी -->
             <td><small><b>${scaleStr}</b></small></td>
-            <!-- पाचवा कॉलम: तपशील / सेवा घटना -->
             <td class="event-cell">${eventDesc}</td>
             <td><b>${basic}</b></td>
             <td>${gpDisplay}</td>
