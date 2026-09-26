@@ -112,6 +112,20 @@
             font-size: 14px;
             background: #fff;
         }
+        /* Custom placeholder styling for date input */
+        input[type="date"] {
+            position: relative;
+        }
+        input[type="date"]::before {
+            content: attr(data-placeholder);
+            width: 100%;
+            color: #777;
+        }
+        input[type="date"]:focus::before,
+        input[type="date"]:valid::before {
+            display: none;
+        }
+
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -148,7 +162,7 @@
             display: block;
         }
 
-        /* Scrollable Table Container */
+        /* Scrollable Table Container with reduced row spacing */
         .table-container {
             width: 100%;
             overflow-x: auto;
@@ -167,7 +181,7 @@
         }
         th, td {
             border: 1px solid #dcdcdc;
-            padding: 10px 12px;
+            padding: 5px 8px; /* Reduced vertical padding */
             text-align: center;
         }
         th {
@@ -177,21 +191,22 @@
             position: sticky;
             top: 0;
             z-index: 1;
+            padding: 7px 8px;
         }
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
 
-        /* Action Buttons in Table */
+        /* Smaller Action Buttons in Table */
         .btn-edit {
             background-color: #2e7d32;
             color: white;
             border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
+            padding: 3px 6px;
+            border-radius: 3px;
             cursor: pointer;
-            font-size: 12px;
-            margin-right: 3px;
+            font-size: 11px;
+            margin-right: 2px;
         }
         .btn-edit:hover {
             background-color: #1b5e20;
@@ -200,10 +215,10 @@
             background-color: #d32f2f;
             color: white;
             border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
+            padding: 3px 6px;
+            border-radius: 3px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
         }
         .btn-delete:hover {
             background-color: #b71c1c;
@@ -270,7 +285,7 @@
             }
             th, td {
                 border: 1px solid #000;
-                padding: 6px;
+                padding: 4px 6px;
                 color: #000;
             }
             th {
@@ -316,7 +331,7 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="daDate">महागाई भत्ता दिनांक *</label>
-                        <input type="date" id="daDate" required title="दिनांक निवडा">
+                        <input type="date" id="daDate" required data-placeholder="दिनांक निवडा" onfocus="this.removeAttribute('data-placeholder')" onblur="if(!this.value)this.setAttribute('data-placeholder', 'दिनांक निवडा');">
                     </div>
                     <div class="form-group">
                         <label for="currentDa">सध्याचे डीए रेट (%) *</label>
@@ -475,6 +490,13 @@
 </div>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const dateInput = document.getElementById("daDate");
+        if(dateInput && !dateInput.value) {
+            dateInput.setAttribute("data-placeholder", "दिनांक निवडा");
+        }
+    });
+
     function switchCommission() {
         const pc = document.getElementById("commissionSelect").value;
         const sections = document.querySelectorAll('.commission-section');
@@ -533,6 +555,7 @@
         }
 
         document.getElementById("daForm").reset();
+        document.getElementById("daDate").setAttribute("data-placeholder", "दिनांक निवडा");
     }
 
     function editRow(button, pc) {
@@ -544,6 +567,7 @@
 
         document.getElementById("editIndex").value = rowIndex;
         document.getElementById("saveBtn").innerText = "Update Entry";
+        document.getElementById("daDate").removeAttribute("data-placeholder");
         window.scrollTo({ top: 0, behavior: 'smooth' });
         alert("फॉर्ममध्ये आवश्यक बदल करून 'Update Entry' वर क्लिक करा.");
     }
