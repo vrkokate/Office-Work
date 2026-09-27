@@ -460,7 +460,6 @@
             margin-top: 8px;
         }
 
-        /* सुधारित वेतनश्रेणी व अतिरिक्त वेतनवाढ जोडण्यासाठी डिझाइन */
         .scale-rev-item, .extra-inc-item {
             background: #fff;
             border: 1px solid #c8e6c9;
@@ -973,7 +972,7 @@
     </div>
 </div>
 
-<!-- ==================== पॉप-अप ३: कालावधी व वेतनवाढ नियम (वेतनश्रेणी सुधारणा व अतिरिक्त वेतनवाढ सोयीसह) ==================== -->
+<!-- ==================== पॉप-अप ३: कालावधी व वेतनवाढ नियम ==================== -->
 <div id="rulesModal" class="modal-overlay hidden">
     <div class="modal-box">
         <div class="modal-header">
@@ -1030,9 +1029,9 @@
             <button type="button" onclick="addScaleRevRow()" style="background: #0277bd; color: white; border: none; padding: 5px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; margin-top: 4px;">+ आणखी एक वेतनश्रेणी सुधारणा जोडा</button>
         </div>
 
-        <!-- अतिरिक्त वेतनवाढ (Additional Increment) विभाग -->
+        <!-- अतिरिक्त वेतनवाढ (सुधारित वेतनश्रेणीच्याच ठिकाणी) -->
         <div class="field-group" style="margin-top: 10px; border-top: 1px dashed #cfd8dc; padding-top: 8px;">
-            <label>⚡ सेवेदरम्यान अतिरिक्त वेतनवाढ मिळाली आहे का?</label>
+            <label>⚡ अतिरिक्त वेतनवाढ (नियमित वाढीएवढीच) मिळाली आहे का?</label>
             <select id="hasExtraInc" onchange="toggleExtraIncSection()">
                 <option value="No" selected>नाही</option>
                 <option value="Yes">होय</option>
@@ -2046,7 +2045,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनश्रेणी सुधारणा व अतिरिक्त वेतनवाढ समाविष्ट)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (सुधारित वेतनश्रेणी व अतिरिक्त वेतनवाढ नियमांनुसार)
     // =========================================================================
     function processFixation() {
         const isC1Valid = validateCard1();
@@ -2108,7 +2107,7 @@
         const fromDateFormatted = formatDateToDDMMYYYY(fromDateInput);
         const toDateFormatted = formatDateToDDMMYYYY(toDateInput);
 
-        // सेवेदरम्यान झालेली 'वेतनश्रेणी सुधारणा' गोळा करणे
+        // सेवेदरम्यान झालेली वेतनश्रेणी सुधारणा गोळा करणे
         let scaleRevisions = [];
         const hasScaleRev = document.getElementById('hasScaleRev').value === 'Yes';
         if (hasScaleRev) {
@@ -2128,7 +2127,7 @@
             });
         }
 
-        // सेवेदरम्यान मिळालेली 'अतिरिक्त वेतनवाढ' गोळा करणे
+        // सेवेदरम्यान मिळालेली अतिरिक्त वेतनवाढ (नियमित वाढीएवढीच जोडणारी) गोळा करणे
         let extraIncrements = [];
         const hasExtraInc = document.getElementById('hasExtraInc').value === 'Yes';
         if (hasExtraInc) {
@@ -2429,7 +2428,7 @@
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             // =========================================================================
-            // ⚡ अतिरिक्त वेतनवाढ (Additional Increment) अंमलबजावणी
+            // ⚡ अतिरिक्त वेतनवाढ (नियमित वेतनवाढीएवढीच अचूक वाढ)
             // =========================================================================
             else if (ev.type === 'EXTRA_INC') {
                 if (currentCommission === '7th') {
