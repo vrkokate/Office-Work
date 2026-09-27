@@ -717,7 +717,7 @@
 
 <div class="container">
     <div class="header">
-        <h2>💰 वेतन निश्चिती (Pay Fixation)</h2>
+        <h2>💰 वेतन निश्चिती (Pay Fixation System)</h2>
         <button class="close-btn" onclick="window.location.href='index.html'">X</button>
     </div>
 
@@ -2130,8 +2130,34 @@
         alert("वेतनवाढ रोखण्याची निवड यशस्वीरीत्या जतन केली!");
     }
 
+    document.addEventListener('click', function(e) {
+        const comboboxes = document.querySelectorAll('.combobox-container');
+        comboboxes.forEach(cb => {
+            if (!cb.contains(e.target)) {
+                const list = cb.querySelector('.custom-dropdown-list');
+                if (list) list.classList.add('hidden');
+            }
+        });
+    });
+
+    window.onload = function() {
+        validateCard1();
+        validateCard2();
+        validateCard3();
+    };
+
+    function fitInMatrix(levelKey, rawAmount) {
+        let match = String(levelKey).match(/S-(\d+)/i);
+        let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
+        let cells = fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
+        for (let i = 0; i < cells.length; i++) {
+            if (cells[i] >= rawAmount) return { basic: cells[i], index: i, level: key };
+        }
+        return { basic: cells[cells.length - 1], index: cells.length - 1, level: key };
+    }
+
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनवाढ रोखण्याच्या नियमांचे १००% कायदेशीर पालन)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (३० जून सेवानिवृत्ती नियम वगळलेला आणि इतर सर्व भाग सुरक्षित असलेला पूर्ण कोड)
     // =========================================================================
     function processFixation() {
         const isC1Valid = validateCard1();
@@ -2222,7 +2248,7 @@
                 withheldDatesSet.add(chk.value);
             });
         }
-        const withheldEffect = document.getElementById('withheldEffect').value; // cumulative किंवा non_cumulative
+        const withheldEffect = document.getElementById('withheldEffect').value;
 
         let activeBenefits = [];
         let summaryBenefitsText = [];
@@ -2697,7 +2723,7 @@
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             // =========================================================================
-            // 🔹 नियमित वार्षिक वेतनवाढ (Non-Cumulative वाढी पूर्ववत समाविष्ट करून)
+            // 🔹 नियमित वार्षिक वेतनवाढ
             // =========================================================================
             else if (ev.type === 'ANNUAL_INC') {
                 if (currentCommission === '7th') {
