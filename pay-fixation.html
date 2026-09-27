@@ -16,6 +16,7 @@
             --text-main: #263238;
         }
 
+        /* पेज स्क्रीनबाहेर आडवे सरकणे १००% रोखणे */
         html, body {
             width: 100%;
             max-width: 100vw;
@@ -66,6 +67,7 @@
             font-size: 13px;
         }
 
+        /* ३ मुख्य स्मार्ट कार्ड्स */
         .smart-cards-list {
             display: flex;
             flex-direction: column;
@@ -195,6 +197,7 @@
         }
         .reset-btn:hover { background-color: #546e7a; }
 
+        /* पॉप-अप */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -2103,34 +2106,32 @@
         evaluateOptionSuggestion(idx);
     }
 
-    document.addEventListener('click', function(e) {
-        const comboboxes = document.querySelectorAll('.combobox-container');
-        comboboxes.forEach(cb => {
-            if (!cb.contains(e.target)) {
-                const list = cb.querySelector('.custom-dropdown-list');
-                if (list) list.classList.add('hidden');
-            }
-        });
-    });
-
-    window.onload = function() {
-        validateCard1();
-        validateCard2();
-        validateCard3();
-    };
-
-    function fitInMatrix(levelKey, rawAmount) {
-        let match = String(levelKey).match(/S-(\d+)/i);
-        let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
-        let cells = fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
-        for (let i = 0; i < cells.length; i++) {
-            if (cells[i] >= rawAmount) return { basic: cells[i], index: i, level: key };
+    function toggleWithheldOption() {
+        const withheld = document.getElementById('incrementWithheld').value;
+        const listContainer = document.getElementById('withheldListContainer');
+        const effectDiv = document.getElementById('withheldEffectDiv');
+        if (withheld === 'Yes') {
+            listContainer.classList.remove('hidden');
+            effectDiv.classList.remove('hidden');
+            populateWithheldCheckboxes();
+        } else {
+            listContainer.classList.add('hidden');
+            effectDiv.classList.add('hidden');
         }
-        return { basic: cells[cells.length - 1], index: cells.length - 1, level: key };
+    }
+
+    function confirmWithheldSelection() {
+        const chks = document.querySelectorAll('.withheld-date-chk:checked');
+        if (chks.length === 0) {
+            alert("कृपया किमान एक वेतनवाढ तारीख निवडा!");
+            return;
+        }
+        document.getElementById('withheldListContainer').classList.add('hidden');
+        alert("वेतनवाढ रोखण्याची निवड यशस्वीरीत्या जतन केली!");
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनवाढ थांबवण्याच्या अचूक नियमांसह)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनवाढ रोखण्याच्या नियमांचे १००% कायदेशीर पालन)
     // =========================================================================
     function processFixation() {
         const isC1Valid = validateCard1();
@@ -2316,7 +2317,7 @@
             }
         });
 
-        // वार्षिक नियमित वेतनवाढ नियोजन (रोखलेल्या वाढी योग्य चिन्हांकित करून)
+        // वार्षिक नियमित वेतनवाढ नियोजन
         let startYr = startDate.getFullYear();
         let endYr = endDate.getFullYear();
 
@@ -2466,6 +2467,9 @@
         let lowerBasic = currentBasic;
         let lowerGP = currentGP;
 
+        // Non-Cumulative रोखलेल्या वाढीचा मागोवा ठेवण्यासाठी ट्रॅकर
+        let deferredIncrementsMap = {};
+
         events.forEach(ev => {
             if (ev.type === 'INITIAL') {
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
@@ -2524,11 +2528,11 @@
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             // =========================================================================
-            // 🛑 वेतनवाढ रोखणे / थांबवणे (Withheld Increment) नियमानुसार अंमलबजावणी
+            // 🛑 कायदेशीर नियम: वेतनवाढ रोखणे (Cumulative / Non-Cumulative)
             // =========================================================================
             else if (ev.type === 'WITHHELD_INC') {
                 if (ev.effect === 'cumulative') {
-                    // परिणाम करणारी असल्यास मूळ वेतनातून वाढ रोखणे
+                    // Cumulative: पुढील वाढीवर व मूळ वेतनावर कायमस्वरूपी वाईट परिणाम (मागील वाढीव टप्पा रद्द)
                     if (currentCommission === '7th') {
                         if (currentMatrixIndex > 0) currentMatrixIndex--;
                         const cells = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
@@ -2541,9 +2545,10 @@
                         currentBasic -= (currentCommission === '5th' ? 100 : 30);
                     }
                 } else {
-                    // परिणाम न करणारी असल्यास त्या वर्षी वाढ नाही, पण पुढील वर्षी पूर्ववत होईल
-                    // तक्त्यात फक्त रोखल्याची नोंद राहील
+                    // Non-Cumulative: त्या विशिष्ट वर्षापुरती वाढ रोखली, परंतु पुढील वर्षाच्या वाढीमध्ये ती तांत्रिकदृष्ट्या समाविष्ट होईल
+                    deferredIncrementsMap[ev.dateStr] = true;
                 }
+                lowerBasic = currentBasic;
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'BENEFIT_SAME_DAY') {
@@ -2692,7 +2697,7 @@
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             // =========================================================================
-            // 🔹 नियमित वार्षिक वेतनवाढ
+            // 🔹 नियमित वार्षिक वेतनवाढ (Non-Cumulative वाढी पूर्ववत समाविष्ट करून)
             // =========================================================================
             else if (ev.type === 'ANNUAL_INC') {
                 if (currentCommission === '7th') {
@@ -2714,10 +2719,21 @@
                         }
                     }
 
-                    if (currentMatrixIndex < cells.length - 1) {
-                        currentMatrixIndex++;
+                    // जर मागील वर्षी नॉन-क्युम्युलेटिभ वाढ रोखली असेल, तर ती आजच्या वाढीसोबत पूर्ववत बहाल करणे
+                    let prevYearStr = `${ev.date.getFullYear() - 1}-${String(ev.date.getMonth() + 1).padStart(2, '0')}-${String(ev.date.getDate()).padStart(2, '0')}`;
+                    let extraJump = 1;
+                    if (deferredIncrementsMap[prevYearStr]) {
+                        extraJump = 2; // एक मागील रोखलेली आणि एक चालू वर्षाची मिळून २ टप्पे वाढ
+                    }
+
+                    if (currentMatrixIndex + extraJump < cells.length) {
+                        currentMatrixIndex += extraJump;
+                        currentBasic = cells[currentMatrixIndex];
+                    } else {
+                        currentMatrixIndex = cells.length - 1;
                         currentBasic = cells[currentMatrixIndex];
                     }
+
                     lowerLevel = currentLevel;
                     lowerMatrixIndex = currentMatrixIndex;
                     lowerBasic = currentBasic;
