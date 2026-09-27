@@ -460,6 +460,18 @@
             margin-top: 8px;
         }
 
+        /* सुधारित वेतनश्रेणी जोडण्यासाठी डिझाइन */
+        .scale-rev-item {
+            background: #fff;
+            border: 1px solid #c8e6c9;
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
         /* अहवाल व तक्ता */
         .output-box {
             margin-top: 20px;
@@ -735,9 +747,7 @@
                             <th>अ.क्र.</th>
                             <th>दिनांक</th>
                             <th>वेतन आयोग</th>
-                            <!-- चतुर्थ कॉलम: वेतन स्तर / श्रेणी -->
                             <th>वेतन स्तर / श्रेणी</th>
-                            <!-- पंचम कॉलम: तपशील / सेवा घटना -->
                             <th>तपशील / सेवा घटना</th>
                             <th>मूळ वेतन</th>
                             <th>ग्रेड पे</th>
@@ -963,7 +973,7 @@
     </div>
 </div>
 
-<!-- ==================== पॉप-अप ३: कालावधी व वेतनवाढ नियम ==================== -->
+<!-- ==================== पॉप-अप ३: कालावधी व वेतनवाढ नियम (सुधारित वेतनश्रेणी सोयीसह) ==================== -->
 <div id="rulesModal" class="modal-overlay hidden">
     <div class="modal-box">
         <div class="modal-header">
@@ -1006,7 +1016,21 @@
             </select>
         </div>
 
-        <div style="background:#e8f5e9; border:1px solid #a5d6a7; border-radius:5px; padding:8px 10px; font-size:11px; color:#1b5e20; line-height:1.5; margin-bottom:10px;">
+        <!-- वेतनश्रेणी सुधारणा (Pay Scale Revision) विभाग -->
+        <div class="field-group" style="margin-top: 10px; border-top: 1px dashed #cfd8dc; padding-top: 8px;">
+            <label>🔄 सेवेदरम्यान वेतनश्रेणी / स्तर सुधारित झाली आहे का?</label>
+            <select id="hasScaleRev" onchange="toggleScaleRevSection()">
+                <option value="No" selected>नाही</option>
+                <option value="Yes">होय</option>
+            </select>
+        </div>
+
+        <div id="scaleRevContainer" class="hidden">
+            <div id="scaleRevList"></div>
+            <button type="button" onclick="addScaleRevRow()" style="background: #0277bd; color: white; border: none; padding: 5px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; margin-top: 4px;">+ आणखी एक वेतनश्रेणी सुधारणा जोडा</button>
+        </div>
+
+        <div style="background:#e8f5e9; border:1px solid #a5d6a7; border-radius:5px; padding:8px 10px; font-size:11px; color:#1b5e20; line-height:1.5; margin-top: 10px; margin-bottom:10px;">
             📌 <b>वेतनवाढ नियम:</b><br>
             • <b>४था व ५वा आयोग:</b> नियुक्ती महिन्याची १ तारीख (स्वयंचलित)<br>
             • <b>६वा आयोग:</b> दरवर्षी १ जुलै (स्वयंचलित)<br>
@@ -1084,6 +1108,62 @@
         }
     }
 
+    function toggleScaleRevSection() {
+        const val = document.getElementById('hasScaleRev').value;
+        const container = document.getElementById('scaleRevContainer');
+        if (val === 'Yes') {
+            container.classList.remove('hidden');
+            if (document.getElementById('scaleRevList').children.length === 0) {
+                addScaleRevRow();
+            }
+        } else {
+            container.classList.add('hidden');
+            document.getElementById('scaleRevList').innerHTML = "";
+        }
+    }
+
+    function addScaleRevRow() {
+        const list = document.getElementById('scaleRevList');
+        const div = document.createElement('div');
+        div.className = 'scale-rev-item';
+        div.innerHTML = `
+            <div style="display: flex; gap: 6px; align-items: center;">
+                <input type="date" class="rev-date" style="flex:1; padding:6px; font-size:11px; border:1px solid #ccc; border-radius:4px;">
+                <select class="rev-comm" style="flex:1; padding:6px; font-size:11px; border:1px solid #ccc; border-radius:4px;" onchange="updateRevScaleOptions(this)">
+                    <option value="" disabled selected>आयोग</option>
+                    <option value="4th">४था</option>
+                    <option value="5th">५वा</option>
+                    <option value="6th">६वा</option>
+                    <option value="7th">७वा</option>
+                </select>
+                <select class="rev-scale" style="flex:2; padding:6px; font-size:11px; border:1px solid #ccc; border-radius:4px;">
+                    <option value="" disabled selected>सुधारित वेतनश्रेणी / स्तर</option>
+                </select>
+                <button type="button" onclick="this.parentElement.parentElement.remove()" style="background:#d32f2f; color:#fff; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:11px;">✕</button>
+            </div>
+        `;
+        list.appendChild(div);
+    }
+
+    function updateRevScaleOptions(selectElem) {
+        const comm = selectElem.value;
+        const scaleSelect = selectElem.parentElement.querySelector('.rev-scale');
+        scaleSelect.innerHTML = '<option value="" disabled selected>सुधारित वेतनश्रेणी / स्तर</option>';
+
+        let list = [];
+        if (comm === '4th') list = payScales4th;
+        else if (comm === '5th') list = payScales5th;
+        else if (comm === '6th') list = payScales6th;
+        else if (comm === '7th') list = levelConfig7th.map(cfg => level7thStartPay[cfg.id].desc);
+
+        list.forEach(item => {
+            let opt = document.createElement('option');
+            opt.value = item;
+            opt.textContent = item;
+            scaleSelect.appendChild(opt);
+        });
+    }
+
     function resetAllData() {
         if (confirm("तुम्हाला भरलेली सर्व माहिती पुसून टाकायची आहे का?")) {
             document.getElementById('empName').value = "";
@@ -1111,6 +1191,9 @@
             document.getElementById('fixationFrom_disp').value = "";
             document.getElementById('fixationTo').value = "";
             document.getElementById('fixationTo_disp').value = "";
+            document.getElementById('hasScaleRev').value = "No";
+            document.getElementById('scaleRevContainer').classList.add('hidden');
+            document.getElementById('scaleRevList').innerHTML = "";
 
             validateCard1();
             validateCard2();
@@ -1357,9 +1440,6 @@
         return entryPayAnnexureIII[gp] || 0;
     }
 
-    // =========================================================================
-    // 🏛️ ७ वा वेतन आयोग: संपूर्ण ३१ स्तर (S-01 ते S-31) (पदांशिवाय)
-    // =========================================================================
     const levelConfig7th = [
         { id: "S-1", gp: 1300, min: 15000, max: 47600, stages: 40 },
         { id: "S-2", gp: 1400, min: 15300, max: 48700, stages: 40 },
@@ -1921,7 +2001,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (पूर्णपणे दुरुस्त व सुरळीत कार्य करणारी)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनश्रेणी सुधारणांसह अचूक गणना)
     // =========================================================================
     function processFixation() {
         const isC1Valid = validateCard1();
@@ -1983,6 +2063,26 @@
         const fromDateFormatted = formatDateToDDMMYYYY(fromDateInput);
         const toDateFormatted = formatDateToDDMMYYYY(toDateInput);
 
+        // सेवेदरम्यान झालेली 'वेतनश्रेणी सुधारणा' (Scale Revision) गोळा करणे
+        let scaleRevisions = [];
+        const hasScaleRev = document.getElementById('hasScaleRev').value === 'Yes';
+        if (hasScaleRev) {
+            const revItems = document.querySelectorAll('#scaleRevList .scale-rev-item');
+            revItems.forEach(item => {
+                let d = item.querySelector('.rev-date').value;
+                let c = item.querySelector('.rev-comm').value;
+                let s = item.querySelector('.rev-scale').value;
+                if (d && c && s) {
+                    scaleRevisions.push({
+                        date: parseLocalDate(d),
+                        dateStr: d,
+                        commission: c,
+                        scale: s
+                    });
+                }
+            });
+        }
+
         let activeBenefits = [];
         let summaryBenefitsText = [];
 
@@ -2005,8 +2105,7 @@
                         optDateStr: bOptDate,
                         commission: bComm,
                         post: bPost,
-                        scale: bScale,
-                        customBasic: 0
+                        scale: bScale
                     });
                     let label = (bType === 'Promotion') ? `पदोन्नती-${i}` : `MACP-${i}`;
                     summaryBenefitsText.push(`${label} (${formatDateToDDMMYYYY(bDate)} | ${bComm} आयोग: ${bScale})`);
@@ -2063,6 +2162,19 @@
                 events.push({ date: c7Date, dateStr: "01-01-2016", type: 'COMMISSION_7TH', desc: `७वा वेतन आयोग सुधारणा (${initialLevel} Matrix Fitment)` });
             }
         }
+
+        // सेवेदरम्यान झालेली वेतनश्रेणी सुधारणा इव्हेंटमध्ये जोडणे
+        scaleRevisions.forEach(rev => {
+            if (rev.date >= startDate && rev.date <= endDate) {
+                events.push({
+                    date: rev.date,
+                    dateStr: formatDateToDDMMYYYY(rev.dateStr),
+                    type: 'SCALE_REVISION',
+                    desc: `वेतनश्रेणी / स्तर सुधारणा (${rev.scale})`,
+                    data: rev
+                });
+            }
+        });
 
         // वार्षिक नियमित वेतनवाढ नियोजन
         let startYr = startDate.getFullYear();
@@ -2219,6 +2331,28 @@
                 lowerGP = 0;
 
                 currentScaleLabel = getCleanScaleLabel(scale, currentCommission, currentLevel);
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+            }
+            // =========================================================================
+            // 🔄 वेतनश्रेणी सुधारणा (Scale Revision) अंमलबजावणी
+            // =========================================================================
+            else if (ev.type === 'SCALE_REVISION') {
+                let rev = ev.data;
+                currentCommission = rev.commission;
+                if (currentCommission === '7th') {
+                    let match = rev.scale.match(/S-(\d+)/i);
+                    if (match) {
+                        currentLevel = "S-" + parseInt(match[1], 10);
+                        let fit = fitInMatrix(currentLevel, currentBasic);
+                        currentBasic = fit.basic;
+                        currentMatrixIndex = fit.index;
+                        currentLevel = fit.level;
+                    }
+                } else if (currentCommission === '6th') {
+                    let gpMatch = rev.scale.match(/GP\s*(\d+)/i);
+                    if (gpMatch) currentGP = parseInt(gpMatch[1], 10);
+                }
+                currentScaleLabel = getCleanScaleLabel(rev.scale, currentCommission, currentLevel);
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'BENEFIT_SAME_DAY') {
@@ -2438,7 +2572,9 @@
             <td>${sr}</td>
             <td>${dateStr}</td>
             <td>${comm}</td>
+            <!-- चतुर्थ कॉलम: वेतन स्तर / श्रेणी -->
             <td><small><b>${scaleStr}</b></small></td>
+            <!-- पंचम कॉलम: तपशील / सेवा घटना -->
             <td class="event-cell">${eventDesc}</td>
             <td><b>${basic}</b></td>
             <td>${gpDisplay}</td>
