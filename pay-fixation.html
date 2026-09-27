@@ -16,7 +16,6 @@
             --text-main: #263238;
         }
 
-        /* पेज स्क्रीनबाहेर आडवे सरकणे १००% रोखणे */
         html, body {
             width: 100%;
             max-width: 100vw;
@@ -67,7 +66,6 @@
             font-size: 13px;
         }
 
-        /* ३ मुख्य स्मार्ट कार्ड्स */
         .smart-cards-list {
             display: flex;
             flex-direction: column;
@@ -197,7 +195,6 @@
         }
         .reset-btn:hover { background-color: #546e7a; }
 
-        /* पॉप-अप */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -469,6 +466,25 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
+        }
+
+        .checkbox-list-box {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11.5px;
+            cursor: pointer;
         }
 
         /* अहवाल व तक्ता */
@@ -1029,33 +1045,20 @@
             <button type="button" onclick="addScaleRevRow()" style="background: #0277bd; color: white; border: none; padding: 5px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; margin-top: 4px;">+ आणखी एक वेतनश्रेणी सुधारणा जोडा</button>
         </div>
 
-        <!-- अतिरिक्त वेतनवाढ (नियमित वाढीएवढीच आणि सुधारित वेतनश्रेणीच्या आधी येणारी) -->
+        <!-- वेतनवाढ थांबवली व विशिष्ट वेतनवाढ निवडण्याची यादी (Multiple Checkboxes) -->
         <div class="field-group" style="margin-top: 10px; border-top: 1px dashed #cfd8dc; padding-top: 8px;">
-            <label>⚡ अतिरिक्त वेतनवाढ (नियमित वाढीएवढीच) मिळाली आहे का?</label>
-            <select id="hasExtraInc" onchange="toggleExtraIncSection()">
-                <option value="No" selected>नाही</option>
-                <option value="Yes">होय</option>
-            </select>
-        </div>
-
-        <div id="extraIncContainer" class="hidden">
-            <div id="extraIncList"></div>
-            <button type="button" onclick="addExtraIncRow()" style="background: #2e7d32; color: white; border: none; padding: 5px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; margin-top: 4px;">+ आणखी एक अतिरिक्त वेतनवाढ जोडा</button>
-        </div>
-
-        <div style="background:#e8f5e9; border:1px solid #a5d6a7; border-radius:5px; padding:8px 10px; font-size:11px; color:#1b5e20; line-height:1.5; margin-top: 10px; margin-bottom:10px;">
-            📌 <b>वेतनवाढ नियम:</b><br>
-            • <b>४था व ५वा आयोग:</b> नियुक्ती महिन्याची १ तारीख (स्वयंचलित)<br>
-            • <b>६वा आयोग:</b> दरवर्षी १ जुलै (स्वयंचलित)<br>
-            • <b>७वा आयोग:</b> वरील निवडीनुसार (१ जुलै किंवा १ जानेवारी)
-        </div>
-
-        <div class="field-group">
-            <label>वेतनवाढ थांबवली का?</label>
+            <label>🛑 कोणती वेतनवाढ थांबवली / रोखली आहे का?</label>
             <select id="incrementWithheld" onchange="toggleWithheldOption()">
                 <option value="No" selected>नाही</option>
                 <option value="Yes">होय</option>
             </select>
+        </div>
+
+        <div id="withheldListContainer" class="field-group hidden">
+            <label style="color:#b71c1c; font-size:11.5px;">खालीलपैकी जी वेतनवाढ थांबवली आहे तिची तारीख निवडा (एकापेक्षा जास्त निवडू शकता):</label>
+            <div id="generatedIncrementsCheckboxes" class="checkbox-list-box">
+                <!-- जतन केलेल्या इंक्रीमेंट्सची यादी इथे डायनॅमिक येईल -->
+            </div>
         </div>
 
         <div class="field-group hidden" id="withheldEffectDiv">
@@ -1064,6 +1067,13 @@
                 <option value="cumulative">होय (रोखून - परिणाम करणारी)</option>
                 <option value="non_cumulative">नाही (परिणाम न करणारी)</option>
             </select>
+        </div>
+
+        <div style="background:#e8f5e9; border:1px solid #a5d6a7; border-radius:5px; padding:8px 10px; font-size:11px; color:#1b5e20; line-height:1.5; margin-top: 10px; margin-bottom:10px;">
+            📌 <b>वेतनवाढ नियम:</b><br>
+            • <b>४था व ५वा आयोग:</b> नियुक्ती महिन्याची १ तारीख (स्वयंचलित)<br>
+            • <b>६वा आयोग:</b> दरवर्षी १ जुलै (स्वयंचलित)<br>
+            • <b>७वा आयोग:</b> वरील निवडीनुसार (१ जुलै किंवा १ जानेवारी)
         </div>
 
         <button type="button" class="modal-save-btn" onclick="saveRulesModal()">माहिती जतन करा (Save)</button>
@@ -1108,6 +1118,9 @@
     }
 
     function openModal(modalId) { 
+        if (modalId === 'rulesModal') {
+            populateWithheldCheckboxes();
+        }
         document.getElementById(modalId).classList.remove('hidden'); 
     }
     function closeModal(modalId) { 
@@ -1177,32 +1190,86 @@
         });
     }
 
-    function toggleExtraIncSection() {
-        const val = document.getElementById('hasExtraInc').value;
-        const container = document.getElementById('extraIncContainer');
-        if (val === 'Yes') {
-            container.classList.remove('hidden');
-            if (document.getElementById('extraIncList').children.length === 0) {
-                addExtraIncRow();
-            }
-        } else {
-            container.classList.add('hidden');
-            document.getElementById('extraIncList').innerHTML = "";
+    // कर्मचाऱ्याच्या कालावधीनुसार शक्य असलेल्या सर्व वेतनवाढींच्या तारखा जनरेट करून चेकबॉक्स दाखवणे
+    function populateWithheldCheckboxes() {
+        const container = document.getElementById('generatedIncrementsCheckboxes');
+        container.innerHTML = "";
+
+        const joinDateInput = document.getElementById('empJoinDate').value;
+        const fromDateInput = document.getElementById('fixationFrom').value;
+        const toDateInput = document.getElementById('fixationTo').value;
+        const comm = document.getElementById('payCommission').value;
+        const rule7th = document.getElementById('incrementMonthRule7th').value;
+
+        if (!joinDateInput || !fromDateInput || !toDateInput || !comm) {
+            container.innerHTML = `<div style="color:#78909c; font-size:11px;">कृपया प्रथम भाग १ व भाग ३ मधील नियुक्ती दिनांक व कालावधी भरा!</div>`;
+            return;
         }
+
+        let startDate = parseLocalDate(fromDateInput);
+        let endDate = parseLocalDate(toDateInput);
+        let joinDateObj = parseLocalDate(joinDateInput);
+        let joinMonth = joinDateObj.getMonth();
+
+        let startYr = startDate.getFullYear();
+        let endYr = endDate.getFullYear();
+        let datesList = [];
+
+        for (let yr = startYr; yr <= endYr; yr++) {
+            let yrDate = new Date(yr, 6, 1);
+            let activeComm = comm;
+            if (yrDate < new Date(1996, 0, 1)) activeComm = "4th";
+            else if (yrDate < new Date(2006, 0, 1)) activeComm = "5th";
+            else if (yrDate < new Date(2016, 0, 1)) activeComm = "6th";
+            else activeComm = "7th";
+
+            let incDate = null;
+            if (activeComm === "4th" || activeComm === "5th") {
+                incDate = new Date(yr, joinMonth, 1);
+                if (incDate <= joinDateObj) continue;
+            } else if (activeComm === "6th") {
+                incDate = new Date(yr, 6, 1);
+            } else if (activeComm === "7th") {
+                if (rule7th === 'january') {
+                    incDate = new Date(yr, 0, 1);
+                    if (yr === 2016) continue;
+                } else {
+                    incDate = new Date(yr, 6, 1);
+                }
+            }
+
+            if (incDate && incDate > startDate && incDate <= endDate) {
+                let isoStr = `${incDate.getFullYear()}-${String(incDate.getMonth() + 1).padStart(2, '0')}-${String(incDate.getDate()).padStart(2, '0')}`;
+                let dispStr = formatDateToDDMMYYYY(isoStr);
+                datesList.push({ iso: isoStr, disp: dispStr });
+            }
+        }
+
+        if (datesList.length === 0) {
+            container.innerHTML = `<div style="color:#78909c; font-size:11px;">निवडलेल्या कालावधीत कोणतीही वार्षिक वेतनवाढ तारीख उपलब्ध नाही.</div>`;
+            return;
+        }
+
+        datesList.forEach(item => {
+            let label = document.createElement('label');
+            label.className = 'checkbox-item';
+            label.innerHTML = `<input type="checkbox" class="withheld-date-chk" value="${item.iso}"> दिनांक: <b>${item.disp}</b> रोजीची वार्षिक वेतनवाढ`;
+            container.appendChild(label);
+        });
     }
 
-    function addExtraIncRow() {
-        const list = document.getElementById('extraIncList');
-        const div = document.createElement('div');
-        div.className = 'extra-inc-item';
-        div.innerHTML = `
-            <div style="display: flex; gap: 6px; align-items: center;">
-                <input type="date" class="extra-date" style="flex:1; padding:6px; font-size:11px; border:1px solid #ccc; border-radius:4px;">
-                <input type="text" class="extra-desc" placeholder="कारण (उदा. कुटुंब नियोजन / विशेष वाढ)" style="flex:2; padding:6px; font-size:11px; border:1px solid #ccc; border-radius:4px;">
-                <button type="button" onclick="this.parentElement.parentElement.remove()" style="background:#d32f2f; color:#fff; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:11px;">✕</button>
-            </div>
-        `;
-        list.appendChild(div);
+    function toggleWithheldOption() {
+        const withheld = document.getElementById('incrementWithheld').value;
+        const listContainer = document.getElementById('withheldListContainer');
+        const effectDiv = document.getElementById('withheldEffectDiv');
+        if (withheld === 'Yes') {
+            listContainer.classList.remove('hidden');
+            effectDiv.classList.remove('hidden');
+            populateWithheldCheckboxes();
+        } else {
+            listContainer.classList.add('hidden');
+            effectDiv.classList.add('hidden');
+        }
     }
 
     function resetAllData() {
@@ -1235,9 +1302,9 @@
             document.getElementById('hasScaleRev').value = "No";
             document.getElementById('scaleRevContainer').classList.add('hidden');
             document.getElementById('scaleRevList').innerHTML = "";
-            document.getElementById('hasExtraInc').value = "No";
-            document.getElementById('extraIncContainer').classList.add('hidden');
-            document.getElementById('extraIncList').innerHTML = "";
+            document.getElementById('incrementWithheld').value = "No";
+            document.getElementById('withheldListContainer').classList.add('hidden');
+            document.getElementById('withheldEffectDiv').classList.add('hidden');
 
             validateCard1();
             validateCard2();
@@ -2011,13 +2078,6 @@
         evaluateOptionSuggestion(idx);
     }
 
-    function toggleWithheldOption() {
-        const withheld = document.getElementById('incrementWithheld').value;
-        const div = document.getElementById('withheldEffectDiv');
-        if (withheld === 'Yes') div.classList.remove('hidden');
-        else div.classList.add('hidden');
-    }
-
     document.addEventListener('click', function(e) {
         const comboboxes = document.querySelectorAll('.combobox-container');
         comboboxes.forEach(cb => {
@@ -2107,7 +2167,7 @@
         const fromDateFormatted = formatDateToDDMMYYYY(fromDateInput);
         const toDateFormatted = formatDateToDDMMYYYY(toDateInput);
 
-        // सेवेदरम्यान झालेली वेतनश्रेणी सुधारणा गोळा करणे
+        // वेतनश्रेणी सुधारणा गोळा करणे
         let scaleRevisions = [];
         const hasScaleRev = document.getElementById('hasScaleRev').value === 'Yes';
         if (hasScaleRev) {
@@ -2127,23 +2187,16 @@
             });
         }
 
-        // सेवेदरम्यान मिळालेली अतिरिक्त वेतनवाढ गोळा करणे
-        let extraIncrements = [];
-        const hasExtraInc = document.getElementById('hasExtraInc').value === 'Yes';
-        if (hasExtraInc) {
-            const extraItems = document.querySelectorAll('#extraIncList .extra-inc-item');
-            extraItems.forEach(item => {
-                let d = item.querySelector('.extra-date').value;
-                let desc = item.querySelector('.extra-desc').value.trim() || "अतिरिक्त वेतनवाढ";
-                if (d) {
-                    extraIncrements.push({
-                        date: parseLocalDate(d),
-                        dateStr: d,
-                        desc: desc
-                    });
-                }
+        // चेकबॉक्समधून निवडलेल्या थांबवलेल्या (रोखलेल्या) वेतनवाढींच्या तारखा गोळा करणे
+        let withheldDatesSet = new Set();
+        const hasWithheld = document.getElementById('incrementWithheld').value === 'Yes';
+        if (hasWithheld) {
+            const chks = document.querySelectorAll('.withheld-date-chk:checked');
+            chks.forEach(chk => {
+                withheldDatesSet.add(chk.value);
             });
         }
+        const withheldEffect = document.getElementById('withheldEffect').value; // cumulative किंवा non_cumulative
 
         let activeBenefits = [];
         let summaryBenefitsText = [];
@@ -2207,21 +2260,21 @@
         if (autoUpgrade && startCommission === '4th') {
             let c5Date = new Date(1996, 0, 1);
             if (c5Date >= startDate && c5Date <= endDate) {
-                events.push({ date: c5Date, dateStr: "01-01-1996", type: 'COMMISSION_5TH', desc: '५वा वेतन आयोग सुधारणा' });
+                events.push({ date: c5Date, dateStr: "01-01-1996", type: 'COMMISSION_5TH', desc: '५वा आयोग सुधारणा' });
             }
         }
 
         if (autoUpgrade && (startCommission === '4th' || startCommission === '5th')) {
             let c6Date = new Date(2006, 0, 1);
             if (c6Date >= startDate && c6Date <= endDate) {
-                events.push({ date: c6Date, dateStr: "01-01-2006", type: 'COMMISSION_6TH', desc: '६वा वेतन आयोग सुधारणा' });
+                events.push({ date: c6Date, dateStr: "01-01-2006", type: 'COMMISSION_6TH', desc: '६वा आयोग सुधारणा' });
             }
         }
 
         if (autoUpgrade && (startCommission === '4th' || startCommission === '5th' || startCommission === '6th')) {
             let c7Date = new Date(2016, 0, 1);
             if (c7Date >= startDate && c7Date <= endDate) {
-                events.push({ date: c7Date, dateStr: "01-01-2016", type: 'COMMISSION_7TH', desc: `७वा वेतन आयोग सुधारणा (${initialLevel} Matrix Fitment)` });
+                events.push({ date: c7Date, dateStr: "01-01-2016", type: 'COMMISSION_7TH', desc: `७वा आयोग सुधारणा (${initialLevel} Matrix Fitment)` });
             }
         }
 
@@ -2234,19 +2287,6 @@
                     type: 'SCALE_REVISION',
                     desc: `वेतनश्रेणी / स्तर सुधारणा (${rev.scale})`,
                     data: rev
-                });
-            }
-        });
-
-        // अतिरिक्त वेतनवाढ इव्हेंटमध्ये जोडणे
-        extraIncrements.forEach(ex => {
-            if (ex.date >= startDate && ex.date <= endDate) {
-                events.push({
-                    date: ex.date,
-                    dateStr: formatDateToDDMMYYYY(ex.dateStr),
-                    type: 'EXTRA_INC',
-                    desc: `अतिरिक्त वेतनवाढ (${ex.desc})`,
-                    data: ex
                 });
             }
         });
@@ -2271,10 +2311,10 @@
             if (activeComm === "4th" || activeComm === "5th") {
                 incDate = new Date(yr, joinMonth, 1);
                 if (incDate <= joinDateObj) continue;
-                incDesc = `नियमित वार्षिक वेतनवाढ (नियुक्ती महिना १ तारीख)`;
+                incDesc = `नियमित वार्षिक वेतनवाढ`;
             } else if (activeComm === "6th") {
                 incDate = new Date(yr, 6, 1);
-                incDesc = `नियमित वार्षिक वेतनवाढ (६वा आयोग - १ जुलै)`;
+                incDesc = `नियमित वार्षिक वेतनवाढ`;
             } else if (activeComm === "7th") {
                 if (rule7th === 'january') {
                     incDate = new Date(yr, 0, 1);
@@ -2294,14 +2334,28 @@
                     continue;
                 }
 
+                let isoStr = `${incDate.getFullYear()}-${String(incDate.getMonth() + 1).padStart(2, '0')}-${String(incDate.getDate()).padStart(2, '0')}`;
+                let isWithheld = withheldDatesSet.has(isoStr);
+
                 let m = String(incDate.getMonth() + 1).padStart(2, '0');
                 let d = String(incDate.getDate()).padStart(2, '0');
-                events.push({
-                    date: incDate,
-                    dateStr: `${d}-${m}-${yr}`,
-                    type: 'ANNUAL_INC',
-                    desc: incDesc
-                });
+
+                if (isWithheld) {
+                    events.push({
+                        date: incDate,
+                        dateStr: `${d}-${m}-${yr}`,
+                        type: 'WITHHELD_INC',
+                        desc: `वेतनवाढ रोखली / थांबवली (${withheldEffect === 'cumulative' ? 'परिणाम करणारी' : 'परिणाम न करणारी'})`,
+                        effect: withheldEffect
+                    });
+                } else {
+                    events.push({
+                        date: incDate,
+                        dateStr: `${d}-${m}-${yr}`,
+                        type: 'ANNUAL_INC',
+                        desc: incDesc
+                    });
+                }
             }
         }
 
@@ -2336,9 +2390,7 @@
             }
         });
 
-        // =========================================================================
-        // 🔄 अचूक शासकीय क्रम: नेहमी (१) नियमित वाढ -> (२) अतिरिक्त वाढ -> (३) वेतनश्रेणी सुधारणा
-        // =========================================================================
+        // अचूक शासकीय क्रम लावणे
         events.sort((a, b) => {
             if (a.date.getTime() !== b.date.getTime()) {
                 return a.date - b.date;
@@ -2348,9 +2400,9 @@
                 'COMMISSION_5TH': 2, 
                 'COMMISSION_6TH': 3, 
                 'COMMISSION_7TH': 4, 
-                'ANNUAL_INC': 5,          // 1st: नियमित वेतनवाढ
-                'EXTRA_INC': 6,           // 2nd: अतिरिक्त वेतनवाढ
-                'SCALE_REVISION': 7,      // 3rd: सुधारित वेतनश्रेणी
+                'ANNUAL_INC': 5, 
+                'WITHHELD_INC': 6, 
+                'SCALE_REVISION': 7, 
                 'BENEFIT_SAME_DAY': 8, 
                 'BENEFIT_OPTION_DNI': 9 
             };
@@ -2427,9 +2479,6 @@
                 currentScaleLabel = getCleanScaleLabel(scale, currentCommission, currentLevel);
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
-            // =========================================================================
-            // 🔄 वेतनश्रेणी सुधारणा (Scale Revision) - नेहमी नियमित आणि अतिरिक्त वाढीनंतर येणारी
-            // =========================================================================
             else if (ev.type === 'SCALE_REVISION') {
                 let rev = ev.data;
                 currentCommission = rev.commission;
@@ -2449,40 +2498,20 @@
                 currentScaleLabel = getCleanScaleLabel(rev.scale, currentCommission, currentLevel);
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
-            // =========================================================================
-            // ⚡ अतिरिक्त वेतनवाढ (नियमित वाढीएवढीच अचूक वाढ)
-            // =========================================================================
-            else if (ev.type === 'EXTRA_INC') {
-                if (currentCommission === '7th') {
-                    let match = String(currentLevel).match(/S-(\d+)/i);
-                    let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
-                    currentLevel = key;
-                    const cells = fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
-
-                    if (currentMatrixIndex === -1 || currentMatrixIndex === undefined) {
-                        currentMatrixIndex = cells.indexOf(currentBasic);
-                        if (currentMatrixIndex === -1) currentMatrixIndex = 0;
-                    }
-                    if (currentMatrixIndex < cells.length - 1) {
-                        currentMatrixIndex++;
+            else if (ev.type === 'WITHHELD_INC') {
+                if (ev.effect === 'cumulative') {
+                    if (currentCommission === '7th') {
+                        if (currentMatrixIndex > 0) currentMatrixIndex--;
+                        const cells = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
                         currentBasic = cells[currentMatrixIndex];
+                    } else if (currentCommission === '6th') {
+                        let total = currentBasic + currentGP;
+                        let inc = Math.ceil((total * 0.03) / 10) * 10;
+                        currentBasic -= inc;
+                    } else {
+                        currentBasic -= (currentCommission === '5th' ? 100 : 30);
                     }
-                    lowerLevel = currentLevel;
-                    lowerMatrixIndex = currentMatrixIndex;
-                    lowerBasic = currentBasic;
-                } else if (currentCommission === '6th') {
-                    let total = currentBasic + currentGP;
-                    let inc = Math.ceil((total * 0.03) / 10) * 10;
-                    if (inc < 10) inc = 10;
-                    currentBasic += inc;
-                    lowerBasic = currentBasic;
-                } else {
-                    let inc = (currentCommission === '5th') ? 100 : 30;
-                    currentBasic += inc;
-                    lowerBasic = currentBasic;
                 }
-
-                currentScaleLabel = getCleanScaleLabel(scale, currentCommission, currentLevel);
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'BENEFIT_SAME_DAY') {
