@@ -16,6 +16,7 @@
             --text-main: #263238;
         }
 
+        /* पेज स्क्रीनबाहेर आडवे सरकणे १००% रोखणे */
         html, body {
             width: 100%;
             max-width: 100vw;
@@ -66,6 +67,7 @@
             font-size: 13px;
         }
 
+        /* ३ मुख्य स्मार्ट कार्ड्स */
         .smart-cards-list {
             display: flex;
             flex-direction: column;
@@ -195,6 +197,7 @@
         }
         .reset-btn:hover { background-color: #546e7a; }
 
+        /* पॉप-अप */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -468,16 +471,17 @@
             gap: 6px;
         }
 
+        /* स्क्रोल बॉक्स व एकाच ओळीतील रचना */
         .checkbox-list-box {
             background: #fff;
             border: 1px solid var(--border-color);
             border-radius: 5px;
-            padding: 8px;
-            max-height: 150px;
+            padding: 6px 8px;
+            max-height: 140px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
         }
         .checkbox-item {
             display: flex;
@@ -485,7 +489,22 @@
             gap: 8px;
             font-size: 11.5px;
             cursor: pointer;
+            white-space: nowrap; /* एकाच ओळीत ठेवण्यासाठी */
         }
+
+        .ok-selection-btn {
+            background-color: #0277bd;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 11.5px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 6px;
+            align-self: flex-end;
+        }
+        .ok-selection-btn:hover { background-color: #01579b; }
 
         /* अहवाल व तक्ता */
         .output-box {
@@ -1045,7 +1064,7 @@
             <button type="button" onclick="addScaleRevRow()" style="background: #0277bd; color: white; border: none; padding: 5px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; margin-top: 4px;">+ आणखी एक वेतनश्रेणी सुधारणा जोडा</button>
         </div>
 
-        <!-- वेतनवाढ थांबवली व विशिष्ट वेतनवाढ निवडण्याची यादी (Multiple Checkboxes) -->
+        <!-- वेतनवाढ थांबवली व 'ओके' बटणासह स्क्रोल बॉक्स -->
         <div class="field-group" style="margin-top: 10px; border-top: 1px dashed #cfd8dc; padding-top: 8px;">
             <label>🛑 कोणती वेतनवाढ थांबवली / रोखली आहे का?</label>
             <select id="incrementWithheld" onchange="toggleWithheldOption()">
@@ -1057,8 +1076,9 @@
         <div id="withheldListContainer" class="field-group hidden">
             <label style="color:#b71c1c; font-size:11.5px;">खालीलपैकी जी वेतनवाढ थांबवली आहे तिची तारीख निवडा (एकापेक्षा जास्त निवडू शकता):</label>
             <div id="generatedIncrementsCheckboxes" class="checkbox-list-box">
-                <!-- जतन केलेल्या इंक्रीमेंट्सची यादी इथे डायनॅमिक येईल -->
+                <!-- डायनॅमिक चेकबॉक्स -->
             </div>
+            <button type="button" class="ok-selection-btn" onclick="confirmWithheldSelection()">ओके (OK)</button>
         </div>
 
         <div class="field-group hidden" id="withheldEffectDiv">
@@ -1190,7 +1210,6 @@
         });
     }
 
-    // कर्मचाऱ्याच्या कालावधीनुसार शक्य असलेल्या सर्व वेतनवाढींच्या तारखा जनरेट करून चेकबॉक्स दाखवणे
     function populateWithheldCheckboxes() {
         const container = document.getElementById('generatedIncrementsCheckboxes');
         container.innerHTML = "";
@@ -1202,7 +1221,7 @@
         const rule7th = document.getElementById('incrementMonthRule7th').value;
 
         if (!joinDateInput || !fromDateInput || !toDateInput || !comm) {
-            container.innerHTML = `<div style="color:#78909c; font-size:11px;">कृपया प्रथम भाग १ व भाग ३ मधील नियुक्ती दिनांक व कालावधी भरा!</div>`;
+            container.innerHTML = `<div style="color:#78909c; font-size:11px;">कृपया प्रथम भाग १ व भाग ३ मधील माहिती भरा!</div>`;
             return;
         }
 
@@ -1246,7 +1265,7 @@
         }
 
         if (datesList.length === 0) {
-            container.innerHTML = `<div style="color:#78909c; font-size:11px;">निवडलेल्या कालावधीत कोणतीही वार्षिक वेतनवाढ तारीख उपलब्ध नाही.</div>`;
+            container.innerHTML = `<div style="color:#78909c; font-size:11px;">कोणतीही वार्षिक वेतनवाढ तारीख उपलब्ध नाही.</div>`;
             return;
         }
 
@@ -1270,6 +1289,17 @@
             listContainer.classList.add('hidden');
             effectDiv.classList.add('hidden');
         }
+    }
+
+    // 'ओके' बटण दाबल्यावर स्क्रोल बॉक्स आणि ओके बटण लपवून युजरला कन्फर्मेशन देणे
+    function confirmWithheldSelection() {
+        const chks = document.querySelectorAll('.withheld-date-chk:checked');
+        if (chks.length === 0) {
+            alert("कृपया किमान एक वेतनवाढ तारीख निवडा!");
+            return;
+        }
+        document.getElementById('withheldListContainer').classList.add('hidden');
+        alert("वेतनवाढ रोखण्याची निवड यशस्वीरीत्या जतन केली!");
     }
 
     function resetAllData() {
@@ -2078,6 +2108,30 @@
         evaluateOptionSuggestion(idx);
     }
 
+    function toggleWithheldOption() {
+        const withheld = document.getElementById('incrementWithheld').value;
+        const listContainer = document.getElementById('withheldListContainer');
+        const effectDiv = document.getElementById('withheldEffectDiv');
+        if (withheld === 'Yes') {
+            listContainer.classList.remove('hidden');
+            effectDiv.classList.remove('hidden');
+            populateWithheldCheckboxes();
+        } else {
+            listContainer.classList.add('hidden');
+            effectDiv.classList.add('hidden');
+        }
+    }
+
+    function confirmWithheldSelection() {
+        const chks = document.querySelectorAll('.withheld-date-chk:checked');
+        if (chks.length === 0) {
+            alert("कृपया किमान एक वेतनवाढ तारीख निवडा!");
+            return;
+        }
+        document.getElementById('withheldListContainer').classList.add('hidden');
+        alert("वेतनवाढ रोखण्याची निवड यशस्वीरीत्या जतन केली!");
+    }
+
     document.addEventListener('click', function(e) {
         const comboboxes = document.querySelectorAll('.combobox-container');
         comboboxes.forEach(cb => {
@@ -2105,7 +2159,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (नियमित वाढ -> अतिरिक्त वाढ -> सुधारित वेतनश्रेणी अचूक क्रम)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (रोखलेल्या वाढींची गणना वगळणारी)
     // =========================================================================
     function processFixation() {
         const isC1Valid = validateCard1();
@@ -2196,7 +2250,7 @@
                 withheldDatesSet.add(chk.value);
             });
         }
-        const withheldEffect = document.getElementById('withheldEffect').value; // cumulative किंवा non_cumulative
+        const withheldEffect = document.getElementById('withheldEffect').value;
 
         let activeBenefits = [];
         let summaryBenefitsText = [];
@@ -2291,7 +2345,7 @@
             }
         });
 
-        // वार्षिक नियमित वेतनवाढ नियोजन
+        // वार्षिक नियमित वेतनवाढ नियोजन (रोखलेल्या वाढी वगळून किंवा WITHHEld म्हणून नोंदवणे)
         let startYr = startDate.getFullYear();
         let endYr = endDate.getFullYear();
 
@@ -2498,6 +2552,9 @@
                 currentScaleLabel = getCleanScaleLabel(rev.scale, currentCommission, currentLevel);
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
+            // =========================================================================
+            // 🛑 वेतनवाढ रोखणे / थांबवणे (Withheld Increment) अंमलबजावणी
+            // =========================================================================
             else if (ev.type === 'WITHHELD_INC') {
                 if (ev.effect === 'cumulative') {
                     if (currentCommission === '7th') {
