@@ -2182,7 +2182,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (पूर्णत: अद्ययावत आणि अचूक, सर्व लाभांसह)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (MACP & Promotion Event Fix)
     // =========================================================================
     function processFixation() {
         const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
@@ -2246,7 +2246,7 @@
         }
         const withheldEffect = document.getElementById('withheldEffect').value;
 
-        // पदोन्नती व MACP लाभ अचूकपणे गोळा करणे (त्रुटी पूर्णपणे दूर केली)
+        // 🌟 आर्थिक लाभ (MACP / Promotion) अचूकपणे गोळा करणे (Screen 1000378343 ची त्रुटी पूर्ण दूर केली)
         let activeBenefits = [];
         let summaryBenefitsText = [];
 
@@ -2386,7 +2386,7 @@
             }
         }
 
-        // पदोन्नती व MACP लाभांचे इव्हेंट तक्त्यात जोडणे
+        // 🌟 पदोन्नती व MACP लाभांचे इव्हेंट तक्त्यात अचूक समाविष्ट करणे
         activeBenefits.forEach(b => {
             let title = (b.type === 'Promotion') ? `पदोन्नती-${b.index} (${b.post})` : `MACP-${b.index} लाभ`;
             if (b.date >= startDate && b.date <= endDate) {
@@ -2395,7 +2395,7 @@
                         date: b.date,
                         dateStr: formatDateToDDMMYYYY(b.dateStr),
                         type: 'BENEFIT_SAME_DAY',
-                        desc: `${title} (नियम ११(१) नुसार वेतन निश्चिती)`,
+                        desc: `${title} मंजूर (नियम ११(१) नुसार वेतन निश्चिती)`,
                         data: b
                     });
                 } else if (b.optDate > b.date && b.optDate <= endDate) {
@@ -2410,7 +2410,7 @@
                         date: b.optDate,
                         dateStr: formatDateToDDMMYYYY(b.optDateStr),
                         type: 'BENEFIT_OPTION_DNI',
-                        desc: `नियम ११(१) विकल्पानुसार वेतन निश्चिती (नियमित वेतनवाढ + पदोन्नती वेतनवाढ)`,
+                        desc: `${title} नियम ११(१) विकल्पानुसार वेतन निश्चिती`,
                         data: b
                     });
                 }
@@ -2510,6 +2510,33 @@
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'WITHHELD_INC') {
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+            }
+            else if (ev.type === 'BENEFIT_SAME_DAY') {
+                let b = ev.data;
+                currentCommission = b.commission;
+
+                if (currentCommission === '7th') {
+                    let lvlMatch = b.scale.match(/S-(\d+)/i);
+                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
+
+                    let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
+                    let currIdx = cellsLower.indexOf(currentBasic);
+                    if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
+                    let notionalIdx = Math.min(currIdx + 1, cellsLower.length - 1);
+                    let notionalPay = cellsLower[notionalIdx];
+
+                    let fitInHigher = fitInMatrix(targetLvl, notionalPay);
+                    currentLevel = fitInHigher.level;
+                    currentBasic = fitInHigher.basic;
+                    currentMatrixIndex = fitInHigher.index;
+                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
+                }
+                lowerLevel = currentLevel;
+                lowerMatrixIndex = currentMatrixIndex;
+                lowerBasic = currentBasic;
+                lowerGP = currentGP;
+
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'BENEFIT_PROMOTED_PROVISIONAL') {
