@@ -16,7 +16,6 @@
             --text-main: #263238;
         }
 
-        /* पेज स्क्रीनबाहेर आडवे सरकणे १००% रोखणे */
         html, body {
             width: 100%;
             max-width: 100vw;
@@ -67,7 +66,6 @@
             font-size: 13px;
         }
 
-        /* ३ मुख्य स्मार्ट कार्ड्स */
         .smart-cards-list {
             display: flex;
             flex-direction: column;
@@ -197,7 +195,6 @@
         }
         .reset-btn:hover { background-color: #546e7a; }
 
-        /* पॉप-अप */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -1083,8 +1080,8 @@
         <div class="field-group hidden" id="withheldEffectDiv">
             <label>पुढील वाढीवर परिणाम?</label>
             <select id="withheldEffect">
-                <option value="cumulative">होय (रोखून - परिणाम करणारी)</option>
-                <option value="non_cumulative">नाही (परिणाम न करणारी)</option>
+                <option value="cumulative">होय (रोखून - परिणाम करणारी / Cumulative)</option>
+                <option value="non_cumulative">नाही (परिणाम न करणारी / Non-Cumulative)</option>
             </select>
         </div>
 
@@ -2016,7 +2013,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (थेट वेतनश्रेणी सुधारणा व रोखलेल्या वाढीचे अचूक लॉजिक)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनवाढ रोखणे: Cumulative & Non-Cumulative अचूक लॉजिक)
     // =========================================================================
     function processFixation() {
         const isC1Valid = validateCard1();
@@ -2098,7 +2095,7 @@
             });
         }
 
-        // रोखलेल्या वेतनवाढी आणि त्यांचे प्रकार गोळा करणे
+        // रोखलेल्या वेतनवाढी आणि त्यांचे प्रकार गोळा करणे (Cumulative किंवा Non-Cumulative)
         let withheldMap = {}; 
         const hasWithheld = document.getElementById('incrementWithheld').value === 'Yes';
         if (hasWithheld) {
@@ -2189,7 +2186,7 @@
             }
         }
 
-        // वेतनश्रेणी सुधारणा इव्हेंटमध्ये जोडणे (थेट फिक्सिंग नियम)
+        // वेतनश्रेणी सुधारणा इव्हेंटमध्ये जोडणे (थेट फिक्सिंग नियम - विकल्प नाही)
         scaleRevisions.forEach(rev => {
             if (rev.date >= startDate && rev.date <= endDate) {
                 events.push({
@@ -2402,18 +2399,13 @@
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             // =========================================================================
-            // 🛑 वेतनवाढ रोखणे: Cumulative (परिणाम करणारी) व Non-Cumulative (परिणाम न करणारी)
+            // 🛑 वेतनवाढ रोखणे: Cumulative vs Non-Cumulative अचूक लॉजिक
             // =========================================================================
             else if (ev.type === 'WITHHELD_INC') {
                 if (ev.effect === 'cumulative') {
-                    // परिणाम करणारी: मूळ वेतन तसेच राहील, पण पुढील वाढीवरही कायम परिणाम राहील (मागील वाढीव टप्पा रद्द)
-                    if (currentCommission === '7th') {
-                        if (currentMatrixIndex > 0) currentMatrixIndex--;
-                        const cells = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
-                        currentBasic = cells[currentMatrixIndex];
-                    }
+                    // Cumulative: वेतन जसेच्या तसे राहील, आणि भविष्यातील सर्व वाढींवर कायमचा १ Cell मागे राहण्याचा परिणाम राहील.
                 } else {
-                    // परिणाम न करणारी: या वर्षी वाढ दिली नाही, पण बेसिक तेच राहिले. पुढच्या वर्षी +२ टप्पे वाढ मिळून भरपाई होईल.
+                    // Non-Cumulative: या वर्षी वाढ दिली नाही (बेसिक तसेच राहिले), पण पुढच्या वर्षी +२ टप्पे वाढ मिळून भरपाई होईल.
                 }
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
@@ -2464,16 +2456,15 @@
                         }
                     }
 
-                    // तपासा की मागील वर्षी कोणती वाढ रोखली होती का?
                     let prevYear = ev.date.getFullYear() - 1;
                     let prevIso = `${prevYear}-${ev.isoDate.substring(5)}`;
                     let jumpSteps = 1;
 
                     if (withheldMap[prevIso] === 'non_cumulative') {
-                        // परिणाम न करणारी वाढ मागच्या वर्षी थांबवली होती, त्यामुळे या वर्षी +२ टप्पे (मागची + चालू) वाढ मिळतील!
+                        // Non-Cumulative असेल तर मागील रोखलेली आणि चालू वर्षाची मिळून २ टप्पे वाढ
                         jumpSteps = 2;
                     } else if (withheldMap[prevIso] === 'cumulative') {
-                        // परिणाम करणारी वाढ मागच्या वर्षी थांबवली होती, त्यामुळे या वर्षी फक्त १ (चालू वर्षाची) वाढ मिळेल, मागची जप्त राहील.
+                        // Cumulative असेल तर मागील वाढ कायमची जप्त, चालू वर्षाची १ वाढ मिळेल
                         jumpSteps = 1;
                     }
 
