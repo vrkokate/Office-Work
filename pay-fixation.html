@@ -2182,7 +2182,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (100% WORKING MASTER CODE)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (MACP & Promotion Event Sorting & Rendering Fix)
     // =========================================================================
     function processFixation() {
         const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
@@ -2246,7 +2246,7 @@
         }
         const withheldEffect = document.getElementById('withheldEffect').value;
 
-        // पदोन्नती व MACP लाभ अचूकपणे गोळा करणे
+        // 🌟 आर्थिक लाभ (MACP / Promotion) अचूकपणे गोळा करणे
         let activeBenefits = [];
         let summaryBenefitsText = [];
 
@@ -2386,7 +2386,7 @@
             }
         }
 
-        // पदोन्नती व MACP लाभांचे इव्हेंट तक्त्यात अचूक समाविष्ट करणे
+        // 🌟 पदोन्नती व MACP लाभांचे इव्हेंट तक्त्यात अचूक समाविष्ट करणे (दिनांकासह आणि अचूक वर्गवारीनुसार)
         activeBenefits.forEach(b => {
             let title = (b.type === 'Promotion') ? `पदोन्नती-${b.index} (${b.post})` : `MACP-${b.index} लाभ`;
             if (b.date >= startDate && b.date <= endDate) {
@@ -2417,6 +2417,7 @@
             }
         });
 
+        // 🌟 सर्व इव्हेंट्सची क्रमवारी योग्य लावली जेणेकरून MACP किंवा पदोन्नतीची नोंद तारीखवार तक्त्यात दिसेल
         events.sort((a, b) => {
             if (a.date.getTime() !== b.date.getTime()) {
                 return a.date - b.date;
@@ -2510,6 +2511,33 @@
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'WITHHELD_INC') {
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+            }
+            else if (ev.type === 'BENEFIT_SAME_DAY') {
+                let b = ev.data;
+                currentCommission = b.commission;
+
+                if (currentCommission === '7th') {
+                    let lvlMatch = b.scale.match(/S-(\d+)/i);
+                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
+
+                    let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
+                    let currIdx = cellsLower.indexOf(currentBasic);
+                    if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
+                    let notionalIdx = Math.min(currIdx + 1, cellsLower.length - 1);
+                    let notionalPay = cellsLower[notionalIdx];
+
+                    let fitInHigher = fitInMatrix(targetLvl, notionalPay);
+                    currentLevel = fitInHigher.level;
+                    currentBasic = fitInHigher.basic;
+                    currentMatrixIndex = fitInHigher.index;
+                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
+                }
+                lowerLevel = currentLevel;
+                lowerMatrixIndex = currentMatrixIndex;
+                lowerBasic = currentBasic;
+                lowerGP = currentGP;
+
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'BENEFIT_PROMOTED_PROVISIONAL') {
