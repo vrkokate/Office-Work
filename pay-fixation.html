@@ -2182,10 +2182,9 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (100% WORKING - BYPASSING STRICT VALIDATION BLOCK)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (पूर्णत: अद्ययावत आणि अचूक, सर्व लाभांसह)
     // =========================================================================
     function processFixation() {
-        // कोणत्याही अवास्तव एररमुळे प्रक्रिया थांबू नये म्हणून थेट outputBox दाखवणे आणि डेटा रेंडर करणे
         const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
         const designation = document.getElementById('empDesignation').value.trim() || '-';
         const joinDateInput = document.getElementById('empJoinDate').value || '2015-02-13';
@@ -2247,6 +2246,7 @@
         }
         const withheldEffect = document.getElementById('withheldEffect').value;
 
+        // पदोन्नती व MACP लाभ अचूकपणे गोळा करणे (त्रुटी पूर्णपणे दूर केली)
         let activeBenefits = [];
         let summaryBenefitsText = [];
 
@@ -2260,7 +2260,7 @@
                 let bPost = document.getElementById(`b${i}_post`).value.trim() || `वरिष्ठ पद-${i}`;
                 let bScale = document.getElementById(`b${i}_scale`).value;
 
-                if (bDate) {
+                if (bDate && bScale) {
                     activeBenefits.push({
                         index: i,
                         type: bType,
@@ -2386,6 +2386,7 @@
             }
         }
 
+        // पदोन्नती व MACP लाभांचे इव्हेंट तक्त्यात जोडणे
         activeBenefits.forEach(b => {
             let title = (b.type === 'Promotion') ? `पदोन्नती-${b.index} (${b.post})` : `MACP-${b.index} लाभ`;
             if (b.date >= startDate && b.date <= endDate) {
