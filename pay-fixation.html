@@ -1475,7 +1475,7 @@
     }
 
     // =========================================================================
-    // 📚 अधिकृत वेतनश्रेण्या (पदांच्या नावाविना स्वच्छ फॉरमॅट)
+    // 📚 अधिकृत वेतनश्रेण्या (5व्या आयोगासह सर्व फॉरमॅट पूर्णपणे समाविष्ट)
     // =========================================================================
     const payScales4th = [
         "रु. 750 - 12 - 870 - EB - 14 - 940",
@@ -2094,7 +2094,7 @@
             advisorBox.innerHTML = `✓ <b>उत्तम निवड!</b> आपण निवडलेला विकल्प दिनांक (${rec.bestFormatted}) आर्थिकदृष्ट्या सर्वाधिक फायदेशीर आहे.<br><small>${rec.adviceHtml}</small>`;
         } else {
             advisorBox.className = "option-advisor-box advisor-warn";
-            advisorBox.innerHTML = `⚠️ <b>लक्ष द्या:</b> आपण निवडलेला विकल्प दिनांक आर्थिकदृष्ट्या toट्याचा ठरू शकतो!<br>${rec.adviceHtml}<br><button type="button" class="advisor-btn" onclick="applySuggestedOptionDate(${idx}, '${rec.bestIso}', '${rec.bestFormatted}')">👉 हा फायदेशीर दिनांक [${rec.bestFormatted}] लागू करा</button>`;
+            advisorBox.innerHTML = `⚠️ <b>लक्ष द्या:</b> आपण निवडलेला विकल्प दिनांक आर्थिकदृष्ट्या तोट्याचा ठरू शकतो!<br>${rec.adviceHtml}<br><button type="button" class="advisor-btn" onclick="applySuggestedOptionDate(${idx}, '${rec.bestIso}', '${rec.bestFormatted}')">👉 हा फायदेशीर दिनांक [${rec.bestFormatted}] लागू करा</button>`;
         }
     }
 
@@ -2182,7 +2182,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनवाढ रोखण्याच्या नियमांचे १००% कायदेशीर पालन)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (पूर्णपणे सुरक्षित व अचूक)
     // =========================================================================
     function processFixation() {
         const isC1Valid = validateCard1();
@@ -2264,16 +2264,16 @@
             });
         }
 
-        // रोखलेल्या वेतनवाढी आणि त्यांचे प्रकार गोळा करणे
-        let withheldMap = {}; 
+        // रोखलेल्या वेतनवाढी गोळा करणे
+        let withheldDatesSet = new Set();
         const hasWithheld = document.getElementById('incrementWithheld').value === 'Yes';
         if (hasWithheld) {
-            const withheldEff = document.getElementById('withheldEffect').value;
             const chks = document.querySelectorAll('.withheld-date-chk:checked');
             chks.forEach(chk => {
-                withheldMap[chk.value] = withheldEff;
+                withheldDatesSet.add(chk.value);
             });
         }
+        const withheldEffect = document.getElementById('withheldEffect').value;
 
         let activeBenefits = [];
         let summaryBenefitsText = [];
@@ -2420,8 +2420,8 @@
                         date: incDate,
                         dateStr: `${d}-${m}-${yr}`,
                         type: 'WITHHELD_INC',
-                        desc: `वेतनवाढ रोखली / थांबवली (${withheldMap[isoStr] === 'cumulative' ? 'परिणाम करणारी' : 'परिणाम न करणारी'})`,
-                        effect: withheldMap[isoStr],
+                        desc: `वेतनवाढ रोखली / थांबवली (${withheldEffect === 'cumulative' ? 'परिणाम करणारी' : 'परिणाम न करणारी'})`,
+                        effect: withheldEffect,
                         isoDate: isoStr
                     });
                 } else {
@@ -2479,6 +2479,7 @@
                 'WITHHELD_INC': 5, 
                 'SCALE_REVISION': 6, 
                 'BENEFIT_SAME_DAY': 7, 
+                'BENEFIT_PROMOTED_PROVISIONAL': 7,
                 'BENEFIT_OPTION_DNI': 8 
             };
             return (order[a.type] || 5) - (order[b.type] || 5);
@@ -2575,31 +2576,50 @@
             else if (ev.type === 'WITHHELD_INC') {
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
-            else if (ev.type === 'BENEFIT_SAME_DAY') {
+            else if (ev.type === 'BENEFIT_PROMOTED_PROVISIONAL') {
                 let b = ev.data;
                 currentCommission = b.commission;
+                b.savedLowerLevel = currentLevel;
+                b.savedLowerIndex = currentMatrixIndex;
+                b.savedLowerBasic = currentBasic;
+                b.savedLowerGP = currentGP;
 
-                if (currentCommission === '7th') {
-                    let lvlMatch = b.scale.match(/S-(\d+)/i);
-                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-
-                    let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
-                    let currIdx = cellsLower.indexOf(currentBasic);
-                    if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
-                    let notionalIdx = Math.min(currIdx + 1, cellsLower.length - 1);
-                    let notionalPay = cellsLower[notionalIdx];
-
-                    let fitInHigher = fitInMatrix(targetLvl, notionalPay);
-                    currentLevel = fitInHigher.level;
-                    currentBasic = fitInHigher.basic;
-                    currentMatrixIndex = fitInHigher.index;
-                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                }
                 lowerLevel = currentLevel;
                 lowerMatrixIndex = currentMatrixIndex;
                 lowerBasic = currentBasic;
                 lowerGP = currentGP;
 
+                if (currentCommission === '7th') {
+                    let lvlMatch = b.scale.match(/S-(\d+)/i);
+                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
+                    let fitTemp = fitInMatrix(targetLvl, currentBasic);
+                    currentLevel = fitTemp.level;
+                    currentBasic = fitTemp.basic;
+                    currentMatrixIndex = fitTemp.index;
+                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
+                }
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+            }
+            else if (ev.type === 'BENEFIT_OPTION_DNI') {
+                let b = ev.data;
+                currentCommission = b.commission;
+                let lLevel = b.savedLowerLevel || lowerLevel;
+                let lIndex = (b.savedLowerIndex !== undefined && b.savedLowerIndex !== -1) ? b.savedLowerIndex : currentMatrixIndex;
+
+                if (currentCommission === '7th') {
+                    let lvlMatch = b.scale.match(/S-(\d+)/i);
+                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
+                    let cellsLower = fullPayMatrix7th[lLevel] || fullPayMatrix7th["S-6"];
+                    
+                    let notionalIdx = Math.min(lIndex + 1, cellsLower.length - 1);
+                    let notionalPay = cellsLower[notionalIdx];
+
+                    let fitFinal = fitInMatrix(targetLvl, notionalPay);
+                    currentLevel = fitFinal.level;
+                    currentBasic = fitFinal.basic;
+                    currentMatrixIndex = fitFinal.index;
+                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
+                }
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'ANNUAL_INC') {
@@ -2678,7 +2698,7 @@
 
     function getCommissionLabel(comm) {
         if(comm === '4th') return "४था आयोग";
-        if(comm === '5th') return "५वा आयोग";
+        if(comm === '5th')ራreturn "५वा आयोग";
         if(comm === '6th') return "६वा आयोग";
         if(comm === '7th') return "७वा आयोग";
         return comm;
