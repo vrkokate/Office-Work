@@ -2182,7 +2182,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (MACP & Promotion Event Sorting & Rendering Fix)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (MACP & Promotion Fixation Corrected)
     // =========================================================================
     function processFixation() {
         const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
@@ -2246,7 +2246,7 @@
         }
         const withheldEffect = document.getElementById('withheldEffect').value;
 
-        // 🌟 आर्थिक लाभ (MACP / Promotion) अचूकपणे गोळा करणे
+        // 🌟 आर्थिक लाभ (MACP / Promotion) अचूकपणे आणि सक्तीने गोळा करणे
         let activeBenefits = [];
         let summaryBenefitsText = [];
 
@@ -2386,7 +2386,7 @@
             }
         }
 
-        // 🌟 पदोन्नती व MACP लाभांचे इव्हेंट तक्त्यात अचूक समाविष्ट करणे (दिनांकासह आणि अचूक वर्गवारीनुसार)
+        // 🌟 पदोन्नती व MACP लाभांचे इव्हेंट तक्त्यात अचूक समाविष्ट करणे आणि त्यांची तारीख वरून खाली योग्य क्रमाने ठेवणे
         activeBenefits.forEach(b => {
             let title = (b.type === 'Promotion') ? `पदोन्नती-${b.index} (${b.post})` : `MACP-${b.index} लाभ`;
             if (b.date >= startDate && b.date <= endDate) {
@@ -2417,7 +2417,6 @@
             }
         });
 
-        // 🌟 सर्व इव्हेंट्सची क्रमवारी योग्य लावली जेणेकरून MACP किंवा पदोन्नतीची नोंद तारीखवार तक्त्यात दिसेल
         events.sort((a, b) => {
             if (a.date.getTime() !== b.date.getTime()) {
                 return a.date - b.date;
@@ -2428,8 +2427,8 @@
                 'ANNUAL_INC': 3, 
                 'WITHHELD_INC': 3, 
                 'SCALE_REVISION': 4, 
-                'BENEFIT_SAME_DAY': 5, 
                 'BENEFIT_PROMOTED_PROVISIONAL': 5,
+                'BENEFIT_SAME_DAY': 5, 
                 'BENEFIT_OPTION_DNI': 6 
             };
             return (order[a.type] || 5) - (order[b.type] || 5);
@@ -2513,6 +2512,30 @@
             else if (ev.type === 'WITHHELD_INC') {
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
+            else if (ev.type === 'BENEFIT_PROMOTED_PROVISIONAL') {
+                let b = ev.data;
+                currentCommission = b.commission;
+                b.savedLowerLevel = currentLevel;
+                b.savedLowerIndex = currentMatrixIndex;
+                b.savedLowerBasic = currentBasic;
+                b.savedLowerGP = currentGP;
+
+                lowerLevel = currentLevel;
+                lowerMatrixIndex = currentMatrixIndex;
+                lowerBasic = currentBasic;
+                lowerGP = currentGP;
+
+                if (currentCommission === '7th') {
+                    let lvlMatch = b.scale.match(/S-(\d+)/i);
+                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
+                    let fitTemp = fitInMatrix(targetLvl, currentBasic);
+                    currentLevel = fitTemp.level;
+                    currentBasic = fitTemp.basic;
+                    currentMatrixIndex = fitTemp.index;
+                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
+                }
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+            }
             else if (ev.type === 'BENEFIT_SAME_DAY') {
                 let b = ev.data;
                 currentCommission = b.commission;
@@ -2538,30 +2561,6 @@
                 lowerBasic = currentBasic;
                 lowerGP = currentGP;
 
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
-            }
-            else if (ev.type === 'BENEFIT_PROMOTED_PROVISIONAL') {
-                let b = ev.data;
-                currentCommission = b.commission;
-                b.savedLowerLevel = currentLevel;
-                b.savedLowerIndex = currentMatrixIndex;
-                b.savedLowerBasic = currentBasic;
-                b.savedLowerGP = currentGP;
-
-                lowerLevel = currentLevel;
-                lowerMatrixIndex = currentMatrixIndex;
-                lowerBasic = currentBasic;
-                lowerGP = currentGP;
-
-                if (currentCommission === '7th') {
-                    let lvlMatch = b.scale.match(/S-(\d+)/i);
-                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-                    let fitTemp = fitInMatrix(targetLvl, currentBasic);
-                    currentLevel = fitTemp.level;
-                    currentBasic = fitTemp.basic;
-                    currentMatrixIndex = fitTemp.index;
-                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                }
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'BENEFIT_OPTION_DNI') {
@@ -2631,6 +2630,8 @@
 
         // स्वतंत्र मोबाईल-फिटेड अहवाल पेज (Output Box) उघडणे
         const outputBox = document.getElementById('outputBox');
+        outputBox.classList.add('hidden'); // Reset to force repaint
+        void outputBox.offsetWidth;
         outputBox.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
