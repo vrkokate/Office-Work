@@ -16,6 +16,7 @@
             --text-main: #263238;
         }
 
+        /* पेज स्क्रीनबाहेर आडवे सरकणे १००% रोखणे */
         html, body {
             width: 100%;
             max-width: 100vw;
@@ -66,6 +67,7 @@
             font-size: 13px;
         }
 
+        /* ३ मुख्य स्मार्ट कार्ड्स */
         .smart-cards-list {
             display: flex;
             flex-direction: column;
@@ -195,6 +197,7 @@
         }
         .reset-btn:hover { background-color: #546e7a; }
 
+        /* पॉप-अप */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -2037,7 +2040,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (पूर्णत: अद्ययावत आणि अचूक)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (100% WORKING MASTER CODE)
     // =========================================================================
     function processFixation() {
         const isC1Valid = validateCard1();
@@ -2257,17 +2260,26 @@
             }
 
             if (incDate && incDate > startDate && incDate <= endDate) {
+                let isDniOptionDate = activeBenefits.some(b => 
+                    b.optDate > b.date && isSameDay(b.optDate, incDate)
+                );
+                if (isDniOptionDate) {
+                    continue;
+                }
+
                 let isoStr = `${incDate.getFullYear()}-${String(incDate.getMonth() + 1).padStart(2, '0')}-${String(incDate.getDate()).padStart(2, '0')}`;
+                let isWithheld = withheldDatesSet.has(isoStr);
+
                 let m = String(incDate.getMonth() + 1).padStart(2, '0');
                 let d = String(incDate.getDate()).padStart(2, '0');
 
-                if (withheldMap[isoStr]) {
+                if (isWithheld) {
                     events.push({
                         date: incDate,
                         dateStr: `${d}-${m}-${yr}`,
                         type: 'WITHHELD_INC',
-                        desc: `वेतनवाढ रोखली / थांबवली (${withheldMap[isoStr] === 'cumulative' ? 'परिणाम करणारी' : 'परिणाम न करणारी'})`,
-                        effect: withheldMap[isoStr],
+                        desc: `वेतनवाढ रोखली / थांबवली (${withheldEffect === 'cumulative' ? 'परिणाम करणारी' : 'परिणाम न करणारी'})`,
+                        effect: withheldEffect,
                         isoDate: isoStr
                     });
                 } else {
@@ -2325,6 +2337,7 @@
                 'WITHHELD_INC': 5, 
                 'SCALE_REVISION': 6, 
                 'BENEFIT_SAME_DAY': 7, 
+                'BENEFIT_PROMOTED_PROVISIONAL': 7,
                 'BENEFIT_OPTION_DNI': 8 
             };
             return (order[a.type] || 5) - (order[b.type] || 5);
@@ -2421,31 +2434,50 @@
             else if (ev.type === 'WITHHELD_INC') {
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
-            else if (ev.type === 'BENEFIT_SAME_DAY') {
+            else if (ev.type === 'BENEFIT_PROMOTED_PROVISIONAL') {
                 let b = ev.data;
                 currentCommission = b.commission;
+                b.savedLowerLevel = currentLevel;
+                b.savedLowerIndex = currentMatrixIndex;
+                b.savedLowerBasic = currentBasic;
+                b.savedLowerGP = currentGP;
 
-                if (currentCommission === '7th') {
-                    let lvlMatch = b.scale.match(/S-(\d+)/i);
-                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-
-                    let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
-                    let currIdx = cellsLower.indexOf(currentBasic);
-                    if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
-                    let notionalIdx = Math.min(currIdx + 1, cellsLower.length - 1);
-                    let notionalPay = cellsLower[notionalIdx];
-
-                    let fitInHigher = fitInMatrix(targetLvl, notionalPay);
-                    currentLevel = fitInHigher.level;
-                    currentBasic = fitInHigher.basic;
-                    currentMatrixIndex = fitInHigher.index;
-                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                }
                 lowerLevel = currentLevel;
                 lowerMatrixIndex = currentMatrixIndex;
                 lowerBasic = currentBasic;
                 lowerGP = currentGP;
 
+                if (currentCommission === '7th') {
+                    let lvlMatch = b.scale.match(/S-(\d+)/i);
+                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
+                    let fitTemp = fitInMatrix(targetLvl, currentBasic);
+                    currentLevel = fitTemp.level;
+                    currentBasic = fitTemp.basic;
+                    currentMatrixIndex = fitTemp.index;
+                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
+                }
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+            }
+            else if (ev.type === 'BENEFIT_OPTION_DNI') {
+                let b = ev.data;
+                currentCommission = b.commission;
+                let lLevel = b.savedLowerLevel || lowerLevel;
+                let lIndex = (b.savedLowerIndex !== undefined && b.savedLowerIndex !== -1) ? b.savedLowerIndex : currentMatrixIndex;
+
+                if (currentCommission === '7th') {
+                    let lvlMatch = b.scale.match(/S-(\d+)/i);
+                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
+                    let cellsLower = fullPayMatrix7th[lLevel] || fullPayMatrix7th["S-6"];
+                    
+                    let notionalIdx = Math.min(lIndex + 1, cellsLower.length - 1);
+                    let notionalPay = cellsLower[notionalIdx];
+
+                    let fitFinal = fitInMatrix(targetLvl, notionalPay);
+                    currentLevel = fitFinal.level;
+                    currentBasic = fitFinal.basic;
+                    currentMatrixIndex = fitFinal.index;
+                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
+                }
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'ANNUAL_INC') {
@@ -2499,7 +2531,6 @@
             }
         });
 
-        // स्वतंत्र मोबाईल-फिटेड अहवाल पेज (Output Box) उघडणे
         const outputBox = document.getElementById('outputBox');
         outputBox.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
