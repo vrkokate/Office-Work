@@ -505,7 +505,7 @@
         }
         .ok-selection-btn:hover { background-color: #01579b; }
 
-        /* अहवाल व तक्ता - स्वतंत्र नवीन पेज व्यू (मोबाईल फिटेड आणि अचूक स्क्रोल बॉक्स) */
+        /* अहवाल व तक्ता - स्वतंत्र नवीन पेज व्यू (मोबाईल फिटेड) */
         .output-box {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -614,10 +614,9 @@
         }
         .report-summary-card div { margin-bottom: 2px; }
 
-        /* 🌟 अचूक स्क्रोल बॉक्स (अंदाजे १५ ओळी दिसेल आणि १६ व्या ओळीपासून वर-खाली / इकडे-तिकडे स्क्रोल करता येईल) */
+        /* 🌟 स्क्रोल बॉक्सची लिमिट केवळ १२ ओळींची (अंदाजे ३०० पिक्सेल हाईट) */
         .table-scroll-container {
-            flex: 1;
-            max-height: 380px; 
+            max-height: 300px;
             overflow-x: auto;
             overflow-y: auto;
             border: 1px solid #c8e6c9;
@@ -2511,33 +2510,6 @@
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'WITHHELD_INC') {
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
-            }
-            else if (ev.type === 'BENEFIT_SAME_DAY') {
-                let b = ev.data;
-                currentCommission = b.commission;
-
-                if (currentCommission === '7th') {
-                    let lvlMatch = b.scale.match(/S-(\d+)/i);
-                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-
-                    let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
-                    let currIdx = cellsLower.indexOf(currentBasic);
-                    if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
-                    let notionalIdx = Math.min(currIdx + 1, cellsLower.length - 1);
-                    let notionalPay = cellsLower[notionalIdx];
-
-                    let fitInHigher = fitInMatrix(targetLvl, notionalPay);
-                    currentLevel = fitInHigher.level;
-                    currentBasic = fitInHigher.basic;
-                    currentMatrixIndex = fitInHigher.index;
-                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                }
-                lowerLevel = currentLevel;
-                lowerMatrixIndex = currentMatrixIndex;
-                lowerBasic = currentBasic;
-                lowerGP = currentGP;
-
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'BENEFIT_PROMOTED_PROVISIONAL') {
