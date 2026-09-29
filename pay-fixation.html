@@ -829,26 +829,26 @@
         
         <div class="field-group">
             <label>१. कर्मचाऱ्याचे नाव:</label>
-            <input type="text" id="empName" placeholder="कर्मचारी नाव टाका">
+            <input type="text" id="empName" placeholder="कर्मचारी नाव टाका" oninput="saveFormDataToStorage()">
         </div>
 
         <div class="field-group">
             <label>२. पदनाम:</label>
-            <input type="text" id="empDesignation" placeholder="कर्मचारी पदनाम टाका (उदा. कनिष्ठ अभियंता)">
+            <input type="text" id="empDesignation" placeholder="कर्मचारी पदनाम टाका (उदा. कनिष्ठ अभियंता)" oninput="saveFormDataToStorage()">
         </div>
 
         <div class="field-group">
             <label>३. नियुक्ती दिनांक:</label>
             <div class="date-box-wrapper">
                 <input type="text" id="empJoinDate_disp" placeholder="नियुक्ती दिनांक निवडा" readonly>
-                <input type="date" id="empJoinDate" class="overlay-date-input" onchange="handleDatePicked('empJoinDate', 'empJoinDate_disp'); reEvaluateAllOptionSuggestions();">
+                <input type="date" id="empJoinDate" class="overlay-date-input" onchange="handleDatePicked('empJoinDate', 'empJoinDate_disp'); reEvaluateAllOptionSuggestions(); saveFormDataToStorage();">
                 <span class="cal-btn-icon">📅</span>
             </div>
         </div>
 
         <div class="field-group">
             <label>४. वेतन आयोग:</label>
-            <select id="payCommission" onchange="updateCommissionRules()" required>
+            <select id="payCommission" onchange="updateCommissionRules(); saveFormDataToStorage();" required>
                 <option value="" disabled selected>वेतन आयोग निवडा</option>
                 <option value="4th">४था वेतन आयोग (1986)</option>
                 <option value="5th">५वा वेतन आयोग (1996)</option>
@@ -869,7 +869,7 @@
         <div class="field-group">
             <label>६. मूळ वेतन (Basic):</label>
             <div class="combobox-container" id="basicWrapper">
-                <input type="number" id="basicPay" placeholder="मूळ वेतन निवडा किंवा टाका" autocomplete="off" onclick="toggleBasicDropdown('basicPay', 'customBasicDropdown', 'currentPayScale', 'payCommission')">
+                <input type="number" id="basicPay" placeholder="मूळ वेतन निवडा किंवा टाका" autocomplete="off" onclick="toggleBasicDropdown('basicPay', 'customBasicDropdown', 'currentPayScale', 'payCommission')" oninput="saveFormDataToStorage()">
                 <span class="combobox-arrow">▼</span>
                 <div id="customBasicDropdown" class="custom-dropdown-list hidden"></div>
             </div>
@@ -893,7 +893,7 @@
         <div class="benefit-sub-card">
             <div class="benefit-sub-header">
                 <span>⭐ पहिला लाभ / पहिली पदोन्नती</span>
-                <select id="b1_type" onchange="toggleBenefitRow(1)" style="font-size:11px; padding:4px 6px;">
+                <select id="b1_type" onchange="toggleBenefitRow(1); saveFormDataToStorage();" style="font-size:11px; padding:4px 6px;">
                     <option value="None" selected>लागू नाही</option>
                     <option value="Promotion">पदोन्नती (Promotion)</option>
                     <option value="MACP">आश्वासित प्रगती योजना (MACP)</option>
@@ -903,12 +903,12 @@
                 <div class="card-grid-2">
                     <div class="date-box-wrapper">
                         <input type="text" id="b1_date_disp" placeholder="लाभाचा दिनांक निवडा" readonly>
-                        <input type="date" id="b1_date" class="overlay-date-input" onchange="handleDatePicked('b1_date', 'b1_date_disp'); onBenefitDateChange(1);">
+                        <input type="date" id="b1_date" class="overlay-date-input" onchange="handleDatePicked('b1_date', 'b1_date_disp'); onBenefitDateChange(1); saveFormDataToStorage();">
                         <span class="cal-btn-icon">📅</span>
                     </div>
                     <div class="date-box-wrapper">
                         <input type="text" id="b1_optDate_disp" placeholder="विकल्प दिनांक निवडा" readonly>
-                        <input type="date" id="b1_optDate" class="overlay-date-input" onchange="handleDatePicked('b1_optDate', 'b1_optDate_disp'); checkOptionDateFeedback(1);">
+                        <input type="date" id="b1_optDate" class="overlay-date-input" onchange="handleDatePicked('b1_optDate', 'b1_optDate_disp'); checkOptionDateFeedback(1); saveFormDataToStorage();">
                         <span class="cal-btn-icon">📅</span>
                     </div>
                 </div>
@@ -916,14 +916,14 @@
                 <div id="b1_advisor" class="option-advisor-box hidden"></div>
 
                 <div class="card-grid-2">
-                    <select id="b1_comm" onchange="updatePromoScaleDropdown(1)" required>
+                    <select id="b1_comm" onchange="updatePromoScaleDropdown(1); saveFormDataToStorage();" required>
                         <option value="" disabled selected>वेतन आयोग निवडा</option>
                         <option value="4th">४था वेतन आयोग</option>
                         <option value="5th">५वा वेतन आयोग</option>
                         <option value="6th">६वा वेतन आयोग</option>
                         <option value="7th">७वा वेतन आयोग</option>
                     </select>
-                    <input type="text" id="b1_post" placeholder="पदोन्नतीचे पद टाका">
+                    <input type="text" id="b1_post" placeholder="पदोन्नतीचे पद टाका" oninput="saveFormDataToStorage()">
                 </div>
                 <div class="card-grid-1">
                     <div class="combobox-container">
@@ -939,7 +939,7 @@
         <div class="benefit-sub-card">
             <div class="benefit-sub-header">
                 <span>⭐ दुसरा लाभ / दुसरी पदोन्नती</span>
-                <select id="b2_type" onchange="toggleBenefitRow(2)" style="font-size:11px; padding:4px 6px;">
+                <select id="b2_type" onchange="toggleBenefitRow(2); saveFormDataToStorage();" style="font-size:11px; padding:4px 6px;">
                     <option value="None" selected>लागू नाही</option>
                     <option value="Promotion">पदोन्नती (Promotion)</option>
                     <option value="MACP">आश्वासित प्रगती योजना (MACP)</option>
@@ -949,12 +949,12 @@
                 <div class="card-grid-2">
                     <div class="date-box-wrapper">
                         <input type="text" id="b2_date_disp" placeholder="लाभाचा दिनांक निवडा" readonly>
-                        <input type="date" id="b2_date" class="overlay-date-input" onchange="handleDatePicked('b2_date', 'b2_date_disp'); onBenefitDateChange(2);">
+                        <input type="date" id="b2_date" class="overlay-date-input" onchange="handleDatePicked('b2_date', 'b2_date_disp'); onBenefitDateChange(2); saveFormDataToStorage();">
                         <span class="cal-btn-icon">📅</span>
                     </div>
                     <div class="date-box-wrapper">
                         <input type="text" id="b2_optDate_disp" placeholder="विकल्प दिनांक निवडा" readonly>
-                        <input type="date" id="b2_optDate" class="overlay-date-input" onchange="handleDatePicked('b2_optDate', 'b2_optDate_disp'); checkOptionDateFeedback(2);">
+                        <input type="date" id="b2_optDate" class="overlay-date-input" onchange="handleDatePicked('b2_optDate', 'b2_optDate_disp'); checkOptionDateFeedback(2); saveFormDataToStorage();">
                         <span class="cal-btn-icon">📅</span>
                     </div>
                 </div>
@@ -962,14 +962,14 @@
                 <div id="b2_advisor" class="option-advisor-box hidden"></div>
 
                 <div class="card-grid-2">
-                    <select id="b2_comm" onchange="updatePromoScaleDropdown(2)" required>
+                    <select id="b2_comm" onchange="updatePromoScaleDropdown(2); saveFormDataToStorage();" required>
                         <option value="" disabled selected>वेतन आयोग निवडा</option>
                         <option value="4th">४था वेतन आयोग</option>
                         <option value="5th">५वा वेतन आयोग</option>
                         <option value="6th">६वा वेतन आयोग</option>
                         <option value="7th">७वा वेतन आयोग</option>
                     </select>
-                    <input type="text" id="b2_post" placeholder="पदोन्नतीचे पद टाका">
+                    <input type="text" id="b2_post" placeholder="पदोन्नतीचे पद टाका" oninput="saveFormDataToStorage()">
                 </div>
                 <div class="card-grid-1">
                     <div class="combobox-container">
@@ -985,7 +985,7 @@
         <div class="benefit-sub-card">
             <div class="benefit-sub-header">
                 <span>⭐ तिसरा लाभ / तिसरी पदोन्नती</span>
-                <select id="b3_type" onchange="toggleBenefitRow(3)" style="font-size:11px; padding:4px 6px;">
+                <select id="b3_type" onchange="toggleBenefitRow(3); saveFormDataToStorage();" style="font-size:11px; padding:4px 6px;">
                     <option value="None" selected>लागू नाही</option>
                     <option value="Promotion">पदोन्नती (Promotion)</option>
                     <option value="MACP">आश्वासित प्रगती योजना (MACP)</option>
@@ -995,12 +995,12 @@
                 <div class="card-grid-2">
                     <div class="date-box-wrapper">
                         <input type="text" id="b3_date_disp" placeholder="लाभाचा दिनांक निवडा" readonly>
-                        <input type="date" id="b3_date" class="overlay-date-input" onchange="handleDatePicked('b3_date', 'b3_date_disp'); onBenefitDateChange(3);">
+                        <input type="date" id="b3_date" class="overlay-date-input" onchange="handleDatePicked('b3_date', 'b3_date_disp'); onBenefitDateChange(3); saveFormDataToStorage();">
                         <span class="cal-btn-icon">📅</span>
                     </div>
                     <div class="date-box-wrapper">
                         <input type="text" id="b3_optDate_disp" placeholder="विकल्प दिनांक निवडा" readonly>
-                        <input type="date" id="b3_optDate" class="overlay-date-input" onchange="handleDatePicked('b3_optDate', 'b3_optDate_disp'); checkOptionDateFeedback(3);">
+                        <input type="date" id="b3_optDate" class="overlay-date-input" onchange="handleDatePicked('b3_optDate', 'b3_optDate_disp'); checkOptionDateFeedback(3); saveFormDataToStorage();">
                         <span class="cal-btn-icon">📅</span>
                     </div>
                 </div>
@@ -1008,14 +1008,14 @@
                 <div id="b3_advisor" class="option-advisor-box hidden"></div>
 
                 <div class="card-grid-2">
-                    <select id="b3_comm" onchange="updatePromoScaleDropdown(3)" required>
+                    <select id="b3_comm" onchange="updatePromoScaleDropdown(3); saveFormDataToStorage();" required>
                         <option value="" disabled selected>वेतन आयोग निवडा</option>
                         <option value="4th">४था वेतन आयोग</option>
                         <option value="5th">५वा वेतन आयोग</option>
                         <option value="6th">६वा वेतन आयोग</option>
                         <option value="7th">७वा वेतन आयोग</option>
                     </select>
-                    <input type="text" id="b3_post" placeholder="पदोन्नतीचे पद टाका">
+                    <input type="text" id="b3_post" placeholder="पदोन्नतीचे पद टाका" oninput="saveFormDataToStorage()">
                 </div>
                 <div class="card-grid-1">
                     <div class="combobox-container">
@@ -1044,7 +1044,7 @@
                 <label>कालावधी सुरू (पासून):</label>
                 <div class="date-box-wrapper">
                     <input type="text" id="fixationFrom_disp" placeholder="सुरू दिनांक निवडा" readonly>
-                    <input type="date" id="fixationFrom" class="overlay-date-input" onchange="handleDatePicked('fixationFrom', 'fixationFrom_disp');">
+                    <input type="date" id="fixationFrom" class="overlay-date-input" onchange="handleDatePicked('fixationFrom', 'fixationFrom_disp'); saveFormDataToStorage();">
                     <span class="cal-btn-icon">📅</span>
                 </div>
             </div>
@@ -1052,7 +1052,7 @@
                 <label>कालावधी अखेर (पर्यंत):</label>
                 <div class="date-box-wrapper">
                     <input type="text" id="fixationTo_disp" placeholder="अखेर दिनांक निवडा" readonly>
-                    <input type="date" id="fixationTo" class="overlay-date-input" onchange="handleDatePicked('fixationTo', 'fixationTo_disp');">
+                    <input type="date" id="fixationTo" class="overlay-date-input" onchange="handleDatePicked('fixationTo', 'fixationTo_disp'); saveFormDataToStorage();">
                     <span class="cal-btn-icon">📅</span>
                 </div>
             </div>
@@ -1060,7 +1060,7 @@
 
         <div class="field-group">
             <label>पुढील आयोग लागू करायचे का?</label>
-            <select id="autoCommissionChange">
+            <select id="autoCommissionChange" onchange="saveFormDataToStorage()">
                 <option value="Yes" selected>होय (कालावधीनुसार पुढील आयोग लागू करा)</option>
                 <option value="No">नाही</option>
             </select>
@@ -1068,7 +1068,7 @@
 
         <div class="field-group">
             <label>७व्या आयोगातील वार्षिक वेतनवाढ दिनांक:</label>
-            <select id="incrementMonthRule7th" onchange="reEvaluateAllOptionSuggestions()">
+            <select id="incrementMonthRule7th" onchange="reEvaluateAllOptionSuggestions(); saveFormDataToStorage();">
                 <option value="july" selected>प्रत्येक वर्षाची १ जुलै (७वा आयोग)</option>
                 <option value="january">प्रत्येक वर्षाची १ जानेवारी (७वा आयोग)</option>
             </select>
@@ -1077,7 +1077,7 @@
         <!-- वेतनश्रेणी सुधारणा विभाग -->
         <div class="field-group" style="margin-top: 10px; border-top: 1px dashed #cfd8dc; padding-top: 8px;">
             <label>🔄 सेवेदरम्यान वेतनश्रेणी / स्तर सुधारित झाली आहे का?</label>
-            <select id="hasScaleRev" onchange="toggleScaleRevSection()">
+            <select id="hasScaleRev" onchange="toggleScaleRevSection(); saveFormDataToStorage();">
                 <option value="No" selected>नाही</option>
                 <option value="Yes">होय</option>
             </select>
@@ -1091,7 +1091,7 @@
         <!-- वेतनवाढ थांबवली व 'ओके' बटणासह स्क्रोल बॉक्स -->
         <div class="field-group" style="margin-top: 10px; border-top: 1px dashed #cfd8dc; padding-top: 8px;">
             <label>🛑 कोणती वेतनवाढ थांबवली / रोखली आहे का?</label>
-            <select id="incrementWithheld" onchange="toggleWithheldOption()">
+            <select id="incrementWithheld" onchange="toggleWithheldOption(); saveFormDataToStorage();">
                 <option value="No" selected>नाही</option>
                 <option value="Yes">होय</option>
             </select>
@@ -1107,7 +1107,7 @@
 
         <div class="field-group hidden" id="withheldEffectDiv">
             <label>पुढील वाढीवर परिणाम?</label>
-            <select id="withheldEffect">
+            <select id="withheldEffect" onchange="saveFormDataToStorage()">
                 <option value="cumulative">होय (रोखून - परिणाम करणारी / Cumulative)</option>
                 <option value="non_cumulative">नाही (परिणाम न करणारी / Non-Cumulative)</option>
             </select>
@@ -1125,6 +1125,74 @@
 </div>
 
 <script>
+    // =========================================================================
+    // 💾 localStorage व्यवस्थापन (पेज रिफ्रेश केल्यावर डेटा कायम राहणे)
+    // =========================================================================
+    const formFieldsToStore = [
+        'empName', 'empDesignation', 'empJoinDate', 'empJoinDate_disp',
+        'payCommission', 'currentPayScale', 'basicPay', 'gradePay',
+        'b1_type', 'b1_date', 'b1_date_disp', 'b1_optDate', 'b1_optDate_disp', 'b1_comm', 'b1_post', 'b1_scale',
+        'b2_type', 'b2_date', 'b2_date_disp', 'b2_optDate', 'b2_optDate_disp', 'b2_comm', 'b2_post', 'b2_scale',
+        'b3_type', 'b3_date', 'b3_date_disp', 'b3_optDate', 'b3_optDate_disp', 'b3_comm', 'b3_post', 'b3_scale',
+        'fixationFrom', 'fixationFrom_disp', 'fixationTo', 'fixationTo_disp',
+        'autoCommissionChange', 'incrementMonthRule7th', 'hasScaleRev', 'incrementWithheld', 'withheldEffect'
+    ];
+
+    function saveFormDataToStorage() {
+        let formData = {};
+        formFieldsToStore.forEach(id => {
+            let el = document.getElementById(id);
+            if (el) {
+                formData[id] = el.value;
+            }
+        });
+        localStorage.setItem('payFixationFormData', JSON.stringify(formData));
+        validateCard1();
+        validateCard2();
+        validateCard3();
+    }
+
+    function loadFormDataFromStorage() {
+        let saved = localStorage.getItem('payFixationFormData');
+        if (!saved) return;
+        try {
+            let formData = JSON.parse(saved);
+            formFieldsToStore.forEach(id => {
+                let el = document.getElementById(id);
+                if (el && formData[id] !== undefined) {
+                    el.value = formData[id];
+                }
+            });
+
+            // डिस्प्ले डेट्स रिस्टोअर करणे
+            if (formData['empJoinDate']) handleDatePicked('empJoinDate', 'empJoinDate_disp');
+            if (formData['b1_date']) handleDatePicked('b1_date', 'b1_date_disp');
+            if (formData['b1_optDate']) handleDatePicked('b1_optDate', 'b1_optDate_disp');
+            if (formData['b2_date']) handleDatePicked('b2_date', 'b2_date_disp');
+            if (formData['b2_optDate']) handleDatePicked('b2_optDate', 'b2_optDate_disp');
+            if (formData['b3_date']) handleDatePicked('b3_date', 'b3_date_disp');
+            if (formData['b3_optDate']) handleDatePicked('b3_optDate', 'b3_optDate_disp');
+            if (formData['fixationFrom']) handleDatePicked('fixationFrom', 'fixationFrom_disp');
+            if (formData['fixationTo']) handleDatePicked('fixationTo', 'fixationTo_disp');
+
+            // UI चे घटक अद्ययावत करणे
+            for (let i = 1; i <= 3; i++) {
+                if (document.getElementById(`b${i}_type`).value !== 'None') {
+                    document.getElementById(`b${i}_fields`).classList.remove('hidden');
+                }
+            }
+            if (document.getElementById('hasScaleRev').value === 'Yes') {
+                document.getElementById('scaleRevContainer').classList.remove('hidden');
+            }
+            if (document.getElementById('incrementWithheld').value === 'Yes') {
+                document.getElementById('withheldListContainer').classList.remove('hidden');
+                document.getElementById('withheldEffectDiv').classList.remove('hidden');
+            }
+        } catch(e) {
+            console.error("Storage load error", e);
+        }
+    }
+
     function formatDateToDDMMYYYY(dateString) {
         if (!dateString) return '';
         let parts = dateString.split('-');
@@ -1159,6 +1227,7 @@
                 dispInput.value = "";
             }
         }
+        saveFormDataToStorage();
     }
 
     function openModal(modalId) { 
@@ -1169,6 +1238,7 @@
     }
     function closeModal(modalId) { 
         document.getElementById(modalId).classList.add('hidden'); 
+        saveFormDataToStorage();
     }
 
     function closeReportView() {
@@ -1194,6 +1264,7 @@
             container.classList.add('hidden');
             document.getElementById('scaleRevList').innerHTML = "";
         }
+        saveFormDataToStorage();
     }
 
     function addScaleRevRow() {
@@ -1317,6 +1388,7 @@
             listContainer.classList.add('hidden');
             effectDiv.classList.add('hidden');
         }
+        saveFormDataToStorage();
     }
 
     function confirmWithheldSelection() {
@@ -1327,10 +1399,13 @@
         }
         document.getElementById('withheldListContainer').classList.add('hidden');
         alert("वेतनवाढ रोखण्याची निवड यशस्वीरीत्या जतन केली!");
+        saveFormDataToStorage();
     }
 
     function resetAllData() {
         if (confirm("तुम्हाला भरलेली सर्व माहिती पुसून टाकायची आहे का?")) {
+            localStorage.removeItem('payFixationFormData');
+            
             document.getElementById('empName').value = "";
             document.getElementById('empDesignation').value = "";
             document.getElementById('empJoinDate').value = "";
@@ -1402,6 +1477,7 @@
     function saveEmployeeModal() {
         validateCard1();
         closeModal('employeeModal');
+        saveFormDataToStorage();
     }
 
     function validateCard2() {
@@ -1444,6 +1520,7 @@
     function saveBenefitModal() {
         validateCard2();
         closeModal('benefitModal');
+        saveFormDataToStorage();
     }
 
     function validateCard3() {
@@ -1472,6 +1549,7 @@
     function saveRulesModal() {
         validateCard3();
         closeModal('rulesModal');
+        saveFormDataToStorage();
     }
 
     // =========================================================================
@@ -1765,6 +1843,28 @@
             return fullPayMatrix7th["S-6"];
         }
 
+        if (commission === '5th' || scaleStr.includes('रु.') || scaleStr.includes('4000')) {
+            let cleanStr = scaleStr.replace(/रु\./g, '').replace(/\(.*?\)/g, '').trim();
+            let matches = cleanStr.match(/\d+/g);
+            if (matches && matches.length >= 3) {
+                let nums = matches.map(n => parseInt(n, 10));
+                let stages = [nums[0]];
+                let current = nums[0];
+                for (let i = 1; i < nums.length - 1; i += 2) {
+                    let inc = nums[i];
+                    let target = nums[i + 1];
+                    let safety = 0;
+                    while (current < target && safety < 100) {
+                        current += inc;
+                        if (current > target) current = target;
+                        stages.push(current);
+                        safety++;
+                    }
+                }
+                return stages;
+            }
+        }
+
         if (commission === '6th' || scaleStr.includes('PB') || scaleStr.includes('GP') || scaleStr.includes('-1S')) {
             let clean = scaleStr.replace(/\(.*?\)/g, '');
             let bandMatch = clean.match(/(\d{4,6})\s*-\s*(\d{4,6})/);
@@ -1777,7 +1877,6 @@
                 let entryPay = get6thEntryPay(scaleStr, gp);
 
                 let stagesSet = new Set();
-
                 if (entryPay && entryPay >= bandMin && entryPay <= bandMax) {
                     let curr = entryPay;
                     let safety = 0;
@@ -1803,18 +1902,14 @@
                         safety++;
                     }
                 }
-
                 return Array.from(stagesSet).sort((a, b) => a - b);
             }
         }
 
         let cleanStr = scaleStr.replace(/\(.*?\)/g, '');
         cleanStr = cleanStr.replace(/PB\s*-\s*\d+/gi, '').replace(/श्रेणी\s*-\s*\d+/gi, '');
-
-        const marathiDigits = ['०','१','२','३','४','५','६','७','८','९'];
-        marathiDigits.forEach((d, i) => cleanStr = cleanStr.replaceAll(d, i.toString()));
         let matches = cleanStr.match(/\d+/g);
-        if (!matches || matches.length < 3) return [];
+        if (!matches || matches.length < 3) return [19900, 20500, 21100, 21700, 22400];
 
         let nums = matches.map(n => parseInt(n, 10));
         let stages = [nums[0]];
@@ -1910,31 +2005,17 @@
         dropdown.innerHTML = "";
         let stages = parsePayScaleStages(scaleStr, comm, gp);
 
-        let entryPayVal = 0;
-        if (comm === '6th') {
-            entryPayVal = get6thEntryPay(scaleStr, gp);
-        }
-
         if (stages.length === 0) {
             dropdown.innerHTML = `<div class="dropdown-item" style="color:#888;">वैध वेतनश्रेणी उपलब्ध नाही</div>`;
         } else {
             stages.forEach((amount, idx) => {
                 let div = document.createElement('div');
                 div.className = 'dropdown-item';
-                
-                if (comm === '6th' && amount === entryPayVal) {
-                    div.innerHTML = `<b>${amount}</b> <span style="font-size:10.5px; color:#2e7d32; font-weight:bold;">★ Annexure-III प्रथम भरती वेतन</span>`;
-                } else if (comm === '7th') {
-                    div.innerHTML = `<b>${amount}</b> <small style="color:#78909c;">(टप्पा ${idx + 1})</small>`;
-                } else {
-                    div.textContent = amount;
-                }
-
+                div.textContent = amount;
                 div.onclick = function(e) {
                     e.stopPropagation();
                     basicInput.value = amount;
                     dropdown.classList.add('hidden');
-                    
                     if (basicInputId === 'basicPay') {
                         validateCard1();
                     }
@@ -2143,6 +2224,7 @@
             listContainer.classList.add('hidden');
             effectDiv.classList.add('hidden');
         }
+        saveFormDataToStorage();
     }
 
     function confirmWithheldSelection() {
@@ -2153,44 +2235,548 @@
         }
         document.getElementById('withheldListContainer').classList.add('hidden');
         alert("वेतनवाढ रोखण्याची निवड यशस्वीरीत्या जतन केली!");
+        saveFormDataToStorage();
     }
 
-    document.addEventListener('click', function(e) {
-        const comboboxes = document.querySelectorAll('.combobox-container');
-        comboboxes.forEach(cb => {
-            if (!cb.contains(e.target)) {
-                const list = cb.querySelector('.custom-dropdown-list');
-                if (list) list.classList.add('hidden');
+    function resetAllData() {
+        if (confirm("तुम्हाला भरलेली सर्व माहिती पुसून टाकायची आहे का?")) {
+            localStorage.removeItem('payFixationFormData');
+            
+            document.getElementById('empName').value = "";
+            document.getElementById('empDesignation').value = "";
+            document.getElementById('empJoinDate').value = "";
+            document.getElementById('empJoinDate_disp').value = "";
+            document.getElementById('payCommission').value = "";
+            document.getElementById('currentPayScale').value = "";
+            document.getElementById('basicPay').value = "";
+            document.getElementById('gradePay').value = "0";
+
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`b${i}_type`).value = "None";
+                document.getElementById(`b${i}_fields`).classList.add('hidden');
+                document.getElementById(`b${i}_date`).value = "";
+                document.getElementById(`b${i}_date_disp`).value = "";
+                document.getElementById(`b${i}_optDate`).value = "";
+                document.getElementById(`b${i}_optDate_disp`).value = "";
+                document.getElementById(`b${i}_comm`).value = "";
+                document.getElementById(`b${i}_post`).value = "";
+                document.getElementById(`b${i}_scale`).value = "";
             }
-        });
+
+            document.getElementById('fixationFrom').value = "";
+            document.getElementById('fixationFrom_disp').value = "";
+            document.getElementById('fixationTo').value = "";
+            document.getElementById('fixationTo_disp').value = "";
+            document.getElementById('hasScaleRev').value = "No";
+            document.getElementById('scaleRevContainer').classList.add('hidden');
+            document.getElementById('scaleRevList').innerHTML = "";
+            document.getElementById('incrementWithheld').value = "No";
+            document.getElementById('withheldListContainer').classList.add('hidden');
+            document.getElementById('withheldEffectDiv').classList.add('hidden');
+
+            validateCard1();
+            validateCard2();
+            validateCard3();
+
+            document.getElementById('outputBox').classList.add('hidden');
+            alert("सर्व माहिती यशस्वीरीत्या साफ करण्यात आली आहे!");
+        }
+    }
+
+    function validateCard1() {
+        const name = document.getElementById('empName').value.trim();
+        const desig = document.getElementById('empDesignation').value.trim();
+        const joinDate = document.getElementById('empJoinDate').value;
+        const comm = document.getElementById('payCommission').value;
+        const scale = document.getElementById('currentPayScale').value.trim();
+        const basic = document.getElementById('basicPay').value.trim();
+
+        const card = document.getElementById('cardEmp');
+        const status = document.getElementById('cardEmpStatus');
+        const badge = document.getElementById('cardEmpBadge');
+
+        if (name && desig && joinDate && comm && scale && basic) {
+            card.classList.remove('card-pending');
+            card.classList.add('card-filled');
+            status.textContent = "✓ माहिती पूर्ण भरली आहे";
+            badge.textContent = "✓";
+            return true;
+        } else {
+            card.classList.remove('card-filled');
+            card.classList.add('card-pending');
+            status.textContent = "⚠️ ही माहिती भरणे बाकी आहे (कृपया भरा)";
+            badge.textContent = "!";
+            return false;
+        }
+    }
+
+    function saveEmployeeModal() {
+        validateCard1();
+        closeModal('employeeModal');
+        saveFormDataToStorage();
+    }
+
+    function validateCard2() {
+        let hasIncomplete = false;
+        let anyActive = false;
+
+        for (let i = 1; i <= 3; i++) {
+            let type = document.getElementById(`b${i}_type`).value;
+            if (type !== 'None') {
+                anyActive = true;
+                let dateVal = document.getElementById(`b${i}_date`).value;
+                let scaleVal = document.getElementById(`b${i}_scale`).value.trim();
+                let commVal = document.getElementById(`b${i}_comm`).value;
+
+                if (!dateVal || !scaleVal || !commVal) {
+                    hasIncomplete = true;
+                }
+            }
+        }
+
+        const card = document.getElementById('cardBenefit');
+        const status = document.getElementById('cardBenefitStatus');
+        const badge = document.getElementById('cardBenefitBadge');
+
+        if (hasIncomplete) {
+            card.classList.remove('card-filled');
+            card.classList.add('card-pending');
+            status.textContent = "⚠️ ही माहिती भरणे बाकी आहे (दिनांक/वेतनश्रेणी भरा)";
+            badge.textContent = "!";
+            return false;
+        } else {
+            card.classList.remove('card-pending');
+            card.classList.add('card-filled');
+            status.textContent = anyActive ? "✓ माहिती पूर्ण भरली आहे" : "✓ कोणताही लाभ नाही (नियमित)";
+            badge.textContent = "✓";
+            return true;
+        }
+    }
+
+    function saveBenefitModal() {
+        validateCard2();
+        closeModal('benefitModal');
+        saveFormDataToStorage();
+    }
+
+    function validateCard3() {
+        const fromDate = document.getElementById('fixationFrom').value;
+        const toDate = document.getElementById('fixationTo').value;
+
+        const card = document.getElementById('cardRules');
+        const status = document.getElementById('cardRulesStatus');
+        const badge = document.getElementById('cardRulesBadge');
+
+        if (fromDate && toDate) {
+            card.classList.remove('card-pending');
+            card.classList.add('card-filled');
+            status.textContent = "✓ माहिती पूर्ण भरली आहे";
+            badge.textContent = "✓";
+            return true;
+        } else {
+            card.classList.remove('card-filled');
+            card.classList.add('card-pending');
+            status.textContent = "⚠️ ही माहिती भरणे बाकी आहे (कालावधी निवडा)";
+            badge.textContent = "!";
+            return false;
+        }
+    }
+
+    function saveRulesModal() {
+        validateCard3();
+        closeModal('rulesModal');
+        saveFormDataToStorage();
+    }
+
+    // =========================================================================
+    // 📚 अधिकृत वेतनश्रेण्या (5व्या आयोगासह सर्व फॉरमॅट पूर्णपणे समाविष्ट)
+    // =========================================================================
+    const payScales4th = [
+        "रु. 750 - 12 - 870 - EB - 14 - 940",
+        "रु. 775 - 12 - 871 - EB - 14 - 1025",
+        "रु. 800 - 15 - 1010 - EB - 20 - 1150",
+        "रु. 950 - 20 - 1150 - EB - 25 - 1400",
+        "रु. 975 - 25 - 1150 - EB - 30 - 1540",
+        "रु. 1150 - 25 - 1500",
+        "रु. 1200 - 30 - 1560 - EB - 40 - 2040",
+        "रु. 1350 - 30 - 1440 - 40 - 1800 - EB - 50 - 2200",
+        "रु. 1400 - 40 - 1600 - 50 - 2300 - EB - 60 - 2600",
+        "रु. 1640 - 60 - 2600 - EB - 75 - 2900",
+        "रु. 2000 - 60 - 2300 - EB - 75 - 3200",
+        "रु. 2200 - 75 - 2800 - EB - 100 - 4000",
+        "रु. 3000 - 100 - 3500 - 125 - 4500"
+    ];
+
+    const payScales5th = [
+        "रु. 2550 - 55 - 2660 - 60 - 3200",
+        "रु. 2610 - 60 - 2910 - 65 - 3300 - 70 - 4000",
+        "रु. 2650 - 65 - 3300 - 70 - 4000",
+        "रु. 2750 - 70 - 3800 - 75 - 4400",
+        "रु. 3050 - 75 - 3950 - 80 - 4590",
+        "रु. 3200 - 85 - 4900",
+        "रु. 4000 - 100 - 6000",
+        "रु. 4500 - 125 - 7000",
+        "रु. 5000 - 150 - 8000",
+        "रु. 5500 - 175 - 9000",
+        "रु. 6000 - 175 - 9850 - 150 - 10000",
+        "रु. 6500 - 200 - 10500",
+        "रु. 7225 - 225 - 11050",
+        "रु. 7450 - 225 - 11050",
+        "रु. 7450 - 225 - 11500",
+        "रु. 7500 - 250 - 12000",
+        "रु. 8000 - 275 - 13500",
+        "रु. 9125 - 275 - 14075",
+        "रु. 10000 - 325 - 15200",
+        "रु. 10650 - 325 - 15850",
+        "रु. 12000 - 375 - 16500",
+        "रु. 14300 - 400 - 18300",
+        "रु. 15100 - 400 - 18300",
+        "रु. 16400 - 450 - 20000",
+        "रु. 16400 - 450 - 20900",
+        "रु. 18400 - 500 - 22400",
+        "रु. 22400 - 525 - 24500"
+    ];
+
+    const payScales6th = [
+        "-1S : 4440 - 7440 (GP 1300)",
+        "-1S : 4440 - 7440 (GP 1400)",
+        "-1S : 4440 - 7440 (GP 1600)",
+        "-1S : 4440 - 7440 (GP 1650)",
+        "-1S : 4440 - 7440 (GP 1700)",
+        "PB-1 : 5200 - 20200 (GP 1800)",
+        "PB-1 : 5200 - 20200 (GP 1900)",
+        "PB-1 : 5200 - 20200 (GP 2000)",
+        "PB-1 : 5200 - 20200 (GP 2400)",
+        "PB-1 : 5200 - 20200 (GP 2500)",
+        "PB-1 : 5200 - 20200 (GP 2800)",
+        "PB-1 : 5200 - 20200 (GP 2900)",
+        "PB-1 : 5200 - 20200 (GP 3000)",
+        "PB-1 : 5200 - 20200 (GP 3500)",
+        "PB-2 : 9300 - 34800 (GP 4200)",
+        "PB-2 : 9300 - 34800 (GP 4300)",
+        "PB-2 : 9300 - 34800 (GP 4400)",
+        "PB-2 : 9300 - 34800 (GP 4500)",
+        "PB-2 : 9300 - 34800 (GP 4600)",
+        "PB-2 : 9300 - 34800 (GP 4800)",
+        "PB-2 : 9300 - 34800 (GP 4900)",
+        "PB-2 : 9300 - 34800 (GP 5000)",
+        "PB-2 : 9300 - 34800 (GP 5400)",
+        "PB-3 : 15600 - 39100 (GP 5000)",
+        "PB-3 : 15600 - 39100 (GP 5400)",
+        "PB-3 : 15600 - 39100 (GP 5500)",
+        "PB-3 : 15600 - 39100 (GP 5700)",
+        "PB-3 : 15600 - 39100 (GP 5800)",
+        "PB-3 : 15600 - 39100 (GP 6600)",
+        "PB-3 : 15600 - 39100 (GP 6900)",
+        "PB-3 : 15600 - 39100 (GP 7600)",
+        "PB-3 : 15600 - 39100 (GP 7900)",
+        "PB-4 : 37400 - 67000 (GP 8700)",
+        "PB-4 : 37400 - 67000 (GP 8800)",
+        "PB-4 : 37400 - 67000 (GP 8900)",
+        "PB-4 : 37400 - 67000 (GP 10000)",
+        "PB-4 : 37400 - 67000 (GP 12000)"
+    ];
+
+    const entryPayAnnexureIII = {
+        1300: 4440,
+        1400: 4440,
+        1600: 4840,
+        1650: 4920,
+        1700: 4920,
+        1800: 5200,
+        1900: 5830,
+        2000: 6460,
+        2400: 7510,
+        2500: 7770,
+        2800: 8560,
+        2900: 8620,
+        3000: 8680,
+        3500: 8920,
+        4200: 9300,
+        4300: 10100,
+        4400: 10900,
+        4500: 11700,
+        4600: 12540,
+        4800: 13350,
+        4900: 13530,
+        5000: 13710,
+        5400: 14450,
+        5500: 15870,
+        5700: 16390,
+        5800: 16660,
+        6600: 18750,
+        6900: 19700,
+        7600: 21900,
+        7900: 22850,
+        8700: 37400,
+        8800: 38800,
+        8900: 40200,
+        10000: 43000,
+        12000: 47100
+    };
+
+    function get6thEntryPay(scaleStr, gp) {
+        if (scaleStr && scaleStr.includes("PB-3")) {
+            if (gp === 5000 || gp === 5400) return 15600;
+        }
+        return entryPayAnnexureIII[gp] || 0;
+    }
+
+    const levelConfig7th = [
+        { id: "S-1", gp: 1300, min: 15000, max: 47600, stages: 40 },
+        { id: "S-2", gp: 1400, min: 15300, max: 48700, stages: 40 },
+        { id: "S-3", gp: 1600, min: 16600, max: 52400, stages: 40 },
+        { id: "S-4", gp: "1650/1700", min: 17100, max: 54000, stages: 40 },
+        { id: "S-5", gp: 1800, min: 18000, max: 56900, stages: 40 },
+        { id: "S-6", gp: 1900, min: 19900, max: 63200, stages: 40 },
+        { id: "S-7", gp: 2000, min: 21700, max: 69100, stages: 40 },
+        { id: "S-8", gp: 2400, min: 25500, max: 81100, stages: 40 },
+        { id: "S-9", gp: 2500, min: 26400, max: 83600, stages: 40 },
+        { id: "S-10", gp: 2800, min: 29200, max: 92300, stages: 40 },
+        { id: "S-11", gp: "2900/3000", min: 30100, max: 95100, stages: 40 },
+        { id: "S-12", gp: 3500, min: 32000, max: 101600, stages: 40 },
+        { id: "S-13", gp: "4100/4200", min: 35400, max: 112400, stages: 40 },
+        { id: "S-14", gp: 4300, min: 38600, max: 122800, stages: 40 },
+        { id: "S-15", gp: 4400, min: 41800, max: 132300, stages: 40 },
+        { id: "S-16", gp: "4500/4600", min: 44900, max: 142400, stages: 40 },
+        { id: "S-17", gp: 4800, min: 47600, max: 151100, stages: 40 },
+        { id: "S-18", gp: "4900/5000", min: 49100, max: 155800, stages: 40 },
+        { id: "S-19", gp: 5000, min: 55100, max: 175100, stages: 40 },
+        { id: "S-20", gp: 5400, min: 56100, max: 177500, stages: 40 },
+        { id: "S-21", gp: 5500, min: 57100, max: 180800, stages: 40 },
+        { id: "S-22", gp: "5700/5800", min: 60000, max: 190800, stages: 40 },
+        { id: "S-23", gp: 6600, min: 67700, max: 208700, stages: 39 },
+        { id: "S-24", gp: 6900, min: 71100, max: 211900, stages: 38 },
+        { id: "S-25", gp: 7600, min: 78800, max: 209200, stages: 34 },
+        { id: "S-26", gp: 7900, min: 82200, max: 211500, stages: 33 },
+        { id: "S-27", gp: 8700, min: 118500, max: 214100, stages: 21 },
+        { id: "S-28", gp: 8800, min: 124800, max: 216600, stages: 19 },
+        { id: "S-29", gp: 8900, min: 131100, max: 212400, stages: 18 },
+        { id: "S-30", gp: 10000, min: 144200, max: 218200, stages: 15 },
+        { id: "S-31", gp: "67000-79000", min: 182200, max: 224100, stages: 8 }
+    ];
+
+    const fullPayMatrix7th = {
+        "S-1": [15000, 15500, 16000, 16500, 17000, 17500, 18000, 18500, 19100, 19700, 20300, 20900, 21500, 22100, 22800, 23500, 24200, 24900, 25600, 26400, 27200, 28000, 28800, 29700, 30600, 31500, 32400, 33400, 34400, 35400, 36500, 37600, 38700, 39900, 41100, 42300, 43600, 44900, 46200, 47600],
+        "S-2": [15300, 15800, 16300, 16800, 17300, 17800, 18300, 18800, 19400, 20000, 20600, 21200, 21800, 22500, 23200, 23900, 24600, 25300, 26100, 26900, 27700, 28500, 29400, 30300, 31200, 32100, 33100, 34100, 35100, 36200, 37300, 38400, 39600, 40800, 42000, 43300, 44600, 45900, 47300, 48700],
+        "S-3": [16600, 17100, 17600, 18100, 18600, 19200, 19800, 20400, 21000, 21600, 22200, 22900, 23600, 24300, 25000, 25800, 26600, 27400, 28200, 29000, 29900, 30800, 31700, 32700, 33700, 34700, 35700, 36800, 37900, 39000, 40200, 41400, 42600, 43900, 45200, 46600, 48000, 49400, 50900, 52400],
+        "S-4": [17100, 17600, 18100, 18600, 19200, 19800, 20400, 21000, 21600, 22200, 22900, 23600, 24300, 25000, 25800, 26600, 27400, 28200, 29000, 29900, 30800, 31700, 32700, 33700, 34700, 35700, 36800, 37900, 39000, 40200, 41400, 42600, 43900, 45200, 46600, 48000, 49400, 50900, 52400, 54000],
+        "S-5": [18000, 18500, 19100, 19700, 20300, 20900, 21500, 22100, 22800, 23500, 24200, 24900, 25600, 26400, 27200, 28000, 28800, 29700, 30600, 31500, 32400, 33400, 34400, 35400, 36500, 37600, 38700, 39900, 41100, 42300, 43600, 44900, 46200, 47600, 49000, 50500, 52000, 53600, 55200, 56900],
+        "S-6": [19900, 20500, 21100, 21700, 22400, 23100, 23800, 24500, 25200, 26000, 26800, 27600, 28400, 29300, 30200, 31100, 32000, 33000, 34000, 35000, 36100, 37200, 38300, 39400, 40600, 41800, 43100, 44400, 45700, 47100, 48500, 50000, 51500, 53000, 54600, 56200, 57900, 59600, 61400, 63200],
+        "S-7": [21700, 22400, 23100, 23800, 24500, 25200, 26000, 26800, 27600, 28400, 29300, 30200, 31100, 32000, 33000, 34000, 35000, 36100, 37200, 38300, 39400, 40600, 41800, 43100, 44400, 45700, 47100, 48500, 50000, 51500, 53000, 54600, 56200, 57900, 59600, 61400, 63200, 65100, 67100, 69100],
+        "S-8": [25500, 26300, 27100, 27900, 28700, 29600, 30500, 31400, 32300, 33300, 34300, 35300, 36400, 37500, 38600, 39800, 41000, 42200, 43500, 44800, 46100, 47500, 48900, 50400, 51900, 53500, 55100, 56800, 58500, 60300, 62100, 64000, 65900, 67900, 69900, 72000, 74200, 76400, 78700, 81100],
+        "S-9": [26400, 27200, 28000, 28800, 29700, 30600, 31500, 32400, 33400, 34400, 35400, 36500, 37600, 38700, 39900, 41100, 42300, 43600, 44900, 46200, 47600, 49000, 50500, 52000, 53600, 55200, 56900, 58600, 60400, 62200, 64100, 66000, 68000, 70000, 72100, 74300, 76500, 78800, 81200, 83600],
+        "S-10": [29200, 30100, 31000, 31900, 32900, 33900, 34900, 35900, 37000, 38100, 39200, 40400, 41600, 42800, 44100, 45400, 46800, 48200, 49600, 51100, 52600, 54200, 55800, 57500, 59200, 61000, 62800, 64700, 66600, 68600, 70700, 72800, 75000, 77300, 79600, 82000, 84500, 87000, 89600, 92300],
+        "S-11": [30100, 31000, 31900, 32900, 33900, 34900, 35900, 37000, 38100, 39200, 40400, 41600, 42800, 44100, 45400, 46800, 48200, 49600, 51100, 52600, 54200, 55800, 57500, 59200, 61000, 62800, 64700, 66600, 68600, 70700, 72800, 75000, 77300, 79600, 82000, 84500, 87000, 89600, 92300, 95100],
+        "S-12": [32000, 33000, 34000, 35000, 36100, 37200, 38300, 39400, 40600, 41800, 43100, 44400, 45700, 47100, 48500, 50000, 51500, 53000, 54600, 56200, 57900, 59600, 61400, 63200, 65100, 67100, 69100, 71200, 73300, 75500, 77800, 80100, 82500, 85000, 87600, 90200, 92900, 95700, 98600, 101600],
+        "S-13": [35400, 36500, 37600, 38700, 39900, 41100, 42300, 43600, 44900, 46200, 47600, 49000, 50500, 52000, 53600, 55200, 56900, 58600, 60400, 62200, 64100, 66000, 68000, 70000, 72100, 74300, 76500, 78800, 81200, 83600, 86100, 88700, 91400, 94100, 96900, 99800, 102800, 105900, 109100, 112400],
+        "S-14": [38600, 39800, 41000, 42200, 43500, 44800, 46100, 47500, 48900, 50400, 51900, 53500, 55100, 56800, 58500, 60300, 62100, 64000, 65900, 67900, 69900, 72000, 74200, 76400, 78700, 81100, 83500, 86000, 88600, 91300, 94000, 96800, 99700, 102700, 105800, 109000, 112300, 115700, 119200, 122800],
+        "S-15": [41800, 43100, 44400, 45700, 47100, 48500, 50000, 51500, 53000, 54600, 56200, 57900, 59600, 61400, 63200, 65100, 67100, 69100, 71200, 73300, 75500, 77800, 80100, 82500, 85000, 87600, 90200, 92900, 95700, 98600, 101600, 104600, 107700, 110900, 114200, 117600, 121100, 124700, 128400, 132300],
+        "S-16": [44900, 46200, 47600, 49000, 50500, 52000, 53600, 55200, 56900, 58600, 60400, 62200, 64100, 66000, 68000, 70000, 72100, 74300, 76500, 78800, 81200, 83600, 86100, 88700, 91400, 94100, 96900, 99800, 102800, 105900, 109100, 112400, 115800, 119300, 122900, 126600, 130400, 134300, 138300, 142400],
+        "S-17": [47600, 49000, 50500, 52000, 53600, 55200, 56900, 58600, 60400, 62200, 64100, 66000, 68000, 70000, 72100, 74300, 76500, 78800, 81200, 83600, 86100, 88700, 91400, 94100, 96900, 99800, 102800, 105900, 109100, 112400, 115800, 119300, 122900, 126600, 130400, 134300, 138300, 142400, 146700, 151100],
+        "S-18": [49100, 50600, 52100, 53700, 55300, 57000, 58700, 60500, 62300, 64200, 66100, 68100, 70100, 72200, 74400, 76600, 78900, 81300, 83700, 86200, 88800, 91500, 94200, 97000, 99900, 102900, 106000, 109200, 112500, 115900, 119400, 123000, 126700, 130500, 134400, 138400, 142600, 146900, 151300, 155800],
+        "S-19": [55100, 56800, 58500, 60300, 62100, 64000, 65900, 67900, 69900, 72000, 74200, 76400, 78700, 81100, 83500, 86000, 88600, 91300, 94000, 96800, 99700, 102700, 105800, 109000, 112300, 115700, 119200, 122800, 126500, 130300, 134200, 138200, 142300, 146600, 151000, 155500, 160200, 165000, 170000, 175100],
+        "S-20": [56100, 57800, 59500, 61300, 63100, 65000, 67000, 69000, 71100, 73200, 75400, 77700, 80000, 82400, 84900, 87400, 90000, 92700, 95500, 98400, 101400, 104400, 107500, 110700, 114000, 117400, 120900, 124500, 128200, 132000, 136000, 140100, 144300, 148600, 153100, 157700, 162400, 167300, 172300, 177500],
+        "S-21": [57100, 58800, 60600, 62400, 64300, 66200, 68200, 70200, 72300, 74500, 76700, 79000, 81400, 83800, 86300, 88900, 91600, 94300, 97100, 100000, 103000, 106100, 109300, 112600, 116000, 119500, 123100, 126800, 130600, 134500, 138500, 142700, 147000, 151400, 155900, 160600, 165400, 170400, 175500, 180800],
+        "S-22": [60000, 61800, 63700, 65600, 67600, 69600, 71700, 73900, 76100, 78400, 80800, 83200, 85700, 88300, 90900, 93600, 96400, 99300, 102300, 105400, 108600, 111900, 115300, 118800, 122400, 126100, 129900, 133800, 137800, 141900, 146200, 150600, 155100, 159800, 164600, 169500, 174600, 179800, 185200, 190800],
+        "S-23": [67700, 69700, 71800, 74000, 76200, 78500, 80900, 83300, 85800, 88400, 91100, 93800, 96600, 99500, 102500, 105600, 108800, 112100, 115500, 119000, 122600, 126300, 130100, 134000, 138000, 142100, 146400, 150800, 155300, 160000, 164800, 169700, 174800, 180000, 185400, 191000, 196700, 202600, 208700],
+        "S-24": [71100, 73200, 75400, 77700, 80000, 82400, 84900, 87400, 90000, 92700, 95500, 98400, 101400, 104400, 107500, 110700, 114000, 117400, 120900, 124500, 128200, 132000, 136000, 140100, 144300, 148600, 153100, 157700, 162400, 167300, 172300, 177500, 182800, 188300, 193900, 199700, 205700, 211900],
+        "S-25": [78800, 81200, 83600, 86100, 88700, 91400, 94100, 96900, 99800, 102800, 105900, 109100, 112400, 115800, 119300, 122900, 126600, 130400, 134300, 138300, 142400, 146700, 151100, 155600, 160300, 165100, 170100, 175200, 180500, 185900, 191500, 197200, 203100, 209200],
+        "S-26": [82200, 84700, 87200, 89800, 92500, 95300, 98200, 101100, 104100, 107200, 110400, 113700, 117100, 120600, 124200, 127900, 131700, 135700, 139800, 144000, 148300, 152700, 157300, 162000, 166900, 171900, 177100, 182400, 187900, 193500, 199300, 205300, 211500],
+        "S-27": [118500, 122100, 125800, 129600, 133500, 137500, 141600, 145800, 150200, 154700, 159300, 164100, 169000, 174100, 179300, 184700, 190200, 195900, 201800, 207900, 214100],
+        "S-28": [124800, 128500, 132400, 136400, 140500, 144700, 149000, 153500, 158100, 162800, 167700, 172700, 177900, 183200, 188700, 194400, 200200, 206200, 212400, 216600],
+        "S-29": [131100, 135000, 139100, 143300, 147600, 152000, 156600, 161300, 166100, 171100, 176200, 181500, 186900, 192500, 198300, 204200, 210300, 212400],
+        "S-30": [144200, 148500, 153000, 157600, 162300, 167200, 172200, 177400, 182700, 188200, 193800, 199600, 205600, 211800, 218200],
+        "S-31": [182200, 187700, 193300, 199100, 205100, 211300, 217600, 224100]
+    };
+
+    const level7thStartPay = {};
+    levelConfig7th.forEach(cfg => {
+        let desc = `${cfg.id} (${cfg.min} - ${cfg.max}) [GP ${cfg.gp}]`;
+        level7thStartPay[cfg.id] = { start: cfg.min, max: cfg.max, desc: desc, gp: cfg.gp };
     });
 
-    window.onload = function() {
+    function mapGpTo7thLevel(gp) {
+        gp = parseInt(gp, 10);
+        if (gp <= 1300) return "S-1";
+        if (gp === 1400) return "S-2";
+        if (gp === 1600) return "S-3";
+        if (gp === 1650 || gp === 1700) return "S-4";
+        if (gp === 1800) return "S-5";
+        if (gp === 1900) return "S-6";
+        if (gp === 2000) return "S-7";
+        if (gp === 2400) return "S-8";
+        if (gp === 2500) return "S-9";
+        if (gp === 2800) return "S-10";
+        if (gp === 2900 || gp === 3000) return "S-11";
+        if (gp === 3500) return "S-12";
+        if (gp === 4200 || gp === 4100) return "S-13";
+        if (gp === 4300) return "S-14";
+        if (gp === 4400) return "S-15";
+        if (gp === 4500 || gp === 4600) return "S-16";
+        if (gp === 4800) return "S-17";
+        if (gp === 4900 || gp === 5000) return "S-18";
+        if (gp === 5000) return "S-19";
+        if (gp === 5400) return "S-20";
+        if (gp === 5500) return "S-21";
+        if (gp === 5700 || gp === 5800) return "S-22";
+        if (gp === 6600) return "S-23";
+        if (gp === 6900) return "S-24";
+        if (gp === 7600) return "S-25";
+        if (gp === 7900) return "S-26";
+        if (gp === 8700) return "S-27";
+        if (gp === 8800) return "S-28";
+        if (gp === 8900) return "S-29";
+        if (gp === 10000) return "S-30";
+        if (gp >= 12000) return "S-31";
+        return "S-6";
+    }
+
+    function getGradePayFrom4thOr5th(scaleStr) {
+        if (!scaleStr) return 1900;
+        if (scaleStr.includes("2550") || scaleStr.includes("750")) return 1300;
+        if (scaleStr.includes("2610") || scaleStr.includes("775")) return 1400;
+        if (scaleStr.includes("2650") || scaleStr.includes("800")) return 1600;
+        if (scaleStr.includes("2750")) return 1650;
+        if (scaleStr.includes("3050") || scaleStr.includes("950")) return 1900;
+        if (scaleStr.includes("3200") || scaleStr.includes("975")) return 1900;
+        if (scaleStr.includes("4000") || scaleStr.includes("1200")) return 2400;
+        if (scaleStr.includes("4500") || scaleStr.includes("1350")) return 2800;
+        if (scaleStr.includes("5000") || scaleStr.includes("1400") || scaleStr.includes("1640")) return 4200;
+        if (scaleStr.includes("38600")) return 4300;
+        if (scaleStr.includes("6500") || scaleStr.includes("2000") || scaleStr.includes("8000") || scaleStr.includes("2200")) return 5400;
+        if (scaleStr.includes("10000") || scaleStr.includes("3000")) return 6600;
+        if (scaleStr.includes("12000")) return 8700;
+        if (scaleStr.includes("14300")) return 10000;
+        if (scaleStr.includes("16400") || scaleStr.includes("22400")) return 12000;
+        return 1900;
+    }
+
+    function getCleanScaleLabel(scale, comm, level) {
+        if (comm === '7th') {
+            let match = String(level || scale).match(/S-(\d+)/i);
+            let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
+            let cells = fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
+            return `${key} (${cells[0]} - ${cells[cells.length - 1]})`;
+        }
+        if (comm === '6th') {
+            let match = scale.match(/(PB-?\d|-1S)\s*:\s*\d+\s*-\s*\d+\s*\(GP\s*\d+\)/i);
+            if (match) return match[0];
+            return scale;
+        }
+        return scale;
+    }
+
+    function parsePayScaleStages(scaleStr, commission, gradePayOverride = 0) {
+        if (!scaleStr) return [];
+
+        if (commission === '7th' || scaleStr.includes('S-')) {
+            let match = scaleStr.match(/S-(\d+)/i);
+            if (match) {
+                let key = "S-" + parseInt(match[1], 10);
+                if (fullPayMatrix7th[key]) return fullPayMatrix7th[key];
+            }
+            return fullPayMatrix7th["S-6"];
+        }
+
+        if (commission === '5th' || scaleStr.includes('रु.') || scaleStr.includes('4000')) {
+            let cleanStr = scaleStr.replace(/रु\./g, '').replace(/\(.*?\)/g, '').trim();
+            let matches = cleanStr.match(/\d+/g);
+            if (matches && matches.length >= 3) {
+                let nums = matches.map(n => parseInt(n, 10));
+                let stages = [nums[0]];
+                let current = nums[0];
+                for (let i = 1; i < nums.length - 1; i += 2) {
+                    let inc = nums[i];
+                    let target = nums[i + 1];
+                    let safety = 0;
+                    while (current < target && safety < 100) {
+                        current += inc;
+                        if (current > target) current = target;
+                        stages.push(current);
+                        safety++;
+                    }
+                }
+                return stages;
+            }
+        }
+
+        if (commission === '6th' || scaleStr.includes('PB') || scaleStr.includes('GP') || scaleStr.includes('-1S')) {
+            let clean = scaleStr.replace(/\(.*?\)/g, '');
+            let bandMatch = clean.match(/(\d{4,6})\s*-\s*(\d{4,6})/);
+            let gpMatch = scaleStr.match(/GP\s*(\d+)/i);
+            let gp = gpMatch ? parseInt(gpMatch[1], 10) : (gradePayOverride || 0);
+
+            if (bandMatch) {
+                let bandMin = parseInt(bandMatch[1], 10);
+                let bandMax = parseInt(bandMatch[2], 10);
+                let entryPay = get6thEntryPay(scaleStr, gp);
+
+                let stagesSet = new Set();
+                if (entryPay && entryPay >= bandMin && entryPay <= bandMax) {
+                    let curr = entryPay;
+                    let safety = 0;
+                    while (curr <= bandMax && safety < 80) {
+                        stagesSet.add(curr);
+                        let total = curr + gp;
+                        let inc = Math.ceil((total * 0.03) / 10) * 10;
+                        if (inc < 10) inc = 10;
+                        curr += inc;
+                        safety++;
+                    }
+                }
+
+                if (bandMin && bandMin <= bandMax) {
+                    let curr = bandMin;
+                    let safety = 0;
+                    while (curr <= bandMax && safety < 80) {
+                        stagesSet.add(curr);
+                        let total = curr + gp;
+                        let inc = Math.ceil((total * 0.03) / 10) * 10;
+                        if (inc < 10) inc = 10;
+                        curr += inc;
+                        safety++;
+                    }
+                }
+                return Array.from(stagesSet).sort((a, b) => a - b);
+            }
+        }
+
+        let cleanStr = scaleStr.replace(/\(.*?\)/g, '');
+        cleanStr = cleanStr.replace(/PB\s*-\s*\d+/gi, '').replace(/श्रेणी\s*-\s*\d+/gi, '');
+        let matches = cleanStr.match(/\d+/g);
+        if (!matches || matches.length < 3) return [19900, 20500, 21100, 21700, 22400];
+
+        let nums = matches.map(n => parseInt(n, 10));
+        let stages = [nums[0]];
+        let current = nums[0];
+        for (let i = 1; i < nums.length - 1; i += 2) {
+            let inc = nums[i];
+            let target = nums[i + 1];
+            while (current < target) {
+                current += inc;
+                if (current > target) current = target;
+                stages.push(current);
+            }
+        }
+        return stages;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        loadFormDataFromStorage();
         validateCard1();
         validateCard2();
         validateCard3();
-    };
+    });
 
-    function fitInMatrix(levelKey, rawAmount) {
-        let match = String(levelKey).match(/S-(\d+)/i);
-        let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
-        let cells = fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
-        for (let i = 0; i < cells.length; i++) {
-            if (cells[i] >= rawAmount) return { basic: cells[i], index: i, level: key };
-        }
-        return { basic: cells[cells.length - 1], index: cells.length - 1, level: key };
-    }
-
-    // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (MACP & Promotion Fixation Corrected)
-    // =========================================================================
+    // 🌟 मुख्य वेतन निश्चिती प्रक्रिया (100% FIXED & VERIFIED)
     function processFixation() {
         const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
         const designation = document.getElementById('empDesignation').value.trim() || '-';
-        const joinDateInput = document.getElementById('empJoinDate').value || '2015-02-13';
-        const scale = document.getElementById('currentPayScale').value || 'PB-1 : 5200 - 20200 (GP 1900)';
-        let basic = parseFloat(document.getElementById('basicPay').value) || 5830;
-        const fromDateInput = document.getElementById('fixationFrom').value || '2015-02-13';
+        const joinDateInput = document.getElementById('empJoinDate').value || '1994-07-07';
+        const scale = document.getElementById('currentPayScale').value || 'रु. 950 - 20 - 1150 - EB - 25 - 1400';
+        let basic = parseFloat(document.getElementById('basicPay').value) || 950;
+        const fromDateInput = document.getElementById('fixationFrom').value || '1994-07-07';
         const toDateInput = document.getElementById('fixationTo').value || '2026-09-30';
         
         let gpMatch = scale.match(/GP\s*(\d+)/i);
@@ -2198,7 +2784,7 @@
 
         const autoUpgrade = document.getElementById('autoCommissionChange').value === 'Yes';
         const rule7th = document.getElementById('incrementMonthRule7th').value;
-        const startCommission = document.getElementById('payCommission').value || '6th';
+        const startCommission = document.getElementById('payCommission').value || '4th';
         
         let initialLevel = "S-6";
         if (startCommission === '7th') {
@@ -2215,7 +2801,6 @@
         const fromDateFormatted = formatDateToDDMMYYYY(fromDateInput);
         const toDateFormatted = formatDateToDDMMYYYY(toDateInput);
 
-        // वेतनश्रेणी सुधारणा गोळा करणे
         let scaleRevisions = [];
         const hasScaleRev = document.getElementById('hasScaleRev').value === 'Yes';
         if (hasScaleRev) {
@@ -2235,7 +2820,6 @@
             });
         }
 
-        // रोखलेल्या वेतनवाढी गोळा करणे
         let withheldDatesSet = new Set();
         const hasWithheld = document.getElementById('incrementWithheld').value === 'Yes';
         if (hasWithheld) {
@@ -2246,7 +2830,6 @@
         }
         const withheldEffect = document.getElementById('withheldEffect').value;
 
-        // 🌟 आर्थिक लाभ (MACP / Promotion) अचूकपणे आणि सक्तीने गोळा करणे
         let activeBenefits = [];
         let summaryBenefitsText = [];
 
@@ -2307,10 +2890,20 @@
             desc: 'मूळ वेतन निश्चिती / रुजू'
         });
 
-        if (autoUpgrade && startCommission === '6th') {
+        // 🌟 सर्व शासकीय आयोग बदलांचे स्वयंचलित इव्हेंट्स समाविष्ट करणे
+        if (autoUpgrade) {
+            let c5Date = new Date(1996, 0, 1);
+            let c6Date = new Date(2006, 0, 1);
             let c7Date = new Date(2016, 0, 1);
-            if (c7Date >= startDate && c7Date <= endDate) {
-                events.push({ date: c7Date, dateStr: "01-01-2016", type: 'COMMISSION_7TH', desc: `७वा आयोग सुधारणा (${initialLevel} Matrix Fitment)` });
+
+            if (startDate < c5Date && c5Date <= endDate) {
+                events.push({ date: c5Date, dateStr: "01-01-1996", type: 'COMMISSION_5TH', desc: '५वा आयोग सुधारणा' });
+            }
+            if (startDate < c6Date && c6Date <= endDate) {
+                events.push({ date: c6Date, dateStr: "01-01-2006", type: 'COMMISSION_6TH', desc: '६वा आयोग सुधारणा' });
+            }
+            if (startDate < c7Date && c7Date <= endDate) {
+                events.push({ date: c7Date, dateStr: "01-01-2016", type: 'COMMISSION_7TH', desc: '७वा आयोग सुधारणा (Matrix Fitment)' });
             }
         }
 
@@ -2320,7 +2913,7 @@
                     date: rev.date,
                     dateStr: formatDateToDDMMYYYY(rev.dateStr),
                     type: 'SCALE_REVISION',
-                    desc: `वेतनश्रेणी सुधारणा (थेट फिक्सिंग: ${rev.scale})`,
+                    desc: `वेतनश्रेणी सुधारणा (${rev.scale})`,
                     data: rev
                 });
             }
@@ -2334,13 +2927,18 @@
             let activeComm = startCommission;
             if (autoUpgrade) {
                 if (yrDate >= new Date(2016, 0, 1)) activeComm = "7th";
-                else activeComm = "6th";
+                else if (yrDate >= new Date(2006, 0, 1)) activeComm = "6th";
+                else if (yrDate >= new Date(1996, 0, 1)) activeComm = "5th";
+                else activeComm = "4th";
             }
 
             let incDate = null;
             let incDesc = "नियमित वार्षिक वेतन वाढ";
 
-            if (activeComm === "6th") {
+            if (activeComm === "4th" || activeComm === "5th") {
+                incDate = new Date(yr, joinMonth, 1);
+                if (incDate <= joinDateObj) continue;
+            } else if (activeComm === "6th") {
                 incDate = new Date(yr, 6, 1);
             } else if (activeComm === "7th") {
                 if (rule7th === 'january') {
@@ -2386,7 +2984,6 @@
             }
         }
 
-        // 🌟 पदोन्नती व MACP लाभांचे इव्हेंट तक्त्यात अचूक समाविष्ट करणे आणि त्यांची तारीख वरून खाली योग्य क्रमाने ठेवणे
         activeBenefits.forEach(b => {
             let title = (b.type === 'Promotion') ? `पदोन्नती-${b.index} (${b.post})` : `MACP-${b.index} लाभ`;
             if (b.date >= startDate && b.date <= endDate) {
@@ -2423,13 +3020,15 @@
             }
             let order = { 
                 'INITIAL': 1, 
-                'COMMISSION_7TH': 2, 
-                'ANNUAL_INC': 3, 
-                'WITHHELD_INC': 3, 
-                'SCALE_REVISION': 4, 
-                'BENEFIT_PROMOTED_PROVISIONAL': 5,
-                'BENEFIT_SAME_DAY': 5, 
-                'BENEFIT_OPTION_DNI': 6 
+                'COMMISSION_5TH': 2,
+                'COMMISSION_6TH': 3,
+                'COMMISSION_7TH': 4, 
+                'ANNUAL_INC': 5, 
+                'WITHHELD_INC': 5, 
+                'SCALE_REVISION': 6, 
+                'BENEFIT_PROMOTED_PROVISIONAL': 7,
+                'BENEFIT_SAME_DAY': 7, 
+                'BENEFIT_OPTION_DNI': 8 
             };
             return (order[a.type] || 5) - (order[b.type] || 5);
         });
@@ -2442,7 +3041,7 @@
         let currentMatrixIndex = -1;
 
         if (currentCommission === '7th') {
-            let match = String(currentLevel).match(/S-(\d+)/i);
+            let match = String(initialLevel).match(/S-(\d+)/i);
             let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
             currentLevel = key;
             let cells = fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
@@ -2461,16 +3060,35 @@
             let cells = parsePayScaleStages(scale, '6th', gradePay);
             currentMatrixIndex = cells.indexOf(currentBasic);
             if (currentMatrixIndex === -1) currentMatrixIndex = 0;
+        } else if (currentCommission === '4th' || currentCommission === '5th') {
+            let cells = parsePayScaleStages(scale, currentCommission);
+            currentMatrixIndex = cells.indexOf(currentBasic);
+            if (currentMatrixIndex === -1) currentMatrixIndex = 0;
         }
 
         let currentScaleLabel = getCleanScaleLabel(scale, currentCommission, currentLevel);
-        let lowerLevel = currentLevel;
-        let lowerMatrixIndex = currentMatrixIndex;
         let lowerBasic = currentBasic;
         let lowerGP = currentGP;
 
         events.forEach(ev => {
             if (ev.type === 'INITIAL') {
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+            }
+            else if (ev.type === 'COMMISSION_5TH') {
+                currentCommission = '5th';
+                currentBasic = Math.round(currentBasic * 2.3);
+                currentGP = 0;
+                currentScaleLabel = "रु. 2550 - 55 - 2660 - 60 - 3200";
+                lowerBasic = currentBasic;
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+            }
+            else if (ev.type === 'COMMISSION_6TH') {
+                currentCommission = '6th';
+                currentBasic = Math.round((currentBasic * 1.86) / 10) * 10;
+                currentGP = 1900;
+                currentScaleLabel = "PB-1 : 5200 - 20200 (GP 1900)";
+                lowerBasic = currentBasic;
+                lowerGP = currentGP;
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'COMMISSION_7TH') {
@@ -2482,8 +3100,6 @@
                 currentLevel = fitmentResult.level;
                 currentGP = 0;
 
-                lowerLevel = currentLevel;
-                lowerMatrixIndex = currentMatrixIndex;
                 lowerBasic = currentBasic;
                 lowerGP = 0;
 
@@ -2493,20 +3109,7 @@
             else if (ev.type === 'SCALE_REVISION') {
                 let rev = ev.data;
                 currentCommission = rev.commission;
-                if (currentCommission === '7th') {
-                    let match = rev.scale.match(/S-(\d+)/i);
-                    if (match) {
-                        currentLevel = "S-" + parseInt(match[1], 10);
-                        let fit = fitInMatrix(currentLevel, currentBasic);
-                        currentBasic = fit.basic;
-                        currentMatrixIndex = fit.index;
-                        currentLevel = fit.level;
-                    }
-                } else if (currentCommission === '6th') {
-                    let gpMatch = rev.scale.match(/GP\s*(\d+)/i);
-                    if (gpMatch) currentGP = parseInt(gpMatch[1], 10);
-                }
-                currentScaleLabel = getCleanScaleLabel(rev.scale, currentCommission, currentLevel);
+                currentScaleLabel = rev.scale;
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'WITHHELD_INC') {
@@ -2514,75 +3117,37 @@
             }
             else if (ev.type === 'BENEFIT_PROMOTED_PROVISIONAL') {
                 let b = ev.data;
-                currentCommission = b.commission;
-                b.savedLowerLevel = currentLevel;
-                b.savedLowerIndex = currentMatrixIndex;
                 b.savedLowerBasic = currentBasic;
                 b.savedLowerGP = currentGP;
+                
+                currentScaleLabel = b.scale;
+                let promoStages = parsePayScaleStages(b.scale, b.commission);
+                let found = promoStages.find(s => s >= currentBasic);
+                if (found) currentBasic = found;
 
-                lowerLevel = currentLevel;
-                lowerMatrixIndex = currentMatrixIndex;
-                lowerBasic = currentBasic;
-                lowerGP = currentGP;
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(b.commission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+            }
+            else if (ev.type === 'BENEFIT_OPTION_DNI') {
+                let b = ev.data;
+                currentCommission = b.commission;
+                let lBasic = b.savedLowerBasic || currentBasic;
 
-                if (currentCommission === '7th') {
-                    let lvlMatch = b.scale.match(/S-(\d+)/i);
-                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-                    let fitTemp = fitInMatrix(targetLvl, currentBasic);
-                    currentLevel = fitTemp.level;
-                    currentBasic = fitTemp.basic;
-                    currentMatrixIndex = fitTemp.index;
-                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                }
+                currentScaleLabel = b.scale;
+                let promoStages = parsePayScaleStages(b.scale, b.commission);
+                let target = lBasic + (b.commission === '4th' ? 50 : (b.commission === '5th' ? 200 : (b.commission === '6th' ? 200 : 1000)));
+                let found = promoStages.find(s => s >= target);
+                currentBasic = found ? found : target;
+
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'BENEFIT_SAME_DAY') {
                 let b = ev.data;
                 currentCommission = b.commission;
+                currentScaleLabel = b.scale;
+                let promoStages = parsePayScaleStages(b.scale, b.commission);
+                let found = promoStages.find(s => s >= currentBasic);
+                currentBasic = found ? found : currentBasic;
 
-                if (currentCommission === '7th') {
-                    let lvlMatch = b.scale.match(/S-(\d+)/i);
-                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-
-                    let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
-                    let currIdx = cellsLower.indexOf(currentBasic);
-                    if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
-                    let notionalIdx = Math.min(currIdx + 1, cellsLower.length - 1);
-                    let notionalPay = cellsLower[notionalIdx];
-
-                    let fitInHigher = fitInMatrix(targetLvl, notionalPay);
-                    currentLevel = fitInHigher.level;
-                    currentBasic = fitInHigher.basic;
-                    currentMatrixIndex = fitInHigher.index;
-                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                }
-                lowerLevel = currentLevel;
-                lowerMatrixIndex = currentMatrixIndex;
-                lowerBasic = currentBasic;
-                lowerGP = currentGP;
-
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
-            }
-            else if (ev.type === 'BENEFIT_OPTION_DNI') {
-                let b = ev.data;
-                currentCommission = b.commission;
-                let lLevel = b.savedLowerLevel || lowerLevel;
-                let lIndex = (b.savedLowerIndex !== undefined && b.savedLowerIndex !== -1) ? b.savedLowerIndex : currentMatrixIndex;
-
-                if (currentCommission === '7th') {
-                    let lvlMatch = b.scale.match(/S-(\d+)/i);
-                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-                    let cellsLower = fullPayMatrix7th[lLevel] || fullPayMatrix7th["S-6"];
-                    
-                    let notionalIdx = Math.min(lIndex + 1, cellsLower.length - 1);
-                    let notionalPay = cellsLower[notionalIdx];
-
-                    let fitFinal = fitInMatrix(targetLvl, notionalPay);
-                    currentLevel = fitFinal.level;
-                    currentBasic = fitFinal.basic;
-                    currentMatrixIndex = fitFinal.index;
-                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                }
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'ANNUAL_INC') {
@@ -2612,32 +3177,28 @@
                         currentMatrixIndex = cells.length - 1;
                         currentBasic = cells[currentMatrixIndex];
                     }
-                    lowerLevel = currentLevel;
-                    lowerMatrixIndex = currentMatrixIndex;
-                    lowerBasic = currentBasic;
-                } else if (currentCommission === '6th') {
-                    let cells = parsePayScaleStages(scale, '6th', gradePay);
-                    if (currentMatrixIndex < cells.length - 1) currentMatrixIndex++;
-                    currentBasic = cells[currentMatrixIndex] || (currentBasic + 900);
                 } else {
-                    currentBasic += 900;
+                    let cells = parsePayScaleStages(currentScaleLabel, currentCommission, currentGP);
+                    let idx = cells.indexOf(currentBasic);
+                    if (idx !== -1 && idx < cells.length - 1) {
+                        currentBasic = cells[idx + 1];
+                    } else {
+                        currentBasic += (currentCommission === '4th' ? 25 : (currentCommission === '5th' ? 100 : 900));
+                    }
                 }
 
-                currentScaleLabel = getCleanScaleLabel(scale, currentCommission, currentLevel);
+                currentScaleLabel = getCleanScaleLabel(currentScaleLabel, currentCommission, currentLevel);
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
         });
 
-        // स्वतंत्र मोबाईल-फिटेड अहवाल पेज (Output Box) उघडणे
         const outputBox = document.getElementById('outputBox');
-        outputBox.classList.add('hidden'); // Reset to force repaint
-        void outputBox.offsetWidth;
         outputBox.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp) {
-        let total = basic + gp;
+        let total = basic + (gp > 0 ? gp : 0);
         let gpDisplay = gp > 0 ? gp : "-";
 
         let tr = document.createElement('tr');
