@@ -2023,8 +2023,7 @@
                         isWithin6MonthsBeforeInc = !(bMonth === 0 && bDay === 1);
                     }
                 } else {
-                    let julyThisYearNext = new Date(bYear + 1, 6, 1);
-                    nextIncDate = julyThisYearNext;
+                    nextIncDate = new Date(bYear + 1, 6, 1);
                     isWithin6MonthsBeforeInc = false;
                 }
             }
@@ -2183,7 +2182,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (पूर्णत: अद्ययावत आणि अचूक)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (MACP & Promotion Fixation Corrected)
     // =========================================================================
     function processFixation() {
         const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
@@ -2247,7 +2246,7 @@
         }
         const withheldEffect = document.getElementById('withheldEffect').value;
 
-        // पदोन्नती व MACP लाभ अचूकपणे गोळा करणे
+        // 🌟 आर्थिक लाभ (MACP / Promotion) अचूकपणे आणि सक्तीने गोळा करणे
         let activeBenefits = [];
         let summaryBenefitsText = [];
 
@@ -2308,20 +2307,10 @@
             desc: 'मूळ वेतन निश्चिती / रुजू'
         });
 
-        // 🌟 स्वयंचलित आयोग बदल (Auto Commission Upgrade from Join Date)
-        if (autoUpgrade) {
-            let c5Date = new Date(1996, 0, 1);
-            let c6Date = new Date(2006, 0, 1);
+        if (autoUpgrade && startCommission === '6th') {
             let c7Date = new Date(2016, 0, 1);
-
-            if (startDate < c5Date && c5Date <= endDate) {
-                events.push({ date: c5Date, dateStr: "01-01-1996", type: 'COMMISSION_5TH', desc: '५वा आयोग सुधारणा' });
-            }
-            if (startDate < c6Date && c6Date <= endDate) {
-                events.push({ date: c6Date, dateStr: "01-01-2006", type: 'COMMISSION_6TH', desc: '६वा आयोग सुधारणा' });
-            }
-            if (startDate < c7Date && c7Date <= endDate) {
-                events.push({ date: c7Date, dateStr: "01-01-2016", type: 'COMMISSION_7TH', desc: `७वा आयोग सुधारणा (Matrix Fitment)` });
+            if (c7Date >= startDate && c7Date <= endDate) {
+                events.push({ date: c7Date, dateStr: "01-01-2016", type: 'COMMISSION_7TH', desc: `७वा आयोग सुधारणा (${initialLevel} Matrix Fitment)` });
             }
         }
 
@@ -2345,23 +2334,18 @@
             let activeComm = startCommission;
             if (autoUpgrade) {
                 if (yrDate >= new Date(2016, 0, 1)) activeComm = "7th";
-                else if (yrDate >= new Date(2006, 0, 1)) activeComm = "6th";
-                else if (yrDate >= new Date(1996, 0, 1)) activeComm = "5th";
-                else activeComm = "4th";
+                else activeComm = "6th";
             }
 
             let incDate = null;
             let incDesc = "नियमित वार्षिक वेतन वाढ";
 
-            if (activeComm === "4th" || activeComm === "5th") {
-                incDate = new Date(yr, joinMonth, 1);
-                if (incDate <= joinDateObj) continue;
-            } else if (activeComm === "6th") {
+            if (activeComm === "6th") {
                 incDate = new Date(yr, 6, 1);
             } else if (activeComm === "7th") {
                 if (rule7th === 'january') {
                     incDate = new Date(yr, 0, 1);
-                    if (yr === 2016 && startDate.getFullYear() === 2016) continue;
+                    if (yr === 2016) continue;
                 } else {
                     incDate = new Date(yr, 6, 1);
                 }
@@ -2402,7 +2386,7 @@
             }
         }
 
-        // 🌟 पदोन्नती व MACP लाभांचे इव्हेंट तक्त्यात अचूक समाविष्ट करणे
+        // 🌟 पदोन्नती व MACP लाभांचे इव्हेंट तक्त्यात अचूक समाविष्ट करणे आणि त्यांची तारीख वरून खाली योग्य क्रमाने ठेवणे
         activeBenefits.forEach(b => {
             let title = (b.type === 'Promotion') ? `पदोन्नती-${b.index} (${b.post})` : `MACP-${b.index} लाभ`;
             if (b.date >= startDate && b.date <= endDate) {
@@ -2439,15 +2423,13 @@
             }
             let order = { 
                 'INITIAL': 1, 
-                'COMMISSION_5TH': 2,
-                'COMMISSION_6TH': 3,
-                'COMMISSION_7TH': 4, 
-                'ANNUAL_INC': 5, 
-                'WITHHELD_INC': 5, 
-                'SCALE_REVISION': 6, 
-                'BENEFIT_PROMOTED_PROVISIONAL': 7,
-                'BENEFIT_SAME_DAY': 7, 
-                'BENEFIT_OPTION_DNI': 8 
+                'COMMISSION_7TH': 2, 
+                'ANNUAL_INC': 3, 
+                'WITHHELD_INC': 3, 
+                'SCALE_REVISION': 4, 
+                'BENEFIT_PROMOTED_PROVISIONAL': 5,
+                'BENEFIT_SAME_DAY': 5, 
+                'BENEFIT_OPTION_DNI': 6 
             };
             return (order[a.type] || 5) - (order[b.type] || 5);
         });
@@ -2460,7 +2442,7 @@
         let currentMatrixIndex = -1;
 
         if (currentCommission === '7th') {
-            let match = String(initialLevel).match(/S-(\d+)/i);
+            let match = String(currentLevel).match(/S-(\d+)/i);
             let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
             currentLevel = key;
             let cells = fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
@@ -2489,23 +2471,6 @@
 
         events.forEach(ev => {
             if (ev.type === 'INITIAL') {
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
-            }
-            else if (ev.type === 'COMMISSION_5TH') {
-                currentCommission = '5th';
-                currentBasic = Math.round(currentBasic * 2.3);
-                currentGP = 0;
-                currentScaleLabel = "५वा आयोग सुधारित";
-                lowerBasic = currentBasic;
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
-            }
-            else if (ev.type === 'COMMISSION_6TH') {
-                currentCommission = '6th';
-                currentBasic = Math.round((currentBasic * 1.86) / 10) * 10;
-                currentGP = 1900;
-                currentScaleLabel = "PB-1 : 5200 - 20200 (GP 1900)";
-                lowerBasic = currentBasic;
-                lowerGP = currentGP;
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'COMMISSION_7TH') {
@@ -2569,6 +2534,33 @@
                     currentMatrixIndex = fitTemp.index;
                     currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
                 }
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+            }
+            else if (ev.type === 'BENEFIT_SAME_DAY') {
+                let b = ev.data;
+                currentCommission = b.commission;
+
+                if (currentCommission === '7th') {
+                    let lvlMatch = b.scale.match(/S-(\d+)/i);
+                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
+
+                    let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
+                    let currIdx = cellsLower.indexOf(currentBasic);
+                    if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
+                    let notionalIdx = Math.min(currIdx + 1, cellsLower.length - 1);
+                    let notionalPay = cellsLower[notionalIdx];
+
+                    let fitInHigher = fitInMatrix(targetLvl, notionalPay);
+                    currentLevel = fitInHigher.level;
+                    currentBasic = fitInHigher.basic;
+                    currentMatrixIndex = fitInHigher.index;
+                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
+                }
+                lowerLevel = currentLevel;
+                lowerMatrixIndex = currentMatrixIndex;
+                lowerBasic = currentBasic;
+                lowerGP = currentGP;
+
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
             else if (ev.type === 'BENEFIT_OPTION_DNI') {
@@ -2638,6 +2630,8 @@
 
         // स्वतंत्र मोबाईल-फिटेड अहवाल पेज (Output Box) उघडणे
         const outputBox = document.getElementById('outputBox');
+        outputBox.classList.add('hidden'); // Reset to force repaint
+        void outputBox.offsetWidth;
         outputBox.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
