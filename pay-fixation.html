@@ -708,7 +708,7 @@
             margin-right: 2px;
         }
 
-        /* 🌟 PDF एक्सपोर्टसाठी तक्त्याचे स्टाईल्स */
+        /* 🌟 PDF एक्सपोर्टसाठी स्टाईल्स */
         .pdf-export-mode table {
             width: 100% !important;
             white-space: normal !important;
@@ -1273,7 +1273,7 @@
     let selectedWithheldDates = new Set();
     let globalCalcDataList = [];
 
-    // 🌟 ॲप (APK) किंवा वेब ब्राऊझर अचूकपणे ओळखणे
+    // 🌟 ॲप (APK) किंवा वेब ब्राऊझर ओळखणे
     function isWebViewApp() {
         const ua = navigator.userAgent || '';
         const isAndroid = /Android/i.test(ua);
@@ -1283,7 +1283,7 @@
         return hasAndroidBridge || (isAndroid && isWv) || isStandalone;
     }
 
-    // 🌟 १. मुख्य अहवाल तक्ता प्रिंट / PDF फंक्शन (APK व Chrome दोन्हीसाठी)
+    // 🌟 १. मुख्य अहवाल तक्ता प्रिंट / PDF फंक्शन (Clean ASCII filename: Pay_Fixation_Report.pdf)
     function printReport() {
         if (window.Android && typeof window.Android.print === 'function') {
             window.Android.print();
@@ -1315,7 +1315,6 @@
         const prevOverflow = scrollContainer ? scrollContainer.style.overflow : '';
         const prevAreaOverflow = reportArea.style.overflow;
 
-        // PDF मध्ये सर्व ओळी पूर्ण येण्यासाठी मर्यादा तात्पुरती काढणे
         reportArea.classList.add('pdf-export-mode');
         if (scrollContainer) {
             scrollContainer.style.maxHeight = 'none';
@@ -1325,7 +1324,7 @@
 
         const opt = {
             margin: [8, 6, 8, 6],
-            filename: 'वेतन_निश्चिती_अहवाल.pdf',
+            filename: 'Pay_Fixation_Report.pdf',
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true, logging: false },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -1350,7 +1349,7 @@
         });
     }
 
-    // 🌟 २. विवरणपत्र प्रिंट / PDF फंक्शन (APK व Chrome दोन्हीसाठी)
+    // 🌟 २. विवरणपत्र प्रिंट / PDF फंक्शन (Clean ASCII filename: Pay_Fixation_Illustration.pdf)
     function printIllustrationSheet() {
         if (window.Android && typeof window.Android.print === 'function') {
             window.Android.print();
@@ -1385,14 +1384,13 @@
             return;
         }
 
-        // युजरने बदललेले आकडे PDF मध्ये अचूक येण्यासाठी व्हॅल्यू सिंक्रोनाईज करणे
         illContent.querySelectorAll('input').forEach(input => {
             input.setAttribute('value', input.value);
         });
 
         const opt = {
             margin: [8, 8, 8, 8],
-            filename: 'पाचवा_वेतन_आयोग_वेतन_निश्चिती.pdf',
+            filename: 'Pay_Fixation_Illustration.pdf',
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true, logging: false },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -3214,15 +3212,18 @@
             else if (ev.type === 'BENEFIT_OPTION_DNI') {
                 let b = ev.data;
                 currentCommission = b.commission;
-                let lBasic = b.savedLowerBasic || currentBasic;
+                let lLevel = b.savedLowerLevel || lowerLevel;
+                let lIndex = (b.savedLowerIndex !== undefined && b.savedLowerIndex !== -1) ? b.savedLowerIndex : currentMatrixIndex;
+                let lBasic = b.savedLowerBasic || lowerBasic;
+                let lGP = b.savedLowerGP !== undefined ? b.savedLowerGP : lowerGP;
 
-                currentScaleLabel = b.scale;
                 if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-                    let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
+                    let cellsLower = fullPayMatrix7th[lLevel] || fullPayMatrix7th["S-6"];
                     let currIdx = cellsLower.indexOf(lBasic);
                     if (currIdx === -1) currIdx = 0;
+
                     let notionalIdx = Math.min(currIdx + 2, cellsLower.length - 1);
                     let notionalPay = cellsLower[notionalIdx];
 
@@ -3262,7 +3263,7 @@
             else if (ev.type === 'BENEFIT_SAME_DAY') {
                 let b = ev.data;
                 currentCommission = b.commission;
-                currentScaleLabel = b.scale;
+
                 if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
@@ -3360,7 +3361,7 @@
         if (evType === 'COMMISSION_5TH' || evType === 'COMMISSION_6TH' || evType === 'COMMISSION_7TH') {
             let dataIdx = globalCalcDataList.length;
             globalCalcDataList.push(calcData);
-            totalDisplay = `<a href="javascript:void(0)" onclick="openCalculationSheet(${dataIdx})" style="color:#01579b; text-decoration:underline; font-weight:bold; cursor:pointer;" title="पाचवा वेतन आयोग वेतन निश्चिती विवरणपत्र पहा">${total}</a>`;
+            totalDisplay = `<a href="javascript:void(0)" onclick="openCalculationSheet(${dataIdx})" style="color:#01579b; text-decoration:underline; font-weight:bold; cursor:pointer;" title="वेतन निश्चिती विवरणपत्र पहा">${total}</a>`;
         }
 
         let tr = document.createElement('tr');
