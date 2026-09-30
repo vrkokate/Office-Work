@@ -1273,7 +1273,6 @@
     let selectedWithheldDates = new Set();
     let globalCalcDataList = [];
 
-    // 🌟 ॲप (APK) किंवा वेब ब्राऊझर ओळखणे
     function isWebViewApp() {
         const ua = navigator.userAgent || '';
         const isAndroid = /Android/i.test(ua);
@@ -1283,7 +1282,7 @@
         return hasAndroidBridge || (isAndroid && isWv) || isStandalone;
     }
 
-    // 🌟 १. मुख्य अहवाल तक्ता प्रिंट / PDF फंक्शन (Clean ASCII filename: Pay_Fixation_Report.pdf)
+    // 🌟 मुख्य अहवाल तक्ता प्रिंट / PDF (थेट Open किंवा योग्य नावाने Save)
     function printReport() {
         if (window.Android && typeof window.Android.print === 'function') {
             window.Android.print();
@@ -1330,13 +1329,15 @@
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        html2pdf().set(opt).from(reportArea).save().then(() => {
+        html2pdf().set(opt).from(reportArea).output('blob').then(async (blob) => {
             if (scrollContainer) {
                 scrollContainer.style.maxHeight = prevMaxH;
                 scrollContainer.style.overflow = prevOverflow;
             }
             reportArea.style.overflow = prevAreaOverflow;
             reportArea.classList.remove('pdf-export-mode');
+
+            await handleAppPdfOutput(blob, 'Pay_Fixation_Report.pdf');
         }).catch(err => {
             console.error(err);
             if (scrollContainer) {
@@ -1349,7 +1350,7 @@
         });
     }
 
-    // 🌟 २. विवरणपत्र प्रिंट / PDF फंक्शन (Clean ASCII filename: Pay_Fixation_Illustration.pdf)
+    // 🌟 विवरणपत्र प्रिंट / PDF (थेट Open किंवा योग्य नावाने Save)
     function printIllustrationSheet() {
         if (window.Android && typeof window.Android.print === 'function') {
             window.Android.print();
@@ -1379,11 +1380,6 @@
         const illContent = document.getElementById('illustrationSheetContent');
         if (!illContent) return;
 
-        if (typeof html2pdf === 'undefined') {
-            printIllustrationSheetNative();
-            return;
-        }
-
         illContent.querySelectorAll('input').forEach(input => {
             input.setAttribute('value', input.value);
         });
@@ -1396,10 +1392,50 @@
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        html2pdf().set(opt).from(illContent).save().catch(err => {
+        html2pdf().set(opt).from(illContent).output('blob').then(async (blob) => {
+            await handleAppPdfOutput(blob, 'Pay_Fixation_Illustration.pdf');
+        }).catch(err => {
             console.error(err);
             printIllustrationSheetNative();
         });
+    }
+
+    // 🌟 फाईलवर '?' न येण्यासाठी आणि PDF थेट ओपन/सेव्ह होण्यासाठीचे मुख्य फंक्शन
+    async function handleAppPdfOutput(blob, fileName) {
+        // १. Android Web Share API (अँड्रॉइडमध्ये थेट Drive PDF Viewer मध्ये ओपन होते)
+        try {
+            const file = new File([blob], fileName, { type: 'application/pdf' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: fileName,
+                    text: 'वेतन निश्चिती अहवाल (PDF)'
+                });
+                return;
+            }
+        } catch (e) {
+            console.log("Web share skipped/fallback", e);
+        }
+
+        // २. जर ॲप जुने असेल आणि सेव्ह डायलॉग आला, तर युजरला सावध करणे व नाव पुरवणे
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(fileName);
+            }
+        } catch(e){}
+
+        alert("महत्त्वाची सूचना:\n'Save As' बॉक्स आल्यास नावाच्या शेवटी '.pdf' नक्की टाईप करा (उदा. " + fileName + ").\nनावापुढे .pdf न टाकल्यास फाईलवर '?' चिन्ह येते व ती उघडत नाही.");
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 2000);
     }
 
     function onWithheldChkChange(chk) {
@@ -3352,7 +3388,6 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 🌟 'एकूण वेतन' रकान्यात केवळ संख्या (लोगो काढलेला) आणि क्लिक करताच थेट पॉप-अप ओपन होणे
     function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp, evType, calcData) {
         let total = basic + (gp > 0 ? gp : 0);
         let gpDisplay = gp > 0 ? gp : "-";
