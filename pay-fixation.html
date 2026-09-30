@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>वेतन निश्चिती प्रणाली (Pay Fixation System)</title>
+    <!-- 🌟 APK (App) आणि Browser मध्ये थेट PDF तयार करण्यासाठी लायब्ररी -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --primary: #2e7d32;
@@ -197,7 +199,7 @@
         }
         .reset-btn:hover { background-color: #546e7a; }
 
-        /* पॉप-अप - z-index २५००० केल्याने तक्त्यावर तात्काळ समोर उघडेल */
+        /* पॉप-अप */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -706,6 +708,16 @@
             margin-right: 2px;
         }
 
+        /* 🌟 PDF एक्सपोर्टसाठी तक्त्याचे स्टाईल्स */
+        .pdf-export-mode table {
+            width: 100% !important;
+            white-space: normal !important;
+            font-size: 10px !important;
+        }
+        .pdf-export-mode th, .pdf-export-mode td {
+            padding: 4px 5px !important;
+        }
+
         @media print {
             body.print-illustration-mode .container,
             body.print-illustration-mode .output-box,
@@ -909,7 +921,7 @@
 
     <div class="report-btn-group">
         <button type="button" class="edit-data-btn" onclick="closeReportView(); scrollToEditData();">✏️ माहिती दुरुस्त करा</button>
-        <button type="button" class="print-direct-btn" onclick="window.print()">🖨️ प्रिंट काढा</button>
+        <button type="button" class="print-direct-btn" onclick="printReport()">🖨️ प्रिंट काढा</button>
     </div>
 
     <div id="printableReportArea" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
@@ -1260,6 +1272,137 @@
 <script>
     let selectedWithheldDates = new Set();
     let globalCalcDataList = [];
+
+    // 🌟 ॲप (APK) किंवा वेब ब्राऊझर अचूकपणे ओळखणे
+    function isWebViewApp() {
+        const ua = navigator.userAgent || '';
+        const isAndroid = /Android/i.test(ua);
+        const isWv = /;\s*wv|Version\/[0-9.]+/i.test(ua);
+        const isStandalone = window.navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+        const hasAndroidBridge = (typeof window.Android !== 'undefined') || (typeof window.AndroidPrint !== 'undefined');
+        return hasAndroidBridge || (isAndroid && isWv) || isStandalone;
+    }
+
+    // 🌟 १. मुख्य अहवाल तक्ता प्रिंट / PDF फंक्शन (APK व Chrome दोन्हीसाठी)
+    function printReport() {
+        if (window.Android && typeof window.Android.print === 'function') {
+            window.Android.print();
+            return;
+        }
+        if (window.AndroidPrint && typeof window.AndroidPrint.print === 'function') {
+            window.AndroidPrint.print();
+            return;
+        }
+
+        if (isWebViewApp()) {
+            generateReportPDF();
+        } else {
+            window.print();
+        }
+    }
+
+    function generateReportPDF() {
+        const reportArea = document.getElementById('printableReportArea');
+        if (!reportArea) return;
+
+        if (typeof html2pdf === 'undefined') {
+            window.print();
+            return;
+        }
+
+        const scrollContainer = reportArea.querySelector('.table-scroll-container');
+        const prevMaxH = scrollContainer ? scrollContainer.style.maxHeight : '';
+        const prevOverflow = scrollContainer ? scrollContainer.style.overflow : '';
+        const prevAreaOverflow = reportArea.style.overflow;
+
+        // PDF मध्ये सर्व ओळी पूर्ण येण्यासाठी मर्यादा तात्पुरती काढणे
+        reportArea.classList.add('pdf-export-mode');
+        if (scrollContainer) {
+            scrollContainer.style.maxHeight = 'none';
+            scrollContainer.style.overflow = 'visible';
+        }
+        reportArea.style.overflow = 'visible';
+
+        const opt = {
+            margin: [8, 6, 8, 6],
+            filename: 'वेतन_निश्चिती_अहवाल.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(reportArea).save().then(() => {
+            if (scrollContainer) {
+                scrollContainer.style.maxHeight = prevMaxH;
+                scrollContainer.style.overflow = prevOverflow;
+            }
+            reportArea.style.overflow = prevAreaOverflow;
+            reportArea.classList.remove('pdf-export-mode');
+        }).catch(err => {
+            console.error(err);
+            if (scrollContainer) {
+                scrollContainer.style.maxHeight = prevMaxH;
+                scrollContainer.style.overflow = prevOverflow;
+            }
+            reportArea.style.overflow = prevAreaOverflow;
+            reportArea.classList.remove('pdf-export-mode');
+            window.print();
+        });
+    }
+
+    // 🌟 २. विवरणपत्र प्रिंट / PDF फंक्शन (APK व Chrome दोन्हीसाठी)
+    function printIllustrationSheet() {
+        if (window.Android && typeof window.Android.print === 'function') {
+            window.Android.print();
+            return;
+        }
+        if (window.AndroidPrint && typeof window.AndroidPrint.print === 'function') {
+            window.AndroidPrint.print();
+            return;
+        }
+
+        if (isWebViewApp()) {
+            generateIllustrationPDF();
+        } else {
+            printIllustrationSheetNative();
+        }
+    }
+
+    function printIllustrationSheetNative() {
+        document.body.classList.add('print-illustration-mode');
+        window.print();
+        setTimeout(() => {
+            document.body.classList.remove('print-illustration-mode');
+        }, 1000);
+    }
+
+    function generateIllustrationPDF() {
+        const illContent = document.getElementById('illustrationSheetContent');
+        if (!illContent) return;
+
+        if (typeof html2pdf === 'undefined') {
+            printIllustrationSheetNative();
+            return;
+        }
+
+        // युजरने बदललेले आकडे PDF मध्ये अचूक येण्यासाठी व्हॅल्यू सिंक्रोनाईज करणे
+        illContent.querySelectorAll('input').forEach(input => {
+            input.setAttribute('value', input.value);
+        });
+
+        const opt = {
+            margin: [8, 8, 8, 8],
+            filename: 'पाचवा_वेतन_आयोग_वेतन_निश्चिती.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(illContent).save().catch(err => {
+            console.error(err);
+            printIllustrationSheetNative();
+        });
+    }
 
     function onWithheldChkChange(chk) {
         if (chk.checked) {
@@ -1634,7 +1777,7 @@
         } else {
             card.classList.remove('card-filled');
             card.classList.add('card-pending');
-            status.textContent = "⚠️️ ही माहिती भरणे बाकी आहे (कालावधी निवडा)";
+            status.textContent = "⚠️ ही माहिती भरणे बाकी आहे (कालावधी निवडा)";
             badge.textContent = "!";
             return false;
         }
@@ -2061,10 +2204,10 @@
                         <div style="font-size: 13px; font-weight: bold; color: #263238; margin-bottom: 2px; text-align: center;">महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, २००९ (०१-०१-२००६)</div>
                     </div>
                     <table class="ill-table">
-                        <tr><td class="col-desc">१. ५व्या आयोगातील मूळ वेतन (Basic Pay)</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input ill-num-input" value="${data.existingPay}"></td></tr>
-                        <tr><td class="col-desc">२. १.८६ गुणाकार घटक (Basic × 1.86)</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input ill-num-input" value="${data.multBasic}"></td></tr>
-                        <tr><td class="col-desc">३. मंजूर ग्रेड पे (Grade Pay)</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input ill-num-input" value="${data.gp}"></td></tr>
-                        <tr style="background:#e8f5e9; font-weight:bold;"><td class="col-desc">४. ६व्या आयोगात एकूण निश्चित वेतन</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input ill-num-input" value="${data.total}" style="color:#b71c1c;"></td></tr>
+                        <tr><td class="col-desc">१. ५व्या आयोगातील मूळ वेतन (Basic Pay)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" class="ill-input ill-num-input" value="${data.existingPay}"></td></tr>
+                        <tr><td class="col-desc">२. १.८६ गुणाकार घटक (Basic × 1.86)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" class="ill-input ill-num-input" value="${data.multBasic}"></td></tr>
+                        <tr><td class="col-desc">३. मंजूर ग्रेड पे (Grade Pay)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" class="ill-input ill-num-input" value="${data.gp}"></td></tr>
+                        <tr style="background:#e8f5e9; font-weight:bold;"><td class="col-desc">४. ६व्या आयोगात एकूण निश्चित वेतन</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" class="ill-input ill-num-input" value="${data.total}" style="color:#b71c1c;"></td></tr>
                     </table>
                     <div class="ill-footer" style="margin-top: 18px; border-top: 1.5px solid #2e7d32; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #37474f;">
                         <div><b>महाराष्ट्र शासन - ६वा वेतन आयोग वेतन निश्चिती</b></div>
@@ -2081,12 +2224,12 @@
                         <div style="font-size: 13px; font-weight: bold; color: #263238; margin-bottom: 2px; text-align: center;">महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, २०१९ (०१-०१-२०१६ पे-मॅट्रिक्स)</div>
                     </div>
                     <table class="ill-table">
-                        <tr><td class="col-desc">१. ३१-१२-२०१५ रोजीचे मूळ वेतन (६वा आयोग)</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input ill-num-input" value="${data.basic6th}"></td></tr>
-                        <tr><td class="col-desc">२. ग्रेड पे (Grade Pay)</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input ill-num-input" value="${data.gp6th}"></td></tr>
-                        <tr><td class="col-desc">३. एकूण वेतन (Basic + GP)</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input ill-num-input" value="${data.total6th}"></td></tr>
-                        <tr><td class="col-desc">४. २.५७ गुणाकार घटक (Total × 2.57)</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input ill-num-input" value="${data.fitmentCalc}"></td></tr>
+                        <tr><td class="col-desc">१. ३१-१२-२०१५ रोजीचे मूळ वेतन (६वा आयोग)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" class="ill-input ill-num-input" value="${data.basic6th}"></td></tr>
+                        <tr><td class="col-desc">२. ग्रेड पे (Grade Pay)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" class="ill-input ill-num-input" value="${data.gp6th}"></td></tr>
+                        <tr><td class="col-desc">३. एकूण वेतन (Basic + GP)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" class="ill-input ill-num-input" value="${data.total6th}"></td></tr>
+                        <tr><td class="col-desc">४. २.५७ गुणाकार घटक (Total × 2.57)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" class="ill-input ill-num-input" value="${data.fitmentCalc}"></td></tr>
                         <tr><td class="col-desc">५. ७व्या आयोगातील समतुल्य स्तर (Pay Matrix Level)</td><td class="col-dots">...</td><td class="col-val"><input type="text" class="ill-input ill-num-input" style="text-align:center;" value="${data.level}"></td></tr>
-                        <tr style="background:#e8f5e9; font-weight:bold;"><td class="col-desc">६. पे-मॅट्रिक्सनुसार अंतिम निश्चित वेतन</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input ill-num-input" value="${data.finalBasic7th}" style="color:#b71c1c;"></td></tr>
+                        <tr style="background:#e8f5e9; font-weight:bold;"><td class="col-desc">६. पे-मॅट्रिक्सनुसार अंतिम निश्चित वेतन</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" class="ill-input ill-num-input" value="${data.finalBasic7th}" style="color:#b71c1c;"></td></tr>
                     </table>
                     <div class="ill-footer" style="margin-top: 18px; border-top: 1.5px solid #2e7d32; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #37474f;">
                         <div><b>महाराष्ट्र शासन - ७वा वेतन आयोग वेतन निश्चिती</b></div>
@@ -2114,14 +2257,6 @@
         let st9 = parseFloat(document.getElementById('ill_stage9').value) || 2550;
         let st10 = parseFloat(document.getElementById('ill_stage10').value) || 2605;
         document.getElementById('ill_stage11').value = Math.max(st9, st10);
-    }
-
-    function printIllustrationSheet() {
-        document.body.classList.add('print-illustration-mode');
-        window.print();
-        setTimeout(() => {
-            document.body.classList.remove('print-illustration-mode');
-        }, 1000);
     }
 
     function getCleanScaleLabel(scale, comm, level) {
@@ -2572,7 +2707,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनश्रेणी सुधारणा व रोखलेली वाढ १००% अचूक)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया
     // =========================================================================
     function processFixation() {
         const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
@@ -3131,9 +3266,10 @@
                 if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
+
                     let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
                     let currIdx = cellsLower.indexOf(currentBasic);
-                    if (currIdx === -1) currIdx = 0;
+                    if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
                     let notionalIdx = Math.min(currIdx + 1, cellsLower.length - 1);
                     let notionalPay = cellsLower[notionalIdx];
 
@@ -3143,11 +3279,28 @@
                     currentMatrixIndex = fitFinal.index;
                     currentGP = 0;
                     currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
+                } else if (currentCommission === '6th') {
+                    let gpMatch = b.scale.match(/GP\s*(\d+)/i);
+                    currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
+                    let inc = Math.ceil(((currentBasic + currentGP) * 0.03) / 10) * 10;
+                    currentBasic += inc;
+                    let ep = get6thEntryPay(b.scale, currentGP);
+                    if (ep && currentBasic < ep) currentBasic = ep;
+                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
                 } else {
-                    let promoStages = parsePayScaleStages(b.scale, b.commission);
-                    let found = promoStages.find(s => s >= currentBasic);
-                    currentBasic = found ? found : currentBasic;
+                    let step = (currentCommission === '4th') ? 25 : 100;
+                    let target = currentBasic + step;
+                    let promoStages = parsePayScaleStages(b.scale, currentCommission);
+                    let found = promoStages.find(s => s >= target);
+                    currentBasic = found ? found : target;
+                    currentGP = 0;
+                    currentScaleLabel = b.scale;
                 }
+
+                lowerLevel = currentLevel;
+                lowerBasic = currentBasic;
+                lowerGP = currentGP;
+                lowerMatrixIndex = currentMatrixIndex;
 
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
             }
@@ -3198,7 +3351,7 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 🌟 'एकूण वेतन' रकान्यात केवळ संख्या (कोणताही लोगो नाही) आणि क्लिक करताच थेट पॉप-अप ओपन होणे
+    // 🌟 'एकूण वेतन' रकान्यात केवळ संख्या (लोगो काढलेला) आणि क्लिक करताच थेट पॉप-अप ओपन होणे
     function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp, evType, calcData) {
         let total = basic + (gp > 0 ? gp : 0);
         let gpDisplay = gp > 0 ? gp : "-";
@@ -3207,7 +3360,6 @@
         if (evType === 'COMMISSION_5TH' || evType === 'COMMISSION_6TH' || evType === 'COMMISSION_7TH') {
             let dataIdx = globalCalcDataList.length;
             globalCalcDataList.push(calcData);
-            // लोगो पूर्णपणे काढून फक्त संख्या ठेवली आहे
             totalDisplay = `<a href="javascript:void(0)" onclick="openCalculationSheet(${dataIdx})" style="color:#01579b; text-decoration:underline; font-weight:bold; cursor:pointer;" title="पाचवा वेतन आयोग वेतन निश्चिती विवरणपत्र पहा">${total}</a>`;
         }
 
