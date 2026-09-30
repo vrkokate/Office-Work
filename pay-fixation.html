@@ -1088,7 +1088,7 @@
             <button type="button" onclick="addScaleRevRow()" style="background: #0277bd; color: white; border: none; padding: 5px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; margin-top: 4px;">+ आणखी एक वेतनश्रेणी सुधारणा जोडा</button>
         </div>
 
-        <!-- वेतनवाढ थांबवली व 'ओके' बटणासह स्क्रोल बॉक्स -->
+        <!-- वेतनवाढ थांबवली व चेकबॉक्स बॉक्स -->
         <div class="field-group" style="margin-top: 10px; border-top: 1px dashed #cfd8dc; padding-top: 8px;">
             <label>🛑 कोणती वेतनवाढ थांबवली / रोखली आहे का?</label>
             <select id="incrementWithheld" onchange="toggleWithheldOption()">
@@ -1123,6 +1123,17 @@
 </div>
 
 <script>
+    // 🌟 निवडलेल्या रोखलेल्या तारखा सुरक्षित ठेवण्यासाठी ग्लोबल सेट
+    let selectedWithheldDates = new Set();
+
+    function onWithheldChkChange(chk) {
+        if (chk.checked) {
+            selectedWithheldDates.add(chk.value);
+        } else {
+            selectedWithheldDates.delete(chk.value);
+        }
+    }
+
     function formatDateToDDMMYYYY(dateString) {
         if (!dateString) return '';
         let parts = dateString.split('-');
@@ -1165,6 +1176,13 @@
             modal.classList.remove('hidden');
         }
         if (modalId === 'rulesModal') {
+            const withheldVal = document.getElementById('incrementWithheld').value;
+            const listContainer = document.getElementById('withheldListContainer');
+            const effectDiv = document.getElementById('withheldEffectDiv');
+            if (withheldVal === 'Yes') {
+                listContainer.classList.remove('hidden');
+                effectDiv.classList.remove('hidden');
+            }
             populateWithheldCheckboxes();
         }
     }
@@ -1243,8 +1261,13 @@
         });
     }
 
+    // 🌟 चेक केलेले पर्याय कधीही न पुसले जाणारे अचूक चेकबॉक्स फंक्शन
     function populateWithheldCheckboxes() {
         const container = document.getElementById('generatedIncrementsCheckboxes');
+        if (!container) return;
+
+        container.querySelectorAll('.withheld-date-chk:checked').forEach(c => selectedWithheldDates.add(c.value));
+
         container.innerHTML = "";
 
         const joinDateInput = document.getElementById('empJoinDate').value;
@@ -1303,9 +1326,10 @@
         }
 
         datesList.forEach(item => {
+            let isChecked = selectedWithheldDates.has(item.iso) ? "checked" : "";
             let label = document.createElement('label');
             label.className = 'checkbox-item';
-            label.innerHTML = `<input type="checkbox" class="withheld-date-chk" value="${item.iso}"> दिनांक: <b>${item.disp}</b> रोजीची वार्षिक वेतनवाढ`;
+            label.innerHTML = `<input type="checkbox" class="withheld-date-chk" value="${item.iso}" ${isChecked} onchange="onWithheldChkChange(this)"> दिनांक: <b>${item.disp}</b> रोजीची वार्षिक वेतनवाढ`;
             container.appendChild(label);
         });
     }
@@ -1321,6 +1345,7 @@
         } else {
             listContainer.classList.add('hidden');
             effectDiv.classList.add('hidden');
+            selectedWithheldDates.clear();
         }
     }
 
@@ -1330,12 +1355,15 @@
             alert("कृपया किमान एक वेतनवाढ तारीख निवडा!");
             return;
         }
-        document.getElementById('withheldListContainer').classList.add('hidden');
-        alert("वेतनवाढ रोखण्याची निवड यशस्वीरीत्या जतन केली!");
+        selectedWithheldDates.clear();
+        chks.forEach(c => selectedWithheldDates.add(c.value));
+        alert("वेतनवाढ रोखण्याची तारीख यशस्वीरीत्या जतन केली!");
     }
 
     function resetAllData() {
         if (confirm("तुम्हाला भरलेली सर्व माहिती पुसून टाकायची आहे का?")) {
+            selectedWithheldDates.clear();
+            
             document.getElementById('empName').value = "";
             document.getElementById('empDesignation').value = "";
             document.getElementById('empJoinDate').value = "";
@@ -1367,6 +1395,7 @@
             document.getElementById('incrementWithheld').value = "No";
             document.getElementById('withheldListContainer').classList.add('hidden');
             document.getElementById('withheldEffectDiv').classList.add('hidden');
+            document.getElementById('withheldEffect').value = "non_cumulative";
 
             validateCard1();
             validateCard2();
@@ -1480,7 +1509,7 @@
     }
 
     // =========================================================================
-    // 📚 अधिकृत वेतनश्रेण्या (४था, ५वा, ६वा व ७वा आयोग)
+    // 📚 अधिकृत वेतनश्रेण्या
     // =========================================================================
     const payScales4th = [
         "रु. 750 - 12 - 870 - EB - 14 - 940",
@@ -1866,7 +1895,7 @@
                         document.getElementById('gradePay').value = gpVal;
                         let ep = get6thEntryPay(scale, gpVal);
                         if (ep && inputId === 'currentPayScale') {
-                            document.getElementById('basicPay').value = ep; // ५८३० ऑटो-सेट
+                            document.getElementById('basicPay').value = ep;
                         }
                     }
                 } else if (comm === '7th' && inputId === 'currentPayScale') {
@@ -2166,7 +2195,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनश्रेणी सुधारणा दुरुस्तीसह)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनश्रेणी सुधारणा व रोखलेली वाढ १००% अचूक)
     // =========================================================================
     function processFixation() {
         const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
@@ -2223,7 +2252,8 @@
             });
         }
 
-        let withheldDatesSet = new Set();
+        // 🌟 रोखलेल्या वेतनवाढीची अचूक नोंद घेणे
+        let withheldDatesSet = new Set(selectedWithheldDates);
         const hasWithheld = document.getElementById('incrementWithheld').value === 'Yes';
         if (hasWithheld) {
             const chks = document.querySelectorAll('.withheld-date-chk:checked');
@@ -2360,17 +2390,18 @@
                 }
 
                 let isoStr = `${incDate.getFullYear()}-${String(incDate.getMonth() + 1).padStart(2, '0')}-${String(incDate.getDate()).padStart(2, '0')}`;
-                let isWithheld = withheldDatesSet.has(isoStr);
+                let isWithheld = (hasWithheld && withheldDatesSet.has(isoStr));
 
                 let m = String(incDate.getMonth() + 1).padStart(2, '0');
                 let d = String(incDate.getDate()).padStart(2, '0');
 
                 if (isWithheld) {
+                    let effectLabel = (withheldEffect === 'cumulative') ? 'परिणाम करणारी' : 'परिणाम न करणारी';
                     events.push({
                         date: incDate,
                         dateStr: `${d}-${m}-${yr}`,
                         type: 'WITHHELD_INC',
-                        desc: `वेतनवाढ रोखली / थांबवली (${withheldEffect === 'cumulative' ? 'परिणाम करणारी' : 'परिणाम न करणारी'})`,
+                        desc: `वेतनवाढ रोखली / थांबवली (${effectLabel})`,
                         effect: withheldEffect,
                         isoDate: isoStr
                     });
@@ -2538,6 +2569,8 @@
             else if (ev.type === 'WITHHELD_INC') {
                 if (ev.effect === 'non_cumulative') {
                     restoreWithheldNext = true;
+                } else {
+                    restoreWithheldNext = false;
                 }
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
