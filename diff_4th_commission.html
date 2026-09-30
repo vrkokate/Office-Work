@@ -2,64 +2,1235 @@
 <html lang="mr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+      maximum-scale=1.0,user-scalable=no">
+
 <title>४ था वेतन आयोग फरक</title>
+
 <style>
-* { box-sizing: border-box; }
-body {
-    margin: 0; padding: 12px;
-    font-family: "Noto Sans Devanagari", Arial, sans-serif;
-    background: radial-gradient(circle at 50% 25%, #173b69 0%, #071a32 45%, #020914 100%);
-    color: white; min-height: 100vh;
+*{
+    box-sizing:border-box;
 }
-.box {
-    max-width: 900px; margin: 0 auto; background: #0f1c30;
-    border-radius: 16px; border: 1px solid #7c3aed; padding: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+
+:root{
+    --bg:#080b14;
+    --card:#111827;
+    --card2:#172033;
+    --border:#334155;
+    --primary:#7c3aed;
+    --primary2:#a855f7;
+    --green:#22c55e;
+    --red:#ef4444;
+    --yellow:#f59e0b;
+    --blue:#3b82f6;
+    --text:#f8fafc;
+    --muted:#94a3b8;
 }
-.top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #7c3aed; padding-bottom: 12px; margin-bottom: 20px; }
-.back-btn { background: #7c3aed; color: white; padding: 8px 16px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; }
-.title { font-size: 20px; font-weight: bold; color: #c4b5fd; margin: 0; }
-.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 15px; }
-.form-group { display: flex; flex-direction: column; gap: 5px; }
-label { font-size: 13px; color: #cbd5e1; }
-input, select { background: #091322; border: 1px solid #4c1d95; color: white; padding: 9px; border-radius: 6px; outline: none; }
-.calc-btn { background: linear-gradient(135deg, #7c3aed, #4f46e5); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+
+body{
+    margin:0;
+    padding:10px;
+    min-height:100vh;
+    font-family:
+      "Noto Sans Devanagari",
+      "Nirmala UI",
+      Arial,sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(circle at top left,#251052 0,#080b14 45%),
+      radial-gradient(circle at bottom right,#082f49 0,#080b14 50%);
+}
+
+.container{
+    width:100%;
+    max-width:900px;
+    margin:auto;
+}
+
+.header{
+    background:linear-gradient(135deg,#4c1d95,#7c3aed,#9333ea);
+    border:1px solid #a78bfa;
+    border-radius:18px;
+    padding:16px;
+    text-align:center;
+    box-shadow:0 10px 30px #0008;
+    margin-bottom:12px;
+}
+
+.header h1{
+    margin:0;
+    font-size:23px;
+}
+
+.header p{
+    margin:6px 0 0;
+    color:#ede9fe;
+    font-size:13px;
+}
+
+.info{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-bottom:12px;
+}
+
+.info-box{
+    background:#111827cc;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px;
+    text-align:center;
+}
+
+.info-box b{
+    display:block;
+    color:#c4b5fd;
+    font-size:12px;
+}
+
+.info-box span{
+    display:block;
+    margin-top:4px;
+    font-size:14px;
+}
+
+.card{
+    background:linear-gradient(145deg,#111827f5,#0f172af5);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:14px;
+    margin-bottom:12px;
+    box-shadow:0 8px 25px #0007;
+}
+
+.card-title{
+    font-size:17px;
+    font-weight:bold;
+    color:#ddd6fe;
+    padding-bottom:10px;
+    margin-bottom:12px;
+    border-bottom:1px solid #334155;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+.field{
+    display:flex;
+    flex-direction:column;
+}
+
+.field.full{
+    grid-column:1/-1;
+}
+
+label{
+    font-size:12px;
+    color:#cbd5e1;
+    margin-bottom:5px;
+}
+
+input,select{
+    width:100%;
+    min-height:44px;
+    border-radius:10px;
+    border:1px solid #475569;
+    background:#020617;
+    color:#fff;
+    padding:9px 10px;
+    outline:none;
+    font-size:14px;
+}
+
+input:focus,select:focus{
+    border-color:#a78bfa;
+    box-shadow:0 0 0 2px #7c3aed33;
+}
+
+input[readonly]{
+    background:#172033;
+    color:#c4b5fd;
+}
+
+.button-row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+}
+
+button{
+    border:0;
+    border-radius:11px;
+    min-height:45px;
+    padding:8px;
+    color:#fff;
+    font-size:14px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.btn-calc{
+    background:linear-gradient(135deg,#7c3aed,#9333ea);
+}
+
+.btn-reset{
+    background:#475569;
+}
+
+.btn-print{
+    background:#2563eb;
+}
+
+.btn-save{
+    background:#15803d;
+}
+
+button:active{
+    transform:scale(.98);
+}
+
+.result{
+    display:none;
+}
+
+.result-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+}
+
+.result-box{
+    background:#020617;
+    border:1px solid #334155;
+    border-radius:12px;
+    padding:12px;
+    text-align:center;
+}
+
+.result-box .caption{
+    color:#94a3b8;
+    font-size:12px;
+}
+
+.result-box .value{
+    margin-top:5px;
+    font-size:19px;
+    font-weight:bold;
+}
+
+.highlight{
+    border-color:#22c55e;
+    background:#052e16;
+}
+
+.highlight .value{
+    color:#4ade80;
+}
+
+.difference{
+    border-color:#f59e0b;
+    background:#451a03;
+}
+
+.difference .value{
+    color:#fbbf24;
+}
+
+.error{
+    display:none;
+    background:#450a0a;
+    border:1px solid #ef4444;
+    color:#fecaca;
+    border-radius:12px;
+    padding:11px;
+    margin-bottom:10px;
+    font-size:13px;
+}
+
+.success{
+    display:none;
+    background:#052e16;
+    border:1px solid #22c55e;
+    color:#bbf7d0;
+    border-radius:12px;
+    padding:11px;
+    margin-bottom:10px;
+    font-size:13px;
+}
+
+.warning{
+    background:#422006;
+    border:1px solid #f59e0b;
+    color:#fde68a;
+    border-radius:12px;
+    padding:10px;
+    font-size:12px;
+    margin-top:10px;
+}
+
+.details{
+    margin-top:12px;
+}
+
+.details-row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    border-bottom:1px solid #1e293b;
+    padding:9px 2px;
+    font-size:13px;
+}
+
+.details-row span:first-child{
+    color:#94a3b8;
+}
+
+.details-row span:last-child{
+    font-weight:bold;
+    text-align:right;
+}
+
+.status{
+    display:inline-block;
+    padding:4px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:bold;
+}
+
+.status.ready{
+    background:#064e3b;
+    color:#6ee7b7;
+}
+
+.status.warning{
+    background:#451a03;
+    color:#fcd34d;
+}
+
+.footer{
+    text-align:center;
+    color:#64748b;
+    font-size:11px;
+    padding:12px;
+}
+
+/* Mobile */
+@media(max-width:650px){
+
+    body{
+        padding:7px;
+    }
+
+    .header{
+        padding:13px 9px;
+        border-radius:15px;
+    }
+
+    .header h1{
+        font-size:19px;
+    }
+
+    .header p{
+        font-size:11px;
+    }
+
+    .info{
+        grid-template-columns:repeat(3,1fr);
+        gap:5px;
+    }
+
+    .info-box{
+        padding:7px 3px;
+    }
+
+    .info-box b{
+        font-size:10px;
+    }
+
+    .info-box span{
+        font-size:11px;
+    }
+
+    .card{
+        padding:11px;
+        border-radius:14px;
+    }
+
+    .grid{
+        grid-template-columns:1fr 1fr;
+        gap:8px;
+    }
+
+    .field.full{
+        grid-column:1/-1;
+    }
+
+    input,select{
+        min-height:42px;
+        font-size:13px;
+    }
+
+    .button-row{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .result-grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .result-box{
+        padding:10px 5px;
+    }
+
+    .result-box .value{
+        font-size:17px;
+    }
+}
+
+@media(max-width:380px){
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    .field.full{
+        grid-column:auto;
+    }
+
+    .result-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+/* Print */
+@media print{
+
+    body{
+        background:#fff;
+        color:#000;
+    }
+
+    .header{
+        background:#fff;
+        color:#000;
+        border:1px solid #000;
+        box-shadow:none;
+    }
+
+    .header h1,
+    .header p{
+        color:#000;
+    }
+
+    .card{
+        background:#fff;
+        color:#000;
+        border:1px solid #999;
+        box-shadow:none;
+    }
+
+    input,select{
+        color:#000;
+        background:#fff;
+        border:1px solid #999;
+    }
+
+    .button-row,
+    .footer{
+        display:none;
+    }
+
+    .result{
+        display:block!important;
+    }
+}
 </style>
 </head>
+
 <body>
-<div class="box">
-    <div class="top-bar">
-        <a href="difference.html" class="back-btn">⬅ मागे जा</a>
-        <h2 class="title">४ था वेतन आयोग (4th Pay Commission)</h2>
+
+<div class="container">
+
+    <div class="header">
+        <h1>💰 ४ था वेतन आयोग फरक</h1>
+        <p>Fourth Pay Commission — Pay Fixation & Difference</p>
     </div>
 
-    <div class="form-grid">
-        <div class="form-group">
-            <label>वेतनश्रेणी (Pay Scale):</label>
-            <select>
-                <option>७५० - ९४०</option>
-                <option>९५० - १५००</option>
-                <option>१२०० - २०४०</option>
-                <option>१४०० - २३००</option>
-                <option>१६४० - २९००</option>
-                <option>२२२० - ४०००</option>
-            </select>
+    <div class="info">
+
+        <div class="info-box">
+            <b>आयोग</b>
+            <span>४ था वेतन आयोग</span>
         </div>
-        <div class="form-group">
-            <label>मूळ वेतन (Basic Pay ₹):</label>
-            <input type="number" placeholder="उदा. 1400">
+
+        <div class="info-box">
+            <b>नियम</b>
+            <span>1988 Rules</span>
         </div>
-        <div class="form-group">
-            <label>महागाई भत्ता (D.A. %):</label>
-            <input type="number" placeholder="DA टक्केवारी">
+
+        <div class="info-box">
+            <b>स्थिती</b>
+            <span id="systemStatus"
+                  class="status ready">
+                READY
+            </span>
         </div>
-        <div class="form-group">
-            <label>घरभाडे भत्ता (H.R.A. ₹):</label>
-            <input type="number" placeholder="HRA रक्कम">
-        </div>
+
     </div>
-    <button class="calc-btn" onclick="alert('४ थ्या आयोगाची गणना लवकरच जोडली जाईल!')">वेतन निश्चित करा</button>
+
+
+    <!-- EMPLOYEE -->
+    <div class="card">
+
+        <div class="card-title">
+            👤 कर्मचारी माहिती
+        </div>
+
+        <div class="grid">
+
+            <div class="field">
+                <label>Employee ID</label>
+                <input
+                    id="employeeId"
+                    type="text"
+                    placeholder="उदा. EMP001">
+            </div>
+
+            <div class="field">
+                <label>कर्मचारी नाव</label>
+                <input
+                    id="employeeName"
+                    type="text"
+                    placeholder="कर्मचाऱ्याचे नाव">
+            </div>
+
+            <div class="field">
+                <label>पदनाम</label>
+                <input
+                    id="designation"
+                    type="text"
+                    placeholder="पदनाम">
+            </div>
+
+            <div class="field">
+                <label>विभाग / कार्यालय</label>
+                <input
+                    id="office"
+                    type="text"
+                    placeholder="कार्यालय">
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FIXATION -->
+    <div class="card">
+
+        <div class="card-title">
+            📅 वेतन निश्चिती माहिती
+        </div>
+
+        <div class="grid">
+
+            <div class="field">
+                <label>वेतन निश्चिती तारीख</label>
+                <input
+                    id="fixationDate"
+                    type="date">
+            </div>
+
+            <div class="field">
+                <label>लागू दिनांक</label>
+                <input
+                    id="effectiveDate"
+                    type="date"
+                    value="1986-01-01">
+            </div>
+
+            <div class="field">
+                <label>जुनी वेतनश्रेणी / Scale Code</label>
+                <input
+                    id="oldScale"
+                    type="text"
+                    placeholder="Scale Code">
+            </div>
+
+            <div class="field">
+                <label>जुना Stage</label>
+                <input
+                    id="oldStage"
+                    type="number"
+                    min="1"
+                    placeholder="Stage">
+            </div>
+
+            <div class="field">
+                <label>जुने मूलभूत वेतन</label>
+                <input
+                    id="oldBasic"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="₹">
+            </div>
+
+            <div class="field">
+                <label>जुना Increment</label>
+                <input
+                    id="oldIncrement"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="₹">
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- REVISED -->
+    <div class="card">
+
+        <div class="card-title">
+            📊 ४ था वेतन आयोग — सुधारित वेतन
+        </div>
+
+        <div class="grid">
+
+            <div class="field">
+                <label>Revised Scale Code</label>
+                <input
+                    id="newScale"
+                    type="text"
+                    placeholder="Revised Scale">
+            </div>
+
+            <div class="field">
+                <label>Revised Stage</label>
+                <input
+                    id="newStage"
+                    type="number"
+                    min="1"
+                    placeholder="Stage">
+            </div>
+
+            <div class="field">
+                <label>सुधारित किमान वेतन</label>
+                <input
+                    id="newMin"
+                    type="number"
+                    min="0"
+                    placeholder="₹">
+            </div>
+
+            <div class="field">
+                <label>सुधारित कमाल वेतन</label>
+                <input
+                    id="newMax"
+                    type="number"
+                    min="0"
+                    placeholder="₹">
+            </div>
+
+            <div class="field">
+                <label>सुधारित मूलभूत वेतन</label>
+                <input
+                    id="newBasic"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="₹">
+            </div>
+
+            <div class="field">
+                <label>सुधारित Increment</label>
+                <input
+                    id="newIncrement"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="₹">
+            </div>
+
+        </div>
+
+        <div class="warning">
+            ⚠️ सुधारित Scale / Stage / Pay values अधिकृत 1988
+            Rules मधील Master Data नुसार भराव्यात.
+        </div>
+
+    </div>
+
+
+    <!-- ERROR -->
+    <div id="errorBox" class="error"></div>
+
+    <!-- SUCCESS -->
+    <div id="successBox" class="success"></div>
+
+
+    <!-- BUTTONS -->
+    <div class="card">
+
+        <div class="button-row">
+
+            <button
+                class="btn-calc"
+                onclick="calculateDifference()">
+                🧮 गणना
+            </button>
+
+            <button
+                class="btn-reset"
+                onclick="resetForm()">
+                🔄 Reset
+            </button>
+
+            <button
+                class="btn-print"
+                onclick="printReport()">
+                🖨️ Print
+            </button>
+
+            <button
+                class="btn-save"
+                onclick="saveRecord()">
+                💾 Save
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESULT -->
+    <div id="resultSection" class="card result">
+
+        <div class="card-title">
+            📈 गणना निकाल
+        </div>
+
+        <div class="result-grid">
+
+            <div class="result-box">
+                <div class="caption">
+                    जुने मूलभूत वेतन
+                </div>
+
+                <div
+                    id="resultOldBasic"
+                    class="value">
+                    ₹0
+                </div>
+            </div>
+
+
+            <div class="result-box highlight">
+                <div class="caption">
+                    सुधारित मूलभूत वेतन
+                </div>
+
+                <div
+                    id="resultNewBasic"
+                    class="value">
+                    ₹0
+                </div>
+            </div>
+
+
+            <div class="result-box difference">
+                <div class="caption">
+                    वेतन फरक
+                </div>
+
+                <div
+                    id="resultDifference"
+                    class="value">
+                    ₹0
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="details">
+
+            <div class="details-row">
+                <span>Employee ID</span>
+                <span id="rEmployeeId">-</span>
+            </div>
+
+            <div class="details-row">
+                <span>कर्मचारी</span>
+                <span id="rEmployeeName">-</span>
+            </div>
+
+            <div class="details-row">
+                <span>जुनी Scale</span>
+                <span id="rOldScale">-</span>
+            </div>
+
+            <div class="details-row">
+                <span>जुना Stage</span>
+                <span id="rOldStage">-</span>
+            </div>
+
+            <div class="details-row">
+                <span>नवीन Scale</span>
+                <span id="rNewScale">-</span>
+            </div>
+
+            <div class="details-row">
+                <span>नवीन Stage</span>
+                <span id="rNewStage">-</span>
+            </div>
+
+            <div class="details-row">
+                <span>वेतन फरक %</span>
+                <span id="rDifferencePercent">0%</span>
+            </div>
+
+            <div class="details-row">
+                <span>Calculation Status</span>
+                <span id="rStatus">VERIFIED</span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+        ४ था वेतन आयोग • Pay Fixation System<br>
+        Master Data आधारित Calculation Engine
+    </div>
+
 </div>
+
+
+<script>
+
+/* =========================================================
+   4TH PAY COMMISSION
+   BASIC CALCULATION ENGINE
+   ========================================================= */
+
+
+/* ---------- Utility ---------- */
+
+function $(id){
+    return document.getElementById(id);
+}
+
+
+function money(value){
+
+    const n = Number(value) || 0;
+
+    return "₹" + n.toLocaleString(
+        "en-IN",
+        {
+            maximumFractionDigits:0
+        }
+    );
+}
+
+
+function showError(message){
+
+    const box = $("errorBox");
+
+    box.textContent = "❌ " + message;
+
+    box.style.display = "block";
+
+    $("successBox").style.display = "none";
+
+    window.scrollTo({
+        top:box.offsetTop - 20,
+        behavior:"smooth"
+    });
+}
+
+
+function showSuccess(message){
+
+    const box = $("successBox");
+
+    box.textContent = "✅ " + message;
+
+    box.style.display = "block";
+
+    $("errorBox").style.display = "none";
+}
+
+
+function clearMessages(){
+
+    $("errorBox").style.display = "none";
+
+    $("successBox").style.display = "none";
+}
+
+
+/* ---------- Validation ---------- */
+
+function validateForm(){
+
+    const employeeId =
+        $("employeeId").value.trim();
+
+    const employeeName =
+        $("employeeName").value.trim();
+
+    const fixationDate =
+        $("fixationDate").value;
+
+    const oldBasic =
+        Number($("oldBasic").value);
+
+    const newBasic =
+        Number($("newBasic").value);
+
+    if(!employeeId){
+        showError("Employee ID भरावा.");
+        return false;
+    }
+
+    if(!employeeName){
+        showError("कर्मचारी नाव भरावे.");
+        return false;
+    }
+
+    if(!fixationDate){
+        showError("वेतन निश्चिती तारीख निवडा.");
+        return false;
+    }
+
+    if(!oldBasic || oldBasic < 0){
+        showError("जुने मूलभूत वेतन योग्यरित्या भरा.");
+        return false;
+    }
+
+    if(!newBasic || newBasic < 0){
+        showError("सुधारित मूलभूत वेतन योग्यरित्या भरा.");
+        return false;
+    }
+
+    return true;
+}
+
+
+/* ---------- Calculation ---------- */
+
+function calculateDifference(){
+
+    clearMessages();
+
+    if(!validateForm()){
+        return;
+    }
+
+    const oldBasic =
+        Number($("oldBasic").value);
+
+    const newBasic =
+        Number($("newBasic").value);
+
+    const difference =
+        newBasic - oldBasic;
+
+    let percentage = 0;
+
+    if(oldBasic > 0){
+
+        percentage =
+            (difference / oldBasic) * 100;
+    }
+
+
+    /* Result */
+
+    $("resultOldBasic").textContent =
+        money(oldBasic);
+
+    $("resultNewBasic").textContent =
+        money(newBasic);
+
+    $("resultDifference").textContent =
+        money(difference);
+
+
+    $("rEmployeeId").textContent =
+        $("employeeId").value;
+
+    $("rEmployeeName").textContent =
+        $("employeeName").value;
+
+    $("rOldScale").textContent =
+        $("oldScale").value || "-";
+
+    $("rOldStage").textContent =
+        $("oldStage").value || "-";
+
+    $("rNewScale").textContent =
+        $("newScale").value || "-";
+
+    $("rNewStage").textContent =
+        $("newStage").value || "-";
+
+    $("rDifferencePercent").textContent =
+        percentage.toFixed(2) + "%";
+
+
+    if(difference >= 0){
+
+        $("rStatus").textContent =
+            "VERIFIED";
+
+        $("rStatus").style.color =
+            "#4ade80";
+
+    }else{
+
+        $("rStatus").textContent =
+            "CHECK REQUIRED";
+
+        $("rStatus").style.color =
+            "#f87171";
+    }
+
+
+    $("resultSection").style.display =
+        "block";
+
+
+    showSuccess(
+        "गणना पूर्ण झाली. निकाल खाली पाहता येईल."
+    );
+
+
+    $("resultSection").scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+    });
+}
+
+
+/* ---------- Reset ---------- */
+
+function resetForm(){
+
+    if(!confirm(
+        "सर्व भरलेली माहिती काढून टाकायची आहे का?"
+    )){
+        return;
+    }
+
+    document.querySelectorAll(
+        "input"
+    ).forEach(function(input){
+
+        if(input.id !== "effectiveDate"){
+            input.value = "";
+        }
+
+    });
+
+
+    $("effectiveDate").value =
+        "1986-01-01";
+
+
+    $("resultSection").style.display =
+        "none";
+
+
+    clearMessages();
+
+    $("systemStatus").textContent =
+        "READY";
+
+    $("systemStatus").className =
+        "status ready";
+}
+
+
+/* ---------- Print ---------- */
+
+function printReport(){
+
+    if($("resultSection").style.display !== "block"){
+
+        showError(
+            "Print करण्यापूर्वी प्रथम गणना करा."
+        );
+
+        return;
+    }
+
+    window.print();
+}
+
+
+/* ---------- Save ---------- */
+
+function saveRecord(){
+
+    clearMessages();
+
+    if(!validateForm()){
+        return;
+    }
+
+    /*
+       Temporary local storage.
+
+       पुढील टप्प्यात याच function ला
+       Google Apps Script / Google Sheets
+       database शी जोडले जाईल.
+    */
+
+    const record = {
+
+        id:
+            "FIX4_" +
+            Date.now(),
+
+        commission:
+            "4TH",
+
+        employeeId:
+            $("employeeId").value.trim(),
+
+        employeeName:
+            $("employeeName").value.trim(),
+
+        designation:
+            $("designation").value.trim(),
+
+        office:
+            $("office").value.trim(),
+
+        fixationDate:
+            $("fixationDate").value,
+
+        effectiveDate:
+            $("effectiveDate").value,
+
+        oldScale:
+            $("oldScale").value.trim(),
+
+        oldStage:
+            $("oldStage").value,
+
+        oldBasic:
+            Number($("oldBasic").value),
+
+        oldIncrement:
+            Number($("oldIncrement").value || 0),
+
+        newScale:
+            $("newScale").value.trim(),
+
+        newStage:
+            $("newStage").value,
+
+        newMin:
+            Number($("newMin").value || 0),
+
+        newMax:
+            Number($("newMax").value || 0),
+
+        newBasic:
+            Number($("newBasic").value),
+
+        newIncrement:
+            Number($("newIncrement").value || 0),
+
+        createdAt:
+            new Date().toISOString()
+
+    };
+
+
+    const records =
+        JSON.parse(
+            localStorage.getItem(
+                "PAY_FIXATION_4TH"
+            ) || "[]"
+        );
+
+
+    records.push(record);
+
+
+    localStorage.setItem(
+        "PAY_FIXATION_4TH",
+        JSON.stringify(records)
+    );
+
+
+    showSuccess(
+        "4th Pay Commission record सुरक्षितपणे Save झाला."
+    );
+}
+
+
+/* ---------- Existing Records ---------- */
+
+function getSavedRecords(){
+
+    return JSON.parse(
+        localStorage.getItem(
+            "PAY_FIXATION_4TH"
+        ) || "[]"
+    );
+}
+
+
+/* ---------- Automatic date ---------- */
+
+window.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        const today =
+            new Date();
+
+        const yyyy =
+            today.getFullYear();
+
+        const mm =
+            String(
+                today.getMonth()+1
+            ).padStart(2,"0");
+
+        const dd =
+            String(
+                today.getDate()
+            ).padStart(2,"0");
+
+        $("fixationDate").value =
+            yyyy + "-" + mm + "-" + dd;
+
+
+        $("effectiveDate").value =
+            "1986-01-01";
+
+    }
+);
+
+</script>
+
 </body>
 </html>
