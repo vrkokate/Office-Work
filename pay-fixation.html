@@ -649,8 +649,83 @@
 
         .hidden { display: none !important; }
 
+        /* 🌟 शासकीय वेतन निश्चिती विवरणपत्र (Illustration Sheet) स्टाईल */
+        .ill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #263238;
+        }
+        .ill-table td {
+            padding: 5px 6px;
+            border: none;
+            border-bottom: 1px dotted #cfd8dc;
+            vertical-align: middle;
+            text-align: left;
+            white-space: normal;
+        }
+        .ill-table td.col-dots {
+            width: 30px;
+            text-align: center;
+            color: #78909c;
+        }
+        .ill-table td.col-val {
+            width: 130px;
+            text-align: right;
+        }
+        .ill-input {
+            width: 100%;
+            max-width: 120px;
+            padding: 4px 6px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1.5px solid #90a4ae;
+            border-radius: 4px;
+            text-align: right;
+            background: #ffffff;
+            color: #1b5e20;
+        }
+        .ill-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            background: #f1f8e9;
+        }
+
         @media print {
-            html, body {
+            body.print-illustration-mode .container,
+            body.print-illustration-mode .output-box,
+            body.print-illustration-mode .modal-close-x,
+            body.print-illustration-mode .ill-no-print {
+                display: none !important;
+            }
+
+            body.print-illustration-mode #illustrationModal {
+                position: static !important;
+                width: 100% !important;
+                height: auto !important;
+                background: transparent !important;
+                padding: 0 !important;
+                display: block !important;
+                overflow: visible !important;
+            }
+
+            body.print-illustration-mode #illustrationModal .modal-box {
+                max-width: 100% !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+
+            body.print-illustration-mode .ill-input {
+                border: none !important;
+                font-size: 12px !important;
+                padding: 0 !important;
+                color: #000 !important;
+            }
+
+            body:not(.print-illustration-mode) html, body:not(.print-illustration-mode) body {
                 background: #ffffff !important;
                 padding: 0 !important;
                 margin: 0 !important;
@@ -658,17 +733,17 @@
                 overflow: visible !important;
             }
 
-            .header, 
-            .smart-cards-list, 
-            .btn-row-action, 
-            #validationBanner, 
-            .report-header-bar, 
-            .report-btn-group,
-            .modal-overlay {
+            body:not(.print-illustration-mode) .header, 
+            body:not(.print-illustration-mode) .smart-cards-list, 
+            body:not(.print-illustration-mode) .btn-row-action, 
+            body:not(.print-illustration-mode) #validationBanner, 
+            body:not(.print-illustration-mode) .report-header-bar, 
+            body:not(.print-illustration-mode) .report-btn-group,
+            body:not(.print-illustration-mode) .modal-overlay {
                 display: none !important;
             }
 
-            .container {
+            body:not(.print-illustration-mode) .container {
                 max-width: 100% !important;
                 width: 100% !important;
                 padding: 0 !important;
@@ -677,7 +752,7 @@
                 box-shadow: none !important;
             }
 
-            .output-box {
+            body:not(.print-illustration-mode) .output-box {
                 position: static !important;
                 background: transparent !important;
                 padding: 0 !important;
@@ -688,7 +763,7 @@
                 overflow: visible !important;
             }
 
-            .table-scroll-container {
+            body:not(.print-illustration-mode) .table-scroll-container {
                 max-height: none !important;
                 height: auto !important;
                 overflow: visible !important;
@@ -698,31 +773,31 @@
                 margin: 0 !important;
             }
 
-            #printableReportArea {
+            body:not(.print-illustration-mode) #printableReportArea {
                 position: static !important;
                 width: 100% !important;
                 display: block !important;
             }
 
-            .report-summary-card {
+            body:not(.print-illustration-mode) .report-summary-card {
                 font-size: 11px !important;
                 line-height: 1.4 !important;
                 margin-bottom: 10px !important;
                 border: none !important;
             }
 
-            table {
+            body:not(.print-illustration-mode) table {
                 width: 100% !important;
                 white-space: normal !important;
                 font-size: 9.5px !important;
             }
 
-            th, td {
+            body:not(.print-illustration-mode) th, body:not(.print-illustration-mode) td {
                 padding: 3px 5px !important;
                 border: 1px solid #333 !important;
             }
 
-            th {
+            body:not(.print-illustration-mode) th {
                 background-color: #f2f2f2 !important;
                 color: #000 !important;
                 position: static !important;
@@ -793,7 +868,7 @@
 
     <div class="report-btn-group">
         <button type="button" class="edit-data-btn" onclick="closeReportView(); scrollToEditData();">✏️ माहिती दुरुस्त करा</button>
-        <button type="button" class="print-direct-btn" onclick="window.print()">🖨️ प्रिंट काढा</button>
+        <button type="button" class="print-direct-btn" onclick="window.print()">🖨️️ प्रिंट काढा</button>
     </div>
 
     <div id="printableReportArea" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
@@ -816,6 +891,27 @@
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
+    </div>
+</div>
+
+<!-- ==================== 🌟 पॉप-अप: अधिकृत शासकीय वेतन निश्चिती विवरणपत्र (Illustration Sheet) ==================== -->
+<div id="illustrationModal" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width: 530px;">
+        <div class="modal-header illustration-modal-header">
+            <h3>📄 अधिकृत वेतन निश्चिती विवरणपत्र</h3>
+            <button type="button" class="modal-close-x" onclick="closeModal('illustrationModal')">✕</button>
+        </div>
+
+        <div class="ill-no-print" style="display:flex; justify-content:space-between; margin-bottom: 8px;">
+            <span style="font-size:11px; color:#546e7a;">💡 आवश्यकतेनुसार खालील संख्या हाताने एडिट करू शकता.</span>
+            <button type="button" onclick="printIllustrationSheet()" style="background:#0277bd; color:#fff; border:none; padding:5px 10px; font-size:11.5px; font-weight:bold; border-radius:4px; cursor:pointer;">🖨️ विवरणपत्र प्रिंट / PDF काढा</button>
+        </div>
+
+        <div id="illustrationSheetContent">
+            <!-- डायनॅमिक विवरणपत्र लोड होईल -->
+        </div>
+
+        <button type="button" class="modal-save-btn ill-no-print" onclick="closeModal('illustrationModal')">पूर्ण झाले (Close)</button>
     </div>
 </div>
 
@@ -1124,6 +1220,7 @@
 
 <script>
     let selectedWithheldDates = new Set();
+    let globalCalcDataList = []; // सर्व वेतन आयोगांच्या गणनेचा डेटा साठवणारी यादी
 
     function onWithheldChkChange(chk) {
         if (chk.checked) {
@@ -1363,6 +1460,7 @@
     function resetAllData() {
         if (confirm("तुम्हाला भरलेली सर्व माहिती पुसून टाकायची आहे का?")) {
             selectedWithheldDates.clear();
+            globalCalcDataList = [];
             
             document.getElementById('empName').value = "";
             document.getElementById('empDesignation').value = "";
@@ -1744,6 +1842,216 @@
         return 1900;
     }
 
+    function get5thScaleFrom4th(scale4th) {
+        if (!scale4th) return payScales5th[0];
+        if (scale4th.includes("750")) return "रु. 2550 - 55 - 2660 - 60 - 3200";
+        if (scale4th.includes("775")) return "रु. 2610 - 60 - 2910 - 65 - 3300 - 70 - 4000";
+        if (scale4th.includes("800")) return "रु. 2650 - 65 - 3300 - 70 - 4000";
+        if (scale4th.includes("950")) return "रु. 3050 - 75 - 3950 - 80 - 4590";
+        if (scale4th.includes("975") || scale4th.includes("1150")) return "रु. 3200 - 85 - 4900";
+        if (scale4th.includes("1200")) return "रु. 4000 - 100 - 6000";
+        if (scale4th.includes("1350")) return "रु. 4500 - 125 - 7000";
+        if (scale4th.includes("1400")) return "रु. 5000 - 150 - 8000";
+        if (scale4th.includes("1640")) return "रु. 5500 - 175 - 9000";
+        if (scale4th.includes("2000")) return "रु. 6500 - 200 - 10500";
+        if (scale4th.includes("2200")) return "रु. 8000 - 275 - 13500";
+        if (scale4th.includes("3000")) return "रु. 10000 - 325 - 15200";
+        return payScales5th[0];
+    }
+
+    function calculate5thPayFixation(existingBasic, existingScaleStr, proposedScaleStr) {
+        let bp = existingBasic;
+        let da = 0;
+        if (bp <= 3500) {
+            da = Math.round(bp * 1.48);
+        } else if (bp <= 6000) {
+            da = Math.max(5180, Math.round(bp * 1.11));
+        } else {
+            da = Math.max(6660, Math.round(bp * 0.96));
+        }
+
+        let ir1 = 100;
+        let ir2 = Math.max(100, Math.round(bp * 0.10));
+        let emoluments = bp + da + ir1 + ir2;
+        let weightage40 = Math.round(bp * 0.40);
+        let total = emoluments + weightage40;
+
+        let proposedStages = parsePayScaleStages(proposedScaleStr, '5th');
+        if (proposedStages.length === 0) {
+            proposedStages = [2550, 2605, 2660, 2720, 2780, 2840, 2900, 2960, 3020, 3080, 3140, 3200];
+        }
+        let minProposed = proposedStages[0];
+
+        let stageNextAbove = minProposed;
+        for (let i = 0; i < proposedStages.length; i++) {
+            if (proposedStages[i] >= total) {
+                stageNextAbove = proposedStages[i];
+                break;
+            }
+        }
+        if (total > proposedStages[proposedStages.length - 1]) {
+            stageNextAbove = proposedStages[proposedStages.length - 1];
+        }
+
+        let existingStages = parsePayScaleStages(existingScaleStr, '4th');
+        let existingIncrements = 0;
+        if (existingStages.length > 0) {
+            let idx = existingStages.indexOf(bp);
+            if (idx !== -1) {
+                existingIncrements = idx;
+            } else {
+                let minExisting = existingStages[0];
+                if (bp > minExisting) {
+                    existingIncrements = Math.floor((bp - minExisting) / 12);
+                }
+            }
+        }
+        let bunchingIncrements = Math.floor(existingIncrements / 3);
+        let bunchingStageIndex = Math.min(bunchingIncrements, proposedStages.length - 1);
+        let bunchingStage = proposedStages[bunchingStageIndex];
+
+        return Math.max(stageNextAbove, bunchingStage);
+    }
+
+    // =========================================================================
+    // 🌟 अधिकृत शासकीय विवरणपत्र ओपन व एडिट करणे (Illustration Modal Handlers)
+    // =========================================================================
+    function openCalculationSheet(dataIndex) {
+        let data = globalCalcDataList[dataIndex];
+        if (!data) return;
+
+        let contentDiv = document.getElementById('illustrationSheetContent');
+
+        if (data.commission === '5th') {
+            contentDiv.innerHTML = `
+                <div style="text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 4px; margin-bottom: 8px;">
+                    <b style="font-size: 14px; color: #1b5e20;">महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, १९९८</b><br>
+                    <span style="font-size: 12.5px; font-weight: bold; font-style: italic;">Illustration I / विवरणपत्र</span>
+                </div>
+                <div style="font-size: 11.5px; margin-bottom: 6px; line-height: 1.4;">
+                    <b>कर्मचाऱ्याचे नाव:</b> ${data.empName} &nbsp;|&nbsp; <b>पदनाम:</b> ${data.designation}
+                </div>
+                <table class="ill-table">
+                    <tr>
+                        <td>1. Existing Scale of Pay</td>
+                        <td class="col-dots">...</td>
+                        <td class="col-val"><input type="text" class="ill-input" style="max-width:140px; text-align:left;" value="${data.existingScale}"></td>
+                    </tr>
+                    <tr>
+                        <td>2. Proposed Scale of Pay</td>
+                        <td class="col-dots">...</td>
+                        <td class="col-val"><input type="text" class="ill-input" style="max-width:140px; text-align:left;" value="${data.proposedScale}"></td>
+                    </tr>
+                    <tr>
+                        <td>3. Existing Pay</td>
+                        <td class="col-dots">...</td>
+                        <td class="col-val">Rs. <input type="number" id="ill_bp" class="ill-input" value="${data.existingPay}" oninput="recalculate5thIllustration()"></td>
+                    </tr>
+                    <tr>
+                        <td>4. D.A. as on 1-1-96 (at index level 1510)</td>
+                        <td class="col-dots">...</td>
+                        <td class="col-val">Rs. <input type="number" id="ill_da" class="ill-input" value="${data.da}" oninput="recalculate5thIllustration()"></td>
+                    </tr>
+                    <tr>
+                        <td>5. 1st instalment of I.R.</td>
+                        <td class="col-dots">...</td>
+                        <td class="col-val">Rs. <input type="number" id="ill_ir1" class="ill-input" value="${data.ir1}" oninput="recalculate5thIllustration()"></td>
+                    </tr>
+                    <tr>
+                        <td>6. 2nd instalment of I.R. (10% of basic pay, subject to min. Rs. 100.)</td>
+                        <td class="col-dots">...</td>
+                        <td class="col-val">Rs. <input type="number" id="ill_ir2" class="ill-input" value="${data.ir2}" oninput="recalculate5thIllustration()"></td>
+                    </tr>
+                    <tr style="background:#f9fbe7; font-weight:bold;">
+                        <td>7. Existing emoluments (3+4+5+6)</td>
+                        <td class="col-dots">...</td>
+                        <td class="col-val">Rs. <input type="number" id="ill_emoluments" class="ill-input" value="${data.emoluments}" readonly></td>
+                    </tr>
+                    <tr>
+                        <td>8. Add 40 % of basic pay</td>
+                        <td class="col-dots">...</td>
+                        <td class="col-val">Rs. <input type="number" id="ill_add40" class="ill-input" value="${data.add40}" oninput="recalculate5thIllustration()"></td>
+                    </tr>
+                    <tr style="background:#f1f8e9; font-weight:bold;">
+                        <td>&nbsp;&nbsp;&nbsp;&nbsp;Total (7+8)</td>
+                        <td class="col-dots">...</td>
+                        <td class="col-val">Rs. <input type="number" id="ill_total" class="ill-input" value="${data.total}" readonly></td>
+                    </tr>
+                    <tr>
+                        <td>9. Stage next above in the proposed scale including benefit of bunching, if admissible.</td>
+                        <td class="col-dots">...</td>
+                        <td class="col-val">Rs. <input type="number" id="ill_stage9" class="ill-input" value="${data.stage9}"></td>
+                    </tr>
+                    <tr>
+                        <td>10. If 1 increment is ensured in the proposed scale for every 3 increments in the existing scale, the stage of pay in the proposed scale.</td>
+                        <td class="col-dots">...</td>
+                        <td class="col-val">Rs. <input type="number" id="ill_stage10" class="ill-input" value="${data.stage10}"></td>
+                    </tr>
+                    <tr style="background:#e8f5e9; font-weight:bold; font-size:12.5px;">
+                        <td>11. Pay to be fixed in the proposed scale (stage of pay at Sr. No. 9 or 10 whichever is higher).</td>
+                        <td class="col-dots">...</td>
+                        <td class="col-val">Rs. <input type="number" id="ill_stage11" class="ill-input" value="${data.stage11}" style="color:#b71c1c; border-color:#2e7d32;"></td>
+                    </tr>
+                </table>
+            `;
+        } else if (data.commission === '6th') {
+            contentDiv.innerHTML = `
+                <div style="text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 4px; margin-bottom: 8px;">
+                    <b style="font-size: 14px; color: #1b5e20;">६वा वेतन आयोग (०१-०१-२००६) वेतन निश्चिती विवरणपत्र</b>
+                </div>
+                <table class="ill-table">
+                    <tr><td>१. ५व्या आयोगातील मूळ वेतन (Basic Pay)</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input" value="${data.existingPay}"></td></tr>
+                    <tr><td>२. १.८६ गुणाकार घटक (Basic × 1.86)</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input" value="${data.multBasic}"></td></tr>
+                    <tr><td>३. मंजूर ग्रेड पे (Grade Pay)</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input" value="${data.gp}"></td></tr>
+                    <tr style="background:#e8f5e9; font-weight:bold;"><td>४. ६व्या आयोगात एकूण निश्चित वेतन</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input" value="${data.total}" style="color:#b71c1c;"></td></tr>
+                </table>
+            `;
+        } else if (data.commission === '7th') {
+            contentDiv.innerHTML = `
+                <div style="text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 4px; margin-bottom: 8px;">
+                    <b style="font-size: 14px; color: #1b5e20;">७वा वेतन आयोग (०१-०१-२०१६) पे-मॅट्रिक्स निश्चिती विवरणपत्र</b>
+                </div>
+                <table class="ill-table">
+                    <tr><td>१. ३१-१२-२०१५ रोजीचे मूळ वेतन (६वा आयोग)</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input" value="${data.basic6th}"></td></tr>
+                    <tr><td>२. ग्रेड पे (Grade Pay)</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input" value="${data.gp6th}"></td></tr>
+                    <tr><td>३. एकूण वेतन (Basic + GP)</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input" value="${data.total6th}"></td></tr>
+                    <tr><td>४. २.५७ गुणाकार घटक (Total × 2.57)</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input" value="${data.fitmentCalc}"></td></tr>
+                    <tr><td>५. ७व्या आयोगातील समतुल्य स्तर (Pay Matrix Level)</td><td class="col-dots">...</td><td class="col-val"><input type="text" class="ill-input" style="max-width:120px; text-align:center;" value="${data.level}"></td></tr>
+                    <tr style="background:#e8f5e9; font-weight:bold;"><td>६. पे-मॅट्रिक्सनुसार अंतिम निश्चित वेतन</td><td class="col-dots">...</td><td class="col-val">Rs. <input type="number" class="ill-input" value="${data.finalBasic7th}" style="color:#b71c1c;"></td></tr>
+                </table>
+            `;
+        }
+
+        openModal('illustrationModal');
+    }
+
+    // 🌟 विवरणपत्रातील आकडे हाताने बदलल्यावर बेरीज आपोआप अद्ययावत होणे
+    function recalculate5thIllustration() {
+        let bp = parseFloat(document.getElementById('ill_bp').value) || 0;
+        let da = parseFloat(document.getElementById('ill_da').value) || Math.round(bp * 1.48);
+        let ir1 = parseFloat(document.getElementById('ill_ir1').value) || 100;
+        let ir2 = parseFloat(document.getElementById('ill_ir2').value) || Math.max(100, Math.round(bp * 0.10));
+        let emoluments = bp + da + ir1 + ir2;
+        let add40 = parseFloat(document.getElementById('ill_add40').value) || Math.round(bp * 0.40);
+        let total = emoluments + add40;
+
+        document.getElementById('ill_emoluments').value = emoluments;
+        document.getElementById('ill_total').value = total;
+
+        let st9 = parseFloat(document.getElementById('ill_stage9').value) || 2550;
+        let st10 = parseFloat(document.getElementById('ill_stage10').value) || 2605;
+        document.getElementById('ill_stage11').value = Math.max(st9, st10);
+    }
+
+    // 🌟 फक्त विवरणपत्राची अधिकृत प्रिंट काढणे
+    function printIllustrationSheet() {
+        document.body.classList.add('print-illustration-mode');
+        window.print();
+        setTimeout(() => {
+            document.body.classList.remove('print-illustration-mode');
+        }, 1000);
+    }
+
     function getCleanScaleLabel(scale, comm, level) {
         if (comm === '7th') {
             let match = String(level || scale).match(/S-(\d+)/i);
@@ -1771,7 +2079,7 @@
             return fullPayMatrix7th["S-6"];
         }
 
-        if (commission === '5th' || scaleStr.includes('रु.') || scaleStr.includes('4000')) {
+        if (commission === '5th' || scaleStr.includes('रु.') || scaleStr.includes('4000') || scaleStr.includes('2550')) {
             let cleanStr = scaleStr.replace(/रु\./g, '').replace(/\(.*?\)/g, '').trim();
             let matches = cleanStr.match(/\d+/g);
             if (matches && matches.length >= 3) {
@@ -2192,7 +2500,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनश्रेणी सुधारणा - थेट सममूल्य टप्पा फिक्स)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (विवरणपत्र डेटा निर्मितीसह)
     // =========================================================================
     function processFixation() {
         const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
@@ -2207,6 +2515,8 @@
             alert("कृपया तिन्ही कार्ड्स मधील आवश्यक माहिती पूर्ण भरा!");
             return;
         }
+
+        globalCalcDataList = []; // रीसेट यादी
 
         let gpMatch = scale.match(/GP\s*(\d+)/i);
         let gradePay = gpMatch ? parseFloat(gpMatch[1]) : (parseFloat(document.getElementById('gradePay').value) || 0);
@@ -2325,7 +2635,7 @@
             let c7Date = new Date(2016, 0, 1);
 
             if (startDate < c5Date && c5Date <= endDate) {
-                events.push({ date: c5Date, dateStr: "01-01-1996", type: 'COMMISSION_5TH', desc: '५वा आयोग सुधारणा' });
+                events.push({ date: c5Date, dateStr: "01-01-1996", type: 'COMMISSION_5TH', desc: '५वा आयोग वेतन निश्चिती (नियम ७ नुसार)' });
             }
             if (startDate < c6Date && c6Date <= endDate) {
                 events.push({ date: c6Date, dateStr: "01-01-2006", type: 'COMMISSION_6TH', desc: '६वा आयोग सुधारणा' });
@@ -2504,32 +2814,91 @@
 
         events.forEach(ev => {
             if (ev.type === 'INITIAL') {
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
             }
             else if (ev.type === 'COMMISSION_5TH') {
                 currentCommission = '5th';
-                currentBasic = Math.round(currentBasic * 2.3);
+                let oldScale = currentScaleLabel;
+                let newScale = get5thScaleFrom4th(oldScale);
+                currentScaleLabel = newScale;
+                
+                let preBasic = currentBasic;
+                // ५व्या आयोगाचे अधिकृत गणितीय सूत्र
+                let bp = preBasic;
+                let da = bp <= 3500 ? Math.round(bp * 1.48) : (bp <= 6000 ? Math.max(5180, Math.round(bp * 1.11)) : Math.max(6660, Math.round(bp * 0.96)));
+                let ir1 = 100;
+                let ir2 = Math.max(100, Math.round(bp * 0.10));
+                let emoluments = bp + da + ir1 + ir2;
+                let add40 = Math.round(bp * 0.40);
+                let total = emoluments + add40;
+
+                let proposedStages = parsePayScaleStages(newScale, '5th');
+                if (proposedStages.length === 0) proposedStages = [2550, 2605, 2660, 2720, 2780, 2840, 2900, 2960, 3020, 3080, 3140, 3200];
+                let st9 = proposedStages[0];
+                for (let i = 0; i < proposedStages.length; i++) {
+                    if (proposedStages[i] >= total) { st9 = proposedStages[i]; break; }
+                }
+
+                let existingStages = parsePayScaleStages(oldScale, '4th');
+                let existingIncrements = (existingStages.indexOf(bp) !== -1) ? existingStages.indexOf(bp) : Math.floor((bp - (existingStages[0] || 750)) / 12);
+                let bunchingIncrements = Math.floor(existingIncrements / 3);
+                let st10 = proposedStages[Math.min(bunchingIncrements, proposedStages.length - 1)];
+
+                currentBasic = Math.max(st9, st10);
                 currentGP = 0;
-                let default5thScale = (currentScaleLabel.includes("950") || currentScaleLabel.includes("975")) ? "रु. 3050 - 75 - 3950 - 80 - 4590" : "रु. 2550 - 55 - 2660 - 60 - 3200";
-                currentScaleLabel = default5thScale;
                 lowerBasic = currentBasic;
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+                lowerGP = 0;
+
+                let calcData5th = {
+                    commission: '5th',
+                    empName: name,
+                    designation: designation,
+                    existingScale: oldScale,
+                    proposedScale: newScale,
+                    existingPay: preBasic,
+                    da: da,
+                    ir1: ir1,
+                    ir2: ir2,
+                    emoluments: emoluments,
+                    add40: add40,
+                    total: total,
+                    stage9: st9,
+                    stage10: st10,
+                    stage11: currentBasic
+                };
+
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, calcData5th);
             }
             else if (ev.type === 'COMMISSION_6TH') {
                 currentCommission = '6th';
+                let preBasic = currentBasic;
                 currentBasic = Math.round((currentBasic * 1.86) / 10) * 10;
                 let gp6th = getGradePayFrom4thOr5th(currentScaleLabel);
                 currentGP = gp6th;
                 currentScaleLabel = (gp6th >= 4200) ? `PB-2 : 9300 - 34800 (GP ${gp6th})` : `PB-1 : 5200 - 20200 (GP ${gp6th})`;
                 lowerBasic = currentBasic;
                 lowerGP = currentGP;
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+
+                let calcData6th = {
+                    commission: '6th',
+                    empName: name,
+                    designation: designation,
+                    existingPay: preBasic,
+                    multBasic: currentBasic,
+                    gp: gp6th,
+                    total: currentBasic + gp6th
+                };
+
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, calcData6th);
             }
             else if (ev.type === 'COMMISSION_7TH') {
                 currentCommission = '7th';
                 let totalBefore7th = currentBasic + currentGP;
                 currentLevel = mapGpTo7thLevel(currentGP);
                 let fitmentResult = fitInMatrix(currentLevel, totalBefore7th * 2.57);
+                let oldB = currentBasic;
+                let oldGP = currentGP;
+
                 currentBasic = fitmentResult.basic;
                 currentMatrixIndex = fitmentResult.index;
                 currentLevel = fitmentResult.level;
@@ -2541,21 +2910,31 @@
                 lowerMatrixIndex = currentMatrixIndex;
 
                 currentScaleLabel = getCleanScaleLabel(scale, currentCommission, currentLevel);
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+
+                let calcData7th = {
+                    commission: '7th',
+                    empName: name,
+                    designation: designation,
+                    basic6th: oldB,
+                    gp6th: oldGP,
+                    total6th: totalBefore7th,
+                    fitmentCalc: Math.round(totalBefore7th * 2.57),
+                    level: currentLevel,
+                    finalBasic7th: currentBasic
+                };
+
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, calcData7th);
             }
             else if (ev.type === 'SCALE_REVISION') {
                 let rev = ev.data;
                 currentCommission = rev.commission;
 
-                // 🌟 नियम ११(१) लागू न करता केवळ मागील बेसिक सुधारित वेतन श्रेणीमध्ये शोधून थेट सममूल्य/पुढील टप्प्यावर फिक्स करणे
                 if (currentCommission === '7th') {
                     let match = rev.scale.match(/S-(\d+)/i);
                     if (match) {
                         currentLevel = "S-" + parseInt(match[1], 10);
                     }
                     currentGP = 0;
-                    
-                    // थेट फिक्सिंग (सममूल्य किंवा नजीकचा पुढील टप्पा)
                     let fit = fitInMatrix(currentLevel, currentBasic);
                     currentBasic = fit.basic;
                     currentMatrixIndex = fit.index;
@@ -2585,14 +2964,13 @@
                     currentScaleLabel = rev.scale;
                 }
 
-                // 🌟 सुधारित वेतनश्रेणी पुढील वर्षांच्या सर्व वेतनवाढीसाठी कायम करणे
                 lowerLevel = currentLevel;
                 lowerBasic = currentBasic;
                 lowerGP = currentGP;
                 lowerMatrixIndex = currentMatrixIndex;
 
                 let desc = `वेतनश्रेणी सुधारणा (थेट सममूल्य / पुढील टप्प्यावर निश्चिती)`;
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, desc, currentBasic, currentGP);
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, desc, currentBasic, currentGP, ev.type, null);
             }
             else if (ev.type === 'WITHHELD_INC') {
                 if (ev.effect === 'non_cumulative') {
@@ -2600,7 +2978,7 @@
                 } else {
                     restoreWithheldNext = false;
                 }
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
             }
             else if (ev.type === 'BENEFIT_PROMOTED_PROVISIONAL') {
                 let b = ev.data;
@@ -2617,82 +2995,26 @@
                     currentBasic = fitTemp.basic;
                     currentMatrixIndex = fitTemp.index;
                     currentGP = 0;
-                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
                 } else {
                     let promoStages = parsePayScaleStages(b.scale, b.commission);
                     let found = promoStages.find(s => s >= currentBasic);
                     if (found) currentBasic = found;
                 }
 
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(b.commission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(b.commission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
             }
             else if (ev.type === 'BENEFIT_OPTION_DNI') {
-                // 🌟 पदोन्नती / MACP च्या विकल्प दिनांकावर नियम ११(१) लागू करणे
                 let b = ev.data;
                 currentCommission = b.commission;
-                let lLevel = b.savedLowerLevel || lowerLevel;
-                let lIndex = (b.savedLowerIndex !== undefined && b.savedLowerIndex !== -1) ? b.savedLowerIndex : currentMatrixIndex;
-                let lBasic = b.savedLowerBasic || lowerBasic;
-                let lGP = b.savedLowerGP !== undefined ? b.savedLowerGP : lowerGP;
+                let lBasic = b.savedLowerBasic || currentBasic;
 
+                currentScaleLabel = b.scale;
                 if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-                    let cellsLower = fullPayMatrix7th[lLevel] || fullPayMatrix7th["S-6"];
-                    let currIdx = cellsLower.indexOf(lBasic);
-                    if (currIdx === -1) currIdx = lIndex;
-                    if (currIdx === -1) currIdx = 0;
-
-                    // DNI रोजी: १ नियमित वार्षिक वाढ + १ पदोन्नती वाढ (नियम ११(१) नुसार एकूण २ टप्पे कनिष्ठ स्तरात)
-                    let notionalIdx = Math.min(currIdx + 2, cellsLower.length - 1);
-                    let notionalPay = cellsLower[notionalIdx];
-
-                    // वरिष्ठ स्तरात सममूल्य किंवा पुढील टप्पा
-                    let fitFinal = fitInMatrix(targetLvl, notionalPay);
-                    currentLevel = fitFinal.level;
-                    currentBasic = fitFinal.basic;
-                    currentMatrixIndex = fitFinal.index;
-                    currentGP = 0;
-                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                } else if (currentCommission === '6th') {
-                    let gpMatch = b.scale.match(/GP\s*(\d+)/i);
-                    currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
-                    let inc1 = Math.ceil(((lBasic + lGP) * 0.03) / 10) * 10;
-                    let basicAfterInc1 = lBasic + inc1;
-                    let inc2 = Math.ceil(((basicAfterInc1 + lGP) * 0.03) / 10) * 10;
-                    currentBasic = basicAfterInc1 + inc2;
-                    let ep = get6thEntryPay(b.scale, currentGP);
-                    if (ep && currentBasic < ep) currentBasic = ep;
-                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                } else {
-                    let step = (currentCommission === '4th') ? 25 : 100;
-                    let target = lBasic + (step * 2);
-                    let promoStages = parsePayScaleStages(b.scale, currentCommission);
-                    let found = promoStages.find(s => s >= target);
-                    currentBasic = found ? found : target;
-                    currentGP = 0;
-                    currentScaleLabel = b.scale;
-                }
-
-                lowerLevel = currentLevel;
-                lowerBasic = currentBasic;
-                lowerGP = currentGP;
-                lowerMatrixIndex = currentMatrixIndex;
-
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
-            }
-            else if (ev.type === 'BENEFIT_SAME_DAY') {
-                // 🌟 लाभाच्याच दिनांकावर नियम ११(१) लागू करणे
-                let b = ev.data;
-                currentCommission = b.commission;
-
-                if (currentCommission === '7th') {
-                    let lvlMatch = b.scale.match(/S-(\d+)/i);
-                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-
                     let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
-                    let currIdx = cellsLower.indexOf(currentBasic);
-                    if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
+                    let currIdx = cellsLower.indexOf(lBasic);
+                    if (currIdx === -1) currIdx = 0;
                     let notionalIdx = Math.min(currIdx + 1, cellsLower.length - 1);
                     let notionalPay = cellsLower[notionalIdx];
 
@@ -2701,31 +3023,40 @@
                     currentBasic = fitFinal.basic;
                     currentMatrixIndex = fitFinal.index;
                     currentGP = 0;
-                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                } else if (currentCommission === '6th') {
-                    let gpMatch = b.scale.match(/GP\s*(\d+)/i);
-                    currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
-                    let inc = Math.ceil(((currentBasic + currentGP) * 0.03) / 10) * 10;
-                    currentBasic += inc;
-                    let ep = get6thEntryPay(b.scale, currentGP);
-                    if (ep && currentBasic < ep) currentBasic = ep;
-                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
                 } else {
-                    let step = (currentCommission === '4th') ? 25 : 100;
-                    let target = currentBasic + step;
-                    let promoStages = parsePayScaleStages(b.scale, currentCommission);
+                    let promoStages = parsePayScaleStages(b.scale, b.commission);
+                    let target = lBasic + (b.commission === '4th' ? 50 : (b.commission === '5th' ? 200 : (b.commission === '6th' ? 200 : 1000)));
                     let found = promoStages.find(s => s >= target);
                     currentBasic = found ? found : target;
-                    currentGP = 0;
-                    currentScaleLabel = b.scale;
                 }
 
-                lowerLevel = currentLevel;
-                lowerBasic = currentBasic;
-                lowerGP = currentGP;
-                lowerMatrixIndex = currentMatrixIndex;
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
+            }
+            else if (ev.type === 'BENEFIT_SAME_DAY') {
+                let b = ev.data;
+                currentCommission = b.commission;
+                currentScaleLabel = b.scale;
+                if (currentCommission === '7th') {
+                    let lvlMatch = b.scale.match(/S-(\d+)/i);
+                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
+                    let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
+                    let currIdx = cellsLower.indexOf(currentBasic);
+                    if (currIdx === -1) currIdx = 0;
+                    let notionalIdx = Math.min(currIdx + 1, cellsLower.length - 1);
+                    let notionalPay = cellsLower[notionalIdx];
 
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
+                    let fitFinal = fitInMatrix(targetLvl, notionalPay);
+                    currentLevel = fitFinal.level;
+                    currentBasic = fitFinal.basic;
+                    currentMatrixIndex = fitFinal.index;
+                    currentGP = 0;
+                } else {
+                    let promoStages = parsePayScaleStages(b.scale, b.commission);
+                    let found = promoStages.find(s => s >= currentBasic);
+                    currentBasic = found ? found : currentBasic;
+                }
+
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
             }
             else if (ev.type === 'ANNUAL_INC') {
                 let stagesToAdvance = restoreWithheldNext ? 2 : 1;
@@ -2759,14 +3090,13 @@
                     if (idx !== -1 && idx + stagesToAdvance < cells.length) {
                         currentBasic = cells[idx + stagesToAdvance];
                     } else {
-                        let stepInc = (currentCommission === '4th' ? 25 : (currentCommission === '5th' ? 100 : Math.ceil(((currentBasic + currentGP) * 0.03) / 10) * 10));
+                        let stepInc = (currentCommission === '4th' ? 25 : (currentCommission === '5th' ? 55 : Math.ceil(((currentBasic + currentGP) * 0.03) / 10) * 10));
                         currentBasic += (stepInc * stagesToAdvance);
                     }
                 }
 
-                // 🌟 चालू स्तरानुसार वेतनश्रेणी कायम ठेवणे (उदा. S-7 लागू झाली असल्यास S-7 च पुढे राहील)
                 currentScaleLabel = getCleanScaleLabel(currentScaleLabel, currentCommission, currentLevel);
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, descText, currentBasic, currentGP);
+                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, descText, currentBasic, currentGP, ev.type, null);
             }
         });
 
@@ -2775,9 +3105,18 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp) {
+    // 🌟 'एकूण वेतन' रकान्यात क्लिकेबल लिंक जोडणे
+    function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp, evType, calcData) {
         let total = basic + (gp > 0 ? gp : 0);
         let gpDisplay = gp > 0 ? gp : "-";
+        let totalDisplay = total;
+
+        // जर वेतन आयोग बदललेला असेल तर 'एकूण वेतन' रकान्यातील संख्येला लिंक देणे
+        if (evType === 'COMMISSION_5TH' || evType === 'COMMISSION_6TH' || evType === 'COMMISSION_7TH') {
+            let dataIdx = globalCalcDataList.length;
+            globalCalcDataList.push(calcData);
+            totalDisplay = `<a href="javascript:void(0)" onclick="openCalculationSheet(${dataIdx})" style="color:#01579b; text-decoration:underline; font-weight:bold; cursor:pointer;" title="शासकीय वेतन निश्चिती विवरणपत्र (Illustration) पहा व प्रिंट करा">${total} 📄</a>`;
+        }
 
         let tr = document.createElement('tr');
         tr.innerHTML = `
@@ -2788,7 +3127,7 @@
             <td class="event-cell">${eventDesc}</td>
             <td><b>${basic}</b></td>
             <td>${gpDisplay}</td>
-            <td><b>${total}</b></td>
+            <td><b>${totalDisplay}</b></td>
         `;
         document.getElementById('tableBody').appendChild(tr);
     }
