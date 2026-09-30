@@ -16,7 +16,6 @@
             --text-main: #263238;
         }
 
-        /* पेज स्क्रीनबाहेर आडवे सरकणे १००% रोखणे */
         html, body {
             width: 100%;
             max-width: 100vw;
@@ -505,7 +504,7 @@
         }
         .ok-selection-btn:hover { background-color: #01579b; }
 
-        /* अहवाल व तक्ता - स्वतंत्र नवीन पेज व्यू */
+        /* अहवाल व तक्ता */
         .output-box {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -614,7 +613,7 @@
         }
         .report-summary-card div { margin-bottom: 2px; }
 
-        /* 🌟 स्क्रोल बॉक्सची मर्यादा - केवळ १२ ओळींची */
+        /* स्क्रोल बॉक्स मर्यादा - १२ ओळी */
         .table-scroll-container {
             max-height: 300px;
             overflow-x: auto;
@@ -1099,9 +1098,7 @@
 
         <div id="withheldListContainer" class="field-group hidden">
             <label style="color:#b71c1c; font-size:11.5px;">खालीलपैकी जी वेतनवाढ थांबवली आहे तिची तारीख निवडा (एकापेक्षा जास्त निवडू शकता):</label>
-            <div id="generatedIncrementsCheckboxes" class="checkbox-list-box">
-                <!-- डायनॅमिक चेकबॉक्स -->
-            </div>
+            <div id="generatedIncrementsCheckboxes" class="checkbox-list-box"></div>
             <button type="button" class="ok-selection-btn" onclick="confirmWithheldSelection()">ओके (OK)</button>
         </div>
 
@@ -1436,7 +1433,7 @@
         if (hasIncomplete) {
             card.classList.remove('card-filled');
             card.classList.add('card-pending');
-            status.textContent = "⚠️️ ही माहिती भरणे बाकी आहे (दिनांक/वेतनश्रेणी भरा)";
+            status.textContent = "⚠️ ही माहिती भरणे बाकी आहे (दिनांक/वेतनश्रेणी भरा)";
             badge.textContent = "!";
             return false;
         } else {
@@ -1482,7 +1479,7 @@
     }
 
     // =========================================================================
-    // 📚 अधिकृत वेतनश्रेण्या (फक्त एकदाच डिक्लिअर केलेल्या)
+    // 📚 अधिकृत वेतनश्रेण्या
     // =========================================================================
     const payScales4th = [
         "रु. 750 - 12 - 870 - EB - 14 - 940",
@@ -1827,6 +1824,7 @@
         return stages;
     }
 
+    // ५. वेतनश्रेणी निवडताना ६ व्या आयोगाचे प्रथम भरती वेतन आपोआप सुचवणे
     function toggleScaleDropdown(inputId, dropdownId, commSelectId = 'payCommission') {
         const comm = document.getElementById(commSelectId).value;
         const dropdown = document.getElementById(dropdownId);
@@ -1859,10 +1857,24 @@
                 input.value = scale;
                 dropdown.classList.add('hidden');
                 
+                // ६ व्या आयोगासाठी ग्रेड पे व Annexure-III मूळ वेतन ऑटो-सुचवणे
                 if (comm === '6th' && scale.includes('GP')) {
                     let gpMatch = scale.match(/GP\s*(\d+)/i);
                     if (gpMatch && gpMatch[1]) {
-                        document.getElementById('gradePay').value = gpMatch[1];
+                        let gpVal = parseInt(gpMatch[1], 10);
+                        document.getElementById('gradePay').value = gpVal;
+                        let ep = get6thEntryPay(scale, gpVal);
+                        if (ep && inputId === 'currentPayScale') {
+                            document.getElementById('basicPay').value = ep; // ५८३० ऑटो-सेट
+                        }
+                    }
+                } else if (comm === '7th' && inputId === 'currentPayScale') {
+                    let m = scale.match(/S-(\d+)/i);
+                    if (m) {
+                        let lvl = "S-" + parseInt(m[1], 10);
+                        if (fullPayMatrix7th[lvl]) {
+                            document.getElementById('basicPay').value = fullPayMatrix7th[lvl][0];
+                        }
                     }
                 }
                 
@@ -1878,6 +1890,7 @@
         dropdown.classList.remove('hidden');
     }
 
+    // ६. मूळ वेतनाच्या ड्रॉपडाउनमध्ये Annexure-III ची ठळक शिफारस दाखवणे
     function toggleBasicDropdown(basicInputId, dropdownId, scaleInputId, commSelectId) {
         const scaleStr = document.getElementById(scaleInputId).value;
         const comm = document.getElementById(commSelectId).value;
@@ -1907,6 +1920,7 @@
 
         dropdown.innerHTML = "";
         let stages = parsePayScaleStages(scaleStr, comm, gp);
+        let entryPayVal = (comm === '6th') ? get6thEntryPay(scaleStr, gp) : 0;
 
         if (stages.length === 0) {
             dropdown.innerHTML = `<div class="dropdown-item" style="color:#888;">वैध वेतनश्रेणी उपलब्ध नाही</div>`;
@@ -1914,7 +1928,17 @@
             stages.forEach((amount, idx) => {
                 let div = document.createElement('div');
                 div.className = 'dropdown-item';
-                div.textContent = amount;
+                
+                // ६ व्या आयोगाच्या Annexure-III साठी ठळक शिफारस
+                if (comm === '6th' && amount === entryPayVal) {
+                    div.innerHTML = `<b>${amount}</b> <span style="font-size:10.5px; color:#1b5e20; background:#e8f5e9; border:1px solid #a5d6a7; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:8px;">★ Annexure-III प्रथम भरती वेतन (शिफारस)</span>`;
+                    div.style.backgroundColor = "#f1f8e9";
+                } else if (comm === '7th') {
+                    div.innerHTML = `<b>${amount}</b> <small style="color:#78909c; margin-left:6px;">(टप्पा ${idx + 1})</small>`;
+                } else {
+                    div.textContent = amount;
+                }
+
                 div.onclick = function(e) {
                     e.stopPropagation();
                     basicInput.value = amount;
@@ -2142,7 +2166,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (100% WORKING & ERROR FREE)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (100% अचूक)
     // =========================================================================
     function processFixation() {
         const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
