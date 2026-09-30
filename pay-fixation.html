@@ -16,6 +16,7 @@
             --text-main: #263238;
         }
 
+        /* पेज स्क्रीनबाहेर आडवे सरकणे १००% रोखणे */
         html, body {
             width: 100%;
             max-width: 100vw;
@@ -1479,7 +1480,7 @@
     }
 
     // =========================================================================
-    // 📚 अधिकृत वेतनश्रेण्या
+    // 📚 अधिकृत वेतनश्रेण्या (४था, ५वा, ६वा व ७वा आयोग)
     // =========================================================================
     const payScales4th = [
         "रु. 750 - 12 - 870 - EB - 14 - 940",
@@ -1929,7 +1930,6 @@
                 let div = document.createElement('div');
                 div.className = 'dropdown-item';
                 
-                // ६ व्या आयोगाच्या Annexure-III साठी ठळक शिफारस
                 if (comm === '6th' && amount === entryPayVal) {
                     div.innerHTML = `<b>${amount}</b> <span style="font-size:10.5px; color:#1b5e20; background:#e8f5e9; border:1px solid #a5d6a7; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:8px;">★ Annexure-III प्रथम भरती वेतन (शिफारस)</span>`;
                     div.style.backgroundColor = "#f1f8e9";
@@ -2166,7 +2166,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (100% अचूक)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (वेतनश्रेणी सुधारणा दुरुस्तीसह)
     // =========================================================================
     function processFixation() {
         const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
@@ -2508,11 +2508,30 @@
                 let rev = ev.data;
                 currentCommission = rev.commission;
                 currentScaleLabel = rev.scale;
-                if (currentCommission === '6th') {
+                
+                // 🌟 सुधारित वेतनश्रेणी कायम करणे आणि पुढील स्तराचे अद्ययावतीकरण
+                if (currentCommission === '7th') {
+                    let match = rev.scale.match(/S-(\d+)/i);
+                    if (match) {
+                        currentLevel = "S-" + parseInt(match[1], 10);
+                    }
+                    currentGP = 0;
+                    let fit = fitInMatrix(currentLevel, currentBasic);
+                    currentBasic = fit.basic;
+                    currentMatrixIndex = fit.index;
+                    currentLevel = fit.level;
+                    currentScaleLabel = getCleanScaleLabel(rev.scale, currentCommission, currentLevel);
+                } else if (currentCommission === '6th') {
                     let gpMatch = rev.scale.match(/GP\s*(\d+)/i);
                     if (gpMatch) currentGP = parseInt(gpMatch[1], 10);
-                } else if (currentCommission === '7th') {
+                    let cells = parsePayScaleStages(rev.scale, '6th', currentGP);
+                    currentMatrixIndex = cells.indexOf(currentBasic);
+                    if (currentMatrixIndex === -1) currentMatrixIndex = 0;
+                } else {
                     currentGP = 0;
+                    let cells = parsePayScaleStages(rev.scale, currentCommission);
+                    currentMatrixIndex = cells.indexOf(currentBasic);
+                    if (currentMatrixIndex === -1) currentMatrixIndex = 0;
                 }
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP);
             }
@@ -2637,6 +2656,7 @@
                     }
                 }
 
+                // चालू स्तरानुसार वेतनश्रेणी कायम ठेवणे (S-7 असल्यास S-7 च पुढे राहील)
                 currentScaleLabel = getCleanScaleLabel(currentScaleLabel, currentCommission, currentLevel);
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, descText, currentBasic, currentGP);
             }
