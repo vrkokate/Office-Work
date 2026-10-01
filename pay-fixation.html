@@ -171,6 +171,7 @@
             display: flex;
             gap: 8px;
             width: 100%;
+            margin-bottom: 14px;
         }
         .submit-btn {
             flex: 2;
@@ -198,6 +199,55 @@
             cursor: pointer;
         }
         .reset-btn:hover { background-color: #546e7a; }
+
+        /* 🌟 जतन केलेल्या नोंदी विभाग (Saved Records Box) */
+        .saved-records-card {
+            background: #ffffff;
+            border: 1.5px solid #b0bec5;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            width: 100%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+        .saved-records-header {
+            font-size: 13px;
+            font-weight: bold;
+            color: #37474f;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed #cfd8dc;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+        }
+        .saved-list-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        .saved-list-table th, .saved-list-table td {
+            padding: 6px 4px;
+            border-bottom: 1px solid #eceff1;
+            text-align: left;
+        }
+        .saved-list-table th {
+            background: #f5f5f5;
+            color: #455a64;
+            font-weight: bold;
+        }
+        .act-btn {
+            border: none;
+            padding: 4px 6px;
+            font-size: 10.5px;
+            font-weight: bold;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 3px;
+        }
+        .act-btn-view { background: #0277bd; color: #fff; }
+        .act-btn-edit { background: #f57c00; color: #fff; }
+        .act-btn-del { background: #d32f2f; color: #fff; }
 
         /* पॉप-अप */
         .modal-overlay {
@@ -569,18 +619,32 @@
 
         .report-btn-group {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             width: 100%;
             margin-bottom: 10px;
         }
+
+        .save-record-btn {
+            flex: 1;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 11px 4px;
+            font-size: 12.5px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .save-record-btn:hover { background-color: #1b5e20; }
 
         .print-direct-btn {
             flex: 1;
             background-color: #0277bd;
             color: white;
             border: none;
-            padding: 11px;
-            font-size: 13px;
+            padding: 11px 4px;
+            font-size: 12.5px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
@@ -593,8 +657,8 @@
             background-color: #e65100;
             color: white;
             border: none;
-            padding: 11px;
-            font-size: 13px;
+            padding: 11px 4px;
+            font-size: 12.5px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
@@ -708,7 +772,6 @@
             margin-right: 2px;
         }
 
-        /* 🌟 PDF एक्सपोर्टसाठी स्टाईल्स */
         .pdf-export-mode table {
             width: 100% !important;
             white-space: normal !important;
@@ -789,6 +852,7 @@
             body:not(.print-illustration-mode) .header, 
             body:not(.print-illustration-mode) .smart-cards-list, 
             body:not(.print-illustration-mode) .btn-row-action, 
+            body:not(.print-illustration-mode) .saved-records-card,
             body:not(.print-illustration-mode) #validationBanner, 
             body:not(.print-illustration-mode) .report-header-bar, 
             body:not(.print-illustration-mode) .report-btn-group,
@@ -909,6 +973,29 @@
         <button type="button" class="submit-btn" onclick="processFixation()">Submit Data</button>
         <button type="button" class="reset-btn" onclick="resetAllData()">Reset Data</button>
     </div>
+
+    <!-- 🌟 जतन केलेल्या वेतन निश्चितींची यादी (Saved Records List Box) -->
+    <div class="saved-records-card" id="savedRecordsBox">
+        <div class="saved-records-header">
+            <span>📁 जतन केलेल्या वेतन निश्चिती नोंदी</span>
+            <small style="color:#78909c; font-weight:normal;" id="savedCountLabel">एकूण: ० नोंदी</small>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="saved-list-table">
+                <thead>
+                    <tr>
+                        <th style="width:25px;">अ.क्र.</th>
+                        <th>कर्मचाऱ्याचे नाव</th>
+                        <th>पदनाम</th>
+                        <th style="width:115px; text-align:center;">कृती</th>
+                    </tr>
+                </thead>
+                <tbody id="savedRecordsTableBody">
+                    <tr><td colspan="4" style="text-align:center; color:#90a4ae; padding:10px;">कोणतीही नोंद जतन केलेली नाही.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <!-- ==================== अहवाल व तक्ता पेज व्यू ==================== -->
@@ -920,6 +1007,7 @@
     </div>
 
     <div class="report-btn-group">
+        <button type="button" class="save-record-btn" onclick="saveCurrentFixationRecord()">💾 रेकॉर्ड सेव्ह करा</button>
         <button type="button" class="edit-data-btn" onclick="closeReportView(); scrollToEditData();">✏️ माहिती दुरुस्त करा</button>
         <button type="button" class="print-direct-btn" onclick="printReport()">🖨️ प्रिंट काढा</button>
     </div>
@@ -1272,17 +1360,239 @@
 <script>
     let selectedWithheldDates = new Set();
     let globalCalcDataList = [];
+    let currentEditingRecordId = null; // चालू संपादित रेकॉर्डचा ID
 
-    function isWebViewApp() {
-        const ua = navigator.userAgent || '';
-        const isAndroid = /Android/i.test(ua);
-        const isWv = /;\s*wv|Version\/[0-9.]+/i.test(ua);
-        const isStandalone = window.navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
-        const hasAndroidBridge = (typeof window.Android !== 'undefined') || (typeof window.AndroidPrint !== 'undefined');
-        return hasAndroidBridge || (isAndroid && isWv) || isStandalone;
+    // =========================================================================
+    // 🌟 Save, Load, Edit & Delete (CRUD) व्यवस्थापन
+    // =========================================================================
+    function getSavedRecordsFromStorage() {
+        try {
+            return JSON.parse(localStorage.getItem('savedPayFixationsList') || '[]');
+        } catch(e) {
+            return [];
+        }
     }
 
-    // 🌟 मुख्य अहवाल तक्ता प्रिंट / PDF (थेट Open किंवा योग्य नावाने Save)
+    function saveRecordsListToStorage(list) {
+        localStorage.setItem('savedPayFixationsList', JSON.stringify(list));
+        renderSavedRecordsTable();
+    }
+
+    // १. चालू वेतन निश्चिती रेकॉर्ड सेव्ह / अपडेट करणे
+    function saveCurrentFixationRecord() {
+        const empName = document.getElementById('empName').value.trim();
+        const empDesig = document.getElementById('empDesignation').value.trim();
+
+        if (!empName) {
+            alert("कृपया कर्मचाऱ्याचे नाव भरा!");
+            return;
+        }
+
+        // सर्व स्केल रिव्हिजन गोळा करणे
+        let revRows = [];
+        document.querySelectorAll('#scaleRevList .scale-rev-item').forEach(item => {
+            let d = item.querySelector('.rev-date').value;
+            let c = item.querySelector('.rev-comm').value;
+            let s = item.querySelector('.rev-scale').value;
+            if (d && c && s) revRows.push({ d, c, s });
+        });
+
+        // सर्व इनपुट्स डेटा ऑब्जेक्ट
+        const recordData = {
+            id: currentEditingRecordId || Date.now(),
+            savedAt: new Date().toLocaleString('mr-IN'),
+            empName: empName,
+            empDesignation: empDesig,
+            formData: {
+                empName: empName,
+                empDesignation: empDesig,
+                empJoinDate: document.getElementById('empJoinDate').value,
+                payCommission: document.getElementById('payCommission').value,
+                currentPayScale: document.getElementById('currentPayScale').value,
+                basicPay: document.getElementById('basicPay').value,
+                gradePay: document.getElementById('gradePay').value,
+                b1_type: document.getElementById('b1_type').value,
+                b1_date: document.getElementById('b1_date').value,
+                b1_optDate: document.getElementById('b1_optDate').value,
+                b1_comm: document.getElementById('b1_comm').value,
+                b1_post: document.getElementById('b1_post').value,
+                b1_scale: document.getElementById('b1_scale').value,
+                b2_type: document.getElementById('b2_type').value,
+                b2_date: document.getElementById('b2_date').value,
+                b2_optDate: document.getElementById('b2_optDate').value,
+                b2_comm: document.getElementById('b2_comm').value,
+                b2_post: document.getElementById('b2_post').value,
+                b2_scale: document.getElementById('b2_scale').value,
+                b3_type: document.getElementById('b3_type').value,
+                b3_date: document.getElementById('b3_date').value,
+                b3_optDate: document.getElementById('b3_optDate').value,
+                b3_comm: document.getElementById('b3_comm').value,
+                b3_post: document.getElementById('b3_post').value,
+                b3_scale: document.getElementById('b3_scale').value,
+                fixationFrom: document.getElementById('fixationFrom').value,
+                fixationTo: document.getElementById('fixationTo').value,
+                autoCommissionChange: document.getElementById('autoCommissionChange').value,
+                incrementMonthRule7th: document.getElementById('incrementMonthRule7th').value,
+                hasScaleRev: document.getElementById('hasScaleRev').value,
+                revRows: revRows,
+                incrementWithheld: document.getElementById('incrementWithheld').value,
+                withheldEffect: document.getElementById('withheldEffect').value,
+                withheldDates: Array.from(selectedWithheldDates)
+            }
+        };
+
+        let list = getSavedRecordsFromStorage();
+        if (currentEditingRecordId) {
+            let idx = list.findIndex(r => r.id === currentEditingRecordId);
+            if (idx !== -1) {
+                list[idx] = recordData;
+            } else {
+                list.unshift(recordData);
+            }
+            alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या अद्ययावत (Update) झाली!`);
+        } else {
+            list.unshift(recordData);
+            currentEditingRecordId = recordData.id;
+            alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या सेव्ह (Save) झाली!`);
+        }
+
+        saveRecordsListToStorage(list);
+    }
+
+    // २. सेव्ह केलेल्या नोंदींची यादी दाखवणे (Render Table)
+    function renderSavedRecordsTable() {
+        const tbody = document.getElementById('savedRecordsTableBody');
+        const countLabel = document.getElementById('savedCountLabel');
+        let list = getSavedRecordsFromStorage();
+
+        if (countLabel) countLabel.textContent = `एकूण: ${list.length} नोंदी`;
+        if (!tbody) return;
+
+        if (list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#90a4ae; padding:10px;">कोणतीही नोंद जतन केलेली नाही.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = "";
+        list.forEach((item, index) => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight:bold;">${index + 1}</td>
+                <td><b>${item.empName}</b></td>
+                <td>${item.empDesignation || '-'}</td>
+                <td style="text-align:center; white-space:nowrap;">
+                    <button type="button" class="act-btn act-btn-view" onclick="viewSavedRecord(${item.id})" title="अहवाल पहा">👁️ पहा</button>
+                    <button type="button" class="act-btn act-btn-edit" onclick="editSavedRecord(${item.id})" title="माहिती दुरुस्त करा">✏️</button>
+                    <button type="button" class="act-btn act-btn-del" onclick="deleteSavedRecord(${item.id}, '${item.empName}')" title="नोंद हटवा">🗑️</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // ३. सेव्ह केलेला रेकॉर्ड फॉर्ममध्ये लोड करणे (अंतर्गत हेल्पर)
+    function populateFormFromRecord(rec) {
+        currentEditingRecordId = rec.id;
+        const d = rec.formData;
+
+        document.getElementById('empName').value = d.empName || '';
+        document.getElementById('empDesignation').value = d.empDesignation || '';
+        document.getElementById('empJoinDate').value = d.empJoinDate || '';
+        handleDatePicked('empJoinDate', 'empJoinDate_disp');
+
+        document.getElementById('payCommission').value = d.payCommission || '';
+        document.getElementById('currentPayScale').value = d.currentPayScale || '';
+        document.getElementById('basicPay').value = d.basicPay || '';
+        document.getElementById('gradePay').value = d.gradePay || '0';
+
+        for (let i = 1; i <= 3; i++) {
+            document.getElementById(`b${i}_type`).value = d[`b${i}_type`] || 'None';
+            toggleBenefitRow(i);
+            document.getElementById(`b${i}_date`).value = d[`b${i}_date`] || '';
+            handleDatePicked(`b${i}_date`, `b${i}_date_disp`);
+            document.getElementById(`b${i}_optDate`).value = d[`b${i}_optDate`] || '';
+            handleDatePicked(`b${i}_optDate`, `b${i}_optDate_disp`);
+            document.getElementById(`b${i}_comm`).value = d[`b${i}_comm`] || '';
+            document.getElementById(`b${i}_post`).value = d[`b${i}_post`] || '';
+            document.getElementById(`b${i}_scale`).value = d[`b${i}_scale`] || '';
+        }
+
+        document.getElementById('fixationFrom').value = d.fixationFrom || '';
+        handleDatePicked('fixationFrom', 'fixationFrom_disp');
+        document.getElementById('fixationTo').value = d.fixationTo || '';
+        handleDatePicked('fixationTo', 'fixationTo_disp');
+
+        document.getElementById('autoCommissionChange').value = d.autoCommissionChange || 'Yes';
+        document.getElementById('incrementMonthRule7th').value = d.incrementMonthRule7th || 'july';
+
+        document.getElementById('hasScaleRev').value = d.hasScaleRev || 'No';
+        toggleScaleRevSection();
+        const listDiv = document.getElementById('scaleRevList');
+        if (listDiv) listDiv.innerHTML = "";
+        if (d.hasScaleRev === 'Yes' && d.revRows && d.revRows.length > 0) {
+            d.revRows.forEach(r => {
+                addScaleRevRow();
+                let lastItem = listDiv.lastElementChild;
+                if (lastItem) {
+                    lastItem.querySelector('.rev-date').value = r.d;
+                    let commSel = lastItem.querySelector('.rev-comm');
+                    commSel.value = r.c;
+                    updateRevScaleOptions(commSel);
+                    lastItem.querySelector('.rev-scale').value = r.s;
+                }
+            });
+        }
+
+        document.getElementById('incrementWithheld').value = d.incrementWithheld || 'No';
+        document.getElementById('withheldEffect').value = d.withheldEffect || 'non_cumulative';
+        selectedWithheldDates.clear();
+        if (d.withheldDates && Array.isArray(d.withheldDates)) {
+            d.withheldDates.forEach(dt => selectedWithheldDates.add(dt));
+        }
+
+        validateCard1();
+        validateCard2();
+        validateCard3();
+    }
+
+    // ४. सेव्ह केलेला रेकॉर्ड थेट पहाणे
+    function viewSavedRecord(id) {
+        let list = getSavedRecordsFromStorage();
+        let rec = list.find(r => r.id === id);
+        if (!rec) return;
+
+        populateFormFromRecord(rec);
+        processFixation();
+    }
+
+    // ५. सेव्ह केलेल्या नोंदीची दुरुस्ती करणे (Edit)
+    function editSavedRecord(id) {
+        let list = getSavedRecordsFromStorage();
+        let rec = list.find(r => r.id === id);
+        if (!rec) return;
+
+        populateFormFromRecord(rec);
+        closeReportView();
+        scrollToEditData();
+        alert(`'${rec.empName}' यांची माहिती फॉर्ममध्ये भरली आहे. आवश्यक ते बदल करून पुन्हा 'Submit Data' व 'Save Record' करा.`);
+    }
+
+    // ६. सेव्ह केलेला रेकॉर्ड हटवणे (Delete)
+    function deleteSavedRecord(id, empName) {
+        if (confirm(`तुम्हाला '${empName}' यांची जतन केलेली वेतन निश्चिती नोंद खरोखर हटवायची आहे का?`)) {
+            let list = getSavedRecordsFromStorage();
+            list = list.filter(r => r.id !== id);
+            if (currentEditingRecordId === id) {
+                currentEditingRecordId = null;
+            }
+            saveRecordsListToStorage(list);
+            alert("नोंद यशस्वीरीत्या हटवण्यात आली आहे!");
+        }
+    }
+
+    // =========================================================================
+    // 🌟 PDF व प्रिंट फंक्शनॅलिटीज
+    // =========================================================================
     function printReport() {
         if (window.Android && typeof window.Android.print === 'function') {
             window.Android.print();
@@ -1350,7 +1660,6 @@
         });
     }
 
-    // 🌟 विवरणपत्र प्रिंट / PDF (थेट Open किंवा योग्य नावाने Save)
     function printIllustrationSheet() {
         if (window.Android && typeof window.Android.print === 'function') {
             window.Android.print();
@@ -1380,6 +1689,11 @@
         const illContent = document.getElementById('illustrationSheetContent');
         if (!illContent) return;
 
+        if (typeof html2pdf === 'undefined') {
+            printIllustrationSheetNative();
+            return;
+        }
+
         illContent.querySelectorAll('input').forEach(input => {
             input.setAttribute('value', input.value);
         });
@@ -1400,9 +1714,7 @@
         });
     }
 
-    // 🌟 फाईलवर '?' न येण्यासाठी आणि PDF थेट ओपन/सेव्ह होण्यासाठीचे मुख्य फंक्शन
     async function handleAppPdfOutput(blob, fileName) {
-        // १. Android Web Share API (अँड्रॉइडमध्ये थेट Drive PDF Viewer मध्ये ओपन होते)
         try {
             const file = new File([blob], fileName, { type: 'application/pdf' });
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -1414,17 +1726,10 @@
                 return;
             }
         } catch (e) {
-            console.log("Web share skipped/fallback", e);
+            console.log("Web share fallback", e);
         }
 
-        // २. जर ॲप जुने असेल आणि सेव्ह डायलॉग आला, तर युजरला सावध करणे व नाव पुरवणे
-        try {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(fileName);
-            }
-        } catch(e){}
-
-        alert("महत्त्वाची सूचना:\n'Save As' बॉक्स आल्यास नावाच्या शेवटी '.pdf' नक्की टाईप करा (उदा. " + fileName + ").\nनावापुढे .pdf न टाकल्यास फाईलवर '?' चिन्ह येते व ती उघडत नाही.");
+        alert("⚠️ महत्त्वाची सूचना:\n'Save As' बॉक्स आल्यास नावाच्या शेवटी '.pdf' नक्की टाईप करा!\nउदा. " + fileName + "\n(नावापुढे .pdf न टाकल्यास फाईलवर '?' येते व ती उघडत नाही.)");
 
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -1677,6 +1982,7 @@
         if (confirm("तुम्हाला भरलेली सर्व माहिती पुसून टाकायची आहे का?")) {
             selectedWithheldDates.clear();
             globalCalcDataList = [];
+            currentEditingRecordId = null;
             
             document.getElementById('empName').value = "";
             document.getElementById('empDesignation').value = "";
@@ -2129,7 +2435,6 @@
         return Math.max(stageNextAbove, bunchingStage);
     }
 
-    // 🌟 अधिकृत शासकीय विवरणपत्र ओपन करणे (दुरुस्त शीर्षक, पूर्ण टेक्स्ट आणि फुटर सह)
     function openCalculationSheet(dataIndex) {
         let data = globalCalcDataList[dataIndex];
         if (!data) return;
@@ -2728,6 +3033,7 @@
         validateCard1();
         validateCard2();
         validateCard3();
+        renderSavedRecordsTable();
     };
 
     function fitInMatrix(levelKey, rawAmount) {
@@ -3388,6 +3694,7 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // 🌟 'एकूण वेतन' रकान्यात केवळ संख्या (लोगो काढलेला) आणि क्लिक करताच थेट पॉप-अप ओपन होणे
     function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp, evType, calcData) {
         let total = basic + (gp > 0 ? gp : 0);
         let gpDisplay = gp > 0 ? gp : "-";
