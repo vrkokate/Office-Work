@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>वेतन निश्चिती प्रणाली (Pay Fixation System)</title>
-    <!-- 🌟 APK (App) आणि Browser मध्ये थेट PDF तयार करण्यासाठी लायब्ररी -->
+    <!-- APK (App) मध्ये थेट PDF फाईल तयार करण्यासाठी लायब्ररी -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
@@ -18,7 +18,6 @@
             --text-main: #263238;
         }
 
-        /* पेज स्क्रीनबाहेर आडवे सरकणे १००% रोखणे */
         html, body {
             width: 100%;
             max-width: 100vw;
@@ -89,45 +88,25 @@
             width: 100%;
             transition: all 0.25s ease;
         }
-        .action-card:active {
-            transform: scale(0.99);
-        }
+        .action-card:active { transform: scale(0.99); }
 
         .action-card.card-pending {
             border: 1.5px solid var(--danger-border) !important;
             border-left: 5px solid var(--danger) !important;
             background-color: var(--danger-bg) !important;
         }
-        .action-card.card-pending .card-title {
-            color: #b71c1c !important;
-        }
-        .action-card.card-pending .card-status {
-            color: var(--danger) !important;
-            font-weight: bold;
-        }
-        .action-card.card-arrow-btn {
-            background-color: #ffcdd2;
-            color: var(--danger);
-            font-weight: bold;
-        }
+        .action-card.card-pending .card-title { color: #b71c1c !important; }
+        .action-card.card-pending .card-status { color: var(--danger) !important; font-weight: bold; }
+        .action-card.card-pending .card-arrow-btn { background-color: #ffcdd2; color: var(--danger); font-weight: bold; }
 
         .action-card.card-filled {
             border: 1.5px solid #a5d6a7 !important;
             border-left: 5px solid var(--primary) !important;
             background-color: var(--primary-light) !important;
         }
-        .action-card.card-filled .card-title {
-            color: #1b5e20 !important;
-        }
-        .action-card.card-filled .card-status {
-            color: var(--primary) !important;
-            font-weight: bold;
-        }
-        .action-card.card-filled .card-arrow-btn {
-            background-color: var(--primary);
-            color: #ffffff;
-            font-weight: bold;
-        }
+        .action-card.card-filled .card-title { color: #1b5e20 !important; }
+        .action-card.card-filled .card-status { color: var(--primary) !important; font-weight: bold; }
+        .action-card.card-filled .card-arrow-btn { background-color: var(--primary); color: #ffffff; font-weight: bold; }
 
         .card-info {
             display: flex;
@@ -136,13 +115,8 @@
             flex: 1;
             min-width: 0;
         }
-        .card-title {
-            font-size: 13.5px;
-            font-weight: bold;
-        }
-        .card-status {
-            font-size: 11.5px;
-        }
+        .card-title { font-size: 13.5px; font-weight: bold; }
+        .card-status { font-size: 11.5px; }
 
         .card-arrow-btn {
             border-radius: 50%;
@@ -200,7 +174,7 @@
         }
         .reset-btn:hover { background-color: #546e7a; }
 
-        /* 🌟 जतन केलेल्या नोंदी विभाग (Saved Records Box) */
+        /* जतन केलेल्या नोंदी विभाग (Saved Records) */
         .saved-records-card {
             background: #ffffff;
             border: 1.5px solid #b0bec5;
@@ -231,11 +205,7 @@
             border-bottom: 1px solid #eceff1;
             text-align: left;
         }
-        .saved-list-table th {
-            background: #f5f5f5;
-            color: #455a64;
-            font-weight: bold;
-        }
+        .saved-list-table th { background: #f5f5f5; color: #455a64; font-weight: bold; }
         .act-btn {
             border: none;
             padding: 4px 6px;
@@ -284,11 +254,7 @@
             padding-bottom: 8px;
             margin-bottom: 12px;
         }
-        .modal-header h3 {
-            margin: 0;
-            font-size: 14.5px;
-            color: var(--primary);
-        }
+        .modal-header h3 { margin: 0; font-size: 14.5px; color: var(--primary); }
         .modal-close-x {
             background: #d32f2f;
             color: white;
@@ -308,11 +274,7 @@
             margin-bottom: 10px;
             width: 100%;
         }
-        .field-group label {
-            font-size: 12px;
-            font-weight: bold;
-            color: #37474f;
-        }
+        .field-group label { font-size: 12px; font-weight: bold; color: #37474f; }
         .field-group input, .field-group select {
             width: 100%;
             padding: 9px 10px;
@@ -322,18 +284,7 @@
             background-color: #fff;
             color: #212121;
         }
-        .field-group input:focus, .field-group select:focus {
-            border-color: var(--primary);
-            outline: none;
-        }
-        
-        input::placeholder, select::placeholder { 
-            color: #78909c !important; 
-            opacity: 1;
-        }
-        select:invalid, select option[value=""] {
-            color: #78909c !important;
-        }
+        .field-group input:focus, .field-group select:focus { border-color: var(--primary); outline: none; }
 
         .date-box-wrapper {
             position: relative;
@@ -368,15 +319,8 @@
             margin: 0; padding: 0; border: none;
         }
 
-        .combobox-container { 
-            position: relative; 
-            width: 100%; 
-        }
-        .combobox-container input { 
-            padding-right: 28px; 
-            cursor: pointer;
-            background-color: #fff;
-        }
+        .combobox-container { position: relative; width: 100%; }
+        .combobox-container input { padding-right: 28px; cursor: pointer; background-color: #fff; }
         .combobox-arrow {
             position: absolute;
             right: 10px;
@@ -433,17 +377,8 @@
             padding-bottom: 4px;
         }
 
-        .card-grid-2 {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 6px;
-            width: 100%;
-        }
-        .card-grid-2 > * {
-            flex: 1 1 0;
-            min-width: 0;
-            width: 0;
-        }
+        .card-grid-2 { display: flex; gap: 6px; margin-bottom: 6px; width: 100%; }
+        .card-grid-2 > * { flex: 1 1 0; min-width: 0; width: 0; }
         .card-grid-2 input, .card-grid-2 select {
             padding: 8px 6px;
             font-size: 11px;
@@ -452,10 +387,7 @@
             background-color: #fff;
         }
 
-        .card-grid-1 {
-            width: 100%;
-            margin-bottom: 6px;
-        }
+        .card-grid-1 { width: 100%; margin-bottom: 6px; }
         .card-grid-1 input {
             width: 100%;
             padding: 8px 6px;
@@ -473,16 +405,8 @@
             margin-top: 4px;
             margin-bottom: 6px;
         }
-        .advisor-good {
-            background-color: #e8f5e9;
-            border: 1px solid #a5d6a7;
-            color: #1b5e20;
-        }
-        .advisor-warn {
-            background-color: #fff3e0;
-            border: 1px solid #ffb74d;
-            color: #e65100;
-        }
+        .advisor-good { background-color: #e8f5e9; border: 1px solid #a5d6a7; color: #1b5e20; }
+        .advisor-warn { background-color: #fff3e0; border: 1px solid #ffb74d; color: #e65100; }
         .advisor-btn {
             background-color: #2e7d32;
             color: white;
@@ -619,18 +543,19 @@
 
         .report-btn-group {
             display: flex;
+            flex-wrap: wrap;
             gap: 6px;
             width: 100%;
             margin-bottom: 10px;
         }
 
         .save-record-btn {
-            flex: 1;
+            flex: 1 1 45%;
             background-color: #2e7d32;
             color: white;
             border: none;
-            padding: 11px 4px;
-            font-size: 12.5px;
+            padding: 10px 4px;
+            font-size: 12px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
@@ -638,13 +563,27 @@
         }
         .save-record-btn:hover { background-color: #1b5e20; }
 
+        .edit-data-btn {
+            flex: 1 1 45%;
+            background-color: #e65100;
+            color: white;
+            border: none;
+            padding: 10px 4px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .edit-data-btn:hover { background-color: #bf360c; }
+
         .print-direct-btn {
-            flex: 1;
+            flex: 1 1 45%;
             background-color: #0277bd;
             color: white;
             border: none;
-            padding: 11px 4px;
-            font-size: 12.5px;
+            padding: 10px 4px;
+            font-size: 12px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
@@ -652,19 +591,19 @@
         }
         .print-direct-btn:hover { background-color: #01579b; }
 
-        .edit-data-btn {
-            flex: 1;
-            background-color: #e65100;
+        .download-pdf-btn {
+            flex: 1 1 45%;
+            background-color: #455a64;
             color: white;
             border: none;
-            padding: 11px 4px;
-            font-size: 12.5px;
+            padding: 10px 4px;
+            font-size: 12px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
             text-align: center;
         }
-        .edit-data-btn:hover { background-color: #bf360c; }
+        .download-pdf-btn:hover { background-color: #263238; }
 
         .report-summary-card {
             background: #ffffff;
@@ -715,7 +654,7 @@
 
         .hidden { display: none !important; }
 
-        /* 🌟 शासकीय वेतन निश्चिती विवरणपत्र (Illustration Sheet) स्टाईल */
+        /* शासकीय वेतन निश्चिती विवरणपत्र (Illustration Sheet) स्टाईल */
         .ill-table {
             width: 100%;
             border-collapse: collapse;
@@ -762,9 +701,7 @@
             text-align: right;
             font-size: 11px;
         }
-        .ill-num-input {
-            width: 95px;
-        }
+        .ill-num-input { width: 95px; }
         .ill-rs-prefix {
             font-size: 11.5px;
             font-weight: 500;
@@ -781,25 +718,80 @@
             padding: 4px 5px !important;
         }
 
+        /* 🌟 गुगल क्रोम प्रिंटसाठी १००% परिपूर्ण CSS */
         @media print {
-            body.print-illustration-mode .container,
-            body.print-illustration-mode .output-box,
-            body.print-illustration-mode .modal-close-x,
-            body.print-illustration-mode .ill-no-print,
-            body.print-illustration-mode .illustration-modal-header {
+            html, body {
+                background: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+
+            .container, 
+            .header, 
+            .smart-cards-list, 
+            .btn-row-action, 
+            .saved-records-card,
+            #validationBanner, 
+            .report-header-bar, 
+            .report-btn-group,
+            .modal-close-x,
+            .ill-no-print {
                 display: none !important;
             }
 
+            /* क्रोम मोड १: मुख्य तक्ता प्रिंट */
+            body:not(.print-illustration-mode) .modal-overlay {
+                display: none !important;
+            }
+            body:not(.print-illustration-mode) .output-box {
+                position: static !important;
+                display: block !important;
+                width: 100% !important;
+                height: auto !important;
+                overflow: visible !important;
+                background: transparent !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            body:not(.print-illustration-mode) .table-scroll-container {
+                max-height: none !important;
+                height: auto !important;
+                overflow: visible !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            body:not(.print-illustration-mode) table {
+                width: 100% !important;
+                white-space: normal !important;
+                font-size: 9.5px !important;
+            }
+            body:not(.print-illustration-mode) th, body:not(.print-illustration-mode) td {
+                padding: 3px 5px !important;
+                border: 1px solid #333 !important;
+            }
+            body:not(.print-illustration-mode) th {
+                background-color: #f2f2f2 !important;
+                color: #000 !important;
+                position: static !important;
+            }
+
+            /* क्रोम मोड २: विवरणपत्र प्रिंट */
+            body.print-illustration-mode .output-box {
+                display: none !important;
+            }
             body.print-illustration-mode #illustrationModal {
                 position: static !important;
+                display: block !important;
                 width: 100% !important;
                 height: auto !important;
                 background: transparent !important;
                 padding: 0 !important;
-                display: block !important;
                 overflow: visible !important;
             }
-
             body.print-illustration-mode #illustrationModal .modal-box {
                 max-width: 100% !important;
                 width: 100% !important;
@@ -809,7 +801,6 @@
                 margin: 0 !important;
                 background: transparent !important;
             }
-
             body.print-illustration-mode .ill-input {
                 border: none !important;
                 background: transparent !important;
@@ -818,111 +809,22 @@
                 padding: 0 !important;
                 color: #000 !important;
             }
-
             body.print-illustration-mode .ill-scale-input {
                 width: 100% !important;
-                max-width: 100% !important;
-                text-align: right !important;
-                font-size: 11px !important;
-            }
-
-            body.print-illustration-mode .ill-num-input {
-                width: auto !important;
                 text-align: right !important;
             }
-
             body.print-illustration-mode .ill-footer {
                 display: flex !important;
                 justify-content: space-between !important;
-                align-items: center !important;
                 margin-top: 25px !important;
                 border-top: 1.5px solid #2e7d32 !important;
                 padding-top: 8px !important;
                 font-size: 11px !important;
             }
 
-            body:not(.print-illustration-mode) html, body:not(.print-illustration-mode) body {
-                background: #ffffff !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                width: 100% !important;
-                overflow: visible !important;
-            }
-
-            body:not(.print-illustration-mode) .header, 
-            body:not(.print-illustration-mode) .smart-cards-list, 
-            body:not(.print-illustration-mode) .btn-row-action, 
-            body:not(.print-illustration-mode) .saved-records-card,
-            body:not(.print-illustration-mode) #validationBanner, 
-            body:not(.print-illustration-mode) .report-header-bar, 
-            body:not(.print-illustration-mode) .report-btn-group,
-            body:not(.print-illustration-mode) .modal-overlay {
-                display: none !important;
-            }
-
-            body:not(.print-illustration-mode) .container {
-                max-width: 100% !important;
-                width: 100% !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                border: none !important;
-                box-shadow: none !important;
-            }
-
-            body:not(.print-illustration-mode) .output-box {
-                position: static !important;
-                background: transparent !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                width: 100% !important;
-                height: auto !important;
-                display: block !important;
-                overflow: visible !important;
-            }
-
-            body:not(.print-illustration-mode) .table-scroll-container {
-                max-height: none !important;
-                height: auto !important;
-                overflow: visible !important;
-                border: none !important;
-                box-shadow: none !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-
-            body:not(.print-illustration-mode) #printableReportArea {
-                position: static !important;
-                width: 100% !important;
-                display: block !important;
-            }
-
-            body:not(.print-illustration-mode) .report-summary-card {
-                font-size: 11px !important;
-                line-height: 1.4 !important;
-                margin-bottom: 10px !important;
-                border: none !important;
-            }
-
-            body:not(.print-illustration-mode) table {
-                width: 100% !important;
-                white-space: normal !important;
-                font-size: 9.5px !important;
-            }
-
-            body:not(.print-illustration-mode) th, body:not(.print-illustration-mode) td {
-                padding: 3px 5px !important;
-                border: 1px solid #333 !important;
-            }
-
-            body:not(.print-illustration-mode) th {
-                background-color: #f2f2f2 !important;
-                color: #000 !important;
-                position: static !important;
-            }
-
             @page {
                 size: A4 portrait;
-                margin: 10mm;
+                margin: 8mm;
             }
         }
     </style>
@@ -939,7 +841,6 @@
 
     <!-- ३ स्मार्ट अ‍ॅक्शन कार्ड्स -->
     <div class="smart-cards-list">
-        
         <!-- कार्ड १ -->
         <div class="action-card card-pending" id="cardEmp" onclick="openModal('employeeModal')">
             <div class="card-info">
@@ -966,7 +867,6 @@
             </div>
             <div class="card-arrow-btn" id="cardRulesBadge">!</div>
         </div>
-
     </div>
 
     <div class="btn-row-action">
@@ -974,7 +874,7 @@
         <button type="button" class="reset-btn" onclick="resetAllData()">Reset Data</button>
     </div>
 
-    <!-- 🌟 जतन केलेल्या वेतन निश्चितींची यादी (Saved Records List Box) -->
+    <!-- जतन केलेल्या वेतन निश्चिती नोंदी (Saved Records List) -->
     <div class="saved-records-card" id="savedRecordsBox">
         <div class="saved-records-header">
             <span>📁 जतन केलेल्या वेतन निश्चिती नोंदी</span>
@@ -1009,7 +909,8 @@
     <div class="report-btn-group">
         <button type="button" class="save-record-btn" onclick="saveCurrentFixationRecord()">💾 रेकॉर्ड सेव्ह करा</button>
         <button type="button" class="edit-data-btn" onclick="closeReportView(); scrollToEditData();">✏️ माहिती दुरुस्त करा</button>
-        <button type="button" class="print-direct-btn" onclick="printReport()">🖨️ प्रिंट काढा</button>
+        <button type="button" class="print-direct-btn" onclick="printReportChrome()">🖨️ प्रिंट काढा (Chrome)</button>
+        <button type="button" class="download-pdf-btn" onclick="downloadReportPDF()">📥 PDF डाऊनलोड (App)</button>
     </div>
 
     <div id="printableReportArea" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
@@ -1035,7 +936,7 @@
     </div>
 </div>
 
-<!-- ==================== 🌟 पॉप-अप: पाचवा वेतन आयोग वेतन निश्चिती (Illustration Sheet) ==================== -->
+<!-- ==================== पॉप-अप: पाचवा वेतन आयोग वेतन निश्चिती विवरणपत्र ==================== -->
 <div id="illustrationModal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width: 530px;">
         <div class="modal-header illustration-modal-header" style="justify-content: center; position: relative;">
@@ -1043,9 +944,9 @@
             <button type="button" class="modal-close-x ill-no-print" style="position: absolute; right: 0; top: 0;" onclick="closeModal('illustrationModal')">✕</button>
         </div>
 
-        <div class="ill-no-print" style="display:flex; justify-content:space-between; margin-bottom: 8px;">
-            <span style="font-size:11px; color:#546e7a;">💡 आवश्यकतेनुसार खालील संख्या हाताने एडिट करू शकता.</span>
-            <button type="button" onclick="printIllustrationSheet()" style="background:#0277bd; color:#fff; border:none; padding:5px 10px; font-size:11.5px; font-weight:bold; border-radius:4px; cursor:pointer;">🖨️ विवरणपत्र प्रिंट / PDF काढा</button>
+        <div class="ill-no-print" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom: 8px;">
+            <button type="button" onclick="printIllustrationChrome()" style="background:#0277bd; color:#fff; border:none; padding:6px 12px; font-size:11.5px; font-weight:bold; border-radius:4px; cursor:pointer;">🖨️ प्रिंट काढा (Chrome)</button>
+            <button type="button" onclick="downloadIllustrationPDF()" style="background:#455a64; color:#fff; border:none; padding:6px 12px; font-size:11.5px; font-weight:bold; border-radius:4px; cursor:pointer;">📥 PDF डाऊनलोड (App)</button>
         </div>
 
         <div id="illustrationSheetContent"></div>
@@ -1054,7 +955,7 @@
     </div>
 </div>
 
-<!-- ==================== पॉप-अप १: कर्मचारी व मूळ नियुक्ती माहिती ==================== -->
+<!-- ==================== पॉप-अप १: कर्मचारी माहिती ==================== -->
 <div id="employeeModal" class="modal-overlay hidden">
     <div class="modal-box">
         <div class="modal-header">
@@ -1111,12 +1012,11 @@
         </div>
 
         <input type="hidden" id="gradePay" value="0">
-
         <button type="button" class="modal-save-btn" onclick="saveEmployeeModal()">माहिती जतन करा (Save)</button>
     </div>
 </div>
 
-<!-- ==================== पॉप-अप २: ३ पदोन्नती / ३ MACP लाभ ==================== -->
+<!-- ==================== पॉप-अप २: आर्थिक लाभ तपशील ==================== -->
 <div id="benefitModal" class="modal-overlay hidden">
     <div class="modal-box" style="max-width: 540px;">
         <div class="modal-header">
@@ -1147,9 +1047,7 @@
                         <span class="cal-btn-icon">📅</span>
                     </div>
                 </div>
-
                 <div id="b1_advisor" class="option-advisor-box hidden"></div>
-
                 <div class="card-grid-2">
                     <select id="b1_comm" onchange="updatePromoScaleDropdown(1); validateCard2();" required>
                         <option value="" disabled selected>वेतन आयोग निवडा</option>
@@ -1193,9 +1091,7 @@
                         <span class="cal-btn-icon">📅</span>
                     </div>
                 </div>
-
                 <div id="b2_advisor" class="option-advisor-box hidden"></div>
-
                 <div class="card-grid-2">
                     <select id="b2_comm" onchange="updatePromoScaleDropdown(2); validateCard2();" required>
                         <option value="" disabled selected>वेतन आयोग निवडा</option>
@@ -1239,9 +1135,7 @@
                         <span class="cal-btn-icon">📅</span>
                     </div>
                 </div>
-
                 <div id="b3_advisor" class="option-advisor-box hidden"></div>
-
                 <div class="card-grid-2">
                     <select id="b3_comm" onchange="updatePromoScaleDropdown(3); validateCard2();" required>
                         <option value="" disabled selected>वेतन आयोग निवडा</option>
@@ -1266,7 +1160,7 @@
     </div>
 </div>
 
-<!-- ==================== पॉप-अप ३: कालावधी व वेतनवाढ नियम ==================== -->
+<!-- ==================== पॉप-अप ३: कालावधी व नियम ==================== -->
 <div id="rulesModal" class="modal-overlay hidden">
     <div class="modal-box">
         <div class="modal-header">
@@ -1323,7 +1217,7 @@
             <button type="button" onclick="addScaleRevRow()" style="background: #0277bd; color: white; border: none; padding: 5px 10px; font-size: 11px; border-radius: 4px; cursor: pointer; margin-top: 4px;">+ आणखी एक वेतनश्रेणी सुधारणा जोडा</button>
         </div>
 
-        <!-- वेतनवाढ थांबवली व चेकबॉक्स बॉक्स -->
+        <!-- वेतनवाढ थांबवली विभाग -->
         <div class="field-group" style="margin-top: 10px; border-top: 1px dashed #cfd8dc; padding-top: 8px;">
             <label>🛑 कोणती वेतनवाढ थांबवली / रोखली आहे का?</label>
             <select id="incrementWithheld" onchange="toggleWithheldOption()">
@@ -1360,7 +1254,97 @@
 <script>
     let selectedWithheldDates = new Set();
     let globalCalcDataList = [];
-    let currentEditingRecordId = null; // चालू संपादित रेकॉर्डचा ID
+    let currentEditingRecordId = null;
+
+    // =========================================================================
+    // 🌟 १. क्रोमसाठी थेट प्रिंट (Chrome Native Print)
+    // =========================================================================
+    function printReportChrome() {
+        document.body.classList.remove('print-illustration-mode');
+        window.print();
+    }
+
+    function printIllustrationChrome() {
+        document.body.classList.add('print-illustration-mode');
+        window.print();
+        const cleanup = () => {
+            document.body.classList.remove('print-illustration-mode');
+            window.removeEventListener('afterprint', cleanup);
+        };
+        window.addEventListener('afterprint', cleanup);
+        setTimeout(cleanup, 2000);
+    }
+
+    // =========================================================================
+    // 🌟 २. ॲप (APK) साठी थेट PDF डाऊनलोड
+    // =========================================================================
+    function downloadReportPDF() {
+        const reportArea = document.getElementById('printableReportArea');
+        if (!reportArea) return;
+
+        if (typeof html2pdf === 'undefined') {
+            window.print();
+            return;
+        }
+
+        const scrollContainer = reportArea.querySelector('.table-scroll-container');
+        const prevMaxH = scrollContainer ? scrollContainer.style.maxHeight : '';
+        const prevOverflow = scrollContainer ? scrollContainer.style.overflow : '';
+
+        reportArea.classList.add('pdf-export-mode');
+        if (scrollContainer) {
+            scrollContainer.style.maxHeight = 'none';
+            scrollContainer.style.overflow = 'visible';
+        }
+
+        const opt = {
+            margin: [8, 6, 8, 6],
+            filename: 'Pay_Fixation_Report.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(reportArea).save().then(() => {
+            if (scrollContainer) {
+                scrollContainer.style.maxHeight = prevMaxH;
+                scrollContainer.style.overflow = prevOverflow;
+            }
+            reportArea.classList.remove('pdf-export-mode');
+        }).catch(err => {
+            console.error(err);
+            if (scrollContainer) {
+                scrollContainer.style.maxHeight = prevMaxH;
+                scrollContainer.style.overflow = prevOverflow;
+            }
+            reportArea.classList.remove('pdf-export-mode');
+            window.print();
+        });
+    }
+
+    function downloadIllustrationPDF() {
+        const illContent = document.getElementById('illustrationSheetContent');
+        if (!illContent) return;
+
+        if (typeof html2pdf === 'undefined') {
+            printIllustrationChrome();
+            return;
+        }
+
+        illContent.querySelectorAll('input').forEach(input => {
+            input.setAttribute('value', input.value);
+        });
+
+        const opt = {
+            margin: [8, 8, 8, 8],
+            filename: 'Pay_Fixation_Illustration.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(illContent).save();
+    }
 
     // =========================================================================
     // 🌟 Save, Load, Edit & Delete (CRUD) व्यवस्थापन
@@ -1378,7 +1362,6 @@
         renderSavedRecordsTable();
     }
 
-    // १. चालू वेतन निश्चिती रेकॉर्ड सेव्ह / अपडेट करणे
     function saveCurrentFixationRecord() {
         const empName = document.getElementById('empName').value.trim();
         const empDesig = document.getElementById('empDesignation').value.trim();
@@ -1388,7 +1371,6 @@
             return;
         }
 
-        // सर्व स्केल रिव्हिजन गोळा करणे
         let revRows = [];
         document.querySelectorAll('#scaleRevList .scale-rev-item').forEach(item => {
             let d = item.querySelector('.rev-date').value;
@@ -1397,7 +1379,6 @@
             if (d && c && s) revRows.push({ d, c, s });
         });
 
-        // सर्व इनपुट्स डेटा ऑब्जेक्ट
         const recordData = {
             id: currentEditingRecordId || Date.now(),
             savedAt: new Date().toLocaleString('mr-IN'),
@@ -1444,22 +1425,18 @@
         let list = getSavedRecordsFromStorage();
         if (currentEditingRecordId) {
             let idx = list.findIndex(r => r.id === currentEditingRecordId);
-            if (idx !== -1) {
-                list[idx] = recordData;
-            } else {
-                list.unshift(recordData);
-            }
-            alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या अद्ययावत (Update) झाली!`);
+            if (idx !== -1) list[idx] = recordData;
+            else list.unshift(recordData);
+            alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या अद्ययावत झाली!`);
         } else {
             list.unshift(recordData);
             currentEditingRecordId = recordData.id;
-            alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या सेव्ह (Save) झाली!`);
+            alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या सेव्ह झाली!`);
         }
 
         saveRecordsListToStorage(list);
     }
 
-    // २. सेव्ह केलेल्या नोंदींची यादी दाखवणे (Render Table)
     function renderSavedRecordsTable() {
         const tbody = document.getElementById('savedRecordsTableBody');
         const countLabel = document.getElementById('savedCountLabel');
@@ -1490,7 +1467,6 @@
         });
     }
 
-    // ३. सेव्ह केलेला रेकॉर्ड फॉर्ममध्ये लोड करणे (अंतर्गत हेल्पर)
     function populateFormFromRecord(rec) {
         currentEditingRecordId = rec.id;
         const d = rec.formData;
@@ -1555,7 +1531,6 @@
         validateCard3();
     }
 
-    // ४. सेव्ह केलेला रेकॉर्ड थेट पहाणे
     function viewSavedRecord(id) {
         let list = getSavedRecordsFromStorage();
         let rec = list.find(r => r.id === id);
@@ -1565,7 +1540,6 @@
         processFixation();
     }
 
-    // ५. सेव्ह केलेल्या नोंदीची दुरुस्ती करणे (Edit)
     function editSavedRecord(id) {
         let list = getSavedRecordsFromStorage();
         let rec = list.find(r => r.id === id);
@@ -1577,178 +1551,19 @@
         alert(`'${rec.empName}' यांची माहिती फॉर्ममध्ये भरली आहे. आवश्यक ते बदल करून पुन्हा 'Submit Data' व 'Save Record' करा.`);
     }
 
-    // ६. सेव्ह केलेला रेकॉर्ड हटवणे (Delete)
     function deleteSavedRecord(id, empName) {
         if (confirm(`तुम्हाला '${empName}' यांची जतन केलेली वेतन निश्चिती नोंद खरोखर हटवायची आहे का?`)) {
             let list = getSavedRecordsFromStorage();
             list = list.filter(r => r.id !== id);
-            if (currentEditingRecordId === id) {
-                currentEditingRecordId = null;
-            }
+            if (currentEditingRecordId === id) currentEditingRecordId = null;
             saveRecordsListToStorage(list);
             alert("नोंद यशस्वीरीत्या हटवण्यात आली आहे!");
         }
     }
 
-    // =========================================================================
-    // 🌟 PDF व प्रिंट फंक्शनॅलिटीज
-    // =========================================================================
-    function printReport() {
-        if (window.Android && typeof window.Android.print === 'function') {
-            window.Android.print();
-            return;
-        }
-        if (window.AndroidPrint && typeof window.AndroidPrint.print === 'function') {
-            window.AndroidPrint.print();
-            return;
-        }
-
-        if (isWebViewApp()) {
-            generateReportPDF();
-        } else {
-            window.print();
-        }
-    }
-
-    function generateReportPDF() {
-        const reportArea = document.getElementById('printableReportArea');
-        if (!reportArea) return;
-
-        if (typeof html2pdf === 'undefined') {
-            window.print();
-            return;
-        }
-
-        const scrollContainer = reportArea.querySelector('.table-scroll-container');
-        const prevMaxH = scrollContainer ? scrollContainer.style.maxHeight : '';
-        const prevOverflow = scrollContainer ? scrollContainer.style.overflow : '';
-        const prevAreaOverflow = reportArea.style.overflow;
-
-        reportArea.classList.add('pdf-export-mode');
-        if (scrollContainer) {
-            scrollContainer.style.maxHeight = 'none';
-            scrollContainer.style.overflow = 'visible';
-        }
-        reportArea.style.overflow = 'visible';
-
-        const opt = {
-            margin: [8, 6, 8, 6],
-            filename: 'Pay_Fixation_Report.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, logging: false },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        html2pdf().set(opt).from(reportArea).output('blob').then(async (blob) => {
-            if (scrollContainer) {
-                scrollContainer.style.maxHeight = prevMaxH;
-                scrollContainer.style.overflow = prevOverflow;
-            }
-            reportArea.style.overflow = prevAreaOverflow;
-            reportArea.classList.remove('pdf-export-mode');
-
-            await handleAppPdfOutput(blob, 'Pay_Fixation_Report.pdf');
-        }).catch(err => {
-            console.error(err);
-            if (scrollContainer) {
-                scrollContainer.style.maxHeight = prevMaxH;
-                scrollContainer.style.overflow = prevOverflow;
-            }
-            reportArea.style.overflow = prevAreaOverflow;
-            reportArea.classList.remove('pdf-export-mode');
-            window.print();
-        });
-    }
-
-    function printIllustrationSheet() {
-        if (window.Android && typeof window.Android.print === 'function') {
-            window.Android.print();
-            return;
-        }
-        if (window.AndroidPrint && typeof window.AndroidPrint.print === 'function') {
-            window.AndroidPrint.print();
-            return;
-        }
-
-        if (isWebViewApp()) {
-            generateIllustrationPDF();
-        } else {
-            printIllustrationSheetNative();
-        }
-    }
-
-    function printIllustrationSheetNative() {
-        document.body.classList.add('print-illustration-mode');
-        window.print();
-        setTimeout(() => {
-            document.body.classList.remove('print-illustration-mode');
-        }, 1000);
-    }
-
-    function generateIllustrationPDF() {
-        const illContent = document.getElementById('illustrationSheetContent');
-        if (!illContent) return;
-
-        if (typeof html2pdf === 'undefined') {
-            printIllustrationSheetNative();
-            return;
-        }
-
-        illContent.querySelectorAll('input').forEach(input => {
-            input.setAttribute('value', input.value);
-        });
-
-        const opt = {
-            margin: [8, 8, 8, 8],
-            filename: 'Pay_Fixation_Illustration.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, logging: false },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        html2pdf().set(opt).from(illContent).output('blob').then(async (blob) => {
-            await handleAppPdfOutput(blob, 'Pay_Fixation_Illustration.pdf');
-        }).catch(err => {
-            console.error(err);
-            printIllustrationSheetNative();
-        });
-    }
-
-    async function handleAppPdfOutput(blob, fileName) {
-        try {
-            const file = new File([blob], fileName, { type: 'application/pdf' });
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: fileName,
-                    text: 'वेतन निश्चिती अहवाल (PDF)'
-                });
-                return;
-            }
-        } catch (e) {
-            console.log("Web share fallback", e);
-        }
-
-        alert("⚠️ महत्त्वाची सूचना:\n'Save As' बॉक्स आल्यास नावाच्या शेवटी '.pdf' नक्की टाईप करा!\nउदा. " + fileName + "\n(नावापुढे .pdf न टाकल्यास फाईलवर '?' येते व ती उघडत नाही.)");
-
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }, 2000);
-    }
-
     function onWithheldChkChange(chk) {
-        if (chk.checked) {
-            selectedWithheldDates.add(chk.value);
-        } else {
-            selectedWithheldDates.delete(chk.value);
-        }
+        if (chk.checked) selectedWithheldDates.add(chk.value);
+        else selectedWithheldDates.delete(chk.value);
     }
 
     function formatDateToDDMMYYYY(dateString) {
@@ -1779,34 +1594,24 @@
         const dateInput = document.getElementById(dateId);
         const dispInput = document.getElementById(dispId);
         if (dateInput && dispInput) {
-            if (dateInput.value) {
-                dispInput.value = formatDateToDDMMYYYY(dateInput.value);
-            } else {
-                dispInput.value = "";
-            }
+            dispInput.value = dateInput.value ? formatDateToDDMMYYYY(dateInput.value) : "";
         }
     }
 
     function openModal(modalId) { 
         const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.remove('hidden');
-        }
+        if (modal) modal.classList.remove('hidden');
         if (modalId === 'rulesModal') {
             const withheldVal = document.getElementById('incrementWithheld').value;
             const effectDiv = document.getElementById('withheldEffectDiv');
-            if (withheldVal === 'Yes') {
-                effectDiv.classList.remove('hidden');
-            }
+            if (withheldVal === 'Yes') effectDiv.classList.remove('hidden');
             populateWithheldCheckboxes();
         }
     }
 
     function closeModal(modalId) { 
         const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.add('hidden');
-        }
+        if (modal) modal.classList.add('hidden');
     }
 
     function closeReportView() {
@@ -1815,9 +1620,7 @@
 
     function scrollToEditData() {
         const cardsArea = document.querySelector('.smart-cards-list');
-        if (cardsArea) {
-            cardsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        if (cardsArea) cardsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function toggleScaleRevSection() {
@@ -1825,9 +1628,7 @@
         const container = document.getElementById('scaleRevContainer');
         if (val === 'Yes') {
             container.classList.remove('hidden');
-            if (document.getElementById('scaleRevList').children.length === 0) {
-                addScaleRevRow();
-            }
+            if (document.getElementById('scaleRevList').children.length === 0) addScaleRevRow();
         } else {
             container.classList.add('hidden');
             document.getElementById('scaleRevList').innerHTML = "";
@@ -1918,18 +1719,13 @@
             } else if (activeComm === "6th") {
                 incDate = new Date(yr, 6, 1);
             } else if (activeComm === "7th") {
-                if (rule7th === 'january') {
-                    incDate = new Date(yr, 0, 1);
-                    if (yr === 2016) continue;
-                } else {
-                    incDate = new Date(yr, 6, 1);
-                }
+                incDate = (rule7th === 'january') ? new Date(yr, 0, 1) : new Date(yr, 6, 1);
+                if (rule7th === 'january' && yr === 2016) continue;
             }
 
             if (incDate && incDate > startDate && incDate <= endDate) {
                 let isoStr = `${incDate.getFullYear()}-${String(incDate.getMonth() + 1).padStart(2, '0')}-${String(incDate.getDate()).padStart(2, '0')}`;
-                let dispStr = formatDateToDDMMYYYY(isoStr);
-                datesList.push({ iso: isoStr, disp: dispStr });
+                datesList.push({ iso: isoStr, disp: formatDateToDDMMYYYY(isoStr) });
             }
         }
 
@@ -1972,9 +1768,7 @@
         chks.forEach(c => selectedWithheldDates.add(c.value));
         
         const listContainer = document.getElementById('withheldListContainer');
-        if (listContainer) {
-            listContainer.classList.add('hidden');
-        }
+        if (listContainer) listContainer.classList.add('hidden');
         alert("वेतनवाढ रोखण्याची तारीख यशस्वीरीत्या जतन केली!");
     }
 
@@ -2070,9 +1864,7 @@
                 let scaleVal = document.getElementById(`b${i}_scale`).value.trim();
                 let commVal = document.getElementById(`b${i}_comm`).value;
 
-                if (!dateVal || !scaleVal || !commVal) {
-                    hasIncomplete = true;
-                }
+                if (!dateVal || !scaleVal || !commVal) hasIncomplete = true;
             }
         }
 
@@ -2235,37 +2027,37 @@
     }
 
     const levelConfig7th = [
-        { id: "S-1", gp: 1300, min: 15000, max: 47600, stages: 40 },
-        { id: "S-2", gp: 1400, min: 15300, max: 48700, stages: 40 },
-        { id: "S-3", gp: 1600, min: 16600, max: 52400, stages: 40 },
-        { id: "S-4", gp: "1650/1700", min: 17100, max: 54000, stages: 40 },
-        { id: "S-5", gp: 1800, min: 18000, max: 56900, stages: 40 },
-        { id: "S-6", gp: 1900, min: 19900, max: 63200, stages: 40 },
-        { id: "S-7", gp: 2000, min: 21700, max: 69100, stages: 40 },
-        { id: "S-8", gp: 2400, min: 25500, max: 81100, stages: 40 },
-        { id: "S-9", gp: 2500, min: 26400, max: 83600, stages: 40 },
-        { id: "S-10", gp: 2800, min: 29200, max: 92300, stages: 40 },
-        { id: "S-11", gp: "2900/3000", min: 30100, max: 95100, stages: 40 },
-        { id: "S-12", gp: 3500, min: 32000, max: 101600, stages: 40 },
-        { id: "S-13", gp: "4100/4200", min: 35400, max: 112400, stages: 40 },
-        { id: "S-14", gp: 4300, min: 38600, max: 122800, stages: 40 },
-        { id: "S-15", gp: 4400, min: 41800, max: 132300, stages: 40 },
-        { id: "S-16", gp: "4500/4600", min: 44900, max: 142400, stages: 40 },
-        { id: "S-17", gp: 4800, min: 47600, max: 151100, stages: 40 },
-        { id: "S-18", gp: "4900/5000", min: 49100, max: 155800, stages: 40 },
-        { id: "S-19", gp: 5000, min: 55100, max: 175100, stages: 40 },
-        { id: "S-20", gp: 5400, min: 56100, max: 177500, stages: 40 },
-        { id: "S-21", gp: 5500, min: 57100, max: 180800, stages: 40 },
-        { id: "S-22", gp: "5700/5800", min: 60000, max: 190800, stages: 40 },
-        { id: "S-23", gp: 6600, min: 67700, max: 208700, stages: 39 },
-        { id: "S-24", gp: 6900, min: 71100, max: 211900, stages: 38 },
-        { id: "S-25", gp: 7600, min: 78800, max: 209200, stages: 34 },
-        { id: "S-26", gp: 7900, min: 82200, max: 211500, stages: 33 },
-        { id: "S-27", gp: 8700, min: 118500, max: 214100, stages: 21 },
-        { id: "S-28", gp: 8800, min: 124800, max: 216600, stages: 19 },
-        { id: "S-29", gp: 8900, min: 131100, max: 212400, stages: 18 },
-        { id: "S-30", gp: 10000, min: 144200, max: 218200, stages: 15 },
-        { id: "S-31", gp: "67000-79000", min: 182200, max: 224100, stages: 8 }
+        { id: "S-1", gp: 1300, min: 15000, max: 47600 },
+        { id: "S-2", gp: 1400, min: 15300, max: 48700 },
+        { id: "S-3", gp: 1600, min: 16600, max: 52400 },
+        { id: "S-4", gp: "1650/1700", min: 17100, max: 54000 },
+        { id: "S-5", gp: 1800, min: 18000, max: 56900 },
+        { id: "S-6", gp: 1900, min: 19900, max: 63200 },
+        { id: "S-7", gp: 2000, min: 21700, max: 69100 },
+        { id: "S-8", gp: 2400, min: 25500, max: 81100 },
+        { id: "S-9", gp: 2500, min: 26400, max: 83600 },
+        { id: "S-10", gp: 2800, min: 29200, max: 92300 },
+        { id: "S-11", gp: "2900/3000", min: 30100, max: 95100 },
+        { id: "S-12", gp: 3500, min: 32000, max: 101600 },
+        { id: "S-13", gp: "4100/4200", min: 35400, max: 112400 },
+        { id: "S-14", gp: 4300, min: 38600, max: 122800 },
+        { id: "S-15", gp: 4400, min: 41800, max: 132300 },
+        { id: "S-16", gp: "4500/4600", min: 44900, max: 142400 },
+        { id: "S-17", gp: 4800, min: 47600, max: 151100 },
+        { id: "S-18", gp: "4900/5000", min: 49100, max: 155800 },
+        { id: "S-19", gp: 5000, min: 55100, max: 175100 },
+        { id: "S-20", gp: 5400, min: 56100, max: 177500 },
+        { id: "S-21", gp: 5500, min: 57100, max: 180800 },
+        { id: "S-22", gp: "5700/5800", min: 60000, max: 190800 },
+        { id: "S-23", gp: 6600, min: 67700, max: 208700 },
+        { id: "S-24", gp: 6900, min: 71100, max: 211900 },
+        { id: "S-25", gp: 7600, min: 78800, max: 209200 },
+        { id: "S-26", gp: 7900, min: 82200, max: 211500 },
+        { id: "S-27", gp: 8700, min: 118500, max: 214100 },
+        { id: "S-28", gp: 8800, min: 124800, max: 216600 },
+        { id: "S-29", gp: 8900, min: 131100, max: 212400 },
+        { id: "S-30", gp: 10000, min: 144200, max: 218200 },
+        { id: "S-31", gp: "67000-79000", min: 182200, max: 224100 }
     ];
 
     const fullPayMatrix7th = {
@@ -2383,15 +2175,7 @@
 
     function calculate5thPayFixation(existingBasic, existingScaleStr, proposedScaleStr) {
         let bp = existingBasic;
-        let da = 0;
-        if (bp <= 3500) {
-            da = Math.round(bp * 1.48);
-        } else if (bp <= 6000) {
-            da = Math.max(5180, Math.round(bp * 1.11));
-        } else {
-            da = Math.max(6660, Math.round(bp * 0.96));
-        }
-
+        let da = (bp <= 3500) ? Math.round(bp * 1.48) : ((bp <= 6000) ? Math.max(5180, Math.round(bp * 1.11)) : Math.max(6660, Math.round(bp * 0.96)));
         let ir1 = 100;
         let ir2 = Math.max(100, Math.round(bp * 0.10));
         let emoluments = bp + da + ir1 + ir2;
@@ -2399,38 +2183,19 @@
         let total = emoluments + weightage40;
 
         let proposedStages = parsePayScaleStages(proposedScaleStr, '5th');
-        if (proposedStages.length === 0) {
-            proposedStages = [2550, 2605, 2660, 2720, 2780, 2840, 2900, 2960, 3020, 3080, 3140, 3200];
-        }
+        if (proposedStages.length === 0) proposedStages = [2550, 2605, 2660, 2720, 2780, 2840, 2900, 2960, 3020, 3080, 3140, 3200];
         let minProposed = proposedStages[0];
 
         let stageNextAbove = minProposed;
         for (let i = 0; i < proposedStages.length; i++) {
-            if (proposedStages[i] >= total) {
-                stageNextAbove = proposedStages[i];
-                break;
-            }
+            if (proposedStages[i] >= total) { stageNextAbove = proposedStages[i]; break; }
         }
-        if (total > proposedStages[proposedStages.length - 1]) {
-            stageNextAbove = proposedStages[proposedStages.length - 1];
-        }
+        if (total > proposedStages[proposedStages.length - 1]) stageNextAbove = proposedStages[proposedStages.length - 1];
 
         let existingStages = parsePayScaleStages(existingScaleStr, '4th');
-        let existingIncrements = 0;
-        if (existingStages.length > 0) {
-            let idx = existingStages.indexOf(bp);
-            if (idx !== -1) {
-                existingIncrements = idx;
-            } else {
-                let minExisting = existingStages[0];
-                if (bp > minExisting) {
-                    existingIncrements = Math.floor((bp - minExisting) / 12);
-                }
-            }
-        }
+        let existingIncrements = (existingStages.indexOf(bp) !== -1) ? existingStages.indexOf(bp) : Math.floor((bp - (existingStages[0] || 750)) / 12);
         let bunchingIncrements = Math.floor(existingIncrements / 3);
-        let bunchingStageIndex = Math.min(bunchingIncrements, proposedStages.length - 1);
-        let bunchingStage = proposedStages[bunchingStageIndex];
+        let bunchingStage = proposedStages[Math.min(bunchingIncrements, proposedStages.length - 1)];
 
         return Math.max(stageNextAbove, bunchingStage);
     }
@@ -2583,14 +2348,16 @@
 
     function recalculate5thIllustration() {
         let bp = parseFloat(document.getElementById('ill_bp').value) || 0;
-        let da = parseFloat(document.getElementById('ill_da').value) || Math.round(bp * 1.48);
-        let ir1 = parseFloat(document.getElementById('ill_ir1').value) || 100;
-        let ir2 = parseFloat(document.getElementById('ill_ir2').value) || Math.max(100, Math.round(bp * 0.10));
+        let da = (bp <= 3500) ? Math.round(bp * 1.48) : ((bp <= 6000) ? Math.max(5180, Math.round(bp * 1.11)) : Math.max(6660, Math.round(bp * 0.96)));
+        let ir1 = 100;
+        let ir2 = Math.max(100, Math.round(bp * 0.10));
         let emoluments = bp + da + ir1 + ir2;
-        let add40 = parseFloat(document.getElementById('ill_add40').value) || Math.round(bp * 0.40);
+        let add40 = Math.round(bp * 0.40);
         let total = emoluments + add40;
 
+        document.getElementById('ill_da').value = da;
         document.getElementById('ill_emoluments').value = emoluments;
+        document.getElementById('ill_add40').value = add40;
         document.getElementById('ill_total').value = total;
 
         let st9 = parseFloat(document.getElementById('ill_stage9').value) || 2550;
@@ -2607,8 +2374,7 @@
         }
         if (comm === '6th') {
             let match = scale.match(/(PB-?\d|-1S)\s*:\s*\d+\s*-\s*\d+\s*\(GP\s*\d+\)/i);
-            if (match) return match[0];
-            return scale;
+            return match ? match[0] : scale;
         }
         return scale;
     }
@@ -2618,11 +2384,8 @@
 
         if (commission === '7th' || scaleStr.includes('S-')) {
             let match = scaleStr.match(/S-(\d+)/i);
-            if (match) {
-                let key = "S-" + parseInt(match[1], 10);
-                if (fullPayMatrix7th[key]) return fullPayMatrix7th[key];
-            }
-            return fullPayMatrix7th["S-6"];
+            let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
+            return fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
         }
 
         if (commission === '5th' || scaleStr.includes('रु.') || scaleStr.includes('4000') || scaleStr.includes('2550')) {
@@ -2657,39 +2420,22 @@
                 let bandMin = parseInt(bandMatch[1], 10);
                 let bandMax = parseInt(bandMatch[2], 10);
                 let entryPay = get6thEntryPay(scaleStr, gp);
-
                 let stagesSet = new Set();
-                if (entryPay && entryPay >= bandMin && entryPay <= bandMax) {
-                    let curr = entryPay;
-                    let safety = 0;
-                    while (curr <= bandMax && safety < 80) {
-                        stagesSet.add(curr);
-                        let total = curr + gp;
-                        let inc = Math.ceil((total * 0.03) / 10) * 10;
-                        if (inc < 10) inc = 10;
-                        curr += inc;
-                        safety++;
-                    }
-                }
-
-                if (bandMin && bandMin <= bandMax) {
-                    let curr = bandMin;
-                    let safety = 0;
-                    while (curr <= bandMax && safety < 80) {
-                        stagesSet.add(curr);
-                        let total = curr + gp;
-                        let inc = Math.ceil((total * 0.03) / 10) * 10;
-                        if (inc < 10) inc = 10;
-                        curr += inc;
-                        safety++;
-                    }
+                let startVal = (entryPay && entryPay >= bandMin && entryPay <= bandMax) ? entryPay : bandMin;
+                let curr = startVal;
+                let safety = 0;
+                while (curr <= bandMax && safety < 80) {
+                    stagesSet.add(curr);
+                    let inc = Math.ceil(((curr + gp) * 0.03) / 10) * 10;
+                    if (inc < 10) inc = 10;
+                    curr += inc;
+                    safety++;
                 }
                 return Array.from(stagesSet).sort((a, b) => a - b);
             }
         }
 
-        let cleanStr = scaleStr.replace(/\(.*?\)/g, '');
-        cleanStr = cleanStr.replace(/PB\s*-\s*\d+/gi, '').replace(/श्रेणी\s*-\s*\d+/gi, '');
+        let cleanStr = scaleStr.replace(/\(.*?\)/g, '').replace(/PB\s*-\s*\d+/gi, '').replace(/श्रेणी\s*-\s*\d+/gi, '');
         let matches = cleanStr.match(/\d+/g);
         if (!matches || matches.length < 3) return [19900, 20500, 21100, 21700, 22400];
 
@@ -2746,25 +2492,18 @@
                         let gpVal = parseInt(gpMatch[1], 10);
                         document.getElementById('gradePay').value = gpVal;
                         let ep = get6thEntryPay(scale, gpVal);
-                        if (ep && inputId === 'currentPayScale') {
-                            document.getElementById('basicPay').value = ep;
-                        }
+                        if (ep && inputId === 'currentPayScale') document.getElementById('basicPay').value = ep;
                     }
                 } else if (comm === '7th' && inputId === 'currentPayScale') {
                     let m = scale.match(/S-(\d+)/i);
                     if (m) {
                         let lvl = "S-" + parseInt(m[1], 10);
-                        if (fullPayMatrix7th[lvl]) {
-                            document.getElementById('basicPay').value = fullPayMatrix7th[lvl][0];
-                        }
+                        if (fullPayMatrix7th[lvl]) document.getElementById('basicPay').value = fullPayMatrix7th[lvl][0];
                     }
                 }
                 
-                if (inputId === 'currentPayScale') {
-                    validateCard1();
-                } else if (inputId.startsWith('b')) {
-                    validateCard2();
-                }
+                if (inputId === 'currentPayScale') validateCard1();
+                else if (inputId.startsWith('b')) validateCard2();
             };
             dropdown.appendChild(div);
         });
@@ -2793,10 +2532,7 @@
         if (comm === '6th') {
             let gpMatch = scaleStr.match(/GP\s*(\d+)/i);
             if (gpMatch) gp = parseInt(gpMatch[1], 10);
-            else {
-                let gpInput = document.getElementById('gradePay');
-                if (gpInput && gpInput.value) gp = parseFloat(gpInput.value) || 0;
-            }
+            else gp = parseFloat(document.getElementById('gradePay').value) || 0;
         }
 
         dropdown.innerHTML = "";
@@ -2823,9 +2559,7 @@
                     e.stopPropagation();
                     basicInput.value = amount;
                     dropdown.classList.add('hidden');
-                    if (basicInputId === 'basicPay') {
-                        validateCard1();
-                    }
+                    if (basicInputId === 'basicPay') validateCard1();
                 };
                 dropdown.appendChild(div);
             });
@@ -2835,10 +2569,8 @@
     }
 
     function updateCommissionRules() {
-        const currentPayScaleInput = document.getElementById('currentPayScale');
-        const basicInput = document.getElementById('basicPay');
-        currentPayScaleInput.value = "";
-        basicInput.value = "";
+        document.getElementById('currentPayScale').value = "";
+        document.getElementById('basicPay').value = "";
         document.getElementById('gradePay').value = "0";
     }
 
@@ -2850,8 +2582,7 @@
 
         if (type !== 'None') {
             fields.classList.remove('hidden');
-            let isPromo = (type === 'Promotion');
-            postInput.placeholder = isPromo ? "पदोन्नतीचे पद टाका" : "वरिष्ठ पद टाका";
+            postInput.placeholder = (type === 'Promotion') ? "पदोन्नतीचे पद टाका" : "वरिष्ठ पद टाका";
             scaleInput.value = "";
         } else {
             fields.classList.add('hidden');
@@ -2878,11 +2609,7 @@
 
         if (comm === '4th' || comm === '5th') {
             let incThisYear = new Date(bYear, joinMonth, 1);
-            if (bDate < incThisYear) {
-                nextIncDate = incThisYear;
-            } else {
-                nextIncDate = new Date(bYear + 1, joinMonth, 1);
-            }
+            nextIncDate = (bDate < incThisYear) ? incThisYear : new Date(bYear + 1, joinMonth, 1);
             let diffDays = Math.round((nextIncDate - bDate) / (1000 * 60 * 60 * 24));
             isWithin6MonthsBeforeInc = (diffDays > 0 && diffDays < 182);
         } else if (comm === '6th') {
@@ -2899,8 +2626,7 @@
         } else {
             let rule7th = document.getElementById('incrementMonthRule7th').value;
             if (rule7th === 'january') {
-                let janNextYear = new Date(bYear + 1, 0, 1);
-                nextIncDate = janNextYear;
+                nextIncDate = new Date(bYear + 1, 0, 1);
                 let diffDays = Math.round((nextIncDate - bDate) / (1000 * 60 * 60 * 24));
                 isWithin6MonthsBeforeInc = (diffDays > 0 && diffDays < 182);
             } else {
@@ -2917,22 +2643,16 @@
             }
         }
 
-        let bestDateStr = "";
-        let adviceHtml = "";
-
         let dNext = String(nextIncDate.getDate()).padStart(2, '0');
         let mNext = String(nextIncDate.getMonth() + 1).padStart(2, '0');
         let yNext = nextIncDate.getFullYear();
         let nextIncFormatted = `${dNext}-${mNext}-${yNext}`;
         let nextIncIso = `${yNext}-${mNext}-${dNext}`;
 
-        if (isWithin6MonthsBeforeInc) {
-            bestDateStr = nextIncIso;
-            adviceHtml = `💡 <b>स्मार्ट शिफारस:</b> लाभाच्या दिनांकापासून पुढील वेतनवाढीपर्यंत ६ महिने पूर्ण होत नसल्याने <b>${nextIncFormatted} (पुढील वेतनवाढ दिनांक)</b> हा विकल्प निवडणे सर्वाधिक फायदेशीर ठरेल. यामुळे नियमित वाढ + १ पदोन्नती वाढ मिळून वरिष्ठ पदात जास्त वेतन निश्चित होईल.`;
-        } else {
-            bestDateStr = benefitDateStr;
-            adviceHtml = `💡 <b>स्मार्ट शिफारस:</b> लाभाच्या दिनांकापासून पुढील वेतनवाढीपर्यंत ६ महिन्यांपेक्षा जास्त कालावधी मिळत असल्याने, <b>लाभाचा दिनांक (${formatDateToDDMMYYYY(benefitDateStr)})</b> हाच विकल्प निवडणे फायदेशीर आहे. यामुळे सुरुवातीपासूनच उच्च वेतनाचा लाभ मिळेल.`;
-        }
+        let bestDateStr = isWithin6MonthsBeforeInc ? nextIncIso : benefitDateStr;
+        let adviceHtml = isWithin6MonthsBeforeInc 
+            ? `💡 <b>स्मार्ट शिफारस:</b> लाभाच्या दिनांकापासून पुढील वेतनवाढीपर्यंत ६ महिने पूर्ण होत नसल्याने <b>${nextIncFormatted} (पुढील वेतनवाढ दिनांक)</b> हा विकल्प निवडणे सर्वाधिक फायदेशीर ठरेल.`
+            : `💡 <b>स्मार्ट शिफारस:</b> लाभाच्या दिनांकापासून पुढील वेतनवाढीपर्यंत ६ महिन्यांपेक्षा जास्त कालावधी मिळत असल्याने, <b>लाभाचा दिनांक (${formatDateToDDMMYYYY(benefitDateStr)})</b> हाच विकल्प निवडणे फायदेशीर आहे.`;
 
         return {
             bestIso: bestDateStr,
@@ -2997,9 +2717,7 @@
     function reEvaluateAllOptionSuggestions() {
         for (let i = 1; i <= 3; i++) {
             let typeElem = document.getElementById(`b${i}_type`);
-            if (typeElem && typeElem.value !== 'None') {
-                evaluateOptionSuggestion(i);
-            }
+            if (typeElem && typeElem.value !== 'None') evaluateOptionSuggestion(i);
         }
     }
 
@@ -3047,7 +2765,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (१००% पूर्ण आणि कधीही खंडित न होणारी)
     // =========================================================================
     function processFixation() {
         const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
@@ -3110,9 +2828,7 @@
         const hasWithheld = document.getElementById('incrementWithheld').value === 'Yes';
         if (hasWithheld) {
             const chks = document.querySelectorAll('.withheld-date-chk:checked');
-            chks.forEach(chk => {
-                withheldDatesSet.add(chk.value);
-            });
+            chks.forEach(chk => withheldDatesSet.add(chk.value));
         }
         const withheldEffect = document.getElementById('withheldEffect').value;
 
@@ -3226,25 +2942,16 @@
             } else if (activeComm === "6th") {
                 incDate = new Date(yr, 6, 1);
             } else if (activeComm === "7th") {
-                if (rule7th === 'january') {
-                    incDate = new Date(yr, 0, 1);
-                    if (yr === 2016) continue;
-                } else {
-                    incDate = new Date(yr, 6, 1);
-                }
+                incDate = (rule7th === 'january') ? new Date(yr, 0, 1) : new Date(yr, 6, 1);
+                if (rule7th === 'january' && yr === 2016) continue;
             }
 
             if (incDate && incDate > startDate && incDate <= endDate) {
-                let isDniOptionDate = activeBenefits.some(b => 
-                    b.optDate > b.date && isSameDay(b.optDate, incDate)
-                );
-                if (isDniOptionDate) {
-                    continue;
-                }
+                let isDniOptionDate = activeBenefits.some(b => b.optDate > b.date && isSameDay(b.optDate, incDate));
+                if (isDniOptionDate) continue;
 
                 let isoStr = `${incDate.getFullYear()}-${String(incDate.getMonth() + 1).padStart(2, '0')}-${String(incDate.getDate()).padStart(2, '0')}`;
                 let isWithheld = (hasWithheld && withheldDatesSet.has(isoStr));
-
                 let m = String(incDate.getMonth() + 1).padStart(2, '0');
                 let d = String(incDate.getDate()).padStart(2, '0');
 
@@ -3301,21 +3008,8 @@
         });
 
         events.sort((a, b) => {
-            if (a.date.getTime() !== b.date.getTime()) {
-                return a.date - b.date;
-            }
-            let order = { 
-                'INITIAL': 1, 
-                'COMMISSION_5TH': 2, 
-                'COMMISSION_6TH': 3, 
-                'COMMISSION_7TH': 4, 
-                'ANNUAL_INC': 5, 
-                'WITHHELD_INC': 5, 
-                'SCALE_REVISION': 6, 
-                'BENEFIT_PROMOTED_PROVISIONAL': 7, 
-                'BENEFIT_SAME_DAY': 7, 
-                'BENEFIT_OPTION_DNI': 8 
-            };
+            if (a.date.getTime() !== b.date.getTime()) return a.date - b.date;
+            let order = { 'INITIAL': 1, 'COMMISSION_5TH': 2, 'COMMISSION_6TH': 3, 'COMMISSION_7TH': 4, 'ANNUAL_INC': 5, 'WITHHELD_INC': 5, 'SCALE_REVISION': 6, 'BENEFIT_PROMOTED_PROVISIONAL': 7, 'BENEFIT_SAME_DAY': 7, 'BENEFIT_OPTION_DNI': 8 };
             return (order[a.type] || 5) - (order[b.type] || 5);
         });
 
@@ -3371,7 +3065,7 @@
                 
                 let preBasic = currentBasic;
                 let bp = preBasic;
-                let da = bp <= 3500 ? Math.round(bp * 1.48) : (bp <= 6000 ? Math.max(5180, Math.round(bp * 1.11)) : Math.max(6660, Math.round(bp * 0.96)));
+                let da = (bp <= 3500) ? Math.round(bp * 1.48) : ((bp <= 6000) ? Math.max(5180, Math.round(bp * 1.11)) : Math.max(6660, Math.round(bp * 0.96)));
                 let ir1 = 100;
                 let ir2 = Math.max(100, Math.round(bp * 0.10));
                 let emoluments = bp + da + ir1 + ir2;
@@ -3478,9 +3172,7 @@
 
                 if (currentCommission === '7th') {
                     let match = rev.scale.match(/S-(\d+)/i);
-                    if (match) {
-                        currentLevel = "S-" + parseInt(match[1], 10);
-                    }
+                    if (match) currentLevel = "S-" + parseInt(match[1], 10);
                     currentGP = 0;
                     let fit = fitInMatrix(currentLevel, currentBasic);
                     currentBasic = fit.basic;
@@ -3491,9 +3183,7 @@
                     let gpMatch = rev.scale.match(/GP\s*(\d+)/i);
                     if (gpMatch) currentGP = parseInt(gpMatch[1], 10);
                     let ep = get6thEntryPay(rev.scale, currentGP);
-                    if (ep && currentBasic < ep) {
-                        currentBasic = ep;
-                    }
+                    if (ep && currentBasic < ep) currentBasic = ep;
                     let cells = parsePayScaleStages(rev.scale, '6th', currentGP);
                     let found = cells.find(s => s >= currentBasic);
                     if (found) currentBasic = found;
@@ -3520,11 +3210,7 @@
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, desc, currentBasic, currentGP, ev.type, null);
             }
             else if (ev.type === 'WITHHELD_INC') {
-                if (ev.effect === 'non_cumulative') {
-                    restoreWithheldNext = true;
-                } else {
-                    restoreWithheldNext = false;
-                }
+                restoreWithheldNext = (ev.effect === 'non_cumulative');
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
             }
             else if (ev.type === 'BENEFIT_PROMOTED_PROVISIONAL') {
@@ -3554,15 +3240,13 @@
             else if (ev.type === 'BENEFIT_OPTION_DNI') {
                 let b = ev.data;
                 currentCommission = b.commission;
-                let lLevel = b.savedLowerLevel || lowerLevel;
-                let lIndex = (b.savedLowerIndex !== undefined && b.savedLowerIndex !== -1) ? b.savedLowerIndex : currentMatrixIndex;
-                let lBasic = b.savedLowerBasic || lowerBasic;
-                let lGP = b.savedLowerGP !== undefined ? b.savedLowerGP : lowerGP;
+                let lBasic = b.savedLowerBasic || currentBasic;
 
+                currentScaleLabel = b.scale;
                 if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-                    let cellsLower = fullPayMatrix7th[lLevel] || fullPayMatrix7th["S-6"];
+                    let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
                     let currIdx = cellsLower.indexOf(lBasic);
                     if (currIdx === -1) currIdx = 0;
 
@@ -3609,7 +3293,6 @@
                 if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-
                     let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
                     let currIdx = cellsLower.indexOf(currentBasic);
                     if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
@@ -3662,10 +3345,7 @@
                         currentMatrixIndex = cells.indexOf(currentBasic);
                         if (currentMatrixIndex === -1) {
                             for (let i = 0; i < cells.length; i++) {
-                                if (cells[i] >= currentBasic) {
-                                    currentMatrixIndex = i;
-                                    break;
-                                }
+                                if (cells[i] >= currentBasic) { currentMatrixIndex = i; break; }
                             }
                             if (currentMatrixIndex === -1) currentMatrixIndex = 0;
                         }
@@ -3694,7 +3374,6 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 🌟 'एकूण वेतन' रकान्यात केवळ संख्या (लोगो काढलेला) आणि क्लिक करताच थेट पॉप-अप ओपन होणे
     function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp, evType, calcData) {
         let total = basic + (gp > 0 ? gp : 0);
         let gpDisplay = gp > 0 ? gp : "-";
