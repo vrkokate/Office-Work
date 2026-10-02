@@ -162,7 +162,7 @@ body * { visibility: hidden; }
 </div>
 </div>
 
-<!-- सर्च केल्यानंतर ओपन होणारे पॉपअप मॉडेल (Search Detail Popup Modal) -->
+<!-- सर्च केल्यानंतर ओपन होणारे पॉपअप मॉडेल -->
 <div id="searchResultModal" class="quick-info-overlay" style="z-index: 3800;">
 <div class="quick-info-card" style="max-width: 500px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
@@ -178,7 +178,7 @@ body * { visibility: hidden; }
 <div id="settingModal" class="modal-overlay" style="z-index:3000;">
 <div class="modal-card" style="max-width:440px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:12px;">
-<h3 style="font-size:15px; color:#c2185b;">⚙️ Setting</h3>
+<h3 style="font-size:15px; color:#c2185b;">⚙️️ Setting</h3>
 <button class="btn-close" onclick="closeSettingModal()">X</button>
 </div>
 <div style="display:flex; flex-direction:column; gap:8px;">
@@ -399,7 +399,6 @@ body * { visibility: hidden; }
 <input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका">
 </div>
 
-<!-- स्क्रीनशॉटनुसार येथे SEARCH बटण केले आहे -->
 <button class="btn-report" onclick="executeSmartSearchOrReport()">🔍 SEARCH</button>
 </div>
 </div>
@@ -729,7 +728,7 @@ index: i
 return null;
 }
 
-// ** उपलब्ध M.B. यादी (दिनांकासह ट्रॅक करणे) **
+// ** उपलब्ध M.B. यादी **
 function getAvailableStock() {
 var allMBs = getData('mb_records');
 var statusMap = {};
@@ -751,6 +750,31 @@ available.push(statusMap[k]);
 }
 }
 return available;
+}
+
+// ** संबंधित JE कडे सध्या प्रत्यक्ष ताब्यात असणाऱ्या M.B. ची यादी काढणारे अचूक फंक्शन **
+function getCurrentlyHeldMBsByJE(jeName) {
+if (!jeName) return [];
+var allMBs = getData('mb_records');
+var normalizedJE = jeName.trim().toLowerCase();
+
+var latestMap = {};
+allMBs.forEach(function(m) {
+var no = (m.mbNumber || '').trim();
+if (no) latestMap[no] = m;
+});
+
+var heldMBs = [];
+for (var no in latestMap) {
+var item = latestMap[no];
+var isGiven = (item.actionType === 'दिलेली M.B.' || item.actionType === 'दिलेली एमबी');
+var detailMatch = (item.receivedDetail || '').trim().toLowerCase() === normalizedJE;
+var sourceMatch = (item.receivedSource || '').trim().toLowerCase() === normalizedJE;
+if (isGiven && (detailMatch || sourceMatch)) {
+heldMBs.push({ mbNo: no, size: item.size || 'लहान M.B.', date: item.date });
+}
+}
+return heldMBs;
 }
 
 function refreshMBDashboard() {
@@ -1265,19 +1289,25 @@ refreshAll();
 }
 }
 
+// ** Work List मध्ये अचूक M.B. लोड करणे (दुरुस्त केले) **
 function onWorkJEChange() {
 var je = document.getElementById('workJE').value;
 var mbSel = document.getElementById('workMB');
 mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';
 if (!je) return;
 
-var assignedMBs = getData('assign_records').filter(function(a){ return a.jeName === je; });
+var heldMBs = getCurrentlyHeldMBsByJE(je);
 var works = getData('work_records');
 
-assignedMBs.forEach(function(a) {
+if (heldMBs.length === 0) {
+mbSel.innerHTML = '<option value="">-- या JE कडे कोणतीही M.B. उपलब्ध नाही --</option>';
+return;
+}
+
+heldMBs.forEach(function(a) {
 var activeWork = works.find(function(w){ return w.mbNo === a.mbNo && w.status === 'अपूर्ण'; });
 if (!activeWork) {
-mbSel.add(new Option(a.mbNo, a.mbNo));
+mbSel.add(new Option(a.mbNo + ' (' + a.size + ')', a.mbNo));
 }
 });
 }
@@ -1346,15 +1376,21 @@ document.getElementById('workJE').value = item.je;
 
 var mbSel = document.getElementById('workMB');
 mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';
-var assignedMBs = getData('assign_records').filter(function(a){ return a.jeName === item.je; });
+var heldMBs = getCurrentlyHeldMBsByJE(item.je);
 var works = getData('work_records');
 
-assignedMBs.forEach(function(a) {
+var foundActive = false;
+heldMBs.forEach(function(a) {
 var activeWork = works.find(function(w){ return w.mbNo === a.mbNo && w.status === 'अपूर्ण'; });
 if (!activeWork || a.mbNo === item.mbNo) {
-mbSel.add(new Option(a.mbNo, a.mbNo));
+mbSel.add(new Option(a.mbNo + ' (' + a.size + ')', a.mbNo));
+foundActive = true;
 }
 });
+
+if (!foundActive && item.mbNo) {
+mbSel.add(new Option(item.mbNo, item.mbNo));
+}
 
 document.getElementById('workMB').value = item.mbNo;
 document.getElementById('workName').value = item.name;
@@ -1523,13 +1559,11 @@ inputGrp.style.display = 'none';
 function executeSmartSearchOrReport() {
 var searchTxt = document.getElementById('smartSearchInput').value.trim();
 
-// जर सर्च बॉक्समध्ये काही टाईप केले असेल तर पॉपअप उघडा
 if (searchTxt) {
 showSmartSearchResultModal(searchTxt);
 return;
 }
 
-// जर काही टाईप केले नसेल तर नियमित फिल्टर रिपोर्ट दाखवा
 generateGeneralReport();
 }
 
@@ -1590,7 +1624,6 @@ var from = (m.receivedFrom || '').toLowerCase();
 return no.includes(queryLower) || je.includes(queryLower) || src.includes(queryLower) || from.includes(queryLower);
 });
 
-// प्रत्येक M.B. ची सर्वात ताजी स्थिती मॅप करणे
 var latestMap = {};
 matched.forEach(function(m) {
 var no = (m.mbNumber || '').trim();
@@ -1725,22 +1758,11 @@ var rawName = (subVal && subVal !== 'सर्व') ? subVal.replace(/^श्र
 var personHeaderName = rawName ? "श्री. " + rawName : "";
 
 var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
-'<div style="text-align:center; margin-bottom:4px;">' +
-'<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
-'<h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + reportTitle + '</h2>' +
-'</div>' +
-'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
-'<div>' + (personHeaderName ? '<strong style="font-size:11.5px;">' + personHeaderName + '</strong><br>' : '') + 'अहवाल दिनांक: ' + todayStr + '</div>' +
-'</div>' +
+'<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + reportTitle + '</h2></div>' +
+'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div>' + (personHeaderName ? '<strong style="font-size:11.5px;">' + personHeaderName + '</strong><br>' : '') + 'अहवाल दिनांक: ' + todayStr + '</div></div>' +
 '</div>' +
 '<table class="print-table">' +
-'<thead><tr>' +
-'<th style="width:8%; text-align:center;">अ.क्र.</th>' +
-'<th style="width:17%;">दिनांक</th>' +
-'<th style="width:25%;">मोजमाप पुस्तिका क्रमांक</th>' +
-'<th style="width:20%; text-align:center;">प्रकार (आकार)</th>' +
-'<th style="width:30%;">सध्यस्थिती / हस्तांतरण</th>' +
-'</tr></thead><tbody>';
+'<thead><tr><th style="width:8%; text-align:center;">अ.क्र.</th><th style="width:17%;">दिनांक</th><th style="width:25%;">मोजमाप पुस्तिका क्रमांक</th><th style="width:20%; text-align:center;">प्रकार (आकार)</th><th style="width:30%;">सध्यस्थिती / हस्तांतरण</th></tr></thead><tbody>';
 
 filtered.forEach(function(item, idx) {
 var mbNo = item.mbNumber || item.mbNo;
@@ -1749,13 +1771,7 @@ var assignedPerson = item.receivedDetail || item.receivedSource || 'संबं
 var cleanPersonName = assignedPerson.replace(/^श्री.?\s*/i, '');
 var currentStatus = (finalType === 'AVAILABLE') ? 'उपलब्ध' : ("श्री. " + cleanPersonName + " यांच्याकडे आहे");
 
-html += '<tr>' +
-'<td style="text-align:center;">' + (idx + 1) + '</td>' +
-'<td>' + formatDateToDMY(item.date) + '</td>' +
-'<td><strong>' + mbNo + '</strong></td>' +
-'<td style="text-align:center;">' + size + '</td>' +
-'<td>' + currentStatus + '</td>' +
-'</tr>';
+html += '<tr><td style="text-align:center;">' + (idx + 1) + '</td><td>' + formatDateToDMY(item.date) + '</td><td><strong>' + mbNo + '</strong></td><td style="text-align:center;">' + size + '</td><td>' + currentStatus + '</td></tr>';
 });
 
 html += '</tbody></table>';
@@ -1779,15 +1795,7 @@ renderBillTableHTML(bills, '', 'संपूर्ण देयक नोंद�
 
 function renderBillTableHTML(billsList, preHTML, title) {
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-var html = preHTML + '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
-'<div style="text-align:center; margin-bottom:4px;">' +
-'<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
-'<h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + title + '</h2>' +
-'</div>' +
-'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
-'<div><strong style="font-size:11.5px;">देयक नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div>' +
-'</div>' +
-'</div>' +
+var html = preHTML + '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + title + '</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong style="font-size:11.5px;">देयक नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div></div>' +
 '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>बिल क्र.</th><th>कंत्राटदार</th><th>कामाचे नाव</th><th>JE</th><th style="text-align:center;">M.B.</th><th>बिल प्रकार</th><th style="text-align:right;">पास रक्कम (₹)</th><th style="text-align:right;">कपात (₹)</th><th style="text-align:right;">नेट रक्कम (₹)</th></tr></thead><tbody>';
 var total = 0, totalDedSum = 0, totalNetSum = 0;
 billsList.forEach(function(b, i) {
@@ -1804,15 +1812,7 @@ printA4Document(html);
 function generateWorkReport(fDate, tDate) {
 var works = getData('work_records');
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
-'<div style="text-align:center; margin-bottom:4px;">' +
-'<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
-'<h2 style="font-size:12px; font-weight:700; margin:2px 0;">कामांची यादी (Work Register)</h2>' +
-'</div>' +
-'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
-'<div><strong>कामांची यादी</strong><br>अहवाल दिनांक: ' + todayStr + '</div>' +
-'</div>' +
-'</div>' +
+var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">कामांची यादी (Work Register)</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>कामांची यादी</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div></div>' +
 '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>कामाचे नाव</th><th>JE</th><th>कंत्राटदार</th><th>स्थिती</th><th style="text-align:center;">M.B. क्र.</th></tr></thead><tbody>';
 works.forEach(function(w, i) {
 html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + w.name + '</td><td>' + w.je + '</td><td>' + w.contractor + '</td><td>' + (w.status || 'अपूर्ण') + '</td><td style="text-align:center;">' + w.mbNo + '</td></tr>';
@@ -1876,15 +1876,7 @@ function printJEReport() {
 var list = getData('je_records');
 if (list.length === 0) return showAlert('कोणतीही कनिष्ठ अभियंता (JE) नोंद उपलब्ध नाही.');
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
-'<div style="text-align:center; margin-bottom:4px;">' +
-'<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
-'<h2 style="font-size:12px; font-weight:700; margin:2px 0;">कनिष्ठ अभियंता (JE) व्यवस्थापन अहवाल</h2>' +
-'</div>' +
-'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
-'<div><strong>JE नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div>' +
-'</div>' +
-'</div>' +
+var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">कनिष्ठ अभियंता (JE) व्यवस्थापन अहवाल</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>JE नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div></div>' +
 '<table class="print-table"><thead><tr><th style="text-align:center; width:15%;">अ.क्र.</th><th>कनिष्ठ अभियंत्याचे नाव</th></tr></thead><tbody>';
 
 list.forEach(function(item, i) {
@@ -2208,6 +2200,7 @@ goToStep(step);
 
 function closeWizard() { document.getElementById('wizardModal').style.display = 'none'; }
 
+// ** देयक नोंदवही (Bill Wizard) मध्ये JE कडील अचूक M.B. लोड करणे (दुरुस्त केले) **
 function onWizardJEChange() {
 var jeName = document.getElementById('wJeSelect').value;
 var mbSel = document.getElementById('wMbSelect');
@@ -2216,13 +2209,16 @@ mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';
 document.getElementById('wContractor').value = '';
 document.getElementById('wWorkName').value = '';
 if(!jeName) return;
-var assigns = getData('assign_records').filter(function(a){ return a.jeName === jeName; });
-var uniqueMBs = {};
-assigns.forEach(function(a) {
-if (!uniqueMBs[a.mbNo]) {
-uniqueMBs[a.mbNo] = true;
-mbSel.add(new Option(a.mbNo, a.mbNo));
+
+var heldMBs = getCurrentlyHeldMBsByJE(jeName);
+
+if (heldMBs.length === 0) {
+mbSel.innerHTML = '<option value="">-- या JE कडे कोणतीही M.B. उपलब्ध नाही --</option>';
+return;
 }
+
+heldMBs.forEach(function(a) {
+mbSel.add(new Option(a.mbNo + ' (' + a.size + ')', a.mbNo));
 });
 }
 
@@ -2385,6 +2381,13 @@ openWizard(1);
 document.getElementById('editBillIndex').value = idx;
 document.getElementById('wJeSelect').value = b.je;
 onWizardJEChange();
+
+var mbSel = document.getElementById('wMbSelect');
+var exists = Array.from(mbSel.options).some(function(opt){ return opt.value === b.mbNo; });
+if (!exists && b.mbNo) {
+mbSel.add(new Option(b.mbNo, b.mbNo));
+}
+
 document.getElementById('wMbSelect').value = b.mbNo;
 onWizardMBChange();
 document.getElementById('wBillType').value = b.billType;
