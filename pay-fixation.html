@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>वेतन निश्चिती प्रणाली (Pay Fixation System)</title>
-    <!-- 🌟 APK (App) आणि Browser मध्ये थेट PDF तयार करण्यासाठी लायब्ररी -->
+    <!-- APK (App) मध्ये थेट PDF फाईल तयार करण्यासाठी लायब्ररी -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
@@ -18,7 +18,6 @@
             --text-main: #263238;
         }
 
-        /* पेज स्क्रीनबाहेर आडवे सरकणे १००% रोखणे */
         html, body {
             width: 100%;
             max-width: 100vw;
@@ -175,7 +174,7 @@
         }
         .reset-btn:hover { background-color: #546e7a; }
 
-        /* जतन केलेल्या नोंदी विभाग (Saved Records Box) */
+        /* जतन केलेल्या नोंदी विभाग (Saved Records) */
         .saved-records-card {
             background: #ffffff;
             border: 1.5px solid #b0bec5;
@@ -743,6 +742,7 @@
                 display: none !important;
             }
 
+            /* क्रोम मोड १: मुख्य तक्ता प्रिंट */
             body:not(.print-illustration-mode) .modal-overlay {
                 display: none !important;
             }
@@ -779,6 +779,7 @@
                 position: static !important;
             }
 
+            /* क्रोम मोड २: विवरणपत्र प्रिंट */
             body.print-illustration-mode .output-box {
                 display: none !important;
             }
@@ -844,7 +845,7 @@
         <div class="action-card card-pending" id="cardEmp" onclick="openModal('employeeModal')">
             <div class="card-info">
                 <span class="card-title">👤 १. कर्मचारी व मूळ नियुक्ती माहिती</span>
-                <span class="card-status" id="cardEmpStatus">⚠️️ ही माहिती भरणे बाकी आहे (कृपया भरा)</span>
+                <span class="card-status" id="cardEmpStatus">⚠️ ही माहिती भरणे बाकी आहे (कृपया भरा)</span>
             </div>
             <div class="card-arrow-btn" id="cardEmpBadge">!</div>
         </div>
@@ -1254,115 +1255,6 @@
     let selectedWithheldDates = new Set();
     let globalCalcDataList = [];
     let currentEditingRecordId = null;
-
-    // =========================================================================
-    // 🌟 अधिकृत वेतनश्रेणी साखळी (Dynamic Linking Chain & Hierarchy)
-    // =========================================================================
-    const payScaleHierarchy = [
-        {
-            levelName: "श्रेणी १ (चतुर्थ श्रेणी / गट-ड)",
-            c4: "रु. 750 - 12 - 870 - EB - 14 - 940",
-            c5: "रु. 2550 - 55 - 2660 - 60 - 3200",
-            c6: "-1S : 4440 - 7440 (GP 1300)",
-            c7: "S-1 (15000 - 47600) [GP 1300]"
-        },
-        {
-            levelName: "श्रेणी २ (चतुर्थ श्रेणी प्रगत)",
-            c4: "रु. 775 - 12 - 871 - EB - 14 - 1025",
-            c5: "रु. 2610 - 60 - 2910 - 65 - 3300 - 70 - 4000",
-            c6: "-1S : 4440 - 7440 (GP 1400)",
-            c7: "S-2 (15300 - 48700) [GP 1400]"
-        },
-        {
-            levelName: "श्रेणी ३ (कुशल कर्मचारी)",
-            c4: "रु. 800 - 15 - 1010 - EB - 20 - 1150",
-            c5: "रु. 2650 - 65 - 3300 - 70 - 4000",
-            c6: "-1S : 4440 - 7440 (GP 1600)",
-            c7: "S-3 (16600 - 52400) [GP 1600]"
-        },
-        {
-            levelName: "श्रेणी ४ (कनिष्ठ लिपिक / समकक्ष)",
-            c4: "रु. 950 - 20 - 1150 - EB - 25 - 1400",
-            c5: "रु. 3050 - 75 - 3950 - 80 - 4590",
-            c6: "PB-1 : 5200 - 20200 (GP 1900)",
-            c7: "S-6 (19900 - 63200) [GP 1900]"
-        },
-        {
-            levelName: "श्रेणी ५ (वरिष्ठ लिपिक / वरिष्ठ तंत्रज्ञ)",
-            c4: "रु. 1200 - 30 - 1560 - EB - 40 - 2040",
-            c5: "रु. 4000 - 100 - 6000",
-            c6: "PB-1 : 5200 - 20200 (GP 2400)",
-            c7: "S-8 (25500 - 81100) [GP 2400]"
-        },
-        {
-            levelName: "श्रेणी ६ (मुख्य लिपिक / प्रथम लिपिक)",
-            c4: "रु. 1350 - 30 - 1440 - 40 - 1800 - EB - 50 - 2200",
-            c5: "रु. 4500 - 125 - 7000",
-            c6: "PB-1 : 5200 - 20200 (GP 2800)",
-            c7: "S-10 (29200 - 92300) [GP 2800]"
-        },
-        {
-            levelName: "श्रेणी ७ (कनिष्ठ अभियंता / अधीक्षक / सहाय्यक)",
-            c4: "रु. 1400 - 40 - 1600 - 50 - 2300 - EB - 60 - 2600",
-            c5: "रु. 5000 - 150 - 8000",
-            c6: "PB-2 : 9300 - 34800 (GP 4200)",
-            c7: "S-13 (35400 - 112400) [GP 4200]"
-        },
-        {
-            levelName: "श्रेणी ८ (शाखा अभियंता / सहाय्यक अभियंता श्रेणी-२)",
-            c4: "रु. 1640 - 60 - 2600 - EB - 75 - 2900",
-            c5: "रु. 5500 - 175 - 9000",
-            c6: "PB-2 : 9300 - 34800 (GP 4300)",
-            c7: "S-14 (38600 - 122800) [GP 4300]"
-        },
-        {
-            levelName: "श्रेणी ९ (उपअभियंता / वर्ग-२ अधिकारी)",
-            c4: "रु. 2000 - 60 - 2300 - EB - 75 - 3200",
-            c5: "रु. 6500 - 200 - 10500",
-            c6: "PB-2 : 9300 - 34800 (GP 4400)",
-            c7: "S-15 (41800 - 132300) [GP 4400]"
-        },
-        {
-            levelName: "श्रेणी १० (सहाय्यक अभियंता श्रेणी-१ / वर्ग-१)",
-            c4: "रु. 2200 - 75 - 2800 - EB - 100 - 4000",
-            c5: "रु. 8000 - 275 - 13500",
-            c6: "PB-2 : 9300 - 34800 (GP 5400)",
-            c7: "S-20 (56100 - 177500) [GP 5400]"
-        },
-        {
-            levelName: "श्रेणी ११ (कार्यकारी अभियंता)",
-            c4: "रु. 3000 - 100 - 3500 - 125 - 4500",
-            c5: "रु. 10000 - 325 - 15200",
-            c6: "PB-3 : 15600 - 39100 (GP 6600)",
-            c7: "S-23 (67700 - 208700) [GP 6600]"
-        }
-    ];
-
-    function getChainIndex(scaleStr, comm) {
-        if (!scaleStr) return -1;
-        let cKey = (comm === '4th') ? 'c4' : ((comm === '5th') ? 'c5' : ((comm === '6th') ? 'c6' : 'c7'));
-        return payScaleHierarchy.findIndex(h => {
-            if (h[cKey] && h[cKey].includes(scaleStr.substring(0, 10))) return true;
-            return false;
-        });
-    }
-
-    function getLinkedScale(baseScale, baseComm, targetComm, stepsAhead = 0) {
-        let idx = getChainIndex(baseScale, baseComm);
-        if (idx === -1) {
-            if (targetComm === '4th') return payScales4th[0];
-            if (targetComm === '5th') return payScales5th[0];
-            if (targetComm === '6th') return payScales6th[5];
-            return levelConfig7th.map(cfg => level7thStartPay[cfg.id].desc)[5];
-        }
-
-        let targetIdx = Math.min(idx + stepsAhead, payScaleHierarchy.length - 1);
-        let row = payScaleHierarchy[targetIdx];
-        if (targetComm === '4th') return row.c4;
-        if (targetComm === '5th') return row.c5;
-        if (targetComm === '6th') return row.c6;
-        return row.c7;
-    }
 
     // =========================================================================
     // 🌟 १. क्रोमसाठी थेट प्रिंट (Chrome Native Print)
@@ -1949,7 +1841,7 @@
         } else {
             card.classList.remove('card-filled');
             card.classList.add('card-pending');
-            status.textContent = "⚠️️ ही माहिती भरणे बाकी आहे (कृपया भरा)";
+            status.textContent = "⚠️ ही माहिती भरणे बाकी आहे (कृपया भरा)";
             badge.textContent = "!";
             return false;
         }
@@ -2454,8 +2346,426 @@
         openModal('illustrationModal');
     }
 
+    function recalculate5thIllustration() {
+        let bp = parseFloat(document.getElementById('ill_bp').value) || 0;
+        let da = (bp <= 3500) ? Math.round(bp * 1.48) : ((bp <= 6000) ? Math.max(5180, Math.round(bp * 1.11)) : Math.max(6660, Math.round(bp * 0.96)));
+        let ir1 = 100;
+        let ir2 = Math.max(100, Math.round(bp * 0.10));
+        let emoluments = bp + da + ir1 + ir2;
+        let add40 = Math.round(bp * 0.40);
+        let total = emoluments + add40;
+
+        document.getElementById('ill_da').value = da;
+        document.getElementById('ill_emoluments').value = emoluments;
+        document.getElementById('ill_add40').value = add40;
+        document.getElementById('ill_total').value = total;
+
+        let st9 = parseFloat(document.getElementById('ill_stage9').value) || 2550;
+        let st10 = parseFloat(document.getElementById('ill_stage10').value) || 2605;
+        document.getElementById('ill_stage11').value = Math.max(st9, st10);
+    }
+
+    function getCleanScaleLabel(scale, comm, level) {
+        if (comm === '7th') {
+            let match = String(level || scale).match(/S-(\d+)/i);
+            let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
+            let cells = fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
+            return `${key} (${cells[0]} - ${cells[cells.length - 1]})`;
+        }
+        if (comm === '6th') {
+            let match = scale.match(/(PB-?\d|-1S)\s*:\s*\d+\s*-\s*\d+\s*\(GP\s*\d+\)/i);
+            return match ? match[0] : scale;
+        }
+        return scale;
+    }
+
+    function parsePayScaleStages(scaleStr, commission, gradePayOverride = 0) {
+        if (!scaleStr) return [];
+
+        if (commission === '7th' || scaleStr.includes('S-')) {
+            let match = scaleStr.match(/S-(\d+)/i);
+            let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
+            return fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
+        }
+
+        if (commission === '5th' || scaleStr.includes('रु.') || scaleStr.includes('4000') || scaleStr.includes('2550')) {
+            let cleanStr = scaleStr.replace(/रु\./g, '').replace(/\(.*?\)/g, '').trim();
+            let matches = cleanStr.match(/\d+/g);
+            if (matches && matches.length >= 3) {
+                let nums = matches.map(n => parseInt(n, 10));
+                let stages = [nums[0]];
+                let current = nums[0];
+                for (let i = 1; i < nums.length - 1; i += 2) {
+                    let inc = nums[i];
+                    let target = nums[i + 1];
+                    let safety = 0;
+                    while (current < target && safety < 100) {
+                        current += inc;
+                        if (current > target) current = target;
+                        stages.push(current);
+                        safety++;
+                    }
+                }
+                return stages;
+            }
+        }
+
+        if (commission === '6th' || scaleStr.includes('PB') || scaleStr.includes('GP') || scaleStr.includes('-1S')) {
+            let clean = scaleStr.replace(/\(.*?\)/g, '');
+            let bandMatch = clean.match(/(\d{4,6})\s*-\s*(\d{4,6})/);
+            let gpMatch = scaleStr.match(/GP\s*(\d+)/i);
+            let gp = gpMatch ? parseInt(gpMatch[1], 10) : (gradePayOverride || 0);
+
+            if (bandMatch) {
+                let bandMin = parseInt(bandMatch[1], 10);
+                let bandMax = parseInt(bandMatch[2], 10);
+                let entryPay = get6thEntryPay(scaleStr, gp);
+                let stagesSet = new Set();
+                let startVal = (entryPay && entryPay >= bandMin && entryPay <= bandMax) ? entryPay : bandMin;
+                let curr = startVal;
+                let safety = 0;
+                while (curr <= bandMax && safety < 80) {
+                    stagesSet.add(curr);
+                    let inc = Math.ceil(((curr + gp) * 0.03) / 10) * 10;
+                    if (inc < 10) inc = 10;
+                    curr += inc;
+                    safety++;
+                }
+                return Array.from(stagesSet).sort((a, b) => a - b);
+            }
+        }
+
+        let cleanStr = scaleStr.replace(/\(.*?\)/g, '').replace(/PB\s*-\s*\d+/gi, '').replace(/श्रेणी\s*-\s*\d+/gi, '');
+        let matches = cleanStr.match(/\d+/g);
+        if (!matches || matches.length < 3) return [19900, 20500, 21100, 21700, 22400];
+
+        let nums = matches.map(n => parseInt(n, 10));
+        let stages = [nums[0]];
+        let current = nums[0];
+        for (let i = 1; i < nums.length - 1; i += 2) {
+            let inc = nums[i];
+            let target = nums[i + 1];
+            while (current < target) {
+                current += inc;
+                if (current > target) current = target;
+                stages.push(current);
+            }
+        }
+        return stages;
+    }
+
+    function toggleScaleDropdown(inputId, dropdownId, commSelectId = 'payCommission') {
+        const comm = document.getElementById(commSelectId).value;
+        const dropdown = document.getElementById(dropdownId);
+        const input = document.getElementById(inputId);
+
+        if (!comm) {
+            alert("कृपया प्रथम वेतन आयोग निवडा!");
+            document.getElementById(commSelectId).focus();
+            return;
+        }
+
+        if (!dropdown.classList.contains('hidden')) {
+            dropdown.classList.add('hidden');
+            return;
+        }
+
+        dropdown.innerHTML = "";
+        let scales = [];
+        if (comm === '4th') scales = payScales4th;
+        else if (comm === '5th') scales = payScales5th;
+        else if (comm === '6th') scales = payScales6th;
+        else scales = levelConfig7th.map(cfg => level7thStartPay[cfg.id].desc);
+
+        scales.forEach(scale => {
+            let div = document.createElement('div');
+            div.className = 'dropdown-item';
+            div.textContent = scale;
+            div.onclick = function(e) {
+                e.stopPropagation();
+                input.value = scale;
+                dropdown.classList.add('hidden');
+                
+                if (comm === '6th' && scale.includes('GP')) {
+                    let gpMatch = scale.match(/GP\s*(\d+)/i);
+                    if (gpMatch && gpMatch[1]) {
+                        let gpVal = parseInt(gpMatch[1], 10);
+                        document.getElementById('gradePay').value = gpVal;
+                        let ep = get6thEntryPay(scale, gpVal);
+                        if (ep && inputId === 'currentPayScale') document.getElementById('basicPay').value = ep;
+                    }
+                } else if (comm === '7th' && inputId === 'currentPayScale') {
+                    let m = scale.match(/S-(\d+)/i);
+                    if (m) {
+                        let lvl = "S-" + parseInt(m[1], 10);
+                        if (fullPayMatrix7th[lvl]) document.getElementById('basicPay').value = fullPayMatrix7th[lvl][0];
+                    }
+                }
+                
+                if (inputId === 'currentPayScale') validateCard1();
+                else if (inputId.startsWith('b')) validateCard2();
+            };
+            dropdown.appendChild(div);
+        });
+
+        dropdown.classList.remove('hidden');
+    }
+
+    function toggleBasicDropdown(basicInputId, dropdownId, scaleInputId, commSelectId) {
+        const scaleStr = document.getElementById(scaleInputId).value;
+        const comm = document.getElementById(commSelectId).value;
+        const dropdown = document.getElementById(dropdownId);
+        const basicInput = document.getElementById(basicInputId);
+
+        if (!scaleStr) {
+            alert("कृपया प्रथम वेतनश्रेणी निवडा!");
+            document.getElementById(scaleInputId).click();
+            return;
+        }
+
+        if (!dropdown.classList.contains('hidden')) {
+            dropdown.classList.add('hidden');
+            return;
+        }
+
+        let gp = 0;
+        if (comm === '6th') {
+            let gpMatch = scaleStr.match(/GP\s*(\d+)/i);
+            if (gpMatch) gp = parseInt(gpMatch[1], 10);
+            else gp = parseFloat(document.getElementById('gradePay').value) || 0;
+        }
+
+        dropdown.innerHTML = "";
+        let stages = parsePayScaleStages(scaleStr, comm, gp);
+        let entryPayVal = (comm === '6th') ? get6thEntryPay(scaleStr, gp) : 0;
+
+        if (stages.length === 0) {
+            dropdown.innerHTML = `<div class="dropdown-item" style="color:#888;">वैध वेतनश्रेणी उपलब्ध नाही</div>`;
+        } else {
+            stages.forEach((amount, idx) => {
+                let div = document.createElement('div');
+                div.className = 'dropdown-item';
+                
+                if (comm === '6th' && amount === entryPayVal) {
+                    div.innerHTML = `<b>${amount}</b> <span style="font-size:10.5px; color:#1b5e20; background:#e8f5e9; border:1px solid #a5d6a7; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:8px;">★ Annexure-III प्रथम भरती वेतन (शिफारस)</span>`;
+                    div.style.backgroundColor = "#f1f8e9";
+                } else if (comm === '7th') {
+                    div.innerHTML = `<b>${amount}</b> <small style="color:#78909c; margin-left:6px;">(टप्पा ${idx + 1})</small>`;
+                } else {
+                    div.textContent = amount;
+                }
+
+                div.onclick = function(e) {
+                    e.stopPropagation();
+                    basicInput.value = amount;
+                    dropdown.classList.add('hidden');
+                    if (basicInputId === 'basicPay') validateCard1();
+                };
+                dropdown.appendChild(div);
+            });
+        }
+
+        dropdown.classList.remove('hidden');
+    }
+
+    function updateCommissionRules() {
+        document.getElementById('currentPayScale').value = "";
+        document.getElementById('basicPay').value = "";
+        document.getElementById('gradePay').value = "0";
+    }
+
+    function toggleBenefitRow(idx) {
+        const type = document.getElementById(`b${idx}_type`).value;
+        const fields = document.getElementById(`b${idx}_fields`);
+        const postInput = document.getElementById(`b${idx}_post`);
+        const scaleInput = document.getElementById(`b${idx}_scale`);
+
+        if (type !== 'None') {
+            fields.classList.remove('hidden');
+            postInput.placeholder = (type === 'Promotion') ? "पदोन्नतीचे पद टाका" : "वरिष्ठ पद टाका";
+            scaleInput.value = "";
+        } else {
+            fields.classList.add('hidden');
+        }
+    }
+
+    function updatePromoScaleDropdown(idx) {
+        document.getElementById(`b${idx}_scale`).value = "";
+        evaluateOptionSuggestion(idx);
+    }
+
+    function getBestOptionRecommendation(benefitDateStr, comm) {
+        if (!benefitDateStr) return null;
+        let bDate = parseLocalDate(benefitDateStr);
+        let bYear = bDate.getFullYear();
+        let bMonth = bDate.getMonth();
+        let bDay = bDate.getDate();
+
+        let joinDateVal = document.getElementById('empJoinDate').value;
+        let joinMonth = joinDateVal ? parseLocalDate(joinDateVal).getMonth() : 6;
+
+        let nextIncDate = null;
+        let isWithin6MonthsBeforeInc = false;
+
+        if (comm === '4th' || comm === '5th') {
+            let incThisYear = new Date(bYear, joinMonth, 1);
+            nextIncDate = (bDate < incThisYear) ? incThisYear : new Date(bYear + 1, joinMonth, 1);
+            let diffDays = Math.round((nextIncDate - bDate) / (1000 * 60 * 60 * 24));
+            isWithin6MonthsBeforeInc = (diffDays > 0 && diffDays < 182);
+        } else if (comm === '6th') {
+            let julyThisYear = new Date(bYear, 6, 1);
+            if (bDate <= julyThisYear) {
+                nextIncDate = julyThisYear;
+                if (bMonth >= 0 && (bMonth < 6 || (bMonth === 6 && bDay === 1))) {
+                    isWithin6MonthsBeforeInc = !(bMonth === 0 && bDay === 1);
+                }
+            } else {
+                nextIncDate = new Date(bYear + 1, 6, 1);
+                isWithin6MonthsBeforeInc = false;
+            }
+        } else {
+            let rule7th = document.getElementById('incrementMonthRule7th').value;
+            if (rule7th === 'january') {
+                nextIncDate = new Date(bYear + 1, 0, 1);
+                let diffDays = Math.round((nextIncDate - bDate) / (1000 * 60 * 60 * 24));
+                isWithin6MonthsBeforeInc = (diffDays > 0 && diffDays < 182);
+            } else {
+                let julyThisYear = new Date(bYear, 6, 1);
+                if (bDate <= julyThisYear) {
+                    nextIncDate = julyThisYear;
+                    if (bMonth >= 0 && (bMonth < 6 || (bMonth === 6 && bDay === 1))) {
+                        isWithin6MonthsBeforeInc = !(bMonth === 0 && bDay === 1);
+                    }
+                } else {
+                    nextIncDate = new Date(bYear + 1, 6, 1);
+                    isWithin6MonthsBeforeInc = false;
+                }
+            }
+        }
+
+        let dNext = String(nextIncDate.getDate()).padStart(2, '0');
+        let mNext = String(nextIncDate.getMonth() + 1).padStart(2, '0');
+        let yNext = nextIncDate.getFullYear();
+        let nextIncFormatted = `${dNext}-${mNext}-${yNext}`;
+        let nextIncIso = `${yNext}-${mNext}-${dNext}`;
+
+        let bestDateStr = isWithin6MonthsBeforeInc ? nextIncIso : benefitDateStr;
+        let adviceHtml = isWithin6MonthsBeforeInc 
+            ? `💡 <b>स्मार्ट शिफारस:</b> लाभाच्या दिनांकापासून पुढील वेतनवाढीपर्यंत ६ महिने पूर्ण होत नसल्याने <b>${nextIncFormatted} (पुढील वेतनवाढ दिनांक)</b> हा विकल्प निवडणे सर्वाधिक फायदेशीर ठरेल.`
+            : `💡 <b>स्मार्ट शिफारस:</b> लाभाच्या दिनांकापासून पुढील वेतनवाढीपर्यंत ६ महिन्यांपेक्षा जास्त कालावधी मिळत असल्याने, <b>लाभाचा दिनांक (${formatDateToDDMMYYYY(benefitDateStr)})</b> हाच विकल्प निवडणे फायदेशीर आहे.`;
+
+        return {
+            bestIso: bestDateStr,
+            bestFormatted: formatDateToDDMMYYYY(bestDateStr),
+            adviceHtml: adviceHtml,
+            isWithin6Months: isWithin6MonthsBeforeInc
+        };
+    }
+
+    function evaluateOptionSuggestion(idx) {
+        const bDateVal = document.getElementById(`b${idx}_date`).value;
+        const comm = document.getElementById(`b${idx}_comm`).value;
+        const advisorBox = document.getElementById(`b${idx}_advisor`);
+        const optInput = document.getElementById(`b${idx}_optDate`);
+        const optDisp = document.getElementById(`b${idx}_optDate_disp`);
+
+        if (!bDateVal || !comm) {
+            if(advisorBox) advisorBox.classList.add('hidden');
+            return;
+        }
+
+        const rec = getBestOptionRecommendation(bDateVal, comm);
+        if (!rec || !advisorBox) return;
+
+        advisorBox.classList.remove('hidden');
+
+        if (!optInput.value) {
+            optInput.value = rec.bestIso;
+            optDisp.value = rec.bestFormatted;
+        }
+
+        checkOptionDateFeedback(idx);
+    }
+
+    function checkOptionDateFeedback(idx) {
+        const bDateVal = document.getElementById(`b${idx}_date`).value;
+        const comm = document.getElementById(`b${idx}_comm`).value;
+        const optVal = document.getElementById(`b${idx}_optDate`).value;
+        const advisorBox = document.getElementById(`b${idx}_advisor`);
+
+        if (!bDateVal || !comm || !advisorBox) return;
+        const rec = getBestOptionRecommendation(bDateVal, comm);
+        if (!rec) return;
+
+        if (optVal === rec.bestIso) {
+            advisorBox.className = "option-advisor-box advisor-good";
+            advisorBox.innerHTML = `✓ <b>उत्तम निवड!</b> आपण निवडलेला विकल्प दिनांक (${rec.bestFormatted}) आर्थिकदृष्ट्या सर्वाधिक फायदेशीर आहे.<br><small>${rec.adviceHtml}</small>`;
+        } else {
+            advisorBox.className = "option-advisor-box advisor-warn";
+            advisorBox.innerHTML = `⚠️ <b>लक्ष द्या:</b> आपण निवडलेला विकल्प दिनांक आर्थिकदृष्ट्या तोट्याचा ठरू शकतो!<br>${rec.adviceHtml}<br><button type="button" class="advisor-btn" onclick="applySuggestedOptionDate(${idx}, '${rec.bestIso}', '${rec.bestFormatted}')">👉 हा फायदेशीर दिनांक [${rec.bestFormatted}] लागू करा</button>`;
+        }
+    }
+
+    function applySuggestedOptionDate(idx, isoDate, formattedDate) {
+        const optInput = document.getElementById(`b${idx}_optDate`);
+        const optDisp = document.getElementById(`b${idx}_optDate_disp`);
+        if(optInput) optInput.value = isoDate;
+        if(optDisp) optDisp.value = formattedDate;
+        checkOptionDateFeedback(idx);
+    }
+
+    function reEvaluateAllOptionSuggestions() {
+        for (let i = 1; i <= 3; i++) {
+            let typeElem = document.getElementById(`b${i}_type`);
+            if (typeElem && typeElem.value !== 'None') evaluateOptionSuggestion(i);
+        }
+    }
+
+    function onBenefitDateChange(idx) {
+        const dVal = document.getElementById(`b${idx}_date`).value;
+        if (!dVal) return;
+
+        const dt = parseLocalDate(dVal);
+        const commSelect = document.getElementById(`b${idx}_comm`);
+
+        if (dt < new Date(1996, 0, 1)) commSelect.value = "4th";
+        else if (dt >= new Date(1996, 0, 1) && dt < new Date(2006, 0, 1)) commSelect.value = "5th";
+        else if (dt >= new Date(2006, 0, 1) && dt < new Date(2016, 0, 1)) commSelect.value = "6th";
+        else commSelect.value = "7th";
+
+        updatePromoScaleDropdown(idx);
+        evaluateOptionSuggestion(idx);
+    }
+
+    document.addEventListener('click', function(e) {
+        const comboboxes = document.querySelectorAll('.combobox-container');
+        comboboxes.forEach(cb => {
+            if (!cb.contains(e.target)) {
+                const list = cb.querySelector('.custom-dropdown-list');
+                if (list) list.classList.add('hidden');
+            }
+        });
+    });
+
+    window.onload = function() {
+        validateCard1();
+        validateCard2();
+        validateCard3();
+        renderSavedRecordsTable();
+    };
+
+    function fitInMatrix(levelKey, rawAmount) {
+        let match = String(levelKey).match(/S-(\d+)/i);
+        let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
+        let cells = fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
+        for (let i = 0; i < cells.length; i++) {
+            if (cells[i] >= rawAmount) return { basic: cells[i], index: i, level: key };
+        }
+        return { basic: cells[cells.length - 1], index: cells.length - 1, level: key };
+    }
+
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (साखळीनुसार वेतनश्रेणी स्वयं-निवड जोडून)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (१००% पूर्ण आणि कधीही खंडित न होणारी)
     // =========================================================================
     function processFixation() {
         const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
@@ -2525,12 +2835,9 @@
         let activeBenefits = [];
         let summaryBenefitsText = [];
 
-        // 🌟 पदोन्नती / MACP लाभांची साखळी तपासणे (हात बदल केला असल्यास तोच राहील, अन्यथा साखळीनुसार येईल)
-        let promoCount = 0;
         for (let i = 1; i <= 3; i++) {
             let typeElem = document.getElementById(`b${i}_type`);
             if (typeElem && typeElem.value !== 'None') {
-                promoCount++;
                 let bType = typeElem.value;
                 let bDate = document.getElementById(`b${i}_date`).value;
                 let bOptDate = document.getElementById(`b${i}_optDate`).value || bDate;
@@ -2538,16 +2845,9 @@
                 let bPost = document.getElementById(`b${i}_post`).value.trim() || `वरिष्ठ पद-${i}`;
                 let bScale = document.getElementById(`b${i}_scale`).value;
 
-                // जर वापरकर्त्याने स्वतः वेतनश्रेणी निवडली नसेल तर साखळीनुसार वरिष्ठ वेतनश्रेणी घेणे
-                if (!bScale && bComm) {
-                    bScale = getLinkedScale(scale, startCommission, bComm, promoCount);
-                    document.getElementById(`b${i}_scale`).value = bScale;
-                }
-
                 if (bDate && bScale) {
                     activeBenefits.push({
                         index: i,
-                        promoStep: promoCount,
                         type: bType,
                         date: parseLocalDate(bDate),
                         dateStr: bDate,
@@ -2720,7 +3020,6 @@
         let currentLevel = initialLevel;
         let currentMatrixIndex = -1;
         let restoreWithheldNext = false;
-        let promoTotalApplied = 0; // पदोन्नती साखळी ट्रॅक करणे
 
         if (currentCommission === '7th') {
             let match = String(initialLevel).match(/S-(\d+)/i);
@@ -2761,8 +3060,7 @@
             else if (ev.type === 'COMMISSION_5TH') {
                 currentCommission = '5th';
                 let oldScale = currentScaleLabel;
-                // 🌟 साखळीनुसार ५व्या आयोगातील समकक्ष वेतनश्रेणी (Corresponding Scale)
-                let newScale = getLinkedScale(scale, startCommission, '5th', promoTotalApplied);
+                let newScale = get5thScaleFrom4th(oldScale);
                 currentScaleLabel = newScale;
                 
                 let preBasic = currentBasic;
@@ -2815,14 +3113,10 @@
             else if (ev.type === 'COMMISSION_6TH') {
                 currentCommission = '6th';
                 let preBasic = currentBasic;
-                // 🌟 साखळीनुसार ६व्या आयोगातील समकक्ष वेतनश्रेणी (Corresponding Scale)
-                let newScale = getLinkedScale(scale, startCommission, '6th', promoTotalApplied);
                 currentBasic = Math.round((currentBasic * 1.86) / 10) * 10;
-                
-                let gpMatchNew = newScale.match(/GP\s*(\d+)/i);
-                let gp6th = gpMatchNew ? parseInt(gpMatchNew[1], 10) : getGradePayFrom4thOr5th(currentScaleLabel);
+                let gp6th = getGradePayFrom4thOr5th(currentScaleLabel);
                 currentGP = gp6th;
-                currentScaleLabel = newScale;
+                currentScaleLabel = (gp6th >= 4200) ? `PB-2 : 9300 - 34800 (GP ${gp6th})` : `PB-1 : 5200 - 20200 (GP ${gp6th})`;
                 lowerBasic = currentBasic;
                 lowerGP = currentGP;
 
@@ -2841,11 +3135,7 @@
             else if (ev.type === 'COMMISSION_7TH') {
                 currentCommission = '7th';
                 let totalBefore7th = currentBasic + currentGP;
-                // 🌟 साखळीनुसार ७व्या आयोगातील समकक्ष वेतनश्रेणी (Corresponding Scale)
-                let linked7th = getLinkedScale(scale, startCommission, '7th', promoTotalApplied);
-                let m = linked7th.match(/S-(\d+)/i);
-                currentLevel = m ? "S-" + parseInt(m[1], 10) : mapGpTo7thLevel(currentGP);
-
+                currentLevel = mapGpTo7thLevel(currentGP);
                 let fitmentResult = fitInMatrix(currentLevel, totalBefore7th * 2.57);
                 let oldB = currentBasic;
                 let oldGP = currentGP;
@@ -2860,7 +3150,7 @@
                 lowerGP = 0;
                 lowerMatrixIndex = currentMatrixIndex;
 
-                currentScaleLabel = getCleanScaleLabel(linked7th, currentCommission, currentLevel);
+                currentScaleLabel = getCleanScaleLabel(scale, currentCommission, currentLevel);
 
                 let calcData7th = {
                     commission: '7th',
@@ -2925,7 +3215,6 @@
             }
             else if (ev.type === 'BENEFIT_PROMOTED_PROVISIONAL') {
                 let b = ev.data;
-                promoTotalApplied = b.promoStep;
                 b.savedLowerBasic = currentBasic;
                 b.savedLowerGP = currentGP;
                 currentCommission = b.commission;
@@ -2950,19 +3239,15 @@
             }
             else if (ev.type === 'BENEFIT_OPTION_DNI') {
                 let b = ev.data;
-                promoTotalApplied = b.promoStep;
                 currentCommission = b.commission;
-                let lLevel = b.savedLowerLevel || lowerLevel;
-                let lIndex = (b.savedLowerIndex !== undefined && b.savedLowerIndex !== -1) ? b.savedLowerIndex : currentMatrixIndex;
-                let lBasic = b.savedLowerBasic || lowerBasic;
-                let lGP = b.savedLowerGP !== undefined ? b.savedLowerGP : lowerGP;
+                let lBasic = b.savedLowerBasic || currentBasic;
 
+                currentScaleLabel = b.scale;
                 if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-                    let cellsLower = fullPayMatrix7th[lLevel] || fullPayMatrix7th["S-6"];
+                    let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
                     let currIdx = cellsLower.indexOf(lBasic);
-                    if (currIdx === -1) currIdx = lIndex;
                     if (currIdx === -1) currIdx = 0;
 
                     let notionalIdx = Math.min(currIdx + 2, cellsLower.length - 1);
@@ -3003,13 +3288,11 @@
             }
             else if (ev.type === 'BENEFIT_SAME_DAY') {
                 let b = ev.data;
-                promoTotalApplied = b.promoStep;
                 currentCommission = b.commission;
 
                 if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-
                     let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
                     let currIdx = cellsLower.indexOf(currentBasic);
                     if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
