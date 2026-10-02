@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>वेतन निश्चिती प्रणाली (Pay Fixation System)</title>
-    <!-- APK (App) आणि Browser मध्ये थेट PDF तयार करण्यासाठी लायब्ररी -->
+    <!-- 🌟 APK (App) आणि Browser मध्ये थेट PDF तयार करण्यासाठी लायब्ररी -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
@@ -18,7 +18,7 @@
             --text-main: #263238;
         }
 
-        /* पेज स्क्रीनबाहेर आडवे सरकणे रोखणे */
+        /* पेज स्क्रीनबाहेर आडवे सरकणे १००% रोखणे */
         html, body {
             width: 100%;
             max-width: 100vw;
@@ -130,6 +130,18 @@
             flex-shrink: 0;
         }
 
+        .validation-alert-box {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1.5px solid #ef9a9a;
+            border-radius: 6px;
+            padding: 9px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
         .btn-row-action {
             display: flex;
             gap: 8px;
@@ -163,7 +175,7 @@
         }
         .reset-btn:hover { background-color: #546e7a; }
 
-        /* जतन केलेल्या नोंदी विभाग (Saved Records) */
+        /* जतन केलेल्या नोंदी विभाग (Saved Records Box) */
         .saved-records-card {
             background: #ffffff;
             border: 1.5px solid #b0bec5;
@@ -643,7 +655,7 @@
 
         .hidden { display: none !important; }
 
-        /* 🌟 शासकीय वेतन निश्चिती विवरणपत्र (Illustration Sheet) स्टाईल */
+        /* शासकीय वेतन निश्चिती विवरणपत्र (Illustration Sheet) स्टाईल */
         .ill-table {
             width: 100%;
             border-collapse: collapse;
@@ -731,7 +743,6 @@
                 display: none !important;
             }
 
-            /* क्रोम मोड १: मुख्य तक्ता प्रिंट */
             body:not(.print-illustration-mode) .modal-overlay {
                 display: none !important;
             }
@@ -768,7 +779,6 @@
                 position: static !important;
             }
 
-            /* क्रोम मोड २: विवरणपत्र प्रिंट */
             body.print-illustration-mode .output-box {
                 display: none !important;
             }
@@ -828,13 +838,13 @@
 
     <div id="validationBanner" class="validation-alert-box hidden"></div>
 
-    <!-- ३ मुख्य स्मार्ट अ‍ॅक्शन कार्ड्स -->
+    <!-- ३ स्मार्ट अ‍ॅक्शन कार्ड्स -->
     <div class="smart-cards-list">
         <!-- कार्ड १ -->
         <div class="action-card card-pending" id="cardEmp" onclick="openModal('employeeModal')">
             <div class="card-info">
                 <span class="card-title">👤 १. कर्मचारी व मूळ नियुक्ती माहिती</span>
-                <span class="card-status" id="cardEmpStatus">⚠️ ही माहिती भरणे बाकी आहे (कृपया भरा)</span>
+                <span class="card-status" id="cardEmpStatus">⚠️️ ही माहिती भरणे बाकी आहे (कृपया भरा)</span>
             </div>
             <div class="card-arrow-btn" id="cardEmpBadge">!</div>
         </div>
@@ -985,7 +995,7 @@
         <div class="field-group">
             <label>५. वेतनश्रेणी (ग्रेड पे / स्तर सह):</label>
             <div class="combobox-container" id="scaleWrapper">
-                <input type="text" id="currentPayScale" placeholder="वेतनश्रेणी निवडा किंवा लिहा" autocomplete="off" onclick="toggleScaleDropdown('currentPayScale', 'customScaleDropdown')">
+                <input type="text" id="currentPayScale" placeholder="वेतनश्रेणी निवडा किंवा लिहा" autocomplete="off" readonly onclick="toggleScaleDropdown('currentPayScale', 'customScaleDropdown')">
                 <span class="combobox-arrow">▼</span>
                 <div id="customScaleDropdown" class="custom-dropdown-list hidden"></div>
             </div>
@@ -1049,7 +1059,7 @@
                 </div>
                 <div class="card-grid-1">
                     <div class="combobox-container">
-                        <input type="text" id="b1_scale" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा किंवा लिहा" onclick="toggleScaleDropdown('b1_scale', 'b1_scaleDropdown', 'b1_comm')">
+                        <input type="text" id="b1_scale" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा" readonly onclick="toggleScaleDropdown('b1_scale', 'b1_scaleDropdown', 'b1_comm')">
                         <span class="combobox-arrow">▼</span>
                         <div id="b1_scaleDropdown" class="custom-dropdown-list hidden"></div>
                     </div>
@@ -1093,7 +1103,7 @@
                 </div>
                 <div class="card-grid-1">
                     <div class="combobox-container">
-                        <input type="text" id="b2_scale" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा किंवा लिहा" onclick="toggleScaleDropdown('b2_scale', 'b2_scaleDropdown', 'b2_comm')">
+                        <input type="text" id="b2_scale" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा" readonly onclick="toggleScaleDropdown('b2_scale', 'b2_scaleDropdown', 'b2_comm')">
                         <span class="combobox-arrow">▼</span>
                         <div id="b2_scaleDropdown" class="custom-dropdown-list hidden"></div>
                     </div>
@@ -1137,7 +1147,7 @@
                 </div>
                 <div class="card-grid-1">
                     <div class="combobox-container">
-                        <input type="text" id="b3_scale" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा किंवा लिहा" onclick="toggleScaleDropdown('b3_scale', 'b3_scaleDropdown', 'b3_comm')">
+                        <input type="text" id="b3_scale" placeholder="मंजूर वेतनश्रेणी / स्तर निवडा" readonly onclick="toggleScaleDropdown('b3_scale', 'b3_scaleDropdown', 'b3_comm')">
                         <span class="combobox-arrow">▼</span>
                         <div id="b3_scaleDropdown" class="custom-dropdown-list hidden"></div>
                     </div>
@@ -1246,227 +1256,116 @@
     let currentEditingRecordId = null;
 
     // =========================================================================
-    // 🌟 वेतन आयोगांमधील वेतनश्रेणींची अधिकृत साखळी (Hierarchy & Dynamic Linking)
+    // 🌟 अधिकृत वेतनश्रेणी साखळी (Dynamic Linking Chain & Hierarchy)
     // =========================================================================
-    const PAY_SCALE_HIERARCHY = [
+    const payScaleHierarchy = [
         {
-            tier: 0,
-            gp: 1300,
-            "4th": "रु. 750 - 12 - 870 - EB - 14 - 940",
-            "5th": "रु. 2550 - 55 - 2660 - 60 - 3200",
-            "6th": "-1S : 4440 - 7440 (GP 1300)",
-            "7th": "S-1 (15000 - 47600) [GP 1300]"
+            levelName: "श्रेणी १ (चतुर्थ श्रेणी / गट-ड)",
+            c4: "रु. 750 - 12 - 870 - EB - 14 - 940",
+            c5: "रु. 2550 - 55 - 2660 - 60 - 3200",
+            c6: "-1S : 4440 - 7440 (GP 1300)",
+            c7: "S-1 (15000 - 47600) [GP 1300]"
         },
         {
-            tier: 1,
-            gp: 1400,
-            "4th": "रु. 775 - 12 - 871 - EB - 14 - 1025",
-            "5th": "रु. 2610 - 60 - 2910 - 65 - 3300 - 70 - 4000",
-            "6th": "-1S : 4440 - 7440 (GP 1400)",
-            "7th": "S-2 (15300 - 48700) [GP 1400]"
+            levelName: "श्रेणी २ (चतुर्थ श्रेणी प्रगत)",
+            c4: "रु. 775 - 12 - 871 - EB - 14 - 1025",
+            c5: "रु. 2610 - 60 - 2910 - 65 - 3300 - 70 - 4000",
+            c6: "-1S : 4440 - 7440 (GP 1400)",
+            c7: "S-2 (15300 - 48700) [GP 1400]"
         },
         {
-            tier: 2,
-            gp: 1650,
-            "4th": "रु. 800 - 15 - 1010 - EB - 20 - 1150",
-            "5th": "रु. 2650 - 65 - 3300 - 70 - 4000",
-            "6th": "-1S : 4440 - 7440 (GP 1650)",
-            "7th": "S-4 (17100 - 54000) [GP 1650/1700]"
+            levelName: "श्रेणी ३ (कुशल कर्मचारी)",
+            c4: "रु. 800 - 15 - 1010 - EB - 20 - 1150",
+            c5: "रु. 2650 - 65 - 3300 - 70 - 4000",
+            c6: "-1S : 4440 - 7440 (GP 1600)",
+            c7: "S-3 (16600 - 52400) [GP 1600]"
         },
         {
-            tier: 3,
-            gp: 1800,
-            "4th": "रु. 800 - 15 - 1010 - EB - 20 - 1150",
-            "5th": "रु. 2750 - 70 - 3800 - 75 - 4400",
-            "6th": "PB-1 : 5200 - 20200 (GP 1800)",
-            "7th": "S-5 (18000 - 56900) [GP 1800]"
+            levelName: "श्रेणी ४ (कनिष्ठ लिपिक / समकक्ष)",
+            c4: "रु. 950 - 20 - 1150 - EB - 25 - 1400",
+            c5: "रु. 3050 - 75 - 3950 - 80 - 4590",
+            c6: "PB-1 : 5200 - 20200 (GP 1900)",
+            c7: "S-6 (19900 - 63200) [GP 1900]"
         },
         {
-            tier: 4,
-            gp: 1900,
-            "4th": "रु. 950 - 20 - 1150 - EB - 25 - 1400",
-            "5th": "रु. 3050 - 75 - 3950 - 80 - 4590",
-            "6th": "PB-1 : 5200 - 20200 (GP 1900)",
-            "7th": "S-6 (19900 - 63200) [GP 1900]"
+            levelName: "श्रेणी ५ (वरिष्ठ लिपिक / वरिष्ठ तंत्रज्ञ)",
+            c4: "रु. 1200 - 30 - 1560 - EB - 40 - 2040",
+            c5: "रु. 4000 - 100 - 6000",
+            c6: "PB-1 : 5200 - 20200 (GP 2400)",
+            c7: "S-8 (25500 - 81100) [GP 2400]"
         },
         {
-            tier: 5,
-            gp: 2000,
-            "4th": "रु. 975 - 25 - 1150 - EB - 30 - 1540",
-            "5th": "रु. 3200 - 85 - 4900",
-            "6th": "PB-1 : 5200 - 20200 (GP 2000)",
-            "7th": "S-7 (21700 - 69100) [GP 2000]"
+            levelName: "श्रेणी ६ (मुख्य लिपिक / प्रथम लिपिक)",
+            c4: "रु. 1350 - 30 - 1440 - 40 - 1800 - EB - 50 - 2200",
+            c5: "रु. 4500 - 125 - 7000",
+            c6: "PB-1 : 5200 - 20200 (GP 2800)",
+            c7: "S-10 (29200 - 92300) [GP 2800]"
         },
         {
-            tier: 6,
-            gp: 2400,
-            "4th": "रु. 1200 - 30 - 1560 - EB - 40 - 2040",
-            "5th": "रु. 4000 - 100 - 6000",
-            "6th": "PB-1 : 5200 - 20200 (GP 2400)",
-            "7th": "S-8 (25500 - 81100) [GP 2400]"
+            levelName: "श्रेणी ७ (कनिष्ठ अभियंता / अधीक्षक / सहाय्यक)",
+            c4: "रु. 1400 - 40 - 1600 - 50 - 2300 - EB - 60 - 2600",
+            c5: "रु. 5000 - 150 - 8000",
+            c6: "PB-2 : 9300 - 34800 (GP 4200)",
+            c7: "S-13 (35400 - 112400) [GP 4200]"
         },
         {
-            tier: 7,
-            gp: 2800,
-            "4th": "रु. 1350 - 30 - 1440 - 40 - 1800 - EB - 50 - 2200",
-            "5th": "रु. 4500 - 125 - 7000",
-            "6th": "PB-1 : 5200 - 20200 (GP 2800)",
-            "7th": "S-10 (29200 - 92300) [GP 2800]"
+            levelName: "श्रेणी ८ (शाखा अभियंता / सहाय्यक अभियंता श्रेणी-२)",
+            c4: "रु. 1640 - 60 - 2600 - EB - 75 - 2900",
+            c5: "रु. 5500 - 175 - 9000",
+            c6: "PB-2 : 9300 - 34800 (GP 4300)",
+            c7: "S-14 (38600 - 122800) [GP 4300]"
         },
         {
-            tier: 8,
-            gp: 4200,
-            "4th": "रु. 1400 - 40 - 1600 - 50 - 2300 - EB - 60 - 2600",
-            "5th": "रु. 5000 - 150 - 8000",
-            "6th": "PB-2 : 9300 - 34800 (GP 4200)",
-            "7th": "S-13 (35400 - 112400) [GP 4100/4200]"
+            levelName: "श्रेणी ९ (उपअभियंता / वर्ग-२ अधिकारी)",
+            c4: "रु. 2000 - 60 - 2300 - EB - 75 - 3200",
+            c5: "रु. 6500 - 200 - 10500",
+            c6: "PB-2 : 9300 - 34800 (GP 4400)",
+            c7: "S-15 (41800 - 132300) [GP 4400]"
         },
         {
-            tier: 9,
-            gp: 4300,
-            "4th": "रु. 1640 - 60 - 2600 - EB - 75 - 2900",
-            "5th": "रु. 5500 - 175 - 9000",
-            "6th": "PB-2 : 9300 - 34800 (GP 4300)",
-            "7th": "S-14 (38600 - 122800) [GP 4300]"
+            levelName: "श्रेणी १० (सहाय्यक अभियंता श्रेणी-१ / वर्ग-१)",
+            c4: "रु. 2200 - 75 - 2800 - EB - 100 - 4000",
+            c5: "रु. 8000 - 275 - 13500",
+            c6: "PB-2 : 9300 - 34800 (GP 5400)",
+            c7: "S-20 (56100 - 177500) [GP 5400]"
         },
         {
-            tier: 10,
-            gp: 4400,
-            "4th": "रु. 2000 - 60 - 2300 - EB - 75 - 3200",
-            "5th": "रु. 6000 - 175 - 9850 - 150 - 10000",
-            "6th": "PB-2 : 9300 - 34800 (GP 4400)",
-            "7th": "S-15 (41800 - 132300) [GP 4400]"
-        },
-        {
-            tier: 11,
-            gp: 4600,
-            "4th": "रु. 2000 - 60 - 2300 - EB - 75 - 3200",
-            "5th": "रु. 6500 - 200 - 10500",
-            "6th": "PB-2 : 9300 - 34800 (GP 4600)",
-            "7th": "S-16 (44900 - 142400) [GP 4500/4600]"
-        },
-        {
-            tier: 12,
-            gp: 5400,
-            "4th": "रु. 2200 - 75 - 2800 - EB - 100 - 4000",
-            "5th": "रु. 8000 - 275 - 13500",
-            "6th": "PB-3 : 15600 - 39100 (GP 5400)",
-            "7th": "S-20 (56100 - 177500) [GP 5400]"
-        },
-        {
-            tier: 13,
-            gp: 6600,
-            "4th": "रु. 3000 - 100 - 3500 - 125 - 4500",
-            "5th": "रु. 10000 - 325 - 15200",
-            "6th": "PB-3 : 15600 - 39100 (GP 6600)",
-            "7th": "S-23 (67700 - 208700) [GP 6600]"
-        },
-        {
-            tier: 14,
-            gp: 7600,
-            "4th": "रु. 3000 - 100 - 3500 - 125 - 4500",
-            "5th": "रु. 12000 - 375 - 16500",
-            "6th": "PB-3 : 15600 - 39100 (GP 7600)",
-            "7th": "S-25 (78800 - 209200) [GP 7600]"
-        },
-        {
-            tier: 15,
-            gp: 8700,
-            "4th": "रु. 3000 - 100 - 3500 - 125 - 4500",
-            "5th": "रु. 14300 - 400 - 18300",
-            "6th": "PB-4 : 37400 - 67000 (GP 8700)",
-            "7th": "S-27 (118500 - 214100) [GP 8700]"
+            levelName: "श्रेणी ११ (कार्यकारी अभियंता)",
+            c4: "रु. 3000 - 100 - 3500 - 125 - 4500",
+            c5: "रु. 10000 - 325 - 15200",
+            c6: "PB-3 : 15600 - 39100 (GP 6600)",
+            c7: "S-23 (67700 - 208700) [GP 6600]"
         }
     ];
 
-    // वेतनश्रेणीचा साखळी टप्पा (Tier) शोधणे
-    function findHierarchyTier(scaleStr, comm) {
-        if (!scaleStr) return 4;
-        let s = scaleStr.trim();
-        for (let i = 0; i < PAY_SCALE_HIERARCHY.length; i++) {
-            let row = PAY_SCALE_HIERARCHY[i];
-            if (row[comm] && (row[comm] === s || s.includes(row[comm]) || row[comm].includes(s))) {
-                return row.tier;
-            }
-        }
-        if (s.includes("GP")) {
-            let m = s.match(/GP\s*(\d+)/i);
-            if (m) {
-                let gpVal = parseInt(m[1], 10);
-                let found = PAY_SCALE_HIERARCHY.find(r => r.gp === gpVal);
-                if (found) return found.tier;
-            }
-        }
-        if (s.includes("S-")) {
-            let m = s.match(/S-(\d+)/i);
-            if (m) {
-                let lvl = "S-" + parseInt(m[1], 10);
-                let found = PAY_SCALE_HIERARCHY.find(r => r["7th"] && r["7th"].includes(lvl));
-                if (found) return found.tier;
-            }
-        }
-        return 4; // Default clerk tier
+    function getChainIndex(scaleStr, comm) {
+        if (!scaleStr) return -1;
+        let cKey = (comm === '4th') ? 'c4' : ((comm === '5th') ? 'c5' : ((comm === '6th') ? 'c6' : 'c7'));
+        return payScaleHierarchy.findIndex(h => {
+            if (h[cKey] && h[cKey].includes(scaleStr.substring(0, 10))) return true;
+            return false;
+        });
     }
 
-    // टप्पा व आयोगानुसार समकक्ष/पुढील वेतनश्रेणी मिळवणे
-    function getScaleByTier(tier, targetComm) {
-        let t = Math.max(0, Math.min(tier, PAY_SCALE_HIERARCHY.length - 1));
-        return PAY_SCALE_HIERARCHY[t][targetComm] || "";
-    }
-
-    // 🌟 पदोन्नती / MACP लाभानुसार पुढील वरिष्ठ वेतनश्रेणी ऑटो-सुचवणे
-    function autoSuggestBenefitScale(idx) {
-        const type = document.getElementById(`b${idx}_type`).value;
-        const comm = document.getElementById(`b${idx}_comm`).value;
-        const scaleInput = document.getElementById(`b${idx}_scale`);
-
-        if (type === 'None' || !comm) return;
-
-        // मूळ पदाचा किंवा मागील लाभाचा टप्पा निश्चित करणे
-        let baseTier = 4;
-        if (idx === 1) {
-            let startScale = document.getElementById('currentPayScale').value;
-            let startComm = document.getElementById('payCommission').value;
-            baseTier = findHierarchyTier(startScale, startComm);
-        } else if (idx === 2) {
-            let b1Type = document.getElementById('b1_type').value;
-            let b1Scale = document.getElementById('b1_scale').value;
-            let b1Comm = document.getElementById('b1_comm').value;
-            if (b1Type !== 'None' && b1Scale) {
-                baseTier = findHierarchyTier(b1Scale, b1Comm);
-            } else {
-                let startScale = document.getElementById('currentPayScale').value;
-                let startComm = document.getElementById('payCommission').value;
-                baseTier = findHierarchyTier(startScale, startComm) + 1;
-            }
-        } else if (idx === 3) {
-            let b2Type = document.getElementById('b2_type').value;
-            let b2Scale = document.getElementById('b2_scale').value;
-            let b2Comm = document.getElementById('b2_comm').value;
-            if (b2Type !== 'None' && b2Scale) {
-                baseTier = findHierarchyTier(b2Scale, b2Comm);
-            } else {
-                let b1Scale = document.getElementById('b1_scale').value;
-                let b1Comm = document.getElementById('b1_comm').value;
-                baseTier = findHierarchyTier(b1Scale, b1Comm) + 1;
-            }
+    function getLinkedScale(baseScale, baseComm, targetComm, stepsAhead = 0) {
+        let idx = getChainIndex(baseScale, baseComm);
+        if (idx === -1) {
+            if (targetComm === '4th') return payScales4th[0];
+            if (targetComm === '5th') return payScales5th[0];
+            if (targetComm === '6th') return payScales6th[5];
+            return levelConfig7th.map(cfg => level7thStartPay[cfg.id].desc)[5];
         }
 
-        // वरिष्ठ वेतनश्रेणी टप्पा (Promotion 1/2/3 Step)
-        let targetTier = baseTier + (baseTier === 4 ? 2 : 1); // लिपिक वर्गासाठी 1900 वरून थेट 2400 (वरिष्ठ लिपिक)
-        if (targetTier >= PAY_SCALE_HIERARCHY.length) targetTier = PAY_SCALE_HIERARCHY.length - 1;
-
-        let suggestedScale = getScaleByTier(targetTier, comm);
-
-        // जर युजरने आधी स्वतः बदल केलेला नसेल तरच ऑटो-सेट करा
-        if (!scaleInput.value || scaleInput.dataset.autoSet === "true") {
-            scaleInput.value = suggestedScale;
-            scaleInput.dataset.autoSet = "true";
-        }
+        let targetIdx = Math.min(idx + stepsAhead, payScaleHierarchy.length - 1);
+        let row = payScaleHierarchy[targetIdx];
+        if (targetComm === '4th') return row.c4;
+        if (targetComm === '5th') return row.c5;
+        if (targetComm === '6th') return row.c6;
+        return row.c7;
     }
 
     // =========================================================================
-    // 🌟 क्रोम व ॲप प्रिंट/PDF इंजिन
+    // 🌟 १. क्रोमसाठी थेट प्रिंट (Chrome Native Print)
     // =========================================================================
     function printReportChrome() {
         document.body.classList.remove('print-illustration-mode');
@@ -1484,6 +1383,9 @@
         setTimeout(cleanup, 2000);
     }
 
+    // =========================================================================
+    // 🌟 २. ॲप (APK) साठी थेट PDF डाऊनलोड
+    // =========================================================================
     function downloadReportPDF() {
         const reportArea = document.getElementById('printableReportArea');
         if (!reportArea) return;
@@ -1553,7 +1455,7 @@
     }
 
     // =========================================================================
-    // 🌟 CRUD (Save, Load, Edit, Delete)
+    // 🌟 Save, Load, Edit & Delete (CRUD) व्यवस्थापन
     // =========================================================================
     function getSavedRecordsFromStorage() {
         try {
@@ -1697,7 +1599,6 @@
             document.getElementById(`b${i}_comm`).value = d[`b${i}_comm`] || '';
             document.getElementById(`b${i}_post`).value = d[`b${i}_post`] || '';
             document.getElementById(`b${i}_scale`).value = d[`b${i}_scale`] || '';
-            document.getElementById(`b${i}_scale`).dataset.autoSet = "false";
         }
 
         document.getElementById('fixationFrom').value = d.fixationFrom || '';
@@ -1874,7 +1775,7 @@
         if (comm === '4th') list = payScales4th;
         else if (comm === '5th') list = payScales5th;
         else if (comm === '6th') list = payScales6th;
-        else if (comm === '7th') list = levelConfig7th.map(cfg => `${cfg.id} (${cfg.min} - ${cfg.max}) [GP ${cfg.gp}]`);
+        else if (comm === '7th') list = levelConfig7th.map(cfg => level7thStartPay[cfg.id].desc);
 
         list.forEach(item => {
             let opt = document.createElement('option');
@@ -2004,7 +1905,6 @@
                 document.getElementById(`b${i}_comm`).value = "";
                 document.getElementById(`b${i}_post`).value = "";
                 document.getElementById(`b${i}_scale`).value = "";
-                document.getElementById(`b${i}_scale`).dataset.autoSet = "false";
             }
 
             document.getElementById('fixationFrom').value = "";
@@ -2049,7 +1949,7 @@
         } else {
             card.classList.remove('card-filled');
             card.classList.add('card-pending');
-            status.textContent = "⚠️ ही माहिती भरणे बाकी आहे (कृपया भरा)";
+            status.textContent = "⚠️️ ही माहिती भरणे बाकी आहे (कृपया भरा)";
             badge.textContent = "!";
             return false;
         }
@@ -2129,7 +2029,7 @@
     }
 
     // =========================================================================
-    // 📚 अधिकृत वेतनश्रेण्या यादी
+    // 📚 अधिकृत वेतनश्रेण्या
     // =========================================================================
     const payScales4th = [
         "रु. 750 - 12 - 870 - EB - 14 - 940",
@@ -2302,9 +2202,10 @@
         "S-31": [182200, 187700, 193300, 199100, 205100, 211300, 217600, 224100]
     };
 
-    const levelConfig7thMapping = {};
+    const level7thStartPay = {};
     levelConfig7th.forEach(cfg => {
-        levelConfig7thMapping[cfg.id] = `${cfg.id} (${cfg.min} - ${cfg.max}) [GP ${cfg.gp}]`;
+        let desc = `${cfg.id} (${cfg.min} - ${cfg.max}) [GP ${cfg.gp}]`;
+        level7thStartPay[cfg.id] = { start: cfg.min, max: cfg.max, desc: desc, gp: cfg.gp };
     });
 
     function mapGpTo7thLevel(gp) {
@@ -2345,13 +2246,39 @@
 
     function getGradePayFrom4thOr5th(scaleStr) {
         if (!scaleStr) return 1900;
-        let tier = findHierarchyTier(scaleStr, "5th");
-        return PAY_SCALE_HIERARCHY[tier]?.gp || 1900;
+        if (scaleStr.includes("2550") || scaleStr.includes("750")) return 1300;
+        if (scaleStr.includes("2610") || scaleStr.includes("775")) return 1400;
+        if (scaleStr.includes("2650") || scaleStr.includes("800")) return 1600;
+        if (scaleStr.includes("2750")) return 1650;
+        if (scaleStr.includes("3050") || scaleStr.includes("950")) return 1900;
+        if (scaleStr.includes("3200") || scaleStr.includes("975")) return 1900;
+        if (scaleStr.includes("4000") || scaleStr.includes("1200")) return 2400;
+        if (scaleStr.includes("4500") || scaleStr.includes("1350")) return 2800;
+        if (scaleStr.includes("5000") || scaleStr.includes("1400") || scaleStr.includes("1640")) return 4200;
+        if (scaleStr.includes("38600")) return 4300;
+        if (scaleStr.includes("6500") || scaleStr.includes("2000") || scaleStr.includes("8000") || scaleStr.includes("2200")) return 5400;
+        if (scaleStr.includes("10000") || scaleStr.includes("3000")) return 6600;
+        if (scaleStr.includes("12000")) return 8700;
+        if (scaleStr.includes("14300")) return 10000;
+        if (scaleStr.includes("16400") || scaleStr.includes("22400")) return 12000;
+        return 1900;
     }
 
     function get5thScaleFrom4th(scale4th) {
-        let tier = findHierarchyTier(scale4th, "4th");
-        return getScaleByTier(tier, "5th") || payScales5th[0];
+        if (!scale4th) return payScales5th[0];
+        if (scale4th.includes("750")) return "रु. 2550 - 55 - 2660 - 60 - 3200";
+        if (scale4th.includes("775")) return "रु. 2610 - 60 - 2910 - 65 - 3300 - 70 - 4000";
+        if (scale4th.includes("800")) return "रु. 2650 - 65 - 3300 - 70 - 4000";
+        if (scale4th.includes("950")) return "रु. 3050 - 75 - 3950 - 80 - 4590";
+        if (scale4th.includes("975") || scale4th.includes("1150")) return "रु. 3200 - 85 - 4900";
+        if (scale4th.includes("1200")) return "रु. 4000 - 100 - 6000";
+        if (scale4th.includes("1350")) return "रु. 4500 - 125 - 7000";
+        if (scale4th.includes("1400")) return "रु. 5000 - 150 - 8000";
+        if (scale4th.includes("1640")) return "रु. 5500 - 175 - 9000";
+        if (scale4th.includes("2000")) return "रु. 6500 - 200 - 10500";
+        if (scale4th.includes("2200")) return "रु. 8000 - 275 - 13500";
+        if (scale4th.includes("3000")) return "रु. 10000 - 325 - 15200";
+        return payScales5th[0];
     }
 
     function calculate5thPayFixation(existingBasic, existingScaleStr, proposedScaleStr) {
@@ -2527,151 +2454,8 @@
         openModal('illustrationModal');
     }
 
-    function toggleScaleDropdown(inputId, dropdownId, commSelectId = 'payCommission') {
-        const comm = document.getElementById(commSelectId).value;
-        const dropdown = document.getElementById(dropdownId);
-        const input = document.getElementById(inputId);
-
-        if (!comm) {
-            alert("कृपया प्रथम वेतन आयोग निवडा!");
-            document.getElementById(commSelectId).focus();
-            return;
-        }
-
-        if (!dropdown.classList.contains('hidden')) {
-            dropdown.classList.add('hidden');
-            return;
-        }
-
-        dropdown.innerHTML = "";
-        let scales = [];
-        if (comm === '4th') scales = payScales4th;
-        else if (comm === '5th') scales = payScales5th;
-        else if (comm === '6th') scales = payScales6th;
-        else scales = levelConfig7th.map(cfg => `${cfg.id} (${cfg.min} - ${cfg.max}) [GP ${cfg.gp}]`);
-
-        scales.forEach(scale => {
-            let div = document.createElement('div');
-            div.className = 'dropdown-item';
-            div.textContent = scale;
-            div.onclick = function(e) {
-                e.stopPropagation();
-                input.value = scale;
-                input.dataset.autoSet = "false";
-                dropdown.classList.add('hidden');
-                
-                if (comm === '6th' && scale.includes('GP')) {
-                    let gpMatch = scale.match(/GP\s*(\d+)/i);
-                    if (gpMatch && gpMatch[1]) {
-                        let gpVal = parseInt(gpMatch[1], 10);
-                        document.getElementById('gradePay').value = gpVal;
-                        let ep = get6thEntryPay(scale, gpVal);
-                        if (ep && inputId === 'currentPayScale') document.getElementById('basicPay').value = ep;
-                    }
-                } else if (comm === '7th' && inputId === 'currentPayScale') {
-                    let m = scale.match(/S-(\d+)/i);
-                    if (m) {
-                        let lvl = "S-" + parseInt(m[1], 10);
-                        if (fullPayMatrix7th[lvl]) document.getElementById('basicPay').value = fullPayMatrix7th[lvl][0];
-                    }
-                }
-                
-                if (inputId === 'currentPayScale') validateCard1();
-                else if (inputId.startsWith('b')) validateCard2();
-            };
-            dropdown.appendChild(div);
-        });
-
-        dropdown.classList.remove('hidden');
-    }
-
-    function toggleBasicDropdown(basicInputId, dropdownId, scaleInputId, commSelectId) {
-        const scaleStr = document.getElementById(scaleInputId).value;
-        const comm = document.getElementById(commSelectId).value;
-        const dropdown = document.getElementById(dropdownId);
-        const basicInput = document.getElementById(basicInputId);
-
-        if (!scaleStr) {
-            alert("कृपया प्रथम वेतनश्रेणी निवडा!");
-            document.getElementById(scaleInputId).click();
-            return;
-        }
-
-        if (!dropdown.classList.contains('hidden')) {
-            dropdown.classList.add('hidden');
-            return;
-        }
-
-        let gp = 0;
-        if (comm === '6th') {
-            let gpMatch = scaleStr.match(/GP\s*(\d+)/i);
-            if (gpMatch) gp = parseInt(gpMatch[1], 10);
-            else gp = parseFloat(document.getElementById('gradePay').value) || 0;
-        }
-
-        dropdown.innerHTML = "";
-        let stages = parsePayScaleStages(scaleStr, comm, gp);
-        let entryPayVal = (comm === '6th') ? get6thEntryPay(scaleStr, gp) : 0;
-
-        if (stages.length === 0) {
-            dropdown.innerHTML = `<div class="dropdown-item" style="color:#888;">वैध वेतनश्रेणी उपलब्ध नाही</div>`;
-        } else {
-            stages.forEach((amount, idx) => {
-                let div = document.createElement('div');
-                div.className = 'dropdown-item';
-                
-                if (comm === '6th' && amount === entryPayVal) {
-                    div.innerHTML = `<b>${amount}</b> <span style="font-size:10.5px; color:#1b5e20; background:#e8f5e9; border:1px solid #a5d6a7; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:8px;">★ Annexure-III प्रथम भरती वेतन (शिफारस)</span>`;
-                    div.style.backgroundColor = "#f1f8e9";
-                } else if (comm === '7th') {
-                    div.innerHTML = `<b>${amount}</b> <small style="color:#78909c; margin-left:6px;">(टप्पा ${idx + 1})</small>`;
-                } else {
-                    div.textContent = amount;
-                }
-
-                div.onclick = function(e) {
-                    e.stopPropagation();
-                    basicInput.value = amount;
-                    dropdown.classList.add('hidden');
-                    if (basicInputId === 'basicPay') validateCard1();
-                };
-                dropdown.appendChild(div);
-            });
-        }
-
-        dropdown.classList.remove('hidden');
-    }
-
-    function updateCommissionRules() {
-        document.getElementById('currentPayScale').value = "";
-        document.getElementById('basicPay').value = "";
-        document.getElementById('gradePay').value = "0";
-    }
-
-    function toggleBenefitRow(idx) {
-        const type = document.getElementById(`b${idx}_type`).value;
-        const fields = document.getElementById(`b${idx}_fields`);
-        const postInput = document.getElementById(`b${idx}_post`);
-        const scaleInput = document.getElementById(`b${idx}_scale`);
-
-        if (type !== 'None') {
-            fields.classList.remove('hidden');
-            postInput.placeholder = (type === 'Promotion') ? "पदोन्नतीचे पद टाका" : "वरिष्ठ पद टाका";
-            autoSuggestBenefitScale(idx);
-        } else {
-            fields.classList.add('hidden');
-            scaleInput.value = "";
-            scaleInput.dataset.autoSet = "false";
-        }
-    }
-
-    function updatePromoScaleDropdown(idx) {
-        autoSuggestBenefitScale(idx);
-        evaluateOptionSuggestion(idx);
-    }
-
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (साखळी आणि पदोन्नती टप्पे सुरक्षित ठेवून)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (साखळीनुसार वेतनश्रेणी स्वयं-निवड जोडून)
     // =========================================================================
     function processFixation() {
         const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
@@ -2741,9 +2525,12 @@
         let activeBenefits = [];
         let summaryBenefitsText = [];
 
+        // 🌟 पदोन्नती / MACP लाभांची साखळी तपासणे (हात बदल केला असल्यास तोच राहील, अन्यथा साखळीनुसार येईल)
+        let promoCount = 0;
         for (let i = 1; i <= 3; i++) {
             let typeElem = document.getElementById(`b${i}_type`);
             if (typeElem && typeElem.value !== 'None') {
+                promoCount++;
                 let bType = typeElem.value;
                 let bDate = document.getElementById(`b${i}_date`).value;
                 let bOptDate = document.getElementById(`b${i}_optDate`).value || bDate;
@@ -2751,9 +2538,16 @@
                 let bPost = document.getElementById(`b${i}_post`).value.trim() || `वरिष्ठ पद-${i}`;
                 let bScale = document.getElementById(`b${i}_scale`).value;
 
+                // जर वापरकर्त्याने स्वतः वेतनश्रेणी निवडली नसेल तर साखळीनुसार वरिष्ठ वेतनश्रेणी घेणे
+                if (!bScale && bComm) {
+                    bScale = getLinkedScale(scale, startCommission, bComm, promoCount);
+                    document.getElementById(`b${i}_scale`).value = bScale;
+                }
+
                 if (bDate && bScale) {
                     activeBenefits.push({
                         index: i,
+                        promoStep: promoCount,
                         type: bType,
                         date: parseLocalDate(bDate),
                         dateStr: bDate,
@@ -2926,6 +2720,7 @@
         let currentLevel = initialLevel;
         let currentMatrixIndex = -1;
         let restoreWithheldNext = false;
+        let promoTotalApplied = 0; // पदोन्नती साखळी ट्रॅक करणे
 
         if (currentCommission === '7th') {
             let match = String(initialLevel).match(/S-(\d+)/i);
@@ -2966,9 +2761,8 @@
             else if (ev.type === 'COMMISSION_5TH') {
                 currentCommission = '5th';
                 let oldScale = currentScaleLabel;
-                // 🌟 जर आधी पदोन्नती झाली असेल तर त्या पदोन्नतीच्या साखळीतील ५व्या आयोगाची समकक्ष श्रेणी येईल
-                let currentTier = findHierarchyTier(oldScale, "4th");
-                let newScale = getScaleByTier(currentTier, "5th") || get5thScaleFrom4th(oldScale);
+                // 🌟 साखळीनुसार ५व्या आयोगातील समकक्ष वेतनश्रेणी (Corresponding Scale)
+                let newScale = getLinkedScale(scale, startCommission, '5th', promoTotalApplied);
                 currentScaleLabel = newScale;
                 
                 let preBasic = currentBasic;
@@ -3021,14 +2815,14 @@
             else if (ev.type === 'COMMISSION_6TH') {
                 currentCommission = '6th';
                 let preBasic = currentBasic;
+                // 🌟 साखळीनुसार ६व्या आयोगातील समकक्ष वेतनश्रेणी (Corresponding Scale)
+                let newScale = getLinkedScale(scale, startCommission, '6th', promoTotalApplied);
                 currentBasic = Math.round((currentBasic * 1.86) / 10) * 10;
                 
-                // 🌟 ५व्या आयोगात मिळालेल्या पदोन्नतीचा टप्पा टिकवून ६व्यात समकक्ष श्रेणी व GP निश्चित करणे
-                let currentTier = findHierarchyTier(currentScaleLabel, "5th");
-                let scale6thFromTier = getScaleByTier(currentTier, "6th");
-                let gp6th = PAY_SCALE_HIERARCHY[currentTier]?.gp || getGradePayFrom4thOr5th(currentScaleLabel);
+                let gpMatchNew = newScale.match(/GP\s*(\d+)/i);
+                let gp6th = gpMatchNew ? parseInt(gpMatchNew[1], 10) : getGradePayFrom4thOr5th(currentScaleLabel);
                 currentGP = gp6th;
-                currentScaleLabel = scale6thFromTier || ((gp6th >= 4200) ? `PB-2 : 9300 - 34800 (GP ${gp6th})` : `PB-1 : 5200 - 20200 (GP ${gp6th})`);
+                currentScaleLabel = newScale;
                 lowerBasic = currentBasic;
                 lowerGP = currentGP;
 
@@ -3047,9 +2841,11 @@
             else if (ev.type === 'COMMISSION_7TH') {
                 currentCommission = '7th';
                 let totalBefore7th = currentBasic + currentGP;
-                
-                // 🌟 ६व्या आयोगातील ग्रेड पे चा योग्य स्तर मॅप करणे
-                currentLevel = mapGpTo7thLevel(currentGP);
+                // 🌟 साखळीनुसार ७व्या आयोगातील समकक्ष वेतनश्रेणी (Corresponding Scale)
+                let linked7th = getLinkedScale(scale, startCommission, '7th', promoTotalApplied);
+                let m = linked7th.match(/S-(\d+)/i);
+                currentLevel = m ? "S-" + parseInt(m[1], 10) : mapGpTo7thLevel(currentGP);
+
                 let fitmentResult = fitInMatrix(currentLevel, totalBefore7th * 2.57);
                 let oldB = currentBasic;
                 let oldGP = currentGP;
@@ -3064,9 +2860,7 @@
                 lowerGP = 0;
                 lowerMatrixIndex = currentMatrixIndex;
 
-                let currentTier = findHierarchyTier(currentScaleLabel, "6th");
-                let scale7thFromTier = getScaleByTier(currentTier, "7th");
-                currentScaleLabel = scale7thFromTier || getCleanScaleLabel(scale, currentCommission, currentLevel);
+                currentScaleLabel = getCleanScaleLabel(linked7th, currentCommission, currentLevel);
 
                 let calcData7th = {
                     commission: '7th',
@@ -3131,6 +2925,7 @@
             }
             else if (ev.type === 'BENEFIT_PROMOTED_PROVISIONAL') {
                 let b = ev.data;
+                promoTotalApplied = b.promoStep;
                 b.savedLowerBasic = currentBasic;
                 b.savedLowerGP = currentGP;
                 currentCommission = b.commission;
@@ -3155,15 +2950,19 @@
             }
             else if (ev.type === 'BENEFIT_OPTION_DNI') {
                 let b = ev.data;
+                promoTotalApplied = b.promoStep;
                 currentCommission = b.commission;
-                let lBasic = b.savedLowerBasic || currentBasic;
+                let lLevel = b.savedLowerLevel || lowerLevel;
+                let lIndex = (b.savedLowerIndex !== undefined && b.savedLowerIndex !== -1) ? b.savedLowerIndex : currentMatrixIndex;
+                let lBasic = b.savedLowerBasic || lowerBasic;
+                let lGP = b.savedLowerGP !== undefined ? b.savedLowerGP : lowerGP;
 
-                currentScaleLabel = b.scale;
                 if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-                    let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
+                    let cellsLower = fullPayMatrix7th[lLevel] || fullPayMatrix7th["S-6"];
                     let currIdx = cellsLower.indexOf(lBasic);
+                    if (currIdx === -1) currIdx = lIndex;
                     if (currIdx === -1) currIdx = 0;
 
                     let notionalIdx = Math.min(currIdx + 2, cellsLower.length - 1);
@@ -3204,6 +3003,7 @@
             }
             else if (ev.type === 'BENEFIT_SAME_DAY') {
                 let b = ev.data;
+                promoTotalApplied = b.promoStep;
                 currentCommission = b.commission;
 
                 if (currentCommission === '7th') {
@@ -3262,10 +3062,7 @@
                         currentMatrixIndex = cells.indexOf(currentBasic);
                         if (currentMatrixIndex === -1) {
                             for (let i = 0; i < cells.length; i++) {
-                                if (cells[i] >= currentBasic) {
-                                    currentMatrixIndex = i;
-                                    break;
-                                }
+                                if (cells[i] >= currentBasic) { currentMatrixIndex = i; break; }
                             }
                             if (currentMatrixIndex === -1) currentMatrixIndex = 0;
                         }
