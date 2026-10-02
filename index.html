@@ -345,7 +345,7 @@ body * { visibility: hidden; }
 <button class="action-btn btn-work" onclick="openModule('workModal')"><span>📋</span>Work list</button>
 <button class="action-btn btn-bill" onclick="openModule('billModal')"><span>📄</span>Bill reg.</button>
 <button class="action-btn btn-assign" onclick="openModule('assignModal')"><span>📁</span>Assign</button>
-<button class="action-btn btn-settings" onclick="openModule('settingsModal')"><span>⚙️</span>Data Manager</button>
+<button class="action-btn btn-settings" onclick="openModule('settingsModal')"><span>⚙️️</span>Data Manager</button>
 </div>
 
 <div class="container">
@@ -683,9 +683,26 @@ window.addEventListener('storage', function(e) { refreshAll(); });
 function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; }
 function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
 
+// ** तारीख प्रमाणित ISO (YYYY-MM-DD) फॉरमॅटमध्ये आणणारे फंक्शन **
+function normalizeDateToISO(dateStr) {
+if (!dateStr) return '';
+var s = dateStr.trim();
+if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+if (/^\d{2}-\d{2}-\d{4}$/.test(s)) {
+var p = s.split('-');
+return p[2] + '-' + p[1] + '-' + p[0];
+}
+if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) {
+var p = s.split('/');
+return p[2] + '-' + p[1] + '-' + p[0];
+}
+return s;
+}
+
 function formatDateToDMY(dateStr) {
 if (!dateStr) return '-';
-var parts = dateStr.split('-');
+var iso = normalizeDateToISO(dateStr);
+var parts = iso.split('-');
 if (parts.length === 3) return parts[2] + '-' + parts[1] + '-' + parts[0];
 return dateStr;
 }
@@ -726,7 +743,7 @@ refreshBillDashboard();
 
 function closeModule(id) { document.getElementById(id).style.display = 'none'; refreshMBDashboard(); }
 
-// ** M.B. क्रमांक सामान्यीकरण (Normalization) **
+// ** M.B. क्रमांक सामान्यीकरण **
 function normalizeMB(val) {
 if (!val) return '';
 return val.toString().trim().toLowerCase().replace(/^m\.?b\.?[\s\-_]*/i, '');
@@ -1634,7 +1651,7 @@ generateWorkReport(fDate, tDate);
 }
 }
 
-// ** सर्च पॉपअप मॉडेल व सद्यस्थिती काढणे (अचूक M.B. जुळवणी दुरुस्तीसह) **
+// ** सर्च पॉपअप मॉडेल व सद्यस्थिती काढणे **
 var activeSearchPrintHTML = '';
 
 function showSmartSearchResultModal(query) {
@@ -1652,10 +1669,7 @@ var je = (m.receivedDetail || '').toLowerCase();
 var src = (m.receivedSource || '').toLowerCase();
 var from = (m.receivedFrom || '').toLowerCase();
 
-// अचूक M.B. क्रमांक जुळवणी: यामुळे "066400" शोधल्यास "0066400" चुकीने मॅच होणार नाही!
 var isExactMB = (noLower === queryLower) || (noMB !== '' && noMB === queryMB);
-
-// JE नाव किंवा इतर तपशील शोधणे
 var isTextMatch = je.includes(queryLower) || src.includes(queryLower) || from.includes(queryLower);
 
 return isExactMB || isTextMatch;
@@ -1733,54 +1747,81 @@ var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; paddin
 printA4Document(html);
 }
 
-// ** सविस्तर रिपोर्ट फिल्टर अहवाल **
+// ** सविस्तर रिपोर्ट फिल्टर अहवाल - दिनांक कालावधी अचूक फिल्टर (दुरुस्त केले) **
 function generateAdvancedMBReport(sizeChoice, finalType, subTarget, subVal, fDate, tDate) {
 var allMBs = getData('mb_records');
 var stock = getAvailableStock();
 
-var latestMap = {};
-allMBs.forEach(function(m) {
-var no = m.mbNumber || m.mbNo;
-if (no) { latestMap[no] = m; }
-});
-var uniqueMBs = [];
-for (var k in latestMap) { uniqueMBs.push(latestMap[k]); }
+var isoFrom = normalizeDateToISO(fDate);
+var isoTo = normalizeDateToISO(tDate);
 
-var filtered = uniqueMBs.filter(function(m) {
-if (fDate && m.date < fDate) return false;
-if (tDate && m.date > tDate) return false;
-if (sizeChoice === 'Small M.B.' && m.size !== 'लहान M.B.') return false;
-if (sizeChoice === 'Big M.B.' && m.size !== 'मोठी M.B.') return false;
-return true;
-});
+var filtered = [];
+var reportTitle = "सर्व मोजमाप पुस्तिका अहवाल";
 
-let reportTitle = "सर्व मोजमाप पुस्तिका अहवाल";
 if (finalType === 'AVAILABLE') {
+reportTitle = "सर्व उपलब्ध मोजमाप पुस्तिका अहवाल";
 filtered = stock.filter(function(s) {
+var itemDateISO = normalizeDateToISO(s.date);
+if (isoFrom && itemDateISO && itemDateISO < isoFrom) return false;
+if (isoTo && itemDateISO && itemDateISO > isoTo) return false;
 if (sizeChoice === 'Small M.B.' && s.size !== 'लहान M.B.') return false;
 if (sizeChoice === 'Big M.B.' && s.size !== 'मोठी M.B.') return false;
 return true;
 });
-reportTitle = "सर्व उपलब्ध मोजमाप पुस्तिका अहवाल";
 } else if (finalType === 'GIVEN') {
-filtered = filtered.filter(function(m) {
-if (m.actionType !== 'दिलेली M.B.' && m.actionType !== 'दिलेली एमबी') return false;
-if (subTarget === 'JE' && subVal) {
-return m.receivedDetail && m.receivedDetail.toLowerCase() === subVal.toLowerCase();
+reportTitle = "दिलेली मोजमाप पुस्तिका अहवाल";
+filtered = allMBs.filter(function(m) {
+var isGiven = (m.actionType === 'दिलेली M.B.' || m.actionType === 'दिलेली एमबी');
+if (!isGiven) return false;
+var itemDateISO = normalizeDateToISO(m.date);
+if (isoFrom && itemDateISO && itemDateISO < isoFrom) return false;
+if (isoTo && itemDateISO && itemDateISO > isoTo) return false;
+if (sizeChoice === 'Small M.B.' && m.size !== 'लहान M.B.') return false;
+if (sizeChoice === 'Big M.B.' && m.size !== 'मोठी M.B.') return false;
+
+if (subTarget === 'JE' && subVal && subVal !== 'सर्व') {
+return (m.receivedDetail || '').toLowerCase() === subVal.toLowerCase();
 } else if (subTarget === 'Office') {
-return m.receivedSource && m.receivedSource.includes('विभागीय कार्यालय');
-} else if (subTarget === 'ALL') {
-return true;
+return (m.receivedSource || '').includes('विभागीय कार्यालय');
 }
 return true;
 });
-reportTitle = "दिलेली मोजमाप पुस्तिका अहवाल";
 } else if (finalType === 'RECEIVED') {
-filtered = filtered.filter(function(m) { return m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी'; });
 reportTitle = "मिळालेली मोजमाप पुस्तिका अहवाल";
+filtered = allMBs.filter(function(m) {
+var isRcv = (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी');
+if (!isRcv) return false;
+var itemDateISO = normalizeDateToISO(m.date);
+if (isoFrom && itemDateISO && itemDateISO < isoFrom) return false;
+if (isoTo && itemDateISO && itemDateISO > isoTo) return false;
+if (sizeChoice === 'Small M.B.' && m.size !== 'लहान M.B.') return false;
+if (sizeChoice === 'Big M.B.' && m.size !== 'मोठी M.B.') return false;
+return true;
+});
+} else {
+// ALL स्थिती
+var latestMap = {};
+allMBs.forEach(function(m) {
+var no = (m.mbNumber || m.mbNo || '').trim();
+if (no) latestMap[no] = m;
+});
+var uniqueMBs = [];
+for (var k in latestMap) { uniqueMBs.push(latestMap[k]); }
+
+filtered = uniqueMBs.filter(function(m) {
+var itemDateISO = normalizeDateToISO(m.date);
+if (isoFrom && itemDateISO && itemDateISO < isoFrom) return false;
+if (isoTo && itemDateISO && itemDateISO > isoTo) return false;
+if (sizeChoice === 'Small M.B.' && m.size !== 'लहान M.B.') return false;
+if (sizeChoice === 'Big M.B.' && m.size !== 'मोठी M.B.') return false;
+return true;
+});
 }
 
-if (filtered.length === 0) return showAlert('निवडलेल्या निकषांनुसार कोणतीही नोंद आढळली नाही.');
+if (filtered.length === 0) {
+var periodMsg = (fDate && tDate) ? ('निवडलेल्या कालावधीत (' + formatDateToDMY(fDate) + ' ते ' + formatDateToDMY(tDate) + ') ') : '';
+return showAlert(periodMsg + 'कोणतीही नोंद आढळली नाही.');
+}
 
 filtered.sort(function(a, b) {
 var sA = a.size || 'लहान M.B.';
@@ -1793,11 +1834,14 @@ return 0;
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var rawName = (subVal && subVal !== 'सर्व') ? subVal.replace(/^श्री.?\s*/i, '') : "";
 var personHeaderName = rawName ? "श्री. " + rawName : "";
+var periodSubHeader = (fDate && tDate) ? ("कालावधी: " + formatDateToDMY(fDate) + " ते " + formatDateToDMY(tDate)) : "";
 
 var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
 '<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + reportTitle + '</h2></div>' +
-'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div>' + (personHeaderName ? '<strong style="font-size:11.5px;">' + personHeaderName + '</strong><br>' : '') + 'अहवाल दिनांक: ' + todayStr + '</div></div>' +
-'</div>' +
+'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
+'<div>' + (personHeaderName ? '<strong style="font-size:11.5px;">' + personHeaderName + '</strong><br>' : '') + (periodSubHeader ? '<span style="font-weight:600; color:#0d47a1;">' + periodSubHeader + '</span><br>' : '') + 'अहवाल दिनांक: ' + todayStr + '</div>' +
+'<div style="text-align:right;"><strong>एकूण संख्या: ' + filtered.length + '</strong></div>' +
+'</div></div>' +
 '<table class="print-table">' +
 '<thead><tr><th style="width:8%; text-align:center;">अ.क्र.</th><th style="width:17%;">दिनांक</th><th style="width:25%;">मोजमाप पुस्तिका क्रमांक</th><th style="width:20%; text-align:center;">प्रकार (आकार)</th><th style="width:30%;">सध्यस्थिती / हस्तांतरण</th></tr></thead><tbody>';
 
@@ -1817,10 +1861,23 @@ printA4Document(html);
 
 function generateBillReports(subType, fDate, tDate) {
 var bills = getData('dmbms_bills');
+var isoFrom = normalizeDateToISO(fDate);
+var isoTo = normalizeDateToISO(tDate);
+
 if (subType.startsWith('JE_BILLS:')) {
 var jeName = subType.split(':')[1];
 bills = bills.filter(function(b){ return b.je === jeName; });
 }
+
+if (isoFrom || isoTo) {
+bills = bills.filter(function(b) {
+var bDateISO = normalizeDateToISO(b.date);
+if (isoFrom && bDateISO && bDateISO < isoFrom) return false;
+if (isoTo && bDateISO && bDateISO > isoTo) return false;
+return true;
+});
+}
+
 renderBillTableHTML(bills, '', 'देयक नोंदवही अहवाल');
 }
 
@@ -2207,10 +2264,10 @@ container.innerHTML = '<div class="form-row-compact"><label>Income Tax</label><i
 
 '<div class="form-row-compact" id="otherRow1">' +
 '<div style="display:flex; align-items:center; justify-content:space-between;">' +
-'<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="otherLabel1">Other-1</span></label>' +
+'<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="' + newLabelId + '">Other-1</span></label>' +
 '<button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="नवीन कपात जोडा">+</button>' +
 '</div>' +
-'<input type="number" class="form-control calc-ded" id="dedOther1" value="0" oninput="autoCalculateDeductions()">' +
+'<input type="number" class="form-control calc-ded" id="' + newInputId + '" value="0" oninput="autoCalculateDeductions()">' +
 '</div>';
 
 var jeSel = document.getElementById('wJeSelect');
