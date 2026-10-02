@@ -345,7 +345,7 @@ body * { visibility: hidden; }
 <button class="action-btn btn-work" onclick="openModule('workModal')"><span>📋</span>Work list</button>
 <button class="action-btn btn-bill" onclick="openModule('billModal')"><span>📄</span>Bill reg.</button>
 <button class="action-btn btn-assign" onclick="openModule('assignModal')"><span>📁</span>Assign</button>
-<button class="action-btn btn-settings" onclick="openModule('settingsModal')"><span>⚙️️</span>Data Manager</button>
+<button class="action-btn btn-settings" onclick="openModule('settingsModal')"><span>⚙</span>Data Manager</button>
 </div>
 
 <div class="container">
@@ -372,8 +372,8 @@ body * { visibility: hidden; }
 <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
 
 <div class="form-row">
-<div class="form-group"><label>दिनांक पासून</label><input type="date" class="form-control" id="repFromDate"></div>
-<div class="form-group"><label>दिनांक पर्यंत</label><input type="date" class="form-control" id="repToDate"></div>
+<div class="form-group"><label>दिनांक पासून *</label><input type="date" class="form-control" id="repFromDate"></div>
+<div class="form-group"><label>दिनांक पर्यंत *</label><input type="date" class="form-control" id="repToDate"></div>
 </div>
 
 <div class="form-group">
@@ -1602,6 +1602,7 @@ inputGrp.style.display = 'none';
 function executeSmartSearchOrReport() {
 var searchTxt = document.getElementById('smartSearchInput').value.trim();
 
+// थेट स्मार्ट सर्च बॉक्स वापरला असल्यास थेट पॉपअप उघडा
 if (searchTxt) {
 showSmartSearchResultModal(searchTxt);
 return;
@@ -1610,12 +1611,26 @@ return;
 generateGeneralReport();
 }
 
+// ** अहवाल जनरेट करताना दोन्ही दिनांक अनिवार्य करणे (दुरुस्त केले) **
 function generateGeneralReport() {
-var mainCat = document.getElementById('repMainCategory').value;
 var fDate = document.getElementById('repFromDate').value;
 var tDate = document.getElementById('repToDate').value;
 
-if (!mainCat) return showAlert('कृपया मुख्य घटक निवडा किंवा स्मार्ट शोध मध्ये टाईप करा.');
+// १. दोन्ही दिनांक निवडणे अनिवार्य (Mandatory)
+if (!fDate || !tDate) {
+return showAlert("कृपया आधी 'दिनांक पासून' आणि 'दिनांक पर्यंत' दोन्ही दिनांक निवडा!");
+}
+
+var isoFrom = normalizeDateToISO(fDate);
+var isoTo = normalizeDateToISO(tDate);
+
+// २. दिनांक पासून हा दिनांक पर्यंत नंतरचा नसावा
+if (isoFrom > isoTo) {
+return showAlert("'दिनांक पासून' हा दिनांक 'दिनांक पर्यंत' नंतरचा असू शकत नाही!");
+}
+
+var mainCat = document.getElementById('repMainCategory').value;
+if (!mainCat) return showAlert('कृपया मुख्य घटक निवडा.');
 
 if (mainCat === 'M.B.') {
 var sizeChoice = document.getElementById('repDynamicSelect1').value;
@@ -1747,7 +1762,7 @@ var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; paddin
 printA4Document(html);
 }
 
-// ** सविस्तर रिपोर्ट फिल्टर अहवाल - दिनांक कालावधी अचूक फिल्टर (दुरुस्त केले) **
+// ** सविस्तर रिपोर्ट फिल्टर अहवाल - दिनांक कालावधी अचूक फिल्टर (Strict Date Validation) **
 function generateAdvancedMBReport(sizeChoice, finalType, subTarget, subVal, fDate, tDate) {
 var allMBs = getData('mb_records');
 var stock = getAvailableStock();
@@ -1762,8 +1777,8 @@ if (finalType === 'AVAILABLE') {
 reportTitle = "सर्व उपलब्ध मोजमाप पुस्तिका अहवाल";
 filtered = stock.filter(function(s) {
 var itemDateISO = normalizeDateToISO(s.date);
-if (isoFrom && itemDateISO && itemDateISO < isoFrom) return false;
-if (isoTo && itemDateISO && itemDateISO > isoTo) return false;
+if (!itemDateISO) return false;
+if (itemDateISO < isoFrom || itemDateISO > isoTo) return false;
 if (sizeChoice === 'Small M.B.' && s.size !== 'लहान M.B.') return false;
 if (sizeChoice === 'Big M.B.' && s.size !== 'मोठी M.B.') return false;
 return true;
@@ -1774,8 +1789,8 @@ filtered = allMBs.filter(function(m) {
 var isGiven = (m.actionType === 'दिलेली M.B.' || m.actionType === 'दिलेली एमबी');
 if (!isGiven) return false;
 var itemDateISO = normalizeDateToISO(m.date);
-if (isoFrom && itemDateISO && itemDateISO < isoFrom) return false;
-if (isoTo && itemDateISO && itemDateISO > isoTo) return false;
+if (!itemDateISO) return false;
+if (itemDateISO < isoFrom || itemDateISO > isoTo) return false;
 if (sizeChoice === 'Small M.B.' && m.size !== 'लहान M.B.') return false;
 if (sizeChoice === 'Big M.B.' && m.size !== 'मोठी M.B.') return false;
 
@@ -1792,8 +1807,8 @@ filtered = allMBs.filter(function(m) {
 var isRcv = (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी');
 if (!isRcv) return false;
 var itemDateISO = normalizeDateToISO(m.date);
-if (isoFrom && itemDateISO && itemDateISO < isoFrom) return false;
-if (isoTo && itemDateISO && itemDateISO > isoTo) return false;
+if (!itemDateISO) return false;
+if (itemDateISO < isoFrom || itemDateISO > isoTo) return false;
 if (sizeChoice === 'Small M.B.' && m.size !== 'लहान M.B.') return false;
 if (sizeChoice === 'Big M.B.' && m.size !== 'मोठी M.B.') return false;
 return true;
@@ -1810,8 +1825,8 @@ for (var k in latestMap) { uniqueMBs.push(latestMap[k]); }
 
 filtered = uniqueMBs.filter(function(m) {
 var itemDateISO = normalizeDateToISO(m.date);
-if (isoFrom && itemDateISO && itemDateISO < isoFrom) return false;
-if (isoTo && itemDateISO && itemDateISO > isoTo) return false;
+if (!itemDateISO) return false;
+if (itemDateISO < isoFrom || itemDateISO > isoTo) return false;
 if (sizeChoice === 'Small M.B.' && m.size !== 'लहान M.B.') return false;
 if (sizeChoice === 'Big M.B.' && m.size !== 'मोठी M.B.') return false;
 return true;
@@ -1819,7 +1834,7 @@ return true;
 }
 
 if (filtered.length === 0) {
-var periodMsg = (fDate && tDate) ? ('निवडलेल्या कालावधीत (' + formatDateToDMY(fDate) + ' ते ' + formatDateToDMY(tDate) + ') ') : '';
+var periodMsg = 'निवडलेल्या कालावधीत (' + formatDateToDMY(fDate) + ' ते ' + formatDateToDMY(tDate) + ') ';
 return showAlert(periodMsg + 'कोणतीही नोंद आढळली नाही.');
 }
 
@@ -1834,12 +1849,12 @@ return 0;
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var rawName = (subVal && subVal !== 'सर्व') ? subVal.replace(/^श्री.?\s*/i, '') : "";
 var personHeaderName = rawName ? "श्री. " + rawName : "";
-var periodSubHeader = (fDate && tDate) ? ("कालावधी: " + formatDateToDMY(fDate) + " ते " + formatDateToDMY(tDate)) : "";
+var periodSubHeader = "कालावधी: " + formatDateToDMY(fDate) + " ते " + formatDateToDMY(tDate);
 
 var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
 '<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + reportTitle + '</h2></div>' +
 '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
-'<div>' + (personHeaderName ? '<strong style="font-size:11.5px;">' + personHeaderName + '</strong><br>' : '') + (periodSubHeader ? '<span style="font-weight:600; color:#0d47a1;">' + periodSubHeader + '</span><br>' : '') + 'अहवाल दिनांक: ' + todayStr + '</div>' +
+'<div>' + (personHeaderName ? '<strong style="font-size:11.5px;">' + personHeaderName + '</strong><br>' : '') + '<span style="font-weight:700; color:#0d47a1;">' + periodSubHeader + '</span><br>अहवाल दिनांक: ' + todayStr + '</div>' +
 '<div style="text-align:right;"><strong>एकूण संख्या: ' + filtered.length + '</strong></div>' +
 '</div></div>' +
 '<table class="print-table">' +
@@ -1872,8 +1887,9 @@ bills = bills.filter(function(b){ return b.je === jeName; });
 if (isoFrom || isoTo) {
 bills = bills.filter(function(b) {
 var bDateISO = normalizeDateToISO(b.date);
-if (isoFrom && bDateISO && bDateISO < isoFrom) return false;
-if (isoTo && bDateISO && bDateISO > isoTo) return false;
+if (!bDateISO) return false;
+if (isoFrom && bDateISO < isoFrom) return false;
+if (isoTo && bDateISO > isoTo) return false;
 return true;
 });
 }
@@ -2264,10 +2280,10 @@ container.innerHTML = '<div class="form-row-compact"><label>Income Tax</label><i
 
 '<div class="form-row-compact" id="otherRow1">' +
 '<div style="display:flex; align-items:center; justify-content:space-between;">' +
-'<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="' + newLabelId + '">Other-1</span></label>' +
+'<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="otherLabel1">Other-1</span></label>' +
 '<button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="नवीन कपात जोडा">+</button>' +
 '</div>' +
-'<input type="number" class="form-control calc-ded" id="' + newInputId + '" value="0" oninput="autoCalculateDeductions()">' +
+'<input type="number" class="form-control calc-ded" id="dedOther1" value="0" oninput="autoCalculateDeductions()">' +
 '</div>';
 
 var jeSel = document.getElementById('wJeSelect');
