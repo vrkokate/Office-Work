@@ -15,6 +15,7 @@ color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justif
 .hub-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; margin-top: 5px; }
 .hub-title-box { text-align: center; }
 .hub-title-box h1 { font-size: 26px; font-weight: 800; background: linear-gradient(180deg, #ffffff 40%, #00e5ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.profile-icon { font-size: 20px; cursor: pointer; background: rgba(0, 229, 255, 0.1); border: 1px solid #00e5ff; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
 
 .breadcrumb-bar {
 background: rgba(0, 229, 255, 0.1);
@@ -27,6 +28,11 @@ display: flex;
 align-items: center;
 gap: 6px;
 letter-spacing: 0.5px;
+}
+
+.breadcrumb-link {
+cursor: pointer;
+text-decoration: underline;
 }
 
 .tabs-wrapper { display: flex; flex-direction: column; gap: 5px; padding: 6px 8px; z-index: 5; }
@@ -175,7 +181,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 </div>
 </div>
 
-<!-- Setting टॅब क्लिक केल्यानंतर उघडणारे १२ नवीन टॅब्सचे मॉडेल -->
+<!-- Setting टॅब मॉडेल -->
 <div id="settingModal" class="modal-overlay" style="z-index:3000;">
 <div class="modal-card" style="max-width:440px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:12px;">
@@ -203,7 +209,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 </div>
 </div>
 
-<!-- बॅकअप व रेस्टोअर मोडल (Backup Tab) -->
+<!-- बॅकअप व रेस्टोअर मोडल -->
 <div id="backupModal" class="modal-overlay" style="z-index:3000;">
 <div class="modal-card" style="max-width:380px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:12px;">
@@ -269,12 +275,11 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div class="profile-icon" onclick="openProfileModal()" title="माहिती व संपर्क">👤</div>
 </div>
 
-<!-- ब्रेडक्रंब पाथ लाईन (वर्तमान मार्गदर्शिका) -->
+<!-- ब्रेडक्रंब पाथ लाईन -->
 <div class="breadcrumb-bar">
-    <span>🏠 मुख्य पृष्ठ</span> &gt; <span>डैशबोर्ड</span>
+    <span class="breadcrumb-link" onclick="showDigitalHub()">🏠 मुख्य पृष्ठ</span> &gt; <span>डैशबोर्ड</span>
 </div>
 
-<!-- मुखपृष्ठावर १२ टॅब्स - M.B. ला showMBSystem() आणि Form ला form.html लिंक केले आहे -->
 <div class="tabs-wrapper">
 <div style="display:flex; justify-content:center; gap:5px;">
 <div class="tab-card btn-est" onclick="showAlert('Est. टॅब')">Est.</div>
@@ -295,7 +300,6 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 </div>
 
 <div class="center-stage">
-<!-- फिरता सुविचार बॉक्स -->
 <div class="suvichar-running-box">
 <marquee behavior="scroll" direction="left" scrollamount="4" scrolldelay="0">
 <span class="suvichar-text" id="dynamicSuvichar">✨ कष्टाशिवाय यशाला मोल नाही, सातत्य आणि प्रामाणिकपणा हीच यशाची खरी गुरुकिल्ली आहे! ✨</span>
@@ -340,7 +344,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 </div>
 
 <div class="breadcrumb-bar">
-    <span>🏠 मुखपृष्ठ</span> &gt; <span>M.B. नियंत्रण प्रणाली</span>
+    <span class="breadcrumb-link" onclick="showDigitalHub()">🏠 मुखपृष्ठ</span> &gt; <span>M.B. नियंत्रण प्रणाली</span>
 </div>
 
 <div class="action-grid">
@@ -531,7 +535,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <button class="btn-report" style="background:#d32f2f; margin-top:10px;" onclick="deleteSelectedData()">निवडलेली माहिती कायमची हटवा</button>
 </div></div>
 
-<!-- तपशील पॉप-अप (स्क्रीन फिट व स्क्रोल करण्यायोग्य) -->
+<!-- तपशील पॉप-अप -->
 <div id="detailModal" class="modal-overlay"><div class="modal-card" style="max-width:95vw; width:450px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:10px;">
 <h3 id="detailModalTitle" style="font-size:14px; color:#0d47a1;">तपशील</h3>
@@ -544,7 +548,7 @@ div { page-break-inside: avoid; page-break-after: avoid; }
 <div id="printableArea" style="display:none;"></div>
 </div>
 
-<!-- बिल विझार्ड मॉडेल (4-Step) -->
+<!-- बिल विझार्ड मॉडेल (3-Step) -->
 <div id="wizardModal" class="wizard-overlay"><div class="wizard-card">
 <div class="wizard-header" style="display:flex; justify-content:space-between; align-items:center; position:relative;">
 <h3 id="wizardTitle" style="font-size:15px; font-weight:700; color:#333;">नवीन देयक नोंदवा</h3>
@@ -988,7 +992,10 @@ document.getElementById('quickModalTitle').innerText = title;
 document.getElementById('quickModalBody').innerHTML = listHTML;
 }
 
-function closeQuickInfoModal() { document.getElementById('quickInfoModal').style.display = 'none'; }
+function closeQuickInfoModal() { 
+    var modal = document.getElementById('quickInfoModal');
+    if (modal) modal.style.display = 'none'; 
+}
 
 function printQuickModalReport() {
 var contentTitle = document.getElementById('quickModalTitle').innerText;
@@ -1169,7 +1176,7 @@ no = document.getElementById('newMBNo').value.trim();
 if (!no) return showAlert('कृपया M.B. क्रमांक भरा.');
 
 var recType = document.getElementById('mbReceivedType').value;
-if (!recType) return alert('कृपया नवीन किंवा चालू पर्याय निवडा.');
+if (!recType) return showAlert('कृपया नवीन किंवा चालू पर्याय निवडा.');
 
 if (recType === 'नवीन') {
 subDetail = document.getElementById('bhandarpalNameInput').value.trim();
@@ -1177,7 +1184,7 @@ if (!subDetail) return showAlert('कृपया भंडारपाळाच
 srcText = 'भंडारपाल (' + subDetail + ')';
 } else {
 var chalooSrc = document.getElementById('mbChalooSource').value;
-if (!chalooSrc) return alert('कृपया चालू स्रोत निवडा.');
+if (!chalooSrc) return showAlert('कृपया चालू स्रोत निवडा.');
 
 if (chalooSrc === 'JE') {
 subDetail = document.getElementById('receivedSubSelect').value;
@@ -1869,7 +1876,7 @@ getData('je_records').forEach(function(j){ jeSel.add(new Option(j.name, j.name))
 }
 }
 
-/* ==================== 4-Step Bill Wizard & Register ==================== */
+/* ==================== 3-Step Bill Wizard & Register ==================== */
 function refreshBillDashboard() {
 var bills = getData('dmbms_bills');
 var totalBills = bills.length;
@@ -1924,7 +1931,6 @@ var container = document.getElementById('billListContainer');
 if(container) container.innerHTML = listHTML;
 }
 
-/* विशिष्ट बिलाच्या सर्व कपात बाबींचा तपशील व डायनॅमिक इतर कपातीसह पॉपअप */
 function openBillDeductionDetail(idx) {
 var b = getData('dmbms_bills')[idx];
 if(!b) return;
@@ -1965,7 +1971,6 @@ document.getElementById('detailModalBody').innerHTML = tableHTML;
 document.getElementById('detailModal').style.display = 'flex';
 }
 
-/* कपात बाबींच्या तपशीलासह सर्व टॅब तपशील पॉपअप */
 function openDetailPopup(type) {
 var bills = getData('dmbms_bills');
 var title = "";
@@ -2344,11 +2349,20 @@ refreshBillDashboard();
 
 /* सेटिंग्स व बॅकअप लॉजिक */
 function downloadBackup() {
-var allData = { je_records: getData('je_records'), mb_records: getData('mb_records'), work_records: getData('work_records'), bill_records: getData('dmbms_bills'), assign_records: getData('assign_records') };
+var allData = { 
+    je_records: getData('je_records'), 
+    mb_records: getData('mb_records'), 
+    work_records: getData('work_records'), 
+    dmbms_bills: getData('dmbms_bills'), 
+    assign_records: getData('assign_records') 
+};
 var blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
-var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-a.download = 'MBMS_Backup_' + new Date().toISOString().slice(0, 10) + '.json'; a.click();
+var a = document.createElement('a'); 
+a.href = URL.createObjectURL(blob);
+a.download = 'MBMS_Backup_' + new Date().toISOString().slice(0, 10) + '.json'; 
+a.click();
 }
+
 function restoreBackup(evt) {
 var file = evt.target.files[0]; if (!file) return;
 var reader = new FileReader();
@@ -2358,26 +2372,29 @@ var d = JSON.parse(e.target.result);
 if(d.je_records) setData('je_records', d.je_records);
 if(d.mb_records) setData('mb_records', d.mb_records);
 if(d.work_records) setData('work_records', d.work_records);
-if(d.bill_records) setData('dmbms_bills', d.bill_records);
+if(d.dmbms_bills) setData('dmbms_bills', d.dmbms_bills);
+else if(d.bill_records) setData('dmbms_bills', d.bill_records);
 if(d.assign_records) setData('assign_records', d.assign_records);
-showAlert('डेटा पूर्ववत यशस्वी!'); refreshAll(); closeBackupModal();
-} catch(err) { alert('चुकीची फाईल.'); }
+showAlert('डेटा पूर्ववत यशस्वी!'); 
+refreshAll(); 
+closeBackupModal();
+} catch(err) { showAlert('चुकीची फाईल किंवा फॉरमॅट.'); }
 };
 reader.readAsText(file);
 }
-function toggleSelectAll(master) { document.querySelectorAll('.del-chk').forEach(function(c){ c.checked = master.checked; }); }
-function deleteSelectedData() {
-var selected = []; document.querySelectorAll('.del-chk:checked').forEach(function(c){ selected.push(c.value); });
-if (selected.length === 0) return showAlert('किमान एक निवडा.');
-if (confirm('नष्ट करायचे का?')) {
-selected.forEach(function(key){ localStorage.removeItem(key); });
-showAlert('हटवले!'); refreshAll(); closeModule('settingsModal');
-}
-}
 
-function closeQuickInfoModal() {
-    var modal = document.getElementById('quickInfoModal');
-    if (modal) modal.style.display = 'none';
+function toggleSelectAll(master) { document.querySelectorAll('.del-chk').forEach(function(c){ c.checked = master.checked; }); }
+
+function deleteSelectedData() {
+var selected = []; 
+document.querySelectorAll('.del-chk:checked').forEach(function(c){ selected.push(c.value); });
+if (selected.length === 0) return showAlert('किमान एक पर्याय निवडा.');
+if (confirm('निवडलेली माहिती कायमची नष्ट करायची का?')) {
+selected.forEach(function(key){ localStorage.removeItem(key); });
+showAlert('माहिती यशस्वीरित्या हटवली!'); 
+refreshAll(); 
+closeModule('settingsModal');
+}
 }
 </script>
 </body>
