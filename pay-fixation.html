@@ -1515,8 +1515,8 @@
                 <td>${item.empDesignation || '-'}</td>
                 <td style="text-align:center; white-space:nowrap;">
                     <button type="button" class="act-btn act-btn-view" onclick="viewSavedRecord(${item.id})" title="अहवाल पहा">👁️ पहा</button>
-                    <button type="button" class="act-btn act-btn-edit" onclick="editSavedRecord(${item.id})" title="माहिती दुरुस्त करा">✏️️</button>
-                    <button type="button" class="act-btn act-btn-del" onclick="deleteSavedRecord(${item.id}, '${item.empName}')" title="नोंद हटवा">🗑️️</button>
+                    <button type="button" class="act-btn act-btn-edit" onclick="editSavedRecord(${item.id})" title="माहिती दुरुस्त करा">✏️</button>
+                    <button type="button" class="act-btn act-btn-del" onclick="deleteSavedRecord(${item.id}, '${item.empName}')" title="नोंद हटवा">🗑️</button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -1897,7 +1897,7 @@
         } else {
             card.classList.remove('card-filled');
             card.classList.add('card-pending');
-            status.textContent = "⚠️️ ही माहिती भरणे बाकी आहे (कृपया भरा)";
+            status.textContent = "⚠️ ही माहिती भरणे बाकी आहे (कृपया भरा)";
             badge.textContent = "!";
             return false;
         }
@@ -2143,7 +2143,7 @@
         "S-27": [118500, 122100, 125800, 129600, 133500, 137500, 141600, 145800, 150200, 154700, 159300, 164100, 169000, 174100, 179300, 184700, 190200, 195900, 201800, 207900, 214100],
         "S-28": [124800, 128500, 132400, 136400, 140500, 144700, 149000, 153500, 158100, 162800, 167700, 172700, 177900, 183200, 188700, 194400, 200200, 206200, 212400, 216600],
         "S-29": [131100, 135000, 139100, 143300, 147600, 152000, 156600, 161300, 166100, 171100, 176200, 181500, 186900, 192500, 198300, 204200, 210300, 212400],
-        "S-30": [144200, 148500, 153000, 157600, 162300, 167200, 172200, 177400, 182700, 188200, 193800, 199600, 205600, 211800, 218200],
+        "S-30": [144200, 148500, 153000, 157600, 162300, 167200, 172200, 177400, 182700, 188200, 193800, 1218200, 205600, 211800, 218200],
         "S-31": [182200, 187700, 193300, 199100, 205100, 211300, 217600, 224100]
     };
 
@@ -2707,7 +2707,7 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (सुधारित 6th to 7th Fitment लॉजिकसह)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (सुधारित विकल्प व पदोन्नती लॉजिकसह)
     // =========================================================================
     function processFixation() {
         try {
@@ -3087,10 +3087,10 @@
                 }
                 else if (ev.type === 'COMMISSION_7TH') {
                     currentCommission = '7th';
-                    let totalBefore7th = currentBasic + prevGpForSheet; // 🌟 सुधारित नियम: Pay in Band + Grade Pay वर २.५७ फिडमेंट
+                    let totalBefore7th = currentBasic; // In 6th, currentBasic is already Pay in Band + Grade Pay
                     currentLevel = mapGpTo7thLevel(prevGpForSheet);
                     let fitmentResult = fitInMatrix(currentLevel, totalBefore7th * 2.57);
-                    let oldB = currentBasic;
+                    let oldB = currentBasic - prevGpForSheet;
                     let oldGP = prevGpForSheet;
 
                     currentBasic = fitmentResult.basic;
@@ -3203,10 +3203,13 @@
                     if (currentCommission === '7th') {
                         let lvlMatch = b.scale.match(/S-(\d+)/i);
                         let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
+                        
+                        // 🌟 विकल्पानुसार अचूक फिक्सेशन: DNI वर नियमित वेतनवाढ + पदोन्नती/MACP ची वाढ (नियम ११(१) / नियम १३)
                         let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
                         let currIdx = cellsLower.indexOf(lBasic);
-                        if (currIdx === -1) currIdx = 0;
+                        if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
 
+                        // DNI वर एक वाढ (Annual Increment) + एक पदोन्नती वाढ (Promotion Increment) = एकूण २ टप्पे पुढे
                         let notionalIdx = Math.min(currIdx + 2, cellsLower.length - 1);
                         let notionalPay = cellsLower[notionalIdx];
 
@@ -3219,10 +3222,13 @@
                     } else if (currentCommission === '6th') {
                         let gpMatch = b.scale.match(/GP\s*(\d+)/i);
                         currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
+                        
+                        // 6th CPC Rule 13 Option from DNI: lower post annual increment + 3% promotion increment
                         let inc1 = Math.ceil((lBasic * 0.03) / 10) * 10;
                         let basicAfterInc1 = lBasic + inc1;
                         let inc2 = Math.ceil((basicAfterInc1 * 0.03) / 10) * 10;
                         currentBasic = basicAfterInc1 + inc2;
+
                         let ep = get6thEntryPay(b.scale, currentGP);
                         if (ep && currentBasic < (ep + currentGP)) currentBasic = ep + currentGP;
                         currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
