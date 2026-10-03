@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>वेतन निश्चिती प्रणाली (Pay Fixation System)</title>
-    <!-- APK (App) मध्ये थेट PDF फाईल तयार करण्यासाठी लायब्ररी -->
+    <!-- 🌟 APK (App) आणि Browser मध्ये थेट PDF तयार करण्यासाठी लायब्ररी -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
@@ -18,6 +18,7 @@
             --text-main: #263238;
         }
 
+        /* पेज स्क्रीनबाहेर आडवे सरकणे १००% रोखणे */
         html, body {
             width: 100%;
             max-width: 100vw;
@@ -174,7 +175,7 @@
         }
         .reset-btn:hover { background-color: #546e7a; }
 
-        /* जतन केलेल्या नोंदी विभाग (Saved Records) */
+        /* जतन केलेल्या नोंदी विभाग (Saved Records Box) */
         .saved-records-card {
             background: #ffffff;
             border: 1.5px solid #b0bec5;
@@ -654,7 +655,7 @@
 
         .hidden { display: none !important; }
 
-        /* शासकीय वेतन निश्चिती विवरणपत्र (Illustration Sheet) स्टाईल */
+        /* 🌟 शासकीय वेतन निश्चिती विवरणपत्र (Illustration Sheet) स्टाईल */
         .ill-table {
             width: 100%;
             border-collapse: collapse;
@@ -2200,6 +2201,7 @@
         return Math.max(stageNextAbove, bunchingStage);
     }
 
+    // 🌟 अधिकृत शासकीय विवरणपत्र ओपन करणे
     function openCalculationSheet(dataIndex) {
         let data = globalCalcDataList[dataIndex];
         if (!data) return;
@@ -2435,7 +2437,8 @@
             }
         }
 
-        let cleanStr = scaleStr.replace(/\(.*?\)/g, '').replace(/PB\s*-\s*\d+/gi, '').replace(/श्रेणी\s*-\s*\d+/gi, '');
+        let cleanStr = scaleStr.replace(/\(.*?\)/g, '');
+        cleanStr = cleanStr.replace(/PB\s*-\s*\d+/gi, '').replace(/श्रेणी\s*-\s*\d+/gi, '');
         let matches = cleanStr.match(/\d+/g);
         if (!matches || matches.length < 3) return [19900, 20500, 21100, 21700, 22400];
 
@@ -2702,7 +2705,7 @@
             advisorBox.innerHTML = `✓ <b>उत्तम निवड!</b> आपण निवडलेला विकल्प दिनांक (${rec.bestFormatted}) आर्थिकदृष्ट्या सर्वाधिक फायदेशीर आहे.<br><small>${rec.adviceHtml}</small>`;
         } else {
             advisorBox.className = "option-advisor-box advisor-warn";
-            advisorBox.innerHTML = `⚠️ <b>लक्ष द्या:</b> आपण निवडलेला विकल्प दिनांक आर्थिकदृष्ट्या तोट्याचा ठरू शकतो!<br>${rec.adviceHtml}<br><button type="button" class="advisor-btn" onclick="applySuggestedOptionDate(${idx}, '${rec.bestIso}', '${rec.bestFormatted}')">👉 हा फायदेशीर दिनांक [${rec.bestFormatted}] लागू करा</button>`;
+            advisorBox.innerHTML = `⚠️️ <b>लक्ष द्या:</b> आपण निवडलेला विकल्प दिनांक आर्थिकदृष्ट्या तोट्याचा ठरू शकतो!<br>${rec.adviceHtml}<br><button type="button" class="advisor-btn" onclick="applySuggestedOptionDate(${idx}, '${rec.bestIso}', '${rec.bestFormatted}')">👉 हा फायदेशीर दिनांक [${rec.bestFormatted}] लागू करा</button>`;
         }
     }
 
@@ -3293,6 +3296,7 @@
                 if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
+
                     let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
                     let currIdx = cellsLower.indexOf(currentBasic);
                     if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
@@ -3374,6 +3378,7 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // 🌟 'एकूण वेतन' रकान्यात केवळ संख्या आणि क्लिक करताच थेट पॉप-अप ओपन होणे
     function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp, evType, calcData) {
         let total = basic + (gp > 0 ? gp : 0);
         let gpDisplay = gp > 0 ? gp : "-";
