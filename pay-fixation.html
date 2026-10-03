@@ -2187,14 +2187,27 @@
         let contentDiv = document.getElementById('illustrationSheetContent');
         let titleHeader = document.getElementById('illustrationModalTitle');
 
+        let gradePayHtml = (data.gp !== undefined && data.gp > 0) ? `<div><b>जुना ग्रेड पे:</b> रु. ${data.gp}</div>` : ((data.gp6th !== undefined && data.gp6th > 0) ? `<div><b>जुना ग्रेड पे:</b> रु. ${data.gp6th}</div>` : '');
+
+        let empInfoBox = `
+            <div style="background: #f4fbf4; border: 1px solid #a5d6a7; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; font-size: 11.5px; line-height: 1.5; color: #1b5e20; text-align: left;">
+                <div><b>कर्मचाऱ्याचे नाव:</b> ${data.empName || '-'}</div>
+                <div><b>पदनाम:</b> ${data.designation || '-'}</div>
+                <div><b>नियुक्ती दिनांक:</b> ${data.joinDate || '-'}</div>
+                <div><b>जुन्या वेतन आयोगाची वेतनश्रेणी:</b> ${data.existingScale || '-'}</div>
+                ${gradePayHtml}
+            </div>
+        `;
+
         if (data.commission === '5th') {
-            if (titleHeader) titleHeader.textContent = "पाचवा वेतन आयोग वेतन निश्चिती";
+            if (titleHeader) titleHeader.textContent = "महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, १९९८ - पाचवा वेतन आयोग वेतन निश्चिती विवरणपत्र";
             contentDiv.innerHTML = `
                 <div class="ill-print-sheet">
-                    <div style="text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin-bottom: 10px;">
-                        <h2 style="font-size: 17px; color: #1b5e20; margin: 0 0 3px 0; font-weight: bold; text-align: center;">पाचवा वेतन आयोग वेतन निश्चिती</h2>
-                        <div style="font-size: 13px; font-weight: bold; color: #263238; margin-bottom: 2px; text-align: center;">महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, १९९८</div>
+                    <div style="text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin-bottom: 8px;">
+                        <h2 style="font-size: 15px; color: #1b5e20; margin: 0 0 2px 0; font-weight: bold; text-align: center;">महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, १९९८</h2>
+                        <div style="font-size: 12.5px; font-weight: bold; color: #263238; text-align: center;">पाचवा वेतन आयोग वेतन निश्चिती विवरणपत्र</div>
                     </div>
+                    ${empInfoBox}
                     <table class="ill-table">
                         <tr><td class="col-desc">Existing Scale of Pay</td><td class="col-dots">...</td><td class="col-val"><input type="text" class="ill-input ill-scale-input" value="${data.existingScale}"></td></tr>
                         <tr><td class="col-desc">Proposed Scale of Pay</td><td class="col-dots">...</td><td class="col-val"><input type="text" class="ill-input ill-scale-input" value="${data.proposedScale}"></td></tr>
@@ -2204,13 +2217,15 @@
                 </div>
             `;
         } else if (data.commission === '6th') {
-            if (titleHeader) titleHeader.textContent = "सहावा वेतन आयोग वेतन निश्चिती (ग्रेड पे सुधारणा सोय)";
+            if (titleHeader) titleHeader.textContent = "महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, २००६ - सहावा वेतन आयोग वेतन निश्चिती विवरणपत्र";
             contentDiv.innerHTML = `
                 <div class="ill-print-sheet">
-                    <div style="text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin-bottom: 10px;">
-                        <h2 style="font-size: 17px; color: #1b5e20; margin: 0 0 3px 0; font-weight: bold; text-align: center;">सहावा वेतन आयोग वेतन निश्चिती</h2>
-                        <div style="font-size: 12px; color: #b71c1c; font-weight:bold; margin-top:4px;">💡 खालील ग्रेड पे (Grade Pay) आवश्यकतेनुसार बदलू शकता (उदा. 5400 ऐवजी 6600):</div>
+                    <div style="text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin-bottom: 8px;">
+                        <h2 style="font-size: 15px; color: #1b5e20; margin: 0 0 2px 0; font-weight: bold; text-align: center;">महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, २००६</h2>
+                        <div style="font-size: 12.5px; font-weight: bold; color: #263238; text-align: center;">सहावा वेतन आयोग वेतन निश्चिती विवरणपत्र</div>
+                        <div style="font-size: 11px; color: #b71c1c; font-weight:bold; margin-top:3px;">💡 खालील ग्रेड पे (Grade Pay) आवश्यकतेनुसार बदलू शकता:</div>
                     </div>
+                    ${empInfoBox}
                     <table class="ill-table">
                         <tr><td class="col-desc">१. ५व्या आयोगातील मूळ वेतन (Basic Pay)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_6th_bp" class="ill-input ill-num-input" value="${data.existingPay}" readonly></td></tr>
                         <tr><td class="col-desc">२. १.८६ गुणाकार (Basic × 1.86)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_6th_mult" class="ill-input ill-num-input" value="${data.multBasic}" readonly></td></tr>
@@ -2220,13 +2235,14 @@
                 </div>
             `;
         } else if (data.commission === '7th') {
-            if (titleHeader) titleHeader.textContent = "सातवा वेतन आयोग वेतन निश्चिती";
+            if (titleHeader) titleHeader.textContent = "महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, २०१९ - सातवा वेतन आयोग वेतन निश्चिती विवरणपत्र";
             contentDiv.innerHTML = `
                 <div class="ill-print-sheet">
-                    <div style="text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin-bottom: 10px;">
-                        <h2 style="font-size: 17px; color: #1b5e20; margin: 0 0 3px 0; font-weight: bold; text-align: center;">सातवा वेतन आयोग वेतन निश्चिती</h2>
-                        <div style="font-size: 13px; font-weight: bold; color: #263238; margin-bottom: 2px; text-align: center;">महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, २०१९ (०१-०१-२०१६ पे-मॅट्रिक्स)</div>
+                    <div style="text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin-bottom: 8px;">
+                        <h2 style="font-size: 15px; color: #1b5e20; margin: 0 0 2px 0; font-weight: bold; text-align: center;">महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, २०१९</h2>
+                        <div style="font-size: 12.5px; font-weight: bold; color: #263238; text-align: center;">सातवा वेतन आयोग वेतन निश्चिती विवरणपत्र (०१-०१-२०१६ पे-मॅट्रिक्स)</div>
                     </div>
+                    ${empInfoBox}
                     <table class="ill-table">
                         <tr><td class="col-desc">१. ३१-१२-२०१५ रोजीचे मूळ वेतन (६वा आयोग)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" class="ill-input ill-num-input" value="${data.basic6th}"></td></tr>
                         <tr><td class="col-desc">२. ग्रेड पे (Grade Pay)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" class="ill-input ill-num-input" value="${data.gp6th}"></td></tr>
@@ -2669,12 +2685,12 @@
     }
 
     // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (try...catch त्रुटी सुरक्षेशी)
+    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया
     // =========================================================================
     function processFixation() {
         try {
             const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
-            const designation = document.getElementById('empDesignation').value.trim() || '-';
+            const initialDesignation = document.getElementById('empDesignation').value.trim() || '-';
             const joinDateInput = document.getElementById('empJoinDate').value;
             const scale = document.getElementById('currentPayScale').value;
             let basic = parseFloat(document.getElementById('basicPay').value);
@@ -2702,7 +2718,7 @@
             } else if (startCommission === '6th') {
                 initialLevel = mapGpTo7thLevel(gradePay);
             } else {
-                let gp = getGradePayFrom4thOr5th(scale, designation);
+                let gp = getGradePayFrom4thOr5th(scale, initialDesignation);
                 initialLevel = mapGpTo7thLevel(gp);
             }
 
@@ -2768,11 +2784,19 @@
                 }
             }
 
+            let finalDesignation = initialDesignation;
+            let sortedBenefitsForDesig = [...activeBenefits].sort((a, b) => a.date - b.date);
+            sortedBenefitsForDesig.forEach(b => {
+                if (b.type === 'Promotion' && b.post) {
+                    finalDesignation = b.post;
+                }
+            });
+
             let benefitSummaryDisplay = summaryBenefitsText.length > 0 ? summaryBenefitsText.join(" | ") : "कोणताही लाभ नाही";
 
             const summaryHtml = `
                 <div><b>कर्मचाऱ्याचे नाव:</b> ${name}</div>
-                <div><b>पदनाम:</b> ${designation}</div>
+                <div><b>पदनाम:</b> ${finalDesignation}</div>
                 <div><b>नियुक्ती दिनांक:</b> ${joinDateFormatted}</div>
                 <div><b>आरंभीचा आयोग व वेतनश्रेणी:</b> ${startCommission} आयोग | ${scale}</div>
                 <div><b>आर्थिक लाभ तपशील:</b> ${benefitSummaryDisplay}</div>
@@ -2959,12 +2983,15 @@
             let lowerMatrixIndex = currentMatrixIndex;
 
             events.forEach(ev => {
+                let prevScaleForSheet = currentScaleLabel;
+                let prevGpForSheet = currentGP;
+
                 if (ev.type === 'INITIAL') {
                     addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
                 }
                 else if (ev.type === 'COMMISSION_5TH') {
                     currentCommission = '5th';
-                    let oldScale = currentScaleLabel;
+                    let oldScale = prevScaleForSheet;
                     let newScale = get5thScaleFrom4th(oldScale);
                     currentScaleLabel = newScale;
                     
@@ -2997,7 +3024,7 @@
                     let calcData5th = {
                         commission: '5th',
                         empName: name,
-                        designation: designation,
+                        designation: finalDesignation,
                         joinDate: joinDateFormatted,
                         existingScale: oldScale,
                         proposedScale: newScale,
@@ -3011,7 +3038,7 @@
                     currentCommission = '6th';
                     let preBasic = currentBasic;
                     let multB = Math.round((currentBasic * 1.86) / 10) * 10;
-                    let gp6th = getGradePayFrom4thOr5th(currentScaleLabel, designation);
+                    let gp6th = getGradePayFrom4thOr5th(prevScaleForSheet, initialDesignation);
                     currentGP = gp6th;
                     currentBasic = multB + gp6th;
                     currentScaleLabel = (gp6th >= 4200) ? `PB-2 : 9300 - 34800 (GP ${gp6th})` : `PB-1 : 5200 - 20200 (GP ${gp6th})`;
@@ -3024,7 +3051,10 @@
                     let calcData6th = {
                         commission: '6th',
                         empName: name,
-                        designation: designation,
+                        designation: finalDesignation,
+                        joinDate: joinDateFormatted,
+                        existingScale: prevScaleForSheet,
+                        proposedScale: currentScaleLabel,
                         existingPay: preBasic,
                         multBasic: multB,
                         gp: gp6th,
@@ -3036,10 +3066,10 @@
                 else if (ev.type === 'COMMISSION_7TH') {
                     currentCommission = '7th';
                     let totalBefore7th = currentBasic;
-                    currentLevel = mapGpTo7thLevel(currentGP);
+                    currentLevel = mapGpTo7thLevel(prevGpForSheet);
                     let fitmentResult = fitInMatrix(currentLevel, totalBefore7th * 2.57);
-                    let oldB = currentBasic - currentGP;
-                    let oldGP = currentGP;
+                    let oldB = currentBasic - prevGpForSheet;
+                    let oldGP = prevGpForSheet;
 
                     currentBasic = fitmentResult.basic;
                     currentMatrixIndex = fitmentResult.index;
@@ -3051,18 +3081,22 @@
                     lowerGP = 0;
                     lowerMatrixIndex = currentMatrixIndex;
 
-                    currentScaleLabel = getCleanScaleLabel(scale, currentCommission, currentLevel);
+                    let newScale7th = getCleanScaleLabel(scale, currentCommission, currentLevel);
+                    currentScaleLabel = newScale7th;
 
                     let calcData7th = {
                         commission: '7th',
                         empName: name,
-                        designation: designation,
-                        basic6th: oldB,
+                        designation: finalDesignation,
+                        joinDate: joinDateFormatted,
+                        existingScale: prevScaleForSheet,
                         gp6th: oldGP,
+                        basic6th: oldB,
                         total6th: totalBefore7th,
                         fitmentCalc: Math.round(totalBefore7th * 2.57),
                         level: currentLevel,
-                        finalBasic7th: currentBasic
+                        finalBasic7th: currentBasic,
+                        proposedScale: newScale7th
                     };
 
                     addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, calcData7th);
