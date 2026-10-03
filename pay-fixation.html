@@ -2138,7 +2138,7 @@
 
     function getGradePayFrom4thOr5th(scaleStr) {
         if (!scaleStr) return 1900;
-        if (scaleStr.includes("8000")) return 5400;
+        if (scaleStr.includes("8000")) return 6600; // सुधारीत: रु. 8000-13500 श्रेणीसाठी योग्य GP 6600 (PB-3) लागू केला आहे
         if (scaleStr.includes("2550") || scaleStr.includes("750")) return 1300;
         if (scaleStr.includes("2610") || scaleStr.includes("775")) return 1400;
         if (scaleStr.includes("2650") || scaleStr.includes("800")) return 1600;
@@ -3118,6 +3118,9 @@
                 let gp6th = getGradePayFrom4thOr5th(currentScaleLabel);
                 currentGP = gp6th;
                 currentScaleLabel = (gp6th >= 4200) ? `PB-2 : 9300 - 34800 (GP ${gp6th})` : `PB-1 : 5200 - 20200 (GP ${gp6th})`;
+                if (gp6th >= 5400) {
+                    currentScaleLabel = `PB-3 : 15600 - 39100 (GP ${gp6th})`;
+                }
                 lowerBasic = currentBasic;
                 lowerGP = currentGP;
 
