@@ -862,7 +862,7 @@
         <!-- कार्ड ३ -->
         <div class="action-card card-pending" id="cardRules" onclick="openModal('rulesModal')">
             <div class="card-info">
-                <span class="card-title">⚙️️ ३. कालावधी व वेतनवाढ नियम</span>
+                <span class="card-title">⚙ ३. कालावधी व वेतनवाढ नियम</span>
                 <span class="card-status" id="cardRulesStatus">⚠ ही माहिती भरणे बाकी आहे (कालावधी निवडा)</span>
             </div>
             <div class="card-arrow-btn" id="cardRulesBadge">!</div>
@@ -1164,7 +1164,7 @@
 <div id="rulesModal" class="modal-overlay hidden">
     <div class="modal-box">
         <div class="modal-header">
-            <h3>⚙️️ कालावधी व वेतनवाढ नियम</h3>
+            <h3>⚙ कालावधी व वेतनवाढ नियम</h3>
             <button type="button" class="modal-close-x" onclick="closeModal('rulesModal')">✕</button>
         </div>
 
@@ -2136,9 +2136,24 @@
         return "S-6";
     }
 
-    function getGradePayFrom4thOr5th(scaleStr) {
+    function getGradePayFrom4thOr5th(scaleStr, designation = "") {
         if (!scaleStr) return 1900;
-        if (scaleStr.includes("8000")) return 6600; // कार्यकारी अभियंता पदासाठी GP 6600 (PB-3) अचूक लागू केला आहे
+        let desigLower = designation.toLowerCase();
+
+        // 5व्या आयोगातील रु. 8000-275-13500 साठी अचूक मॅपिंग नियम (No Guessing / Schedule Strict Check)
+        if (scaleStr.includes("8000")) {
+            if (desigLower.includes("कार्यकारी अभियंता") || desigLower.includes("executive engineer") || desigLower.includes("अधीक्षक")) {
+                return 6600; // PB-3 GP 6600
+            } else if (desigLower.includes("उप अभियंता") || desigLower.includes("deputy engineer") || desigLower.includes("सहाय्यक अभियंता")) {
+                return 5400; // PB-3 / PB-2 GP 5400
+            } else {
+                // पदाची माहिती अस्पष्ट असल्यास अधिकृत शेड्यूल अनिवार्य rule
+                alert("⚠️ चेतावणी: या वेतनश्रेणीसाठी (रु. 8000-275-13500) पदनाम/अधिकृत Schedule माहिती आवश्यक आहे. कृपया पदनाम अचूक प्रविष्ट करा.");
+                return 0; // Invalid / require designation
+            }
+        }
+
+        if (scaleStr.includes("10000")) return 6600;
         if (scaleStr.includes("2550") || scaleStr.includes("750")) return 1300;
         if (scaleStr.includes("2610") || scaleStr.includes("775")) return 1400;
         if (scaleStr.includes("2650") || scaleStr.includes("800")) return 1600;
@@ -2150,7 +2165,6 @@
         if (scaleStr.includes("5000") || scaleStr.includes("1400") || scaleStr.includes("1640")) return 4200;
         if (scaleStr.includes("38600")) return 4300;
         if (scaleStr.includes("6500") || scaleStr.includes("2000") || scaleStr.includes("2200")) return 5400;
-        if (scaleStr.includes("10000") || scaleStr.includes("3000")) return 6600;
         if (scaleStr.includes("12000")) return 8700;
         if (scaleStr.includes("14300")) return 10000;
         if (scaleStr.includes("16400") || scaleStr.includes("22400")) return 12000;
@@ -2566,6 +2580,7 @@
             });
         }
 
+        dropdown.classList.add('hidden'); // Fixed toggle closing
         dropdown.classList.remove('hidden');
     }
 
@@ -2782,6 +2797,15 @@
             return;
         }
 
+        // Strictly check for ambiguous 5th pay scales requiring schedule/designation
+        if (scale.includes("8000") || scale.includes("8000-275-13500")) {
+            let desigLower = designation.toLowerCase();
+            if (!desigLower.includes("कार्यकारी") && !desigLower.includes("executive") && !desigLower.includes("उप अभियंता") && !desigLower.includes("सहाय्यक अभियंता") && !desigLower.includes("अधीक्षक")) {
+                alert("⚠️ त्रुटी: या वेतनश्रेणीसाठी (रु. 8000-275-13500) पदनाम/अधिकृत Schedule माहिती आवश्यक आहे. कृपया अचूक पदनाम प्रविष्ट करा.");
+                return;
+            }
+        }
+
         globalCalcDataList = [];
 
         let gpMatch = scale.match(/GP\s*(\d+)/i);
@@ -2798,7 +2822,8 @@
         } else if (startCommission === '6th') {
             initialLevel = mapGpTo7thLevel(gradePay);
         } else {
-            let gp = getGradePayFrom4thOr5th(scale);
+            let gp = getGradePayFrom4thOr5th(scale, designation);
+            if (gp === 0) return; // Halt if invalid schedule
             initialLevel = mapGpTo7thLevel(gp);
         }
 
@@ -3115,7 +3140,8 @@
                 currentCommission = '6th';
                 let preBasic = currentBasic;
                 currentBasic = Math.round((currentBasic * 1.86) / 10) * 10;
-                let gp6th = getGradePayFrom4thOr5th(currentScaleLabel);
+                let gp6th = getGradePayFrom4thOr5th(currentScaleLabel, designation);
+                if (gp6th === 0) return;
                 currentGP = gp6th;
                 currentScaleLabel = (gp6th >= 4200) ? `PB-2 : 9300 - 34800 (GP ${gp6th})` : `PB-1 : 5200 - 20200 (GP ${gp6th})`;
                 if (gp6th >= 5400) {
