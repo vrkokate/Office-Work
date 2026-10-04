@@ -287,7 +287,7 @@ body * { visibility: hidden; }
 <div id="sacHistoryContainer" style="display:none; margin-top:10px; background:#fff; border:1.5px solid #455a64; border-radius:8px; padding:10px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:4px;">
         <span style="font-size:12.5px; font-weight:700; color:#37474f;">📜 संपूर्ण व्यवहार व इतिहास</span>
-        <button type="button" class="btn-action" style="background:#0d47a1; padding:4px 8px; font-weight:bold;" onclick="printHistoryFromSAC()">🖨️ PRINT REPORT</button>
+        <button type="button" class="btn-action" style="background:#0d47a1; padding:5px 10px; font-weight:bold; font-size:11px;" onclick="printHistoryFromSAC()">🖨️ PRINT REPORT</button>
     </div>
     <div id="sacHistoryTableWrapper" style="max-height:220px; overflow-y:auto; overflow-x:auto;"></div>
 </div>
@@ -1257,6 +1257,32 @@ function closeQuickInfoModal() {
     if (modal) modal.style.display = 'none'; 
 }
 
+// ** 🌟 थेट प्रिंटर सेवा व A4 फॉरमॅट प्रिंटिंग (Android APK + Chrome सुसंगत) **
+function printA4Document(content) {
+    try {
+        var p = document.getElementById('printableArea');
+        if (p) {
+            p.innerHTML = content;
+            p.style.display = 'block';
+        }
+
+        // Android Native Bridge तपासणी
+        if (window.Android && typeof window.Android.print === 'function') {
+            window.Android.print(content);
+        } else {
+            // Chrome व Android WebView साठी मानक विंडो प्रिंट
+            window.print();
+        }
+
+        setTimeout(function() {
+            if (p) p.style.display = 'none';
+        }, 1000);
+    } catch(err) {
+        console.error("प्रिंटिंग त्रुटी:", err);
+        showAlert("या उपकरणावर थेट प्रिंट सेवा उपलब्ध नाही.", "ERROR");
+    }
+}
+
 function printQuickModalReport() {
 var contentTitle = document.getElementById('quickModalTitle').innerText;
 var tableHTML = document.getElementById('quickModalBody').innerHTML;
@@ -1394,7 +1420,6 @@ inp.placeholder = 'उदा. व्यक्तीचे किंवा का
 }
 }
 
-// ** सुधारित ड्रॉपडाऊन: Edit Mode मध्ये Current Record मधील M.B. नेहमी उपलब्ध राहते **
 function populateAvailableMBs(excludeIndex = -1, includeMB = "") {
 var selectedSize = document.getElementById('newMBSize').value;
 var sel = document.getElementById('selectAvailableMB');
@@ -1417,7 +1442,6 @@ stock.forEach(function(s) {
 });
 }
 
-// ** M.B. Save व Update: Edit Mode मध्ये स्वतःचा रेकॉर्ड Exclude करणे व Duplicate Block करणे **
 function saveOrUpdateMB() {
 var actionType = document.getElementById('mbActionType').value;
 var size = document.getElementById('newMBSize').value;
@@ -1472,7 +1496,6 @@ srcText = chalooSrc + ' (' + subDetail + ')';
 }
 }
 
-// ** सिस्टीम लेव्हल अचूक व्हॅलिडेशन **
 var lastStatus = getLatestMBStatus(no, idx);
 
 if (actionType === 'दिलेली M.B.') {
@@ -1510,7 +1533,6 @@ refreshAll();
 showAlert((idx === -1 ? 'M.B. नोंद यशस्वीरीत्या जतन झाली!' : 'M.B. नोंद यशस्वीरीत्या अद्ययावत (Update) झाली!'), 'SUCCESS');
 }
 
-// ** सुधारित EDIT फंक्शन **
 function editMB(idx) {
 var item = getData('mb_records')[idx];
 if (!item) return;
@@ -1870,7 +1892,6 @@ function resetSearchSectionForm() {
     if (mainCat) { mainCat.value = ''; }
     if (searchTxt) { searchTxt.value = ''; }
 
-    // सर्व Dependent Dynamic फिल्ड्स सुरक्षितपणे लपवणे (Hide)
     var grp1 = document.getElementById('dynamicOptionGroup1');
     var grp2 = document.getElementById('dynamicOptionGroup2');
     var grp3 = document.getElementById('dynamicOptionGroup3');
@@ -1882,7 +1903,6 @@ function resetSearchSectionForm() {
     if (inputGrp) inputGrp.style.display = 'none';
 }
 
-// ** SEARCH बटण क्लिक झाल्यावर सर्च पूर्ण करणे व त्यानंतर सर्च फॉर्म रिसेट करणे **
 function executeSmartSearchOrReport() {
 var searchTxt = document.getElementById('smartSearchInput').value.trim();
 
@@ -1954,7 +1974,6 @@ resetSearchSectionForm();
 
 var activeSearchPrintHTML = '';
 
-// ** 🌟 CHANGE NO. 1: Search Result मध्ये "(क्लिक करा)" व "🔵" काढून फक्त 015750 क्लिकेबल ठेवणे **
 function showSmartSearchResultModal(query) {
 var queryClean = query.trim();
 var queryLower = queryClean.toLowerCase();
@@ -2052,14 +2071,55 @@ printA4Document(html);
 var currentSacMB = null;
 var currentSacStatusObj = null;
 
-// ** 🌟 CHANGE NO. 2 & 5: फक्त ४ बटन्स आणि "स्रोत/हस्तांतरण" पूर्णपणे काढले **
+// ** 🌟 व्याकरणदृष्ट्या अचूक वाक्य तयार करणारे युटिलिटी फंक्शन (Dynamic Sentence Generator) **
+function formatTransactionSentence(h) {
+    if (!h) return '-';
+    var act = (h.actionType || '').trim();
+    var detail = (h.receivedDetail || '').trim();
+    var from = (h.receivedFrom || '').trim();
+    var src = (h.receivedSource || '').trim();
+
+    function cleanName(n) {
+        if (!n) return '';
+        var c = n.replace(/^श्री.?\s*/i, '').replace(/रावसाहेब/g, '').trim();
+        return 'श्री ' + c + ' रावसाहेब';
+    }
+
+    if (act === 'मिळालेली M.B.' || act === 'मिळालेली एमबी') {
+        if (detail) {
+            return 'ही M.B. JE ' + cleanName(detail) + ' यांच्याकडून मिळाली.';
+        } else if (from.includes('(')) {
+            var raw = from.substring(from.indexOf('(')+1, from.indexOf(')'));
+            return 'ही M.B. ' + cleanName(raw) + ' यांच्याकडून मिळाली.';
+        } else if (src.includes('भंडारपाल') || from.includes('भंडारपाल')) {
+            return 'ही M.B. भंडारपाल यांच्याकडून प्राप्त झाली.';
+        }
+        return 'ही M.B. कार्यालयात जमा झाली.';
+    }
+
+    if (act === 'दिलेली M.B.' || act === 'दिलेली एमबी') {
+        if (from.includes('विभागीय कार्यालय') || src.includes('विभागीय कार्यालय')) {
+            var person = detail;
+            if (!person && from.includes('(')) {
+                person = from.substring(from.indexOf('(')+1, from.indexOf(')'));
+            }
+            return 'ही M.B. विभागीय कार्यालयात ' + cleanName(person) + ' यांना दिली.';
+        } else if (detail) {
+            return 'ही M.B. JE ' + cleanName(detail) + ' यांना दिली.';
+        }
+        return 'ही M.B. संबंधित अधिकाऱ्यांना देण्यात आली.';
+    }
+
+    return from || detail || '-';
+}
+
 function openSmartActionCenter(mbNo) {
 var cleanNo = (mbNo || '').trim();
 if (!cleanNo) return;
 
 var status = getLatestMBStatus(cleanNo);
 if (!status) {
-return showAlert("⚠️️ M.B. क्रमांक '" + cleanNo + "' चा सविस्तर डेटा उपलब्ध नाही.", "ERROR");
+return showAlert("⚠ M.B. क्रमांक '" + cleanNo + "' चा सविस्तर डेटा उपलब्ध नाही.", "ERROR");
 }
 
 currentSacMB = cleanNo;
@@ -2069,8 +2129,7 @@ var stock = getAvailableStock();
 var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(cleanNo); });
 
 var works = getData('work_records').filter(function(w){ return normalizeMB(w.mbNo) === normalizeMB(cleanNo); });
-var currentWorkName = works.length > 0 ? works[works.length - 1].name : "काम नोंदवलेले नाही";
-var currentContractor = works.length > 0 ? (works[works.length - 1].contractor || "-") : "-";
+var currentWorkName = works.length > 0 ? works[works.length - 1].name : "अद्याप नोंद नाही";
 
 var holderDisplay = "-";
 var statusBadgeHtml = "";
@@ -2096,7 +2155,6 @@ var detailsHtml = `
 
 document.getElementById('sacDetailsBox').innerHTML = detailsHtml;
 
-// ४ बटन्स ग्रिड: [ TRANSFER / ISSUE ] [ RECEIVE ] [ EDIT ] [ HISTORY ]
 var btnGrid = document.getElementById('sacActionButtonsGrid');
 btnGrid.innerHTML = "";
 
@@ -2123,7 +2181,6 @@ currentSacMB = null;
 currentSacStatusObj = null;
 }
 
-// ** Smart Action: थेट रिसीव्ह करणे **
 function sacTriggerReceiveMB() {
 if (!currentSacMB || !currentSacStatusObj) return;
 
@@ -2159,7 +2216,6 @@ if (confirm(confirmMsg)) {
 }
 }
 
-// ** Smart Action: ट्रान्सफर फॉर्म दाखवणे **
 function sacOpenTransferForm() {
 var holder = currentSacStatusObj.detail || currentSacStatusObj.source || "संबंधित व्यक्ती";
 var todayISO = new Date().toISOString().slice(0, 10);
@@ -2275,7 +2331,6 @@ if (confirm("M.B. क्र. " + currentSacMB + " ही श्री. " + curre
 }
 }
 
-// ** Smart Action: उपलब्ध M.B. इश्यू फॉर्म उघडणे **
 function sacOpenIssueForm() {
 var todayISO = new Date().toISOString().slice(0, 10);
 var jes = getData('je_records');
@@ -2368,7 +2423,6 @@ if (confirm("M.B. क्र. " + currentSacMB + " ही श्री. " + holde
 }
 }
 
-// ** Smart Action: मूळ Edit Form थेट उघडणे **
 function sacTriggerEditRecord() {
 if (!currentSacMB || !currentSacStatusObj) return;
 closeSmartActionCenter();
@@ -2377,7 +2431,7 @@ openModule('mbModal');
 editMB(currentSacStatusObj.index);
 }
 
-// ** 🌟 Smart Action: सविस्तर इतिहास (History View) उघडणे **
+// ** 🌟 Smart Action: सविस्तर इतिहास (History View) उघडणे (सुधारित भाषेसह) **
 function sacToggleHistoryView() {
 var histBox = document.getElementById('sacHistoryContainer');
 if (histBox.style.display === "block") {
@@ -2390,15 +2444,16 @@ var cleanNo = normalizeMB(currentSacMB);
 var historyEntries = allMBs.filter(function(m){ return normalizeMB(m.mbNumber) === cleanNo; });
 
 var html = '<table class="data-table"><thead><tr>' +
-'<th style="text-align:center;">अ.क्र.</th><th>दिनांक</th><th>प्रकार</th><th>हस्तांतरण / तपशील</th>' +
+'<th style="text-align:center;">अ.क्र.</th><th>दिनांक</th><th>प्रकार</th><th>हस्तांतरण / तपशील (कोणाकडून / कोणाला)</th>' +
 '</tr></thead><tbody>';
 
 historyEntries.forEach(function(h, idx) {
+    var smartSentence = formatTransactionSentence(h);
     html += '<tr>' +
     '<td style="text-align:center;">' + (idx+1) + '</td>' +
     '<td>' + formatDateToDMY(h.date) + '</td>' +
     '<td><strong>' + h.actionType + '</strong></td>' +
-    '<td>' + (h.receivedFrom || h.receivedDetail || '-') + '</td>' +
+    '<td>' + smartSentence + '</td>' +
     '</tr>';
 });
 html += '</tbody></table>';
@@ -2407,7 +2462,7 @@ document.getElementById('sacHistoryTableWrapper').innerHTML = html;
 histBox.style.display = "block";
 }
 
-// ** 🌟 HISTORY PRINT REPORT (A4 Format + Context Heading + Created By) **
+// ** 🌟 HISTORY PRINT REPORT (वास्तविक मॅपिंग + अचूक व्याकरण भाषा + अद्याप नोंद नाही) **
 function printHistoryFromSAC() {
 if (!currentSacMB || !currentSacStatusObj) return;
 
@@ -2415,28 +2470,49 @@ var allMBs = getData('mb_records');
 var cleanNo = normalizeMB(currentSacMB);
 var historyEntries = allMBs.filter(function(m){ return normalizeMB(m.mbNumber) === cleanNo; });
 
+// १. प्रत्यक्ष कामाचा व कंत्राटदाराचा डेटा शोधणे
 var works = getData('work_records').filter(function(w){ return normalizeMB(w.mbNo) === cleanNo; });
-var wName = works.length > 0 ? works[works.length - 1].name : "काम नोंदवलेले नाही";
-var wContractor = works.length > 0 ? (works[works.length - 1].contractor || "-") : "-";
-var wJE = works.length > 0 ? works[works.length - 1].je : (currentSacStatusObj.detail || "-");
+var wName = (works.length > 0 && works[works.length - 1].name) ? works[works.length - 1].name : "अद्याप नोंद नाही";
+var wContractor = (works.length > 0 && works[works.length - 1].contractor) ? works[works.length - 1].contractor : "अद्याप नोंद नाही";
 
+// २. वास्तविक संबंधित JE शोधणे (Current Holder ला JE समजू नये)
+var realJE = "अद्याप नोंद नाही";
+if (works.length > 0 && works[works.length - 1].je) {
+    realJE = works[works.length - 1].je;
+} else {
+    var assigns = getData('assign_records').filter(function(a){ return normalizeMB(a.mbNo) === cleanNo; });
+    if (assigns.length > 0 && assigns[assigns.length - 1].jeName) {
+        realJE = assigns[assigns.length - 1].jeName;
+    }
+}
+if (realJE !== "अद्याप नोंद नाही" && !realJE.startsWith("श्री")) {
+    realJE = "श्री " + realJE.replace(/^श्री.?\s*/i, '');
+}
+
+// ३. प्रत्यक्ष देयक रक्कम शोधणे
 var bills = getData('dmbms_bills').filter(function(b){ return normalizeMB(b.mbNo) === cleanNo; });
-var billTotalAmt = 0;
-bills.forEach(function(b){ billTotalAmt += (parseFloat(b.passedAmt) || 0); });
-var billDisplay = bills.length > 0 ? ("₹ " + billTotalAmt.toLocaleString('en-IN') + " (" + bills.length + " बिले)") : "-";
+var billDisplay = "अद्याप नोंद नाही";
+if (bills.length > 0) {
+    var billTotalAmt = 0;
+    bills.forEach(function(b){ billTotalAmt += (parseFloat(b.passedAmt) || 0); });
+    billDisplay = "₹ " + billTotalAmt.toLocaleString('en-IN') + " (" + bills.length + " बिले)";
+}
 
 var stock = getAvailableStock();
 var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === cleanNo; });
-var holderDisplay = isAvail ? "कार्यालय (उपलब्ध)" : (currentSacStatusObj.detail || currentSacStatusObj.source || "-");
+var holderDisplay = isAvail ? "कार्यालय (उपलब्ध)" : (currentSacStatusObj.detail || currentSacStatusObj.source || "अद्याप नोंद नाही");
+if (holderDisplay !== "कार्यालय (उपलब्ध)" && holderDisplay !== "अद्याप नोंद नाही" && !holderDisplay.startsWith("श्री")) {
+    holderDisplay = "श्री " + holderDisplay.replace(/^श्री.?\s*/i, '');
+}
 
-// 🌟 SMART CONTEXT-BASED REPORT HEADING
+// संदर्भानुसार स्मार्ट अहवाल हेडिंग
 var dynamicReportHeading = "मोजमाप पुस्तिका (M.B.) सविस्तर इतिहास अहवाल";
 var hasTransfer = historyEntries.some(function(h){ return (h.receivedFrom && h.receivedFrom.includes('हस्तांतरण')); });
 if (hasTransfer) {
     dynamicReportHeading = "मोजमाप पुस्तिका हस्तांतरण इतिहास अहवाल";
-} else if (wName !== "काम नोंदवलेले नाही" && bills.length > 0) {
+} else if (wName !== "अद्याप नोंद नाही" && billDisplay !== "अद्याप नोंद नाही") {
     dynamicReportHeading = "मोजमाप पुस्तिका, कामाचा तपशील व देयक नोंद अहवाल";
-} else if (wName !== "काम नोंदवलेले नाही") {
+} else if (wName !== "अद्याप नोंद नाही") {
     dynamicReportHeading = "मोजमाप पुस्तिका व कामाचा तपशील इतिहास अहवाल";
 }
 
@@ -2459,7 +2535,7 @@ var html = `
         <div><strong>M.B. क्रमांक:</strong> ${currentSacMB}</div>
         <div><strong>M.B. आकार:</strong> ${currentSacStatusObj.size || 'लहान M.B.'}</div>
         <div><strong>सध्याचे धारक (Current Holder):</strong> ${holderDisplay}</div>
-        <div><strong>संबंधित JE:</strong> ${wJE}</div>
+        <div><strong>संबंधित JE:</strong> ${realJE}</div>
         <div><strong>कामाचे नाव:</strong> ${wName}</div>
         <div><strong>कंत्राटदार / एजन्सी:</strong> ${wContractor}</div>
         <div><strong>एकूण देयक रक्कम:</strong> ${billDisplay}</div>
@@ -2481,12 +2557,13 @@ var html = `
 `;
 
 historyEntries.forEach(function(h, idx) {
+    var smartSentence = formatTransactionSentence(h);
     html += `
         <tr>
             <td style="text-align:center;">${idx + 1}</td>
             <td>${formatDateToDMY(h.date)}</td>
             <td><strong>${h.actionType}</strong></td>
-            <td>${h.receivedFrom || h.receivedDetail || '-'}</td>
+            <td>${smartSentence}</td>
         </tr>
     `;
 });
@@ -2588,7 +2665,7 @@ return 0;
 
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var rawName = (subVal && subVal !== 'सर्व') ? subVal.replace(/^श्री.?\s*/i, '') : "";
-var personHeaderName = rawName ? "श्री. " + rawName : "";
+var personHeaderName = rawName ? "श्री " + rawName : "";
 var periodSubHeader = "कालावधी: " + formatDateToDMY(fDate) + " ते " + formatDateToDMY(tDate);
 
 var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
@@ -2602,7 +2679,7 @@ var mbNo = item.mbNumber || item.mbNo;
 var size = item.size || 'लहान M.B.';
 var assignedPerson = item.receivedDetail || item.receivedSource || 'संबंधित';
 var cleanPersonName = assignedPerson.replace(/^श्री.?\s*/i, '');
-var currentStatus = (finalType === 'AVAILABLE') ? 'उपलब्ध' : ("श्री. " + cleanPersonName + " यांच्याकडे आहे");
+var currentStatus = (finalType === 'AVAILABLE') ? 'उपलब्ध' : ("श्री " + cleanPersonName + " यांच्याकडे आहे");
 
 html += '<tr><td style="text-align:center;">' + (idx + 1) + '</td><td>' + formatDateToDMY(item.date) + '</td><td><strong>' + mbNo + '</strong></td><td style="text-align:center;">' + size + '</td><td>' + currentStatus + '</td></tr>';
 });
@@ -2666,14 +2743,6 @@ html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + w.name + '
 });
 html += '</tbody></table>';
 printA4Document(html);
-}
-
-function printA4Document(content) {
-var p = document.getElementById('printableArea');
-p.innerHTML = content;
-p.style.display = 'block';
-window.print();
-p.style.display = 'none';
 }
 
 function saveOrUpdateJE() {
@@ -2762,7 +2831,7 @@ list.push({ mbNo: mb, jeName: je, assignDate: dt });
 setData('assign_records', list);
 
 refreshAll();
-showAlert('M.B. क्र. ' + mb + ' चे श्री. ' + je + ' यांना वाटप यशस्वी!', 'SUCCESS');
+showAlert('M.B. क्र. ' + mb + ' चे श्री ' + je + ' यांना वाटप यशस्वी!', 'SUCCESS');
 }
 
 function deleteAssign(idx) {
@@ -3029,10 +3098,10 @@ container.innerHTML = '<div class="form-row-compact"><label>Income Tax</label><i
 
 '<div class="form-row-compact" id="otherRow1">' +
 '<div style="display:flex; align-items:center; justify-content:space-between;">' +
-'<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="otherLabel1">Other-1</span></label>' +
+'<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="' + newLabelId + '">Other-1</span></label>' +
 '<button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="नवीन कपात जोडा">+</button>' +
 '</div>' +
-'<input type="number" class="form-control calc-ded" id="dedOther1" value="0" oninput="autoCalculateDeductions()">' +
+'<input type="number" class="form-control calc-ded" id="' + 'dedOther1' + '" value="0" oninput="autoCalculateDeductions()">' +
 '</div>';
 
 var jeSel = document.getElementById('wJeSelect');
