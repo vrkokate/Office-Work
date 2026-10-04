@@ -1516,7 +1516,7 @@
                 <td style="text-align:center; white-space:nowrap;">
                     <button type="button" class="act-btn act-btn-view" onclick="viewSavedRecord(${item.id})" title="अहवाल पहा">👁️ पहा</button>
                     <button type="button" class="act-btn act-btn-edit" onclick="editSavedRecord(${item.id})" title="माहिती दुरुस्त करा">✏️</button>
-                    <button type="button" class="act-btn act-btn-del" onclick="deleteSavedRecord(${item.id}, '${item.empName}')" title="नोंद हटवा">🗑️️</button>
+                    <button type="button" class="act-btn act-btn-del" onclick="deleteSavedRecord(${item.id}, '${item.empName}')" title="नोंद हटवा">🗑️</button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -1961,7 +1961,7 @@
         } else {
             card.classList.remove('card-filled');
             card.classList.add('card-pending');
-            status.textContent = "⚠️ ही माहिती भरणे बाकी आहे (कृपया भरा)";
+            status.textContent = "⚠️️ ही माहिती भरणे बाकी आहे (कृपया भरा)";
             badge.textContent = "!";
             return false;
         }
@@ -2312,7 +2312,7 @@
                     <table class="ill-table">
                         <tr><td class="col-desc">१. ३१-१२-२०१५ रोजीचे मूळ वेतन (६वा आयोग) [Pay in Pay Band]</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_b6" class="ill-input ill-num-input" value="${data.basic6th}" oninput="recalculate7thIllustration(${dataIndex})"></td></tr>
                         <tr><td class="col-desc">२. ग्रेड पे (Grade Pay)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_gp6" class="ill-input ill-num-input" value="${data.gp6th}" oninput="recalculate7thIllustration(${dataIndex})"></td></tr>
-                        <tr><td class="col-desc">३. एकूण वेतन (Basic + GP)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_total6" class="ill-input ill-num-input" value="${data.total6th}" readonly></td></tr>
+                        <tr><td class="col-desc">३. एकूण वेतन (Pay in Pay Band + Grade Pay)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_total6" class="ill-input ill-num-input" value="${data.total6th}" readonly></td></tr>
                         <tr><td class="col-desc">४. २.५७ गुणाकार घटक (Total × 2.57)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_fit" class="ill-input ill-num-input" value="${data.fitmentCalc}" readonly></td></tr>
                         <tr><td class="col-desc">५. ७व्या आयोगातील समतुल्य स्तर (Pay Matrix Level) <span class="ill-no-print">[बदला: S-20 / S-23]</span></td><td class="col-dots">...</td><td class="col-val"><input type="text" id="ill_7th_lvl" class="ill-input ill-num-input" style="text-align:center;" value="${data.level}" oninput="recalculate7thIllustration(${dataIndex})"></td></tr>
                         <tr style="background:#e8f5e9; font-weight:bold;"><td class="col-desc">६. पे-मॅट्रिक्सनुसार अंतिम निश्चित वेतन</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_final" class="ill-input ill-num-input" value="${data.finalBasic7th}" style="color:#b71c1c;" readonly></td></tr>
@@ -2338,19 +2338,19 @@
         let b6 = parseFloat(document.getElementById('ill_7th_b6').value) || 0;
         let gp6 = parseFloat(document.getElementById('ill_7th_gp6').value) || 0;
         let total6 = b6 + gp6;
-        let fit = Math.round(total6 * 2.57);
-        let lvl = document.getElementById('ill_7th_lvl').value.trim() || "S-23";
+        let fit = Math.round(total6 * 2.57 * 100) / 100;
+        let lvl = document.getElementById('ill_7th_lvl').value.trim() || "S-6";
 
-        let fitRes = fitInMatrix(lvl, fit);
+        let fitRes = fitInMatrix(lvl, total6 * 2.57);
 
         document.getElementById('ill_7th_total6').value = total6;
-        document.getElementById('ill_7th_fit').value = fit;
+        document.getElementById('ill_7th_fit').value = fit.toFixed(2);
         document.getElementById('ill_7th_final').value = fitRes.basic;
 
         globalCalcDataList[dataIndex].basic6th = b6;
         globalCalcDataList[dataIndex].gp6th = gp6;
         globalCalcDataList[dataIndex].total6th = total6;
-        globalCalcDataList[dataIndex].fitmentCalc = fit;
+        globalCalcDataList[dataIndex].fitmentCalc = fit.toFixed(2);
         globalCalcDataList[dataIndex].level = lvl;
         globalCalcDataList[dataIndex].finalBasic7th = fitRes.basic;
     }
@@ -3162,11 +3162,13 @@
                 }
                 else if (ev.type === 'COMMISSION_7TH') {
                     currentCommission = '7th';
-                    let totalBefore7th = currentBasic;
-                    currentLevel = mapGpTo7thLevel(prevGpForSheet);
+                    let payInBand6th = currentBasic; // e.g. 5830 (Pay in Pay Band)
+                    let gp6thVal = prevGpForSheet; // e.g. 1900 (Grade Pay)
+                    let totalBefore7th = payInBand6th + gp6thVal; // 5830 + 1900 = 7730 (Existing Basic Pay)
+                    currentLevel = mapGpTo7thLevel(gp6thVal);
+                    
+                    let fitmentCalcVal = Math.round(totalBefore7th * 2.57 * 100) / 100;
                     let fitmentResult = fitInMatrix(currentLevel, totalBefore7th * 2.57);
-                    let oldB = currentBasic - prevGpForSheet;
-                    let oldGP = prevGpForSheet;
 
                     currentBasic = fitmentResult.basic;
                     currentMatrixIndex = fitmentResult.index;
@@ -3187,10 +3189,10 @@
                         designation: finalDesignation,
                         joinDate: joinDateFormatted,
                         existingScale: prevScaleForSheet,
-                        gp6th: oldGP,
-                        basic6th: oldB,
+                        gp6th: gp6thVal,
+                        basic6th: payInBand6th,
                         total6th: totalBefore7th,
-                        fitmentCalc: Math.round(totalBefore7th * 2.57),
+                        fitmentCalc: fitmentCalcVal,
                         level: currentLevel,
                         finalBasic7th: currentBasic,
                         proposedScale: newScale7th
