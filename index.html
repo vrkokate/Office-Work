@@ -248,7 +248,7 @@ font-weight: normal;
 .sum-card-clickable { background: #fff; border: 1px solid #bbdefb; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
 .sum-card-clickable:hover { background: #e3f2fd; }
 
-/* 🌟 SMART ACTION CENTER STYLES (४ बटन्स ग्रिड) */
+/* 🌟 SMART ACTION CENTER STYLES (४/५ बटन्स ग्रिड) */
 .smart-action-btn-grid {
 display: grid;
 grid-template-columns: repeat(2, 1fr);
@@ -278,6 +278,7 @@ transition: 0.2s;
 .btn-act-transfer { background: #7b1fa2; }
 .btn-act-edit { background: #f57c00; }
 .btn-act-history { background: #455a64; }
+.btn-act-delete { background: #d32f2f; grid-column: span 2; }
 
 .status-badge-pill {
 display: inline-block;
@@ -314,7 +315,7 @@ body * { visibility: hidden !important; }
 <!-- आधुनिक व सविस्तर अलर्ट मॉडेल -->
 <div id="customAlertModal" class="modal-overlay" style="display:none; z-index:4000;">
 <div class="modal-card" style="max-width:350px; text-align:center; padding:22px; border-radius:12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
-<div id="customAlertIcon" style="font-size:36px; margin-bottom:8px;">⚠️️</div>
+<div id="customAlertIcon" style="font-size:36px; margin-bottom:8px;">⚠️</div>
 <div id="customAlertTitle" style="font-size:15px; font-weight:800; color:#0d47a1; margin-bottom:6px;">माहिती व सूचना</div>
 <div id="customAlertText" style="font-size:13px; font-weight:600; line-height: 1.55; color: #37474f; margin-bottom:18px; white-space: pre-line; text-align:center;">मेसेज येथे येईल</div>
 <button class="btn-report" style="background:#0d47a1; margin-top:0; padding:9px 18px; width:100%;" onclick="closeCustomAlert()">समजले (OK)</button>
@@ -334,7 +335,7 @@ body * { visibility: hidden !important; }
     </div>
 </div>
 
-<!-- 🌟 SMART ACTION CENTER MODAL (४ बटन्स: TRANSFER, RECEIVE, EDIT, HISTORY) -->
+<!-- 🌟 SMART ACTION CENTER MODAL (५ बटन्स: TRANSFER, RECEIVE, EDIT, HISTORY, PERMANENT DELETE) -->
 <div id="smartActionCenterModal" class="quick-info-overlay" style="z-index: 3900;">
 <div class="quick-info-card" style="max-width: 470px; padding: 18px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0d47a1; padding-bottom:8px; margin-bottom:12px;">
@@ -344,7 +345,7 @@ body * { visibility: hidden !important; }
 
 <div id="sacDetailsBox" style="background:#f4f7f9; border:1px solid #cfd8dc; border-radius:8px; padding:12px; font-size:12px; line-height:1.6; margin-bottom:10px;"></div>
 
-<!-- ४ ॲक्शन बटनांचा ग्रिड -->
+<!-- ॲक्शन बटनांचा ग्रिड (Delete सह) -->
 <div id="sacActionButtonsGrid" class="smart-action-btn-grid"></div>
 
 <!-- ॲक्शन इनपुट / कन्फर्मेशन बॉक्स -->
@@ -361,15 +362,15 @@ body * { visibility: hidden !important; }
 </div>
 </div>
 
-<!-- सर्च केल्यानंतर ओपन होणारे पॉपअप मॉडेल (Search Detail Popup Modal) -->
+<!-- सर्च केल्यानंतर ओपन होणारे पॉपअप मॉडेल (Search Detail Popup Modal with PERMANENT DELETE Button in Table) -->
 <div id="searchResultModal" class="quick-info-overlay" style="z-index: 3800;">
-<div class="quick-info-card" style="max-width: 500px;">
+<div class="quick-info-card" style="max-width: 520px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
 <h3 id="searchResultModalTitle" style="font-size: 14px; color:#0d47a1; font-weight: 800;">🔍 शोध तपशील व सद्यस्थिती</h3>
 <button class="btn-close" onclick="closeSearchResultModal()">X</button>
 </div>
 <div style="background:#e3f2fd; color:#0d47a1; font-size:11px; padding:6px 10px; border-radius:6px; margin-bottom:8px; font-weight:600;">
-👉 <b>टीप:</b> ॲक्शन सेंटर, ट्रान्सफर, रिसिव्ह व हिस्ट्री पाहण्यासाठी खालील <b>M.B. क्रमांकावर टच/क्लिक करा</b>.
+👉 <b>टीप:</b> ॲक्शन सेंटर, ट्रान्सफर, रिसिव्ह व हिस्ट्री पाहण्यासाठी M.B. क्रमांकावर क्लिक करा. किंवा खालील <b>🗑️ Delete</b> बटणावरून कायमस्वरूपी काढा.
 </div>
 <div class="table-responsive-box" id="searchResultModalBody" style="max-height: 270px; margin-bottom: 12px;"></div>
 <button class="btn-report" style="background:#0d47a1; margin-top:4px;" onclick="printSearchResultFromPopup()">📄 REPORT / PRINT</button>
@@ -1764,6 +1765,13 @@ function saveOrUpdateMB() {
         no = document.getElementById('selectAvailableMB').value;
         if (!no) return showAlert('कृपया उपलब्ध M.B. निवडा.', 'WARNING');
 
+        var uniqueReceived = getUniqueReceivedMBs();
+        var receivedMap = {};
+        uniqueReceived.forEach(function(m) { receivedMap[normalizeMB(m.mbNumber)] = true; });
+        if (!receivedMap[normalizeMB(no)]) {
+            return showAlert('❌ ISSUE BLOCKED:\n\nही M.B. क्रमांक "' + no + '" प्रणालीमध्ये Received म्हणून उपलब्ध नाही. त्यामुळे ती कोणालाही देता येणार नाही.', 'ERROR');
+        }
+
         var recType = document.getElementById('mbGivenRecipientType').value;
         if (!recType) return showAlert('कृपया "कोणाला दिली?" ते निवडा.', 'WARNING');
 
@@ -2289,6 +2297,7 @@ function generateGeneralReport() {
 
 var activeSearchPrintHTML = '';
 
+// ** 🌟 Updated Search Result Modal with PERMANENT DELETE Button in Table **
 function showSmartSearchResultModal(query) {
     var queryClean = query.trim();
     var queryLower = queryClean.toLowerCase();
@@ -2333,6 +2342,7 @@ function showSmartSearchResultModal(query) {
     '<th>आकार</th>' +
     '<th>दिनांक</th>' +
     '<th>सद्यस्थिती</th>' +
+    '<th style="text-align:center;">Action</th>' +
     '</tr></thead><tbody>';
 
     var isAvailableMap = {};
@@ -2360,6 +2370,7 @@ function showSmartSearchResultModal(query) {
         '<td>' + size + '</td>' +
         '<td>' + dateStr + '</td>' +
         '<td>' + statusText + '</td>' +
+        '<td style="text-align:center;"><button class="btn-action" style="background:#d32f2f; padding:3px 6px; font-size:10px; font-weight:700;" onclick="confirmPermanentDeleteFromSearch(\'' + mbNo + '\')">🗑️ Delete</button></td>' +
         '</tr>';
     });
 
@@ -2369,6 +2380,87 @@ function showSmartSearchResultModal(query) {
     document.getElementById('searchResultModalTitle').innerText = '🔍 शोध तपशील (M.B. / नाव: "' + query + '")';
     document.getElementById('searchResultModalBody').innerHTML = tableHTML;
     document.getElementById('searchResultModal').style.display = 'flex';
+}
+
+// ** 🌟 Central Cascade Deletion with Dependency Impact Scan & Double Confirmation **
+function confirmPermanentDeleteFromSearch(mbNo) {
+    var cleanMB = (mbNo || '').trim();
+    if (!cleanMB) return;
+    var targetMB = normalizeMB(cleanMB);
+
+    var mbList = getData('mb_records');
+    var workList = getData('work_records');
+    var billList = getData('dmbms_bills');
+    var assignList = getData('assign_records');
+
+    var receivedCount = 0;
+    var issuedCount = 0;
+    var historyCount = 0;
+
+    mbList.forEach(function(m) {
+        if (normalizeMB(m.mbNumber) === targetMB) {
+            historyCount++;
+            var act = (m.actionType || '').trim();
+            if (act === 'मिळालेली M.B.' || act === 'मिळालेली एमबी') receivedCount++;
+            if (act === 'दिलेली M.B.' || act === 'दिलेली एमबी') issuedCount++;
+        }
+    });
+
+    var assignRefCount = 0;
+    assignList.forEach(function(a) {
+        if (normalizeMB(a.mbNo) === targetMB) assignRefCount++;
+    });
+
+    var workRefCount = 0;
+    workList.forEach(function(w) {
+        if (normalizeMB(w.mbNo) === targetMB) workRefCount++;
+    });
+
+    var billRefCount = 0;
+    billList.forEach(function(b) {
+        if (normalizeMB(b.mbNo) === targetMB) billRefCount++;
+    });
+
+    var impactMsg = "⚠️ PERMANENT DELETE IMPACT SCAN\n\n" +
+                    "M.B. क्रमांक: " + cleanMB + "\n\n" +
+                    "• Received Entries: " + receivedCount + "\n" +
+                    "• Issued/Transaction Entries: " + issuedCount + "\n" +
+                    "• History Records: " + historyCount + "\n" +
+                    "• JE Assignment Records: " + assignRefCount + "\n" +
+                    "• Work Register References: " + workRefCount + "\n" +
+                    "• Bill Register References: " + billRefCount + "\n\n" +
+                    "ही M.B. आणि तिच्याशी संबंधित वरील सर्व नोंदी कायमस्वरूपी Delete करायच्या आहेत का?";
+
+    if (confirm(impactMsg)) {
+        var finalConfirm = prompt("अंतिम पुष्टी:\n\npermanent delete करण्यासाठी संबंधित M.B. क्रमांक अगदी तसाच ('" + cleanMB + "') खाली टाईप करा:");
+        if (finalConfirm && finalConfirm.trim() === cleanMB) {
+            
+            var newMBList = mbList.filter(function(m) { return normalizeMB(m.mbNumber) !== targetMB; });
+            var newWorkList = workList.filter(function(w) { return normalizeMB(w.mbNo) !== targetMB; });
+            var newBillList = billList.filter(function(b) { return normalizeMB(b.mbNo) !== targetMB; });
+            var newAssignList = assignList.filter(function(a) { return normalizeMB(a.mbNo) !== targetMB; });
+
+            setData('mb_records', newMBList);
+            setData('work_records', newWorkList);
+            setData('dmbms_bills', newBillList);
+            setData('assign_records', newAssignList);
+
+            var postCheckMB = getData('mb_records').some(function(m) { return normalizeMB(m.mbNumber) === targetMB; });
+            var postCheckWork = getData('work_records').some(function(w) { return normalizeMB(w.mbNo) === targetMB; });
+            var postCheckBill = getData('dmbms_bills').some(function(b) { return normalizeMB(b.mbNo) === targetMB; });
+
+            closeSearchResultModal();
+            refreshAll();
+
+            if (!postCheckMB && !postCheckWork && !postCheckBill) {
+                showAlert("✅ M.B. क्रमांक " + cleanMB + " ची माहिती आणि सर्व संबंधित नोंदी यशस्वीपणे कायमस्वरूपी हटवण्यात आल्या आहेत (0 References Found).", "SUCCESS");
+            } else {
+                showAlert("⚠️ Delete पूर्ण झाली नाही. काही Orphan References अजूनही सिस्टममध्ये शिल्लक आहेत.", "ERROR");
+            }
+        } else {
+            showAlert("❌ Permanent Delete रद्द करण्यात आले कारण क्रमांक जुळला नाही.", "WARNING");
+        }
+    }
 }
 
 function closeSearchResultModal() {
@@ -2476,11 +2568,13 @@ function openSmartActionCenter(mbNo) {
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-receive" style="opacity:0.5; cursor:not-allowed;" title="ही M.B. आधीच कार्यालयात उपलब्ध आहे">📥 RECEIVE</button>`;
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-edit" onclick="sacTriggerEditRecord()">✏️ EDIT</button>`;
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-history" onclick="sacToggleHistoryView()">🕘 HISTORY</button>`;
+        btnGrid.innerHTML += `<button class="btn-smart-act btn-act-delete" onclick="confirmPermanentDeleteFromSearch('${cleanNo}')">🗑️ PERMANENT DELETE</button>`;
     } else {
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-transfer" onclick="sacOpenTransferForm()">📤 TRANSFER</button>`;
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-receive" onclick="sacTriggerReceiveMB()">📥 RECEIVE</button>`;
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-edit" onclick="sacTriggerEditRecord()">✏️ EDIT</button>`;
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-history" onclick="sacToggleHistoryView()">🕘 HISTORY</button>`;
+        btnGrid.innerHTML += `<button class="btn-smart-act btn-act-delete" onclick="confirmPermanentDeleteFromSearch('${cleanNo}')">🗑️ PERMANENT DELETE</button>`;
     }
 
     document.getElementById('sacSubActionContainer').style.display = "none";
@@ -2713,13 +2807,12 @@ function sacConfirmIssueExecution() {
         srcText = "M.B. विभागीय कार्यालय (" + holder + ") यांना दिली";
     }
 
-    // Pre-Validation: Check if MB exists in Received Master before issuing
     var uniqueReceived = getUniqueReceivedMBs();
     var receivedMap = {};
     uniqueReceived.forEach(function(m) { receivedMap[normalizeMB(m.mbNumber)] = true; });
     
     if (!receivedMap[normalizeMB(currentSacMB)]) {
-        return showAlert("❌ ISSUE BLOCKED:\n\nही M.B. क्रमांक '" + currentSacMB + "' प्रणालीमध्ये Received म्हणून उपलब्ध नाही. म्हणून ती कोणालाही देता येणार नाही.", "ERROR");
+        return showAlert("❌ ISSUE BLOCKED:\n\nही M.B. क्रमांक '" + currentSacMB + "' प्रणालीमध्ये Received म्हणून उपलब्ध नाही. त्यामुळे ती कोणालाही देता येणार नाही.", "ERROR");
     }
 
     var cleanHolderName = holder.replace(/^श्री\.?\s*/i, '').trim();
@@ -3707,7 +3800,7 @@ function deleteSelectedData() {
     if (selected.length === 0) return showAlert('किमान एक पर्याय निवडा.', 'WARNING');
     if (confirm('निवडलेली माहिती कायमची नष्ट करायची का?')) {
         selected.forEach(key => localStorage.removeItem(key));
-        showAlert('निवडलेली माहिती यशस्वीरीत्या हटवली!', 'SUCCESS'); 
+        showAlert('निवडलेली माहिती यशस्वीरित्या हटवली!', 'SUCCESS'); 
         refreshAll(); 
         closeModule('settingsModal');
     }
