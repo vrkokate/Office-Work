@@ -11,14 +11,14 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; }
         
-        /* Custom Scrollbox for 5 rows visible with scroll */
-        .history-scroll-box {
-            max-height: 250px; /* अंदाजे ५ ओळी बसतील एवढी उंची */
+        .table-responsive-box {
+            max-height: 400px;
             overflow-y: auto;
-            overflow-x: hidden;
-            padding-right: 2px;
+            overflow-x: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
         }
-
+        
         /* Print / PDF Styling */
         @media print {
             body * { visibility: hidden !important; }
@@ -42,95 +42,121 @@
                     <i class="fa-solid fa-house"></i> मुखपृष्ठ
                 </a>
                 <h1 class="text-base md:text-lg font-bold tracking-wide flex items-center gap-2">
-                    <i class="fa-solid fa-scroll"><span>📜 Central System History</span></i>
+                    <i class="fa-solid fa-scroll"><span>📜 HISTORY</span></i>
                 </h1>
             </div>
         </div>
     </header>
 
     <!-- Main Container -->
-    <main class="max-w-4xl mx-auto px-3 py-4 flex-grow w-full space-y-3">
+    <main class="max-w-5xl mx-auto px-3 py-4 flex-grow w-full space-y-4">
 
-        <!-- Summary & Report / Print Action Bar (스크린शॉटप्रमाणे वर व्यवस्थित डिझाईन) -->
-        <div class="bg-white px-4 py-2.5 rounded-xl shadow-sm border border-gray-200 flex flex-wrap justify-between items-center gap-2 text-xs font-semibold text-gray-700">
+        <!-- Summary & Report / Print Action Bar (Screenshot प्रमाणे वर डिझाईन) -->
+        <div class="bg-white px-4 py-3 rounded-xl shadow-sm border border-gray-200 flex flex-wrap justify-between items-center gap-2 text-xs font-bold text-gray-700">
             <div class="flex items-center gap-2">
-                <span id="totalHistoryCount" class="bg-blue-50 text-blue-800 px-2.5 py-1 rounded-md border border-blue-100">Total: 0</span>
-                <span>|</span>
-                <span id="filteredHistoryCount" class="bg-gray-50 text-gray-700 px-2.5 py-1 rounded-md border border-gray-200">Showing: 0</span>
+                <span id="totalHistoryCount" class="bg-blue-50 text-blue-800 px-3 py-1 rounded-md border border-blue-100">एकूण History Records: 0</span>
+                <span class="text-gray-400">|</span>
+                <span id="filteredHistoryCount" class="bg-gray-50 text-gray-700 px-3 py-1 rounded-md border border-gray-200">दिसत आहेत: 0</span>
             </div>
             <div>
-                <button onclick="printHistoryReport()" class="bg-[#0d47a1] hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg font-medium transition shadow flex items-center gap-1.5 text-xs">
+                <button onclick="printHistoryReport()" class="bg-[#0d47a1] hover:bg-blue-800 text-white px-4 py-2 rounded-lg font-bold transition shadow flex items-center gap-2 text-xs uppercase tracking-wide">
                     <i class="fa-solid fa-print"></i> REPORT / PRINT
                 </button>
             </div>
         </div>
 
-        <!-- Search & Filters Section -->
-        <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-200 space-y-3">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                <!-- Global Search -->
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                    </span>
-                    <input type="text" id="searchInput" oninput="filterHistory()" placeholder="Search text, ID, Module, Action, Remark..." class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs">
-                </div>
-                <!-- Module Filter -->
-                <div>
-                    <select id="moduleFilter" onchange="filterHistory()" class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white font-medium">
-                        <option value="">सर्व Modules (All)</option>
-                    </select>
-                </div>
+        <!-- Filter Card (Screenshot प्रमाणे सुटसुटीत रचना) -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-3">
+            <h3 class="text-xs font-bold text-[#0d47a1] uppercase tracking-wide border-b pb-1.5 flex items-center gap-2">
+                <i class="fa-solid fa-filter"></i> Search & Filters
+            </h3>
+
+            <!-- Search Bar -->
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                </span>
+                <input type="text" id="searchInput" oninput="filterHistory()" placeholder="Search History ID, Module, Action, Record Name, M.B. Number, User..." class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs">
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                <!-- Module Filter -->
+                <div>
+                    <label class="block text-[11px] font-semibold text-gray-600 mb-1">Module Filter:</label>
+                    <select id="moduleFilter" onchange="filterHistory()" class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white font-medium">
+                        <option value="">सर्व Modules</option>
+                    </select>
+                </div>
                 <!-- Action Filter -->
                 <div>
+                    <label class="block text-[11px] font-semibold text-gray-600 mb-1">Action Filter:</label>
                     <select id="actionFilter" onchange="filterHistory()" class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white font-medium">
-                        <option value="">सर्व Actions (All)</option>
+                        <option value="">सर्व Actions</option>
                     </select>
                 </div>
                 <!-- Date Filters -->
-                <div class="flex items-center gap-1.5">
-                    <input type="date" id="dateFrom" onchange="filterHistory()" class="border border-gray-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs flex-1">
-                    <span class="text-xs text-gray-500">ते</span>
-                    <input type="date" id="dateTo" onchange="filterHistory()" class="border border-gray-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs flex-1">
+                <div class="flex flex-col">
+                    <label class="block text-[11px] font-semibold text-gray-600 mb-1">Date Range (From - To):</label>
+                    <div class="flex items-center gap-1.5">
+                        <input type="date" id="dateFrom" onchange="filterHistory()" class="border border-gray-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs flex-1">
+                        <span class="text-xs text-gray-500">ते</span>
+                        <input type="date" id="dateTo" onchange="filterHistory()" class="border border-gray-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs flex-1">
+                    </div>
                 </div>
             </div>
 
-            <div class="text-right pt-0.5">
-                <button onclick="resetFilters()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-md transition text-xs font-semibold">
-                    <i class="fa-solid fa-rotate-right"></i> Reset Filters
+            <div class="text-right pt-1">
+                <button onclick="resetFilters()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-lg transition text-xs font-semibold">
+                    <i class="fa-solid fa-rotate-right"></i> 🔄 RESET
                 </button>
             </div>
         </div>
 
-        <!-- History Content Area (Scrollable Box for continuous rows) -->
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-200">
-            <h3 class="text-xs font-bold text-[#0d47a1] mb-2 flex items-center gap-1.5 border-b pb-1.5">
-                <i class="fa-solid fa-list-check"></i> सर्व हिस्ट्री नोंदी (क्रमशः ओळी)
+        <!-- History Compact Table Section (Screenshot प्रमाणे टेबल डिझाईन) -->
+        <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-200 space-y-2">
+            <h3 class="text-xs font-bold text-[#0d47a1] uppercase tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-table-list"></i> History Records Table
             </h3>
-            <div id="historyContainer" class="history-scroll-box space-y-2">
-                <!-- Dynamic History Records will load here inside scrollbox -->
+            
+            <div class="table-responsive-box">
+                <table class="w-full border-collapse text-xs whitespace-nowrap">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700 font-bold border-b border-gray-200">
+                            <th class="p-2.5 text-center border-r border-gray-200 w-12">अ.क्र.</th>
+                            <th class="p-2.5 text-left border-r border-gray-200">दिनांक</th>
+                            <th class="p-2.5 text-left border-r border-gray-200">वेळ</th>
+                            <th class="p-2.5 text-left border-r border-gray-200">Module</th>
+                            <th class="p-2.5 text-left border-r border-gray-200">Action</th>
+                            <th class="p-2.5 text-left border-r border-gray-200">Record / Item</th>
+                            <th class="p-2.5 text-left border-r border-gray-200">M.B. क्र.</th>
+                            <th class="p-2.5 text-left border-r border-gray-200">User</th>
+                            <th class="p-2.5 text-left border-r border-gray-200">Status</th>
+                            <th class="p-2.5 text-center w-20">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <!-- Dynamic Records -->
+                    </tbody>
+                </table>
             </div>
         </div>
 
     </main>
 
-    <!-- Detail View Modal -->
+    <!-- Detail View Modal (Screenshot प्रमाणे मॉडेल डिझाईन) -->
     <div id="detailModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-3">
-        <div class="bg-white rounded-xl max-w-lg w-full p-4 shadow-2xl space-y-2.5 max-h-[90vh] overflow-y-auto relative">
-            <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="text-xs md:text-sm font-bold text-gray-800 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-info text-blue-600"></i> History Record Details
+        <div class="bg-white rounded-xl max-w-xl w-full p-5 shadow-2xl space-y-3 max-h-[90vh] overflow-y-auto relative">
+            <div class="flex justify-between items-center border-b pb-2.5">
+                <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-blue-600"></i> 📜 History Details
                 </h3>
-                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 text-lg font-bold bg-gray-100 px-2 py-0.5 rounded" title="Close" aria-label="Close">&times;</button>
+                <button onclick="closeDetailModal()" class="bg-[#d32f2f] text-white font-bold w-7 h-7 rounded flex items-center justify-center text-xs hover:bg-red-700 transition" title="Close" aria-label="Close">X</button>
             </div>
-            <div id="modalContent" class="space-y-1.5 text-xs">
+            <div id="modalContent" class="space-y-2 text-xs">
                 <!-- Details injected dynamically -->
             </div>
             <div class="text-right pt-2 border-t">
-                <button onclick="closeDetailModal()" class="bg-[#0d47a1] hover:bg-blue-800 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition shadow">बंद करा</button>
+                <button onclick="closeDetailModal()" class="bg-[#0d47a1] hover:bg-blue-800 text-white px-4 py-2 rounded-lg text-xs font-semibold transition shadow">बंद करा</button>
             </div>
         </div>
     </div>
@@ -289,57 +315,47 @@
 
         let currentFilteredList = [];
 
-        // Load History UI into Scrollable Box (All records sorted sequentially by timestamp, without splitting into separate date headers)
         function loadHistoryUI(filteredData = null) {
             let list = filteredData || getAllHistory();
             currentFilteredList = list;
             
-            // Sort by Timestamp (Newest -> Oldest)
+            // Sort Newest -> Oldest
             list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-            let container = document.getElementById("historyContainer");
-            container.innerHTML = "";
+            let tbody = document.getElementById("historyTableBody");
+            tbody.innerHTML = "";
 
             let totalCount = getAllHistory().length;
-            document.getElementById("totalHistoryCount").innerText = `Total: ${totalCount}`;
-            document.getElementById("filteredHistoryCount").innerText = `Showing: ${list.length}`;
+            document.getElementById("totalHistoryCount").innerText = `एकूण History Records: ${totalCount}`;
+            document.getElementById("filteredHistoryCount").innerText = `दिसत आहेत: ${list.length}`;
 
             if (list.length === 0) {
-                container.innerHTML = `
-                    <div class="py-6 text-center text-gray-400 text-xs">
-                        <i class="fa-solid fa-folder-open text-2xl mb-1 text-gray-300"></i>
-                        <p class="font-medium">📜 History उपलब्ध नाही.</p>
-                    </div>
-                `;
+                tbody.innerHTML = `<tr><td colspan="10" class="p-6 text-center text-gray-400">📜 कोणतीही History नोंद उपलब्ध नाही.</td></tr>`;
                 return;
             }
 
-            // Render each record sequentially in a single scrollable box
             list.forEach((item, idx) => {
                 let badgeColor = getActionBadgeColor(item.action);
-                let row = document.createElement("div");
-                row.className = "bg-white px-2.5 py-1.5 rounded border border-gray-200 flex items-center justify-between gap-2 text-xs hover:bg-gray-50 transition";
+                let tr = document.createElement("tr");
+                tr.className = "border-b border-gray-100 hover:bg-gray-50 transition";
 
-                let recordNameEsc = escapeHTML(item.recordName);
-                let mbNoEsc = item.mbNumber !== '—' ? '(' + escapeHTML(item.mbNumber) + ')' : '';
-                let givenToEsc = item.givenTo !== '—' ? '<span class="text-gray-500 font-normal">→ ' + escapeHTML(item.givenTo) + '</span>' : '';
-
-                row.innerHTML = `
-                    <div class="flex items-center gap-2 flex-grow overflow-hidden">
-                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${badgeColor} uppercase tracking-wide whitespace-nowrap shadow-sm">${escapeHTML(item.action)}</span>
-                        <div class="truncate space-y-0 text-[11px]">
-                            <span class="font-bold text-gray-700 bg-gray-100 px-1 py-0.2 rounded text-[10px]">${escapeHTML(item.module)}</span>
-                            <span class="text-gray-400 text-[10px]">${escapeHTML(item.date)} ${escapeHTML(item.time)}</span>
-                            <span class="font-semibold text-gray-800 truncate ml-1">${recordNameEsc} ${mbNoEsc} ${givenToEsc}</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-1 flex-shrink-0">
-                        <button onclick="openDetailModal('${item.id}')" class="bg-[#0d47a1] hover:bg-blue-800 text-white px-2 py-0.5 rounded text-[10px] font-medium transition shadow flex items-center gap-1" title="सविस्तर माहिती पहा">
-                            details
+                tr.innerHTML = `
+                    <td class="p-2.5 text-center font-medium border-r border-gray-200">${idx + 1}</td>
+                    <td class="p-2.5 border-r border-gray-200">${escapeHTML(item.date)}</td>
+                    <td class="p-2.5 border-r border-gray-200">${escapeHTML(item.time)}</td>
+                    <td class="p-2.5 border-r border-gray-200 font-semibold text-blue-900">${escapeHTML(item.module)}</td>
+                    <td class="p-2.5 border-r border-gray-200"><span class="px-2 py-0.5 rounded font-bold text-[10px] ${badgeColor}">${escapeHTML(item.action)}</span></td>
+                    <td class="p-2.5 border-r border-gray-200 font-medium">${escapeHTML(item.recordName)}</td>
+                    <td class="p-2.5 border-r border-gray-200 font-mono">${escapeHTML(item.mbNumber)}</td>
+                    <td class="p-2.5 border-r border-gray-200">${escapeHTML(item.user)}</td>
+                    <td class="p-2.5 border-r border-gray-200 text-green-700 font-semibold">${escapeHTML(item.status)}</td>
+                    <td class="p-2.5 text-center">
+                        <button onclick="openDetailModal('${item.id}')" class="bg-[#0d47a1] hover:bg-blue-800 text-white px-2.5 py-1 rounded text-[11px] font-medium transition shadow">
+                            View
                         </button>
-                    </div>
+                    </td>
                 `;
-                container.appendChild(row);
+                tbody.appendChild(tr);
             });
         }
 
@@ -433,7 +449,7 @@
             }
             let html = '<table class="w-full text-left text-xs border-collapse">';
             for (let key in obj) {
-                html += `<tr class="border-b border-gray-100"><td class="py-0.5 font-semibold text-gray-600">${escapeHTML(key)}:</td> <td class="py-0.5 text-gray-800">${escapeHTML(obj[key])}</td></tr>`;
+                html += `<tr class="border-b border-gray-100"><td class="py-1 font-semibold text-gray-600">${escapeHTML(key)}:</td> <td class="py-1 text-gray-800">${escapeHTML(obj[key])}</td></tr>`;
             }
             html += '</table>';
             return html;
@@ -444,15 +460,15 @@
             if (keys.size === 0) return '<p class="text-gray-400">—</p>';
 
             let html = '<table class="w-full text-left text-xs border border-gray-200 rounded-lg overflow-hidden">';
-            html += '<thead class="bg-gray-100 text-gray-700 font-semibold"><tr><th class="p-1.5 border-b">Field</th><th class="p-1.5 border-b">Old Value</th><th class="p-1.5 border-b">New Value</th></tr></thead><tbody>';
+            html += '<thead class="bg-gray-100 text-gray-700 font-semibold"><tr><th class="p-2 border-b">Field</th><th class="p-2 border-b">Old Value</th><th class="p-2 border-b">New Value</th></tr></thead><tbody>';
 
             keys.forEach(key => {
                 let oldVal = (oldObj && oldObj[key] !== undefined) ? oldObj[key] : '—';
                 let newVal = (newObj && newObj[key] !== undefined) ? newObj[key] : '—';
                 html += `<tr class="border-b border-gray-100">
-                    <td class="p-1.5 font-semibold text-gray-600">${escapeHTML(key)}</td>
-                    <td class="p-1.5 text-red-700 bg-red-50/50">${escapeHTML(oldVal)}</td>
-                    <td class="p-1.5 text-emerald-700 bg-emerald-50/50">${escapeHTML(newVal)}</td>
+                    <td class="p-2 font-semibold text-gray-600">${escapeHTML(key)}</td>
+                    <td class="p-2 text-red-700 bg-red-50/50">${escapeHTML(oldVal)}</td>
+                    <td class="p-2 text-emerald-700 bg-emerald-50/50">${escapeHTML(newVal)}</td>
                 </tr>`;
             });
 
@@ -470,25 +486,25 @@
 
             let comparisonView = "";
             if (typeof item.oldData === 'object' && typeof item.newData === 'object' && Object.keys(item.oldData).length > 0 && Object.keys(item.newData).length > 0) {
-                comparisonView = `<div class="pt-1.5"><strong>Field-wise Comparison:</strong><div class="mt-1">${renderComparisonTable(item.oldData, item.newData)}</div></div>`;
+                comparisonView = `<div class="pt-2"><strong>Field-wise Comparison:</strong><div class="mt-1">${renderComparisonTable(item.oldData, item.newData)}</div></div>`;
             }
 
             let content = `
-                <div class="grid grid-cols-2 gap-2 bg-gray-50 p-2 rounded-lg border text-[11px]">
+                <div class="grid grid-cols-2 gap-2 bg-gray-50 p-2.5 rounded-lg border text-xs">
                     <div><strong>ID:</strong> <span class="font-mono text-gray-700">${escapeHTML(item.id)}</span></div>
                     <div><strong>वेळ:</strong> ${escapeHTML(item.date)} | ${escapeHTML(item.time)}</div>
                     <div><strong>Module:</strong> <span class="text-blue-600 font-semibold">${escapeHTML(item.module)}</span></div>
                     <div><strong>Action:</strong> <span class="font-semibold">${escapeHTML(item.action)}</span></div>
                 </div>
-                <div class="space-y-1.5 pt-1 text-[11px]">
+                <div class="space-y-2 pt-1 text-xs">
                     <div><strong>Record Name:</strong> ${escapeHTML(item.recordName)}</div>
                     <div><strong>Record ID:</strong> ${escapeHTML(item.recordId)}</div>
-                    <div><strong>M.B. No:</strong> ${escapeHTML(item.mbNumber)} | <strong>Size:</strong> ${escapeHTML(item.mbSize)}</div>
+                    <div><strong>M.B. क्र.:</strong> ${escapeHTML(item.mbNumber)} | <strong>Size:</strong> ${escapeHTML(item.mbSize)}</div>
                     <div><strong>कोणाकडून:</strong> ${escapeHTML(item.receivedFrom)} | <strong>कोणाला:</strong> ${escapeHTML(item.givenTo)}</div>
-                    <div class="p-2 bg-red-50 text-red-900 rounded border border-red-100"><strong>जुनी माहिती:</strong><div class="mt-0.5">${oldDataRender}</div></div>
-                    <div class="p-2 bg-emerald-50 text-emerald-900 rounded border border-red-100"><strong>नवीन माहिती:</strong><div class="mt-0.5">${newDataRender}</div></div>
+                    <div class="p-2.5 bg-red-50 text-red-900 rounded border border-red-100"><strong>जुनी माहिती (Old Data):</strong><div class="mt-1">${oldDataRender}</div></div>
+                    <div class="p-2.5 bg-emerald-50 text-emerald-900 rounded border border-emerald-100"><strong>नवीन माहिती (New Data):</strong><div class="mt-1">${newDataRender}</div></div>
                     ${comparisonView}
-                    <div><strong>बदल:</strong> ${escapeHTML(item.changes)}</div>
+                    <div><strong>बदलाचा तपशील:</strong> ${escapeHTML(item.changes)}</div>
                     <div><strong>Status:</strong> ${escapeHTML(item.status)} | <strong>User:</strong> ${escapeHTML(item.user)}</div>
                     <div><strong>Remark:</strong> ${escapeHTML(item.remark)}</div>
                 </div>
@@ -512,10 +528,10 @@
             let todayStr = new Date().toLocaleDateString('en-GB');
 
             let html = `
-                <div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; text-align:center;">
-                    <h1 style="font-size:15px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>
+                <div style="margin-bottom:12px; border-bottom:2px solid #333; padding-bottom:6px; text-align:center;">
+                    <h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>
                     <h2 style="font-size:13px; font-weight:700; margin:3px 0; color:#0d47a1;">अहवाल हिस्ट्री</h2>
-                    <div style="display:flex; justify-content:space-between; font-size:10px; margin-top:5px;">
+                    <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:6px;">
                         <div><strong>अहवाल दिनांक:</strong> ${todayStr}</div>
                         <div><strong>एकूण नोंदी:</strong> ${list.length}</div>
                     </div>
@@ -524,11 +540,12 @@
                     <thead>
                         <tr style="background:#eee;">
                             <th style="text-align:center; width:6%;">अ.क्र.</th>
-                            <th style="width:14%;">दिनांक / वेळ</th>
-                            <th style="width:12%;">Module</th>
+                            <th style="width:14%;">दिनांक</th>
+                            <th style="width:10%;">वेळ</th>
+                            <th style="width:14%;">Module</th>
                             <th style="width:10%;">Action</th>
-                            <th style="width:38%;">Record / तपशील</th>
-                            <th style="width:20%;">User / Remark</th>
+                            <th style="width:30%;">Record / तपशील</th>
+                            <th style="width:16%;">User / Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -538,11 +555,12 @@
                 html += `
                     <tr>
                         <td style="text-align:center;">${idx + 1}</td>
-                        <td>${escapeHTML(item.date)}<br><span style="font-size:8pt; color:#666;">${escapeHTML(item.time)}</span></td>
+                        <td>${escapeHTML(item.date)}</td>
+                        <td>${escapeHTML(item.time)}</td>
                         <td><strong>${escapeHTML(item.module)}</strong></td>
                         <td>${escapeHTML(item.action)}</td>
                         <td>${escapeHTML(item.recordName)} ${item.mbNumber !== '—' ? '(' + escapeHTML(item.mbNumber) + ')' : ''}</td>
-                        <td>${escapeHTML(item.user)}<br><span style="font-size:8pt; color:#666;">${escapeHTML(item.remark)}</span></td>
+                        <td>${escapeHTML(item.user)} / ${escapeHTML(item.status)}</td>
                     </tr>
                 `;
             });
