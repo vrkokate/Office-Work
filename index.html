@@ -2462,7 +2462,7 @@ document.getElementById('sacHistoryTableWrapper').innerHTML = html;
 histBox.style.display = "block";
 }
 
-// ** 🌟 HISTORY PRINT REPORT (वास्तविक मॅपिंग + अचूक व्याकरण भाषा + अद्याप नोंद नाही) **
+// ** 🌟 HISTORY PRINT REPORT (अंतिम Heading: 'मोजमाप पुस्तिका हालचाल सविस्तर अहवाल' + अचूक JE Source) **
 function printHistoryFromSAC() {
 if (!currentSacMB || !currentSacStatusObj) return;
 
@@ -2475,14 +2475,14 @@ var works = getData('work_records').filter(function(w){ return normalizeMB(w.mbN
 var wName = (works.length > 0 && works[works.length - 1].name) ? works[works.length - 1].name : "अद्याप नोंद नाही";
 var wContractor = (works.length > 0 && works[works.length - 1].contractor) ? works[works.length - 1].contractor : "अद्याप नोंद नाही";
 
-// २. वास्तविक संबंधित JE शोधणे (Current Holder ला JE समजू नये)
+// २. वास्तविक संबंधित JE शोधणे (Current Holder, Transfer Person किंवा विभागीय कार्यालयातील व्यक्तीचे नाव अजिबात JE म्हणून वापरू नये)
 var realJE = "अद्याप नोंद नाही";
 if (works.length > 0 && works[works.length - 1].je) {
-    realJE = works[works.length - 1].je;
+    realJE = works[works.length - 1].je.trim();
 } else {
     var assigns = getData('assign_records').filter(function(a){ return normalizeMB(a.mbNo) === cleanNo; });
     if (assigns.length > 0 && assigns[assigns.length - 1].jeName) {
-        realJE = assigns[assigns.length - 1].jeName;
+        realJE = assigns[assigns.length - 1].jeName.trim();
     }
 }
 if (realJE !== "अद्याप नोंद नाही" && !realJE.startsWith("श्री")) {
@@ -2505,16 +2505,8 @@ if (holderDisplay !== "कार्यालय (उपलब्ध)" && holderD
     holderDisplay = "श्री " + holderDisplay.replace(/^श्री.?\s*/i, '');
 }
 
-// संदर्भानुसार स्मार्ट अहवाल हेडिंग
-var dynamicReportHeading = "मोजमाप पुस्तिका (M.B.) सविस्तर इतिहास अहवाल";
-var hasTransfer = historyEntries.some(function(h){ return (h.receivedFrom && h.receivedFrom.includes('हस्तांतरण')); });
-if (hasTransfer) {
-    dynamicReportHeading = "मोजमाप पुस्तिका हस्तांतरण इतिहास अहवाल";
-} else if (wName !== "अद्याप नोंद नाही" && billDisplay !== "अद्याप नोंद नाही") {
-    dynamicReportHeading = "मोजमाप पुस्तिका, कामाचा तपशील व देयक नोंद अहवाल";
-} else if (wName !== "अद्याप नोंद नाही") {
-    dynamicReportHeading = "मोजमाप पुस्तिका व कामाचा तपशील इतिहास अहवाल";
-}
+// 🌟 CHANGE NO. 2: अहवालाचे अंतिम शीर्षक "मोजमाप पुस्तिका हालचाल सविस्तर अहवाल"
+var dynamicReportHeading = "मोजमाप पुस्तिका हालचाल सविस्तर अहवाल";
 
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 
@@ -2720,7 +2712,7 @@ renderBillTableHTML(bills, '', 'संपूर्ण देयक नोंद�
 function renderBillTableHTML(billsList, preHTML, title) {
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var html = preHTML + '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + title + '</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong style="font-size:11.5px;">देयक नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div></div>' +
-'<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>बिल क्र.</th><th>कंत्राटदार</th><th>कामाचे नाव</th><th>JE</th><th style="text-align:center;">M.B.</th><th>बिल प्रकार</th><th style="text-align:right;">पास रक्कम (₹)</th><th style="text-align:right;">कपात (₹)</th><th style="text-align:right;">नेट रक्कम (₹)</th></tr></thead><tbody>';
+'<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>बिल क्र.</th><th>कंत्राटदार</th><th>कामाचे नाव</th><th>JE</th><th>M.B.</th><th>बिल प्रकार</th><th>दिनांक</th><th style="text-align:right;">पास रक्कम (₹)</th><th style="text-align:right;">कपात (₹)</th><th style="text-align:right;">नेट रक्कम (₹)</th></tr></thead><tbody>';
 var total = 0, totalDedSum = 0, totalNetSum = 0;
 billsList.forEach(function(b, i) {
 var amt = parseFloat(b.passedAmt) || 0;
