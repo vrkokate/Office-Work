@@ -126,9 +126,9 @@ letter-spacing: 0.5px;
 .summary-title { font-size: 13px; font-weight: 700; text-align: center; color: #0d47a1; margin-bottom: 8px; }
 .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
-/* 🌟 Animated Lighting Effect on Stat Cards */
+/* 🌟 Stat Cards with Distinct Moving Color Light & Inner Burst Effects */
 .stat-card { 
-border: 1px solid #bbdefb; 
+border: 2px solid transparent; 
 border-radius: 6px; 
 text-align: center; 
 padding: 10px 4px; 
@@ -140,20 +140,53 @@ z-index: 10;
 pointer-events: auto !important; 
 overflow: hidden;
 }
-.stat-card:hover { background: #e3f2fd; transform: scale(1.02); }
+.stat-card:hover { transform: scale(1.02); }
 
-/* Moving Border Light Effect */
-.stat-card::after {
+/* Card 1: मिळालेले M.B. -> Green / Cyan / Lime Theme */
+.stat-card:nth-child(1)::after {
 content: '';
 position: absolute;
 inset: -2px;
 border-radius: 8px;
-background: linear-gradient(90deg, #00e5ff, #00c853, #e040fb, #00e5ff);
+background: linear-gradient(90deg, #00c853, #00e5ff, #76ff03, #00c853);
 background-size: 300% 300%;
-animation: borderLightMove 6s linear infinite;
+animation: borderLightMove 4s linear infinite;
 z-index: 1;
 pointer-events: none;
-opacity: 0.6;
+mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+-webkit-mask-composite: xor;
+mask-composite: exclude;
+}
+
+/* Card 2: दिलेली M.B. -> Blue / Violet / Magenta Theme */
+.stat-card:nth-child(2)::after {
+content: '';
+position: absolute;
+inset: -2px;
+border-radius: 8px;
+background: linear-gradient(90deg, #2979ff, #aa00ff, #ff4081, #2979ff);
+background-size: 300% 300%;
+animation: borderLightMove 4s linear infinite;
+z-index: 1;
+pointer-events: none;
+mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+-webkit-mask-composite: xor;
+mask-composite: exclude;
+}
+
+/* Card 3: उपलब्ध M.B. -> Orange / Pink / Yellow Theme */
+.stat-card:nth-child(3)::after {
+content: '';
+position: absolute;
+inset: -2px;
+border-radius: 8px;
+background: linear-gradient(90deg, #ff9100, #ffea00, #ff1744, #ff9100);
+background-size: 300% 300%;
+animation: borderLightMove 4s linear infinite;
+z-index: 1;
+pointer-events: none;
 mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 -webkit-mask-composite: xor;
@@ -166,42 +199,42 @@ mask-composite: exclude;
 100% { background-position: 0% 50%; }
 }
 
-/* Inner Electric Spark / Mini Light Burst Effect */
+/* Inner Color Particle Burst Effect */
 .stat-card::before {
 content: '';
 position: absolute;
-top: 25%;
-left: 35%;
-width: 4px;
-height: 4px;
+top: 30%;
+left: 40%;
+width: 5px;
+height: 5px;
 background: #00e5ff;
 border-radius: 50%;
-box-shadow: 0 0 8px 3px rgba(0, 229, 255, 0.8);
+box-shadow: 0 0 10px 4px rgba(0, 229, 255, 0.9), 6px 8px 0px #00c853, -8px -6px 0px #76ff03;
 opacity: 0;
-animation: electricSpark 4s ease-in-out infinite;
+animation: colorParticleBurst 3.5s ease-in-out infinite;
 pointer-events: none;
 z-index: 2;
 }
 .stat-card:nth-child(2)::before {
-top: 60%;
-left: 70%;
-animation-delay: 1.5s;
-background: #e040fb;
-box-shadow: 0 0 8px 3px rgba(224, 64, 251, 0.8);
+top: 55%;
+left: 65%;
+animation-delay: 1.2s;
+background: #aa00ff;
+box-shadow: 0 0 10px 4px rgba(170, 0, 255, 0.9), -7px 6px 0px #2979ff, 8px -5px 0px #ff4081;
 }
 .stat-card:nth-child(3)::before {
-top: 45%;
-left: 50%;
-animation-delay: 2.8s;
-background: #00c853;
-box-shadow: 0 0 8px 3px rgba(0, 200, 83, 0.8);
+top: 40%;
+left: 55%;
+animation-delay: 2.1s;
+background: #ffea00;
+box-shadow: 0 0 10px 4px rgba(255, 234, 0, 0.9), 7px -7px 0px #ff9100, -6px 7px 0px #ff1744;
 }
 
-@keyframes electricSpark {
-0%, 80% { opacity: 0; transform: scale(0.5); }
-85% { opacity: 1; transform: scale(1.5); }
-90% { opacity: 0.8; transform: scale(2); box-shadow: 0 0 12px 6px rgba(255,255,255,0.9); }
-100% { opacity: 0; transform: scale(1); }
+@keyframes colorParticleBurst {
+0%, 75% { opacity: 0; transform: scale(0.3); }
+82% { opacity: 1; transform: scale(1.4); }
+90% { opacity: 0.7; transform: scale(2.2); filter: brightness(1.3); }
+100% { opacity: 0; transform: scale(1.2); }
 }
 
 .stat-num { font-size: 18px; font-weight: 700; color: #0d47a1; pointer-events: none; position: relative; z-index: 3; }
@@ -1259,7 +1292,7 @@ function refreshMBDashboard() {
     if(document.getElementById('countAvailableMB')) document.getElementById('countAvailableMB').innerText = availableCount;
 }
 
-// ** 🌟 Smart M.B. Number Assistant (Updated Exact and New Messages as requested) **
+// ** 🌟 Smart M.B. Number Assistant (Updated Validation Text as requested) **
 function checkRealTimeMBInput(input) {
     var val = (input.value || '').trim();
     var statusEl = document.getElementById('mbRealtimeStatus');
@@ -1769,8 +1802,8 @@ function saveOrUpdateMB() {
 
         if (recType === 'नवीन') {
             subDetail = document.getElementById('bhandarpalNameInput').value.trim();
-            if (!subDetail) return showAlert('कृपया भंडारपाळाचे नाव भरा.', 'WARNING');
-            srcText = 'भंडारपाल (' + subDetail + ')';
+            if (!subDetail) return showAlert('कृपया भांडारपाळाचे नाव भरा.', 'WARNING');
+            srcText = 'भांडारपाल (' + subDetail + ')';
         } else {
             var chalooSrc = document.getElementById('mbChalooSource').value;
             if (!chalooSrc) return showAlert('कृपया चालू स्रोत निवडा.', 'WARNING');
@@ -2229,7 +2262,7 @@ function generateGeneralReport() {
     var isoTo = normalizeDateToISO(tDate);
 
     if (isoFrom > isoTo) {
-        return showAlert("'दिनांक पासून' हा दिनांक 'दिनांक पर्यंत' नंतरचा असू शकत नाही!", 'ERROR');
+        return showAlert("'दिनांक पासून' हा दिनांक 'दिनांक पर्यंत' ನಂತರचा असू शकत नाही!", 'ERROR');
     }
 
     var mainCat = document.getElementById('repMainCategory').value;
