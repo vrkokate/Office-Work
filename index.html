@@ -321,7 +321,7 @@ body * { visibility: hidden !important; }
 </div>
 </div>
 
-<!-- 🌟 System Health Monitor Floating Card (Problem असेल तरच दिसणार) -->
+<!-- 🌟 System Health Monitor Floating Card (Exact Root Cause Diagnostic) -->
 <div id="systemHealthAlertCard" style="display:none; position:fixed; bottom:20px; right:20px; max-width:320px; background:#fff; border-left:4px solid #f57c00; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.2); padding:12px; z-index:3500; animation: fadeInGlow 0.4s ease;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
         <span style="font-size:12.5px; font-weight:800; color:#e65100;" id="healthAlertTitle">⚠️ M.B. DATA WARNING</span>
@@ -1041,29 +1041,46 @@ function refreshAll() {
     }
 }
 
-// ** 🌟 System Health Monitor Background Checker (Exact M.B. String Matching) **
+// ** 🌟 System Health Monitor Background Checker (Exact Root Cause Diagnostic) **
 function checkSystemHealth() {
-    var allMBs = getData('mb_records');
-    var uniqueReceivedMap = {};
-    allMBs.forEach(function(m) {
-        if (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी') {
-            var no = normalizeMB(m.mbNumber);
-            if (no) uniqueReceivedMap[no] = true;
-        }
-    });
-    var totalReceived = Object.keys(uniqueReceivedMap).length;
+    var uniqueReceived = getUniqueReceivedMBs();
     var activeGiven = getCurrentlyActiveGivenMBs();
     var stock = getAvailableStock();
     
-    var expectedAvailable = totalReceived - activeGiven.length;
+    var totalReceivedCount = uniqueReceived.length;
+    var activeGivenCount = activeGiven.length;
+    var expectedAvailable = totalReceivedCount - activeGivenCount;
     var currentAvailable = stock.length;
 
     var alertCard = document.getElementById('systemHealthAlertCard');
     if (!alertCard) return;
 
-    if (currentAvailable !== expectedAvailable) {
+    // Check intersection (Issued ∩ Available)
+    var issuedMap = {};
+    activeGiven.forEach(function(m) {
+        var no = (m.mbNumber || '').trim();
+        if (no) issuedMap[no] = true;
+    });
+
+    var overlapList = [];
+    stock.forEach(function(s) {
+        var no = (s.mbNumber || '').trim();
+        if (no && issuedMap[no]) {
+            if (!overlapList.includes(no)) {
+                overlapList.push(no);
+            }
+        }
+    });
+
+    if (currentAvailable !== expectedAvailable || overlapList.length > 0) {
         document.getElementById('healthAlertTitle').innerText = '⚠️ M.B. DATA WARNING';
-        document.getElementById('healthAlertText').innerHTML = 'Available M.B. मध्ये तफावत आढळली.<br>Expected: ' + expectedAvailable + ' | Current: ' + currentAvailable + '<br>Difference: ' + Math.abs(currentAvailable - expectedAvailable);
+        var warningText = 'Available M.B. मध्ये तफावत आढळली.<br>Expected Available: ' + expectedAvailable + ' | Current Available: ' + currentAvailable + '<br>Difference: ' + Math.abs(currentAvailable - expectedAvailable);
+        
+        if (overlapList.length > 0) {
+            warningText += '<br><strong style="color:#d32f2f;">समस्या:</strong> M.B. क्र. <strong>' + overlapList.join(', ') + '</strong> ही Issued आणि Available दोन्हीमध्ये आढळली.';
+        }
+
+        document.getElementById('healthAlertText').innerHTML = warningText;
         alertCard.style.display = 'block';
     } else {
         alertCard.style.display = 'none';
@@ -1076,7 +1093,35 @@ function closeHealthAlert() {
 }
 
 function showHealthDetails() {
-    showAlert('System Health Details:\nगणिती सुसंगतता तपासा. Received - Issued = Available चे गणित तपासले गेले आहे.', 'WARNING');
+    var uniqueReceived = getUniqueReceivedMBs();
+    var activeGiven = getCurrentlyActiveGivenMBs();
+    var stock = getAvailableStock();
+    var expectedAvailable = uniqueReceived.length - activeGiven.length;
+    
+    var issuedMap = {};
+    activeGiven.forEach(function(m) {
+        var no = (m.mbNumber || '').trim();
+        if (no) issuedMap[no] = true;
+    });
+    var overlapList = [];
+    stock.forEach(function(s) {
+        var no = (s.mbNumber || '').trim();
+        if (no && issuedMap[no]) overlapList.push(no);
+    });
+
+    var msg = 'System Health Details:\n' +
+              'एकूण Unique Received M.B.: ' + uniqueReceived.length + '\n' +
+              'एकूण Active Issued M.B.: ' + activeGiven.length + '\n' +
+              'Expected Available: ' + expectedAvailable + '\n' +
+              'Current Available: ' + stock.length;
+              
+    if (overlapList.length > 0) {
+        msg += '\n\nOverlap Found (Issued & Available both): ' + overlapList.join(', ');
+    } else {
+        msg += '\n\nNo direct overlap found between Issued and Available.';
+    }
+
+    showAlert(msg, 'WARNING');
 }
 
 function openModule(id) {
@@ -2430,7 +2475,7 @@ function openSmartActionCenter(mbNo) {
     if (isAvail) {
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-give" onclick="sacOpenIssueForm()">📤 ISSUE / GIVE</button>`;
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-receive" style="opacity:0.5; cursor:not-allowed;" title="ही M.B. आधीच कार्यालयात उपलब्ध आहे">📥 RECEIVE</button>`;
-        btnGrid.innerHTML += `<button class="btn-smart-act btn-act-edit" onclick="sacTriggerEditRecord()">✏️️ EDIT</button>`;
+        btnGrid.innerHTML += `<button class="btn-smart-act btn-act-edit" onclick="sacTriggerEditRecord()">✏️ EDIT</button>`;
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-history" onclick="sacToggleHistoryView()">🕘 HISTORY</button>`;
     } else {
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-transfer" onclick="sacOpenTransferForm()">📤 TRANSFER</button>`;
@@ -2457,7 +2502,7 @@ function sacTriggerReceiveMB() {
     var todayISO = new Date().toISOString().slice(0, 10);
     var todayDMY = formatDateToDMY(todayISO);
 
-    var confirmMsg = "⚠️ CONFIRM RECEIVE\n\n" +
+    var confirmMsg = "⚠️️ CONFIRM RECEIVE\n\n" +
     "M.B. क्रमांक: " + currentSacMB + "\n" +
     "धारक: " + holder + "\n" +
     "दिनांक: " + todayDMY + "\n\n" +
@@ -3035,7 +3080,7 @@ function refreshJEList() {
     if(!tbody) return;
     tbody.innerHTML = '';
     list.forEach(function(item, idx) {
-        tbody.innerHTML += '<tr><td>' + (idx+1)  + '</td><td>' + item.name + '</td><td class="action-cell"><button class="btn-action" style="background:#2e7d32;" onclick="editJE(' + idx + ')">Edit</button><button class="btn-action" style="background:#d32f2f;" onclick="deleteJE(' + idx + ')">Delete</button></td></tr>';
+        tbody.innerHTML += '<tr><td>' + (idx+1) + '</td><td>' + item.name + '</td><td class="action-cell"><button class="btn-action" style="background:#2e7d32;" onclick="editJE(' + idx + ')">Edit</button><button class="btn-action" style="background:#d32f2f;" onclick="deleteJE(' + idx + ')">Delete</button></td></tr>';
     });
 }
 
@@ -3312,7 +3357,7 @@ function addOtherDeductionField() {
     div.id = newRowId;
     div.innerHTML = '<div style="display:flex; align-items:center; justify-content:space-between;">' +
     '<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="' + newLabelId + '">Other-' + otherDeductionCount + '</span></label>' +
-    '<button type="button" onclick="removeOtherDeductionField(\'' + newRowId + '\')" style="background:#d32f2f; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="कपात काढा">-</button>' +
+    '<button type="button" onclick="removeOtherDeductionField(\'' + newRowId + '\')" style="background:#d32f2f; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11.5px;" title="कपात काढा">-</button>' +
     '</div>' +
     '<input type="number" class="form-control calc-ded" id="' + newInputId + '" value="0" oninput="autoCalculateDeductions()">';
     container.appendChild(div);
