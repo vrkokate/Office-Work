@@ -977,7 +977,7 @@
             <label>३. नियुक्ती दिनांक:</label>
             <div class="date-box-wrapper">
                 <input type="text" id="empJoinDate_disp" placeholder="नियुक्ती दिनांक निवडा" readonly>
-                <input type="date" id="empJoinDate" class="overlay-date-input" onchange="handleJoinDateChange();">
+                <input type="date" id="empJoinDate" class="overlay-date-input" onchange="handleDatePicked('empJoinDate', 'empJoinDate_disp'); reEvaluateAllOptionSuggestions(); validateCard1();">
                 <span class="cal-btn-icon">📅</span>
             </div>
         </div>
@@ -1173,7 +1173,7 @@
                 <label>कालावधी सुरू (पासून):</label>
                 <div class="date-box-wrapper">
                     <input type="text" id="fixationFrom_disp" placeholder="सुरू दिनांक निवडा" readonly>
-                    <input type="date" id="fixationFrom" class="overlay-date-input" onchange="onFixationFromChange();">
+                    <input type="date" id="fixationFrom" class="overlay-date-input" onchange="handleDatePicked('fixationFrom', 'fixationFrom_disp'); validateCard3();">
                     <span class="cal-btn-icon">📅</span>
                 </div>
             </div>
@@ -1181,7 +1181,7 @@
                 <label>कालावधी अखेर (पर्यंत):</label>
                 <div class="date-box-wrapper">
                     <input type="text" id="fixationTo_disp" placeholder="अखेर दिनांक निवडा" readonly>
-                    <input type="date" id="fixationTo" class="overlay-date-input" onchange="onFixationToChange();">
+                    <input type="date" id="fixationTo" class="overlay-date-input" onchange="handleDatePicked('fixationTo', 'fixationTo_disp'); validateCard3();">
                     <span class="cal-btn-icon">📅</span>
                 </div>
             </div>
@@ -1554,8 +1554,6 @@
         document.getElementById('fixationTo').value = d.fixationTo || '';
         handleDatePicked('fixationTo', 'fixationTo_disp');
 
-        updateDateConstraints();
-
         document.getElementById('autoCommissionChange').value = d.autoCommissionChange || 'Yes';
         document.getElementById('incrementMonthRule7th').value = d.incrementMonthRule7th || 'july';
 
@@ -1656,72 +1654,10 @@
         }
     }
 
-    function handleJoinDateChange() {
-        handleDatePicked('empJoinDate', 'empJoinDate_disp');
-        reEvaluateAllOptionSuggestions();
-        validateCard1();
-        updateDateConstraints();
-    }
-
-    function updateDateConstraints() {
-        const joinDate = document.getElementById('empJoinDate').value;
-        const fromInput = document.getElementById('fixationFrom');
-        const toInput = document.getElementById('fixationTo');
-
-        if (joinDate) {
-            fromInput.min = joinDate;
-            if (!fromInput.value || fromInput.value < joinDate) {
-                fromInput.value = joinDate;
-                handleDatePicked('fixationFrom', 'fixationFrom_disp');
-            }
-            toInput.min = fromInput.value || joinDate;
-            if (!toInput.value || toInput.value < toInput.min) {
-                toInput.value = toInput.min;
-                handleDatePicked('fixationTo', 'fixationTo_disp');
-            }
-        }
-    }
-
-    function onFixationFromChange() {
-        handleDatePicked('fixationFrom', 'fixationFrom_disp');
-        const joinDate = document.getElementById('empJoinDate').value;
-        const fromInput = document.getElementById('fixationFrom');
-        const toInput = document.getElementById('fixationTo');
-
-        if (joinDate && fromInput.value && fromInput.value < joinDate) {
-            alert("अहवालाची सुरुवातीची तारीख कर्मचाऱ्याच्या दिनांकापूर्वीची असू शकत नाही.");
-            fromInput.value = joinDate;
-            handleDatePicked('fixationFrom', 'fixationFrom_disp');
-        }
-
-        if (fromInput.value) {
-            toInput.min = fromInput.value;
-            if (toInput.value && toInput.value < toInput.min) {
-                toInput.value = toInput.min;
-                handleDatePicked('fixationTo', 'fixationTo_disp');
-            }
-        }
-        validateCard3();
-    }
-
-    function onFixationToChange() {
-        handleDatePicked('fixationTo', 'fixationTo_disp');
-        const fromInput = document.getElementById('fixationFrom');
-        const toInput = document.getElementById('fixationTo');
-
-        if (fromInput.value && toInput.value && toInput.value < fromInput.value) {
-            alert("अहवालाची अखेरची तारीख सुरुवातीच्या तारखेपूर्वीची असू शकत नाही.");
-            toInput.value = fromInput.value;
-            handleDatePicked('fixationTo', 'fixationTo_disp');
-        }
-        validateCard3();
-    }
-
     function openModal(modalId) { 
         const modal = document.getElementById(modalId);
         if (modal) modal.classList.remove('hidden');
         if (modalId === 'rulesModal') {
-            updateDateConstraints();
             const withheldVal = document.getElementById('incrementWithheld').value;
             const effectDiv = document.getElementById('withheldEffectDiv');
             if (withheldVal === 'Yes') effectDiv.classList.remove('hidden');
@@ -2015,13 +1951,12 @@
     function validateCard3() {
         const fromDate = document.getElementById('fixationFrom').value;
         const toDate = document.getElementById('fixationTo').value;
-        const joinDate = document.getElementById('empJoinDate').value;
 
         const card = document.getElementById('cardRules');
         const status = document.getElementById('cardRulesStatus');
         const badge = document.getElementById('cardRulesBadge');
 
-        if (fromDate && toDate && (!joinDate || fromDate >= joinDate)) {
+        if (fromDate && toDate) {
             card.classList.remove('card-pending');
             card.classList.add('card-filled');
             status.textContent = "✓ माहिती पूर्ण भरली आहे";
@@ -2208,7 +2143,7 @@
         "S-27": [118500, 122100, 125800, 129600, 133500, 137500, 141600, 145800, 150200, 154700, 159300, 164100, 169000, 174100, 179300, 184700, 190200, 195900, 201800, 207900, 214100],
         "S-28": [124800, 128500, 132400, 136400, 140500, 144700, 149000, 153500, 158100, 162800, 167700, 172700, 177900, 183200, 188700, 194400, 200200, 206200, 212400, 216600],
         "S-29": [131100, 135000, 139100, 143300, 147600, 152000, 156600, 161300, 166100, 171100, 176200, 181500, 186900, 192500, 198300, 204200, 210300, 212400],
-        "S-30": [144200, 148500, 153000, 157600, 162300, 167200, 172200, 177400, 182700, 188200, 193800, 1뎃4200 (193800, 199600, 205600, 211800, 218200],
+        "S-30": [144200, 148500, 153000, 157600, 162300, 167200, 172200, 177400, 182700, 188200, 193800, 199600, 205600, 211800, 218200],
         "S-31": [182200, 187700, 193300, 199100, 205100, 211300, 217600, 224100]
     };
 
@@ -2310,9 +2245,9 @@
                     </div>
                     ${empInfoBox}
                     <table class="ill-table">
-                        <tr><td class="col-desc">१. ३१-१२-२०१५ रोजीचे मूळ वेतन (६वा आयोग) [Pay in Pay Band]</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_b6" class="ill-input ill-num-input" value="${data.basic6th}" oninput="recalculate7thIllustration(${dataIndex})"></td></tr>
+                        <tr><td class="col-desc">१. ३१-१२-२०१५ रोजीचे मूळ वेतन (६वा आयोग)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_b6" class="ill-input ill-num-input" value="${data.basic6th}" oninput="recalculate7thIllustration(${dataIndex})"></td></tr>
                         <tr><td class="col-desc">२. ग्रेड पे (Grade Pay)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_gp6" class="ill-input ill-num-input" value="${data.gp6th}" oninput="recalculate7thIllustration(${dataIndex})"></td></tr>
-                        <tr><td class="col-desc">३. एकूण वेतन (Pay in Pay Band + Grade Pay)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_total6" class="ill-input ill-num-input" value="${data.total6th}" readonly></td></tr>
+                        <tr><td class="col-desc">३. एकूण वेतन (Basic + GP)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_total6" class="ill-input ill-num-input" value="${data.total6th}" readonly></td></tr>
                         <tr><td class="col-desc">४. २.५७ गुणाकार घटक (Total × 2.57)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_fit" class="ill-input ill-num-input" value="${data.fitmentCalc}" readonly></td></tr>
                         <tr><td class="col-desc">५. ७व्या आयोगातील समतुल्य स्तर (Pay Matrix Level) <span class="ill-no-print">[बदला: S-20 / S-23]</span></td><td class="col-dots">...</td><td class="col-val"><input type="text" id="ill_7th_lvl" class="ill-input ill-num-input" style="text-align:center;" value="${data.level}" oninput="recalculate7thIllustration(${dataIndex})"></td></tr>
                         <tr style="background:#e8f5e9; font-weight:bold;"><td class="col-desc">६. पे-मॅट्रिक्सनुसार अंतिम निश्चित वेतन</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_final" class="ill-input ill-num-input" value="${data.finalBasic7th}" style="color:#b71c1c;" readonly></td></tr>
@@ -2338,19 +2273,19 @@
         let b6 = parseFloat(document.getElementById('ill_7th_b6').value) || 0;
         let gp6 = parseFloat(document.getElementById('ill_7th_gp6').value) || 0;
         let total6 = b6 + gp6;
-        let fit = Math.round(total6 * 2.57 * 100) / 100;
+        let fit = Math.round(total6 * 2.57);
         let lvl = document.getElementById('ill_7th_lvl').value.trim() || "S-23";
 
-        let fitRes = fitInMatrix(lvl, total6 * 2.57);
+        let fitRes = fitInMatrix(lvl, fit);
 
         document.getElementById('ill_7th_total6').value = total6;
-        document.getElementById('ill_7th_fit').value = fit.toFixed(2);
+        document.getElementById('ill_7th_fit').value = fit;
         document.getElementById('ill_7th_final').value = fitRes.basic;
 
         globalCalcDataList[dataIndex].basic6th = b6;
         globalCalcDataList[dataIndex].gp6th = gp6;
         globalCalcDataList[dataIndex].total6th = total6;
-        globalCalcDataList[dataIndex].fitmentCalc = fit.toFixed(2);
+        globalCalcDataList[dataIndex].fitmentCalc = fit;
         globalCalcDataList[dataIndex].level = lvl;
         globalCalcDataList[dataIndex].finalBasic7th = fitRes.basic;
     }
@@ -2709,7 +2644,7 @@
             advisorBox.innerHTML = `✓ <b>उत्तम निवड!</b> आपण निवडलेला विकल्प दिनांक (${rec.bestFormatted}) आर्थिकदृष्ट्या सर्वाधिक फायदेशीर आहे.<br><small>${rec.adviceHtml}</small>`;
         } else {
             advisorBox.className = "option-advisor-box advisor-warn";
-            advisorBox.innerHTML = `⚠️ <b>लक्ष द्या:</b> आपण निवडलेला विकल्प दिनांक आर्थिकदृष्ट्या तोट्याचा ठरू शकतो!<br>${rec.adviceHtml}<br><button type="button" class="advisor-btn" onclick="applySuggestedOptionDate(${idx}, '${rec.bestIso}', '${rec.bestFormatted}')">👉 हा फायदेशीर दिनांक [${rec.bestFormatted}] लागू करा</button>`;
+            advisorBox.innerHTML = `⚠️️ <b>लक्ष द्या:</b> आपण निवडलेला विकल्प दिनांक आर्थिकदृष्ट्या तोट्याचा ठरू शकतो!<br>${rec.adviceHtml}<br><button type="button" class="advisor-btn" onclick="applySuggestedOptionDate(${idx}, '${rec.bestIso}', '${rec.bestFormatted}')">👉 हा फायदेशीर दिनांक [${rec.bestFormatted}] लागू करा</button>`;
         }
     }
 
@@ -2786,19 +2721,6 @@
 
             if (!joinDateInput || !scale || isNaN(basic) || !fromDateInput || !toDateInput) {
                 alert("कृपया तिन्ही कार्ड्स मधील आवश्यक माहिती पूर्ण भरा!");
-                return;
-            }
-
-            let joinDateObj = parseLocalDate(joinDateInput);
-            let startDate = parseLocalDate(fromDateInput);
-            let endDate = parseLocalDate(toDateInput);
-
-            if (startDate < joinDateObj) {
-                alert("अहवालाची सुरुवातीची तारीख कर्मचाऱ्याच्या दिनांकापूर्वीची असू शकत नाही.");
-                return;
-            }
-            if (endDate < startDate) {
-                alert("अहवालाची अखेरची तारीख सुरुवातीच्या तारखेपूर्वीची असू शकत नाही.");
                 return;
             }
 
@@ -2909,6 +2831,9 @@
             tableBody.innerHTML = "";
 
             let events = [];
+            let startDate = parseLocalDate(fromDateInput);
+            let endDate = parseLocalDate(toDateInput);
+            let joinDateObj = parseLocalDate(joinDateInput);
             let joinMonth = joinDateObj.getMonth();
 
             events.push({
@@ -3162,13 +3087,11 @@
                 }
                 else if (ev.type === 'COMMISSION_7TH') {
                     currentCommission = '7th';
-                    let payInBand6th = currentBasic; // Pay in Pay Band
-                    let gp6thVal = prevGpForSheet; // Grade Pay
-                    let totalBefore7th = payInBand6th + gp6thVal; // Existing Basic Pay
-                    currentLevel = mapGpTo7thLevel(gp6thVal);
-                    
-                    let fitmentCalcVal = Math.round(totalBefore7th * 2.57 * 100) / 100;
+                    let totalBefore7th = currentBasic; // In 6th, currentBasic is already Pay in Band + Grade Pay
+                    currentLevel = mapGpTo7thLevel(prevGpForSheet);
                     let fitmentResult = fitInMatrix(currentLevel, totalBefore7th * 2.57);
+                    let oldB = currentBasic - prevGpForSheet;
+                    let oldGP = prevGpForSheet;
 
                     currentBasic = fitmentResult.basic;
                     currentMatrixIndex = fitmentResult.index;
@@ -3189,10 +3112,10 @@
                         designation: finalDesignation,
                         joinDate: joinDateFormatted,
                         existingScale: prevScaleForSheet,
-                        gp6th: gp6thVal,
-                        basic6th: payInBand6th,
+                        gp6th: oldGP,
+                        basic6th: oldB,
                         total6th: totalBefore7th,
-                        fitmentCalc: fitmentCalcVal,
+                        fitmentCalc: Math.round(totalBefore7th * 2.57),
                         level: currentLevel,
                         finalBasic7th: currentBasic,
                         proposedScale: newScale7th
@@ -3298,6 +3221,7 @@
                         let oldGP = currentGP;
                         currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
                         
+                        // 🌟 नियम १३ / नियम ११(१) विकल्पानुसार अचूक सूत्र: (३% मूळ वेतनातील वाढ + नवीन ग्रेड पे आणि जुना ग्रेड पे मधील फरक)
                         let inc = Math.ceil((lBasic * 0.03) / 10) * 10;
                         let gpDiff = currentGP - oldGP;
                         currentBasic = lBasic + inc + gpDiff;
@@ -3346,6 +3270,7 @@
                         let oldGP = currentGP;
                         currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
                         
+                        // 🌟 थेट लाभाच्या दिनांकावर फिक्सेशन (3% Increment + GP Difference)
                         let inc = Math.ceil((currentBasic * 0.03) / 10) * 10;
                         let gpDiff = currentGP - oldGP;
                         currentBasic = currentBasic + inc + gpDiff;
