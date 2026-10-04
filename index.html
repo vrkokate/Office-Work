@@ -126,9 +126,9 @@ letter-spacing: 0.5px;
 .summary-title { font-size: 13px; font-weight: 700; text-align: center; color: #0d47a1; margin-bottom: 8px; }
 .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
-/* 🌟 Reference GIF 1 Based Moving Border Light Effect on Stat Cards */
+/* 🌟 Reference GIF 1 Based Distinct Moving Color Border Light Effect on Stat Cards */
 .stat-card { 
-border: 2px solid transparent; 
+border: 2px solid #b0bec5; 
 border-radius: 6px; 
 text-align: center; 
 padding: 10px 4px; 
@@ -139,18 +139,19 @@ position: relative;
 z-index: 10; 
 pointer-events: auto !important; 
 overflow: hidden;
+box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 .stat-card:hover { transform: scale(1.02); }
 
-/* Card 1: मिळालेले M.B. -> Green / Cyan Moving Border Light */
+/* Card 1: मिळालेले M.B. -> Green / Cyan / Lime Moving Border Flow */
 .stat-card:nth-child(1)::after {
 content: '';
 position: absolute;
-inset: -2px;
+inset: -3px;
 border-radius: 8px;
 background: linear-gradient(90deg, #00c853, #00e5ff, #76ff03, #00c853);
 background-size: 300% 300%;
-animation: borderLightMove 4s linear infinite;
+animation: borderLightFlow 3s linear infinite;
 z-index: 1;
 pointer-events: none;
 mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -159,15 +160,15 @@ mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 mask-composite: exclude;
 }
 
-/* Card 2: दिलेली M.B. -> Blue / Violet / Magenta Moving Border Light */
+/* Card 2: दिलेली M.B. -> Blue / Violet / Magenta Moving Border Flow */
 .stat-card:nth-child(2)::after {
 content: '';
 position: absolute;
-inset: -2px;
+inset: -3px;
 border-radius: 8px;
 background: linear-gradient(90deg, #2979ff, #aa00ff, #ff4081, #2979ff);
 background-size: 300% 300%;
-animation: borderLightMove 4s linear infinite;
+animation: borderLightFlow 3s linear infinite;
 z-index: 1;
 pointer-events: none;
 mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -176,15 +177,15 @@ mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 mask-composite: exclude;
 }
 
-/* Card 3: उपलब्ध M.B. -> Orange / Pink / Yellow Moving Border Light */
+/* Card 3: उपलब्ध M.B. -> Orange / Yellow / Red Moving Border Flow */
 .stat-card:nth-child(3)::after {
 content: '';
 position: absolute;
-inset: -2px;
+inset: -3px;
 border-radius: 8px;
 background: linear-gradient(90deg, #ff9100, #ffea00, #ff1744, #ff9100);
 background-size: 300% 300%;
-animation: borderLightMove 4s linear infinite;
+animation: borderLightFlow 3s linear infinite;
 z-index: 1;
 pointer-events: none;
 mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -193,7 +194,7 @@ mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 mask-composite: exclude;
 }
 
-@keyframes borderLightMove {
+@keyframes borderLightFlow {
 0% { background-position: 0% 50%; }
 50% { background-position: 100% 50%; }
 100% { background-position: 0% 50%; }
@@ -1211,7 +1212,7 @@ function getCurrentlyHeldMBsByJE(jeName) {
     return heldMBs;
 }
 
-// ** 🌟 Number Count Animation (Smooth Speed as requested) **
+// ** 🌟 Number Count Animation (Slightly Slower Smooth Speed as requested) **
 function animateNumberCount(elementId, finalVal) {
     var el = document.getElementById(elementId);
     if (!el) return;
@@ -1220,8 +1221,8 @@ function animateNumberCount(elementId, finalVal) {
         el.innerText = 0;
         return;
     }
-    var duration = 1200; // milliseconds (smooth pace)
-    var steps = 30;
+    var duration = 1600; // milliseconds (slower, smooth pace)
+    var steps = 35;
     var increment = finalVal / steps;
     var stepTime = duration / steps;
     
