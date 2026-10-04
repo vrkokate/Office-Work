@@ -908,7 +908,7 @@
 
     <div class="report-btn-group">
         <button type="button" class="save-record-btn" onclick="saveCurrentFixationRecord()">💾 रेकॉर्ड सेव्ह करा</button>
-        <button type="button" class="edit-data-btn" onclick="closeReportView(); scrollToEditData();">✏️ माहिती दुरुस्त करा</button>
+        <button type="button" class="edit-data-btn" onclick="closeReportView(); loadCurrentRecordIntoForm(); scrollToEditData();">✏️ माहिती दुरुस्त करा</button>
         <button type="button" class="print-direct-btn" onclick="printReportChrome()">🖨 प्रिंट काढा (Chrome)</button>
         <button type="button" class="download-pdf-btn" onclick="downloadReportPDF()">📥 PDF डाऊनलोड (App)</button>
     </div>
@@ -945,7 +945,7 @@
         </div>
 
         <div class="ill-no-print" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom: 8px;">
-            <button type="button" onclick="printIllustrationChrome()" style="background:#0277bd; color:#fff; border:none; padding:6px 12px; font-size:11.5px; font-weight:bold; border-radius:4px; cursor:pointer;">🖨️️ प्रिंट काढा (Chrome)</button>
+            <button type="button" onclick="printIllustrationChrome()" style="background:#0277bd; color:#fff; border:none; padding:6px 12px; font-size:11.5px; font-weight:bold; border-radius:4px; cursor:pointer;">🖨️ प्रिंट काढा (Chrome)</button>
             <button type="button" onclick="downloadIllustrationPDF()" style="background:#455a64; color:#fff; border:none; padding:6px 12px; font-size:11.5px; font-weight:bold; border-radius:4px; cursor:pointer;">📥 PDF डाऊनलोड (App)</button>
         </div>
 
@@ -1418,14 +1418,9 @@
         renderSavedRecordsTable();
     }
 
-    function saveCurrentFixationRecord() {
+    function getRecordDataObject() {
         const empName = document.getElementById('empName').value.trim();
         const empDesig = document.getElementById('empDesignation').value.trim();
-
-        if (!empName) {
-            alert("कृपया कर्मचाऱ्याचे नाव भरा!");
-            return;
-        }
 
         let revRows = [];
         document.querySelectorAll('#scaleRevList .scale-rev-item').forEach(item => {
@@ -1435,7 +1430,7 @@
             if (d && c && s) revRows.push({ d, c, s });
         });
 
-        const recordData = {
+        return {
             id: currentEditingRecordId || Date.now(),
             savedAt: new Date().toLocaleString('mr-IN'),
             empName: empName,
@@ -1477,20 +1472,30 @@
                 withheldDates: Array.from(selectedWithheldDates)
             }
         };
+    }
 
+    function saveCurrentFixationRecord(showAlert = true) {
+        const empName = document.getElementById('empName').value.trim();
+        if (!empName) {
+            if (showAlert) alert("कृपया कर्मचाऱ्याचे नाव भरा!");
+            return null;
+        }
+
+        const recordData = getRecordDataObject();
         let list = getSavedRecordsFromStorage();
         if (currentEditingRecordId) {
             let idx = list.findIndex(r => r.id === currentEditingRecordId);
             if (idx !== -1) list[idx] = recordData;
             else list.unshift(recordData);
-            alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या अद्ययावत झाली!`);
+            if (showAlert) alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या अद्ययावत झाली!`);
         } else {
             list.unshift(recordData);
-            alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या सेव्ह झाली!`);
+            currentEditingRecordId = recordData.id;
+            if (showAlert) alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या सेव्ह झाली!`);
         }
 
         saveRecordsListToStorage(list);
-        currentEditingRecordId = null; // Save पूर्ण झाल्यावर ID reset करा
+        return recordData;
     }
 
     function renderSavedRecordsTable() {
@@ -1587,6 +1592,15 @@
         validateCard3();
     }
 
+    function loadCurrentRecordIntoForm() {
+        if (!currentEditingRecordId) return;
+        let list = getSavedRecordsFromStorage();
+        let rec = list.find(r => r.id === currentEditingRecordId);
+        if (rec) {
+            populateFormFromRecord(rec);
+        }
+    }
+
     function viewSavedRecord(id) {
         let list = getSavedRecordsFromStorage();
         let rec = list.find(r => r.id === id);
@@ -1604,7 +1618,7 @@
         populateFormFromRecord(rec);
         closeReportView();
         scrollToEditData();
-        alert(`'${rec.empName}' यांची माहिती फॉर्ममध्ये भरली आहे. आवश्यक ते बदल करून पुन्हा 'Submit Data' व 'Save Record' करा.`);
+        alert(`'${rec.empName}' यांची माहिती फॉर्ममध्ये भरली आहे. आवश्यक ते बदल करून पुन्हा 'Submit Data' किंवा 'Save Record' करा.`);
     }
 
     function deleteSavedRecord(id, empName) {
@@ -2655,7 +2669,7 @@
             advisorBox.innerHTML = `✓ <b>उत्तम निवड!</b> आपण निवडलेला विकल्प दिनांक (${rec.bestFormatted}) आर्थिकदृष्ट्या सर्वाधिक फायदेशीर आहे.<br><small>${rec.adviceHtml}</small>`;
         } else {
             advisorBox.className = "option-advisor-box advisor-warn";
-            advisorBox.innerHTML = `⚠️️ <b>लक्ष द्या:</b> आपण निवडलेला विकल्प दिनांक आर्थिकदृष्ट्या तोट्याचा ठरू शकतो!<br>${rec.adviceHtml}<br><button type="button" class="advisor-btn" onclick="applySuggestedOptionDate(${idx}, '${rec.bestIso}', '${rec.bestFormatted}')">👉 हा फायदेशीर दिनांक [${rec.bestFormatted}] लागू करा</button>`;
+            advisorBox.innerHTML = `⚠️ <b>लक्ष द्या:</b> आपण निवडलेला विकल्प दिनांक आर्थिकदृष्ट्या तोट्याचा ठरू शकतो!<br>${rec.adviceHtml}<br><button type="button" class="advisor-btn" onclick="applySuggestedOptionDate(${idx}, '${rec.bestIso}', '${rec.bestFormatted}')">👉 हा फायदेशीर दिनांक [${rec.bestFormatted}] लागू करा</button>`;
         }
     }
 
@@ -2734,6 +2748,9 @@
                 alert("कृपया तिन्ही कार्ड्स मधील आवश्यक माहिती पूर्ण भरा!");
                 return;
             }
+
+            // 🌟 सबमिट केल्यावर रेकॉर्ड स्वयंचलितरित्या सेव्ह / अपडेट होईल
+            saveCurrentFixationRecord(false);
 
             globalCalcDataList = [];
 
@@ -3098,7 +3115,7 @@
                 }
                 else if (ev.type === 'COMMISSION_7TH') {
                     currentCommission = '7th';
-                    let totalBefore7th = currentBasic; // In 6th, currentBasic is already Pay in Band + Grade Pay
+                    let totalBefore7th = currentBasic; 
                     currentLevel = mapGpTo7thLevel(prevGpForSheet);
                     let fitmentResult = fitInMatrix(currentLevel, totalBefore7th * 2.57);
                     let oldB = currentBasic - prevGpForSheet;
@@ -3232,7 +3249,6 @@
                         let oldGP = currentGP;
                         currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
                         
-                        // 🌟 नियम १३ / नियम ११(१) विकल्पानुसार अचूक सूत्र: (३% मूळ वेतनातील वाढ + नवीन ग्रेड पे आणि जुना ग्रेड पे मधील फरक)
                         let inc = Math.ceil((lBasic * 0.03) / 10) * 10;
                         let gpDiff = currentGP - oldGP;
                         currentBasic = lBasic + inc + gpDiff;
@@ -3281,7 +3297,6 @@
                         let oldGP = currentGP;
                         currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
                         
-                        // 🌟 थेट लाभाच्या दिनांकावर फिक्सेशन (3% Increment + GP Difference)
                         let inc = Math.ceil((currentBasic * 0.03) / 10) * 10;
                         let gpDiff = currentGP - oldGP;
                         currentBasic = currentBasic + inc + gpDiff;
@@ -3348,48 +3363,6 @@
             const outputBox = document.getElementById('outputBox');
             outputBox.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            // 🌟 सबमिट डाटा केल्यानंतर सर्व फील्ड्स ब्लँक/रिसेट करण्यासाठीचा कोड (परंतु currentEditingRecordId इथे null केला नाही, जेणेकरून Update काम करेल)
-            selectedWithheldDates.clear();
-            
-            document.getElementById('empName').value = "";
-            document.getElementById('empDesignation').value = "";
-            document.getElementById('empJoinDate').value = "";
-            document.getElementById('empJoinDate_disp').value = "";
-            document.getElementById('payCommission').value = "";
-            document.getElementById('currentPayScale').value = "";
-            document.getElementById('basicPay').value = "";
-            document.getElementById('gradePay').value = "0";
-
-            for (let i = 1; i <= 3; i++) {
-                document.getElementById(`b${i}_type`).value = "None";
-                document.getElementById(`b${i}_fields`).classList.add('hidden');
-                document.getElementById(`b${i}_date`).value = "";
-                document.getElementById(`b${i}_date_disp`).value = "";
-                document.getElementById(`b${i}_optDate`).value = "";
-                document.getElementById(`b${i}_optDate_disp`).value = "";
-                document.getElementById(`b${i}_comm`).value = "";
-                document.getElementById(`b${i}_post`).value = "";
-                document.getElementById(`b${i}_scale`).value = "";
-                let adv = document.getElementById(`b${i}_advisor`);
-                if(adv) adv.classList.add('hidden');
-            }
-
-            document.getElementById('fixationFrom').value = "";
-            document.getElementById('fixationFrom_disp').value = "";
-            document.getElementById('fixationTo').value = "";
-            document.getElementById('fixationTo_disp').value = "";
-            document.getElementById('hasScaleRev').value = "No";
-            document.getElementById('scaleRevContainer').classList.add('hidden');
-            document.getElementById('scaleRevList').innerHTML = "";
-            document.getElementById('incrementWithheld').value = "No";
-            document.getElementById('withheldListContainer').classList.add('hidden');
-            document.getElementById('withheldEffectDiv').classList.add('hidden');
-            document.getElementById('withheldEffect').value = "non_cumulative";
-
-            validateCard1();
-            validateCard2();
-            validateCard3();
 
         } catch (err) {
             console.error("Process Fixation Error:", err);
