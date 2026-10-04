@@ -7,6 +7,8 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>Digital Hub & M.B. System</title>
+<!-- क्लायंट साइड डायरेक्ट PDF डाऊनलोडसाठी अत्यंत हलकी व जलद लायब्ररी -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
@@ -202,7 +204,7 @@ font-weight: normal;
 .sum-card-clickable { background: #fff; border: 1px solid #bbdefb; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
 .sum-card-clickable:hover { background: #e3f2fd; }
 
-/* 🌟 SMART ACTION CENTER STYLES (४ बटन्स ग्रिड) */
+/* 🌟 SMART ACTION CENTER STYLES */
 .smart-action-btn-grid {
 display: grid;
 grid-template-columns: repeat(2, 1fr);
@@ -244,10 +246,15 @@ letter-spacing: 0.5px;
 .badge-avail { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
 .badge-issued { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
 
+/* 🌟 स्क्रीनवर रिपोर्ट दिसू नये यासाठी स्वतंत्र प्रिंट लेआउट */
+@media screen {
+  #printableArea { display: none !important; }
+}
+
 @media print {
 body * { visibility: hidden; }
 #printableArea, #printableArea * { visibility: visible; }
-#printableArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 4mm; }
+#printableArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 4mm; display: block !important; }
 @page { size: A4 portrait; margin: 4mm; }
 .print-table { width: 100%; border-collapse: collapse; font-size: 10pt; }
 .print-table th, .print-table td { border: 1px solid #222; padding: 4px 5px; text-align: left; }
@@ -687,7 +694,7 @@ body * { visibility: hidden; }
 <button class="btn-report" style="margin-top:12px;" onclick="printDetailModalReport()">📄 REPORT / PRINT</button>
 </div></div>
 
-<div id="printableArea" style="display:none;"></div>
+<div id="printableArea"></div>
 </div>
 
 <!-- बिल विझार्ड मॉडेल -->
@@ -768,7 +775,7 @@ body * { visibility: hidden; }
 <label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="otherLabel1">Other-1</span></label>
 <button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="नवीन कपात जोडा">+</button>
 </div>
-<input type="number" class="form-control calc-ded" id="dedOther1" value="0" oninput="autoCalculateDeductions()">
+<input type="number" class="form-control calc-ded" id="' + 'dedOther1' + '" value="0" oninput="autoCalculateDeductions()">
 </div>
 </div>
 
@@ -857,7 +864,6 @@ window.addEventListener('storage', function(e) { refreshAll(); });
 function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; }
 function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
 
-// ** तारीख प्रमाणित ISO (YYYY-MM-DD) फॉरमॅटमध्ये आणणारे फंक्शन **
 function normalizeDateToISO(dateStr) {
 if (!dateStr) return '';
 var s = dateStr.trim();
@@ -881,7 +887,6 @@ if (parts.length === 3) return parts[2] + '-' + parts[1] + '-' + parts[0];
 return dateStr;
 }
 
-// ** 🌟 सुरक्षित नेव्हिगेशन फंक्शन्स (Navigation Fix) **
 function showMBSystem() {
     try {
         var hub = document.getElementById('digitalHubSection');
@@ -942,13 +947,11 @@ refreshBillDashboard();
 
 function closeModule(id) { document.getElementById(id).style.display = 'none'; refreshMBDashboard(); }
 
-// ** M.B. क्रमांक सामान्यीकरण **
 function normalizeMB(val) {
 if (!val) return '';
 return val.toString().trim().toLowerCase().replace(/^m\.?b\.?[\s\-_]*/i, '');
 }
 
-// ** M.B. ची सर्वात ताजी स्थिती तपासणी **
 function getLatestMBStatus(mbNumber, excludeIndex = -1) {
 var allMBs = getData('mb_records');
 var normalizedNo = normalizeMB(mbNumber);
@@ -971,7 +974,6 @@ index: i
 return null;
 }
 
-// ** उपलब्ध M.B. यादी **
 function getAvailableStock(excludeIndex = -1) {
 var allMBs = getData('mb_records');
 var statusMap = {};
@@ -996,7 +998,6 @@ available.push(statusMap[k]);
 return available;
 }
 
-// ** सध्या प्रत्यक्ष एकाच व्यक्तीकडे Active Issued असणाऱ्या सर्व M.B. ची यादी **
 function getCurrentlyActiveGivenMBs(excludeIndex = -1) {
 var allMBs = getData('mb_records');
 var latestMap = {};
@@ -1018,7 +1019,6 @@ activeGivenList.push(item);
 return activeGivenList;
 }
 
-// ** संबंधित JE कडे सध्या प्रत्यक्ष ताब्यात असणाऱ्या M.B. ची यादी **
 function getCurrentlyHeldMBsByJE(jeName) {
 if (!jeName) return [];
 var normalizedJE = jeName.trim().toLowerCase();
@@ -1071,11 +1071,58 @@ if(document.getElementById('countGivenMB')) document.getElementById('countGivenM
 if(document.getElementById('countAvailableMB')) document.getElementById('countAvailableMB').innerText = stock.length;
 }
 
+// ** 🌟 अचूक आणि सेफ प्रिंट फंक्शन (Mobile APK मध्ये Direct PDF Download + Chrome मध्ये Print) **
+function printA4Document(content, optionalFileName) {
+    try {
+        var isAndroidApp = (window.Android !== undefined) || (window.matchMedia('(display-mode: standalone)').matches) || navigator.userAgent.includes('wv');
+        var fileName = optionalFileName || ('Report_' + new Date().toISOString().slice(0, 10) + '.pdf');
+
+        if (isAndroidApp && window.html2pdf) {
+            // 🌟 MOBILE APK: स्क्रीनवर काहीही न दाखवता थेट बॅकग्राउंडमध्ये PDF तयार करून Download करणे
+            var opt = {
+                margin:       4,
+                filename:     fileName,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            var tempContainer = document.createElement('div');
+            tempContainer.innerHTML = content;
+            tempContainer.style.position = 'fixed';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '-9999px';
+            tempContainer.style.width = '210mm';
+            document.body.appendChild(tempContainer);
+
+            html2pdf().set(opt).from(tempContainer).save().then(function() {
+                document.body.removeChild(tempContainer);
+                showAlert("✅ PDF यशस्वीरित्या डाउनलोड झाली.", "SUCCESS");
+            }).catch(function(err) {
+                document.body.removeChild(tempContainer);
+                console.error("PDF Download Error:", err);
+                showAlert("PDF तयार करताना अडचण आली. कृपया पुन्हा प्रयत्न करा.", "ERROR");
+            });
+        } else {
+            // 🌟 GOOGLE CHROME / DESKTOP: मूळ प्रिंट प्रक्रियेला हात न लावता सुरक्षितपणे चालवणे
+            var p = document.getElementById('printableArea');
+            if (p) {
+                p.innerHTML = content;
+                window.print();
+                p.innerHTML = '';
+            }
+        }
+    } catch(err) {
+        console.error("प्रिंटिंग त्रुटी:", err);
+        showAlert("अहवाल तयार करताना तांत्रिक अडचण आली.", "ERROR");
+    }
+}
+
 function printMBReport() {
 var list = getData('mb_records');
 if (list.length === 0) return showAlert('कोणतीही M.B. नोंद उपलब्ध नाही.', 'WARNING');
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
+var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;">' +
 '<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">मोजमाप पुस्तिका (M.B.) नोंद अहवाल</h2></div>' +
 '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>M.B. नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div>' +
 '</div>' +
@@ -1102,7 +1149,7 @@ html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formattedD
 });
 
 html += '</tbody></table>';
-printA4Document(html);
+printA4Document(html, 'MB_Register_Report.pdf');
 }
 
 var currentQuickModalType = '';
@@ -1257,38 +1304,12 @@ function closeQuickInfoModal() {
     if (modal) modal.style.display = 'none'; 
 }
 
-// ** 🌟 थेट प्रिंटर सेवा व A4 फॉरमॅट प्रिंटिंग (Android APK + Chrome सुसंगत) **
-function printA4Document(content) {
-    try {
-        var p = document.getElementById('printableArea');
-        if (p) {
-            p.innerHTML = content;
-            p.style.display = 'block';
-        }
-
-        // Android Native Bridge तपासणी
-        if (window.Android && typeof window.Android.print === 'function') {
-            window.Android.print(content);
-        } else {
-            // Chrome व Android WebView साठी मानक विंडो प्रिंट
-            window.print();
-        }
-
-        setTimeout(function() {
-            if (p) p.style.display = 'none';
-        }, 1000);
-    } catch(err) {
-        console.error("प्रिंटिंग त्रुटी:", err);
-        showAlert("या उपकरणावर थेट प्रिंट सेवा उपलब्ध नाही.", "ERROR");
-    }
-}
-
 function printQuickModalReport() {
 var contentTitle = document.getElementById('quickModalTitle').innerText;
 var tableHTML = document.getElementById('quickModalBody').innerHTML;
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; padding-bottom:6px;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + contentTitle + '</h2></div><div style="text-align:right; font-size:11.5px;">अहवाल दिनांक: ' + todayStr + '</div></div>' + tableHTML;
-printA4Document(html);
+printA4Document(html, 'Quick_Report_' + todayStr + '.pdf');
 }
 
 function onMBActionTypeChange() {
@@ -1752,7 +1773,7 @@ function printWorkReport() {
 var works = getData('work_records');
 if (works.length === 0) return showAlert('कोणतीही कामाची नोंद उपलब्ध नाही.', 'WARNING');
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
+var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;">' +
 '<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">कामांची यादी (Work Register) अहवाल</h2></div>' +
 '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>कामांची यादी</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div>' +
 '</div>' +
@@ -1763,7 +1784,7 @@ html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + w.name + '
 });
 
 html += '</tbody></table>';
-printA4Document(html);
+printA4Document(html, 'Work_Register_Report.pdf');
 }
 
 function refreshWorkList() {
@@ -1880,7 +1901,6 @@ inputGrp.style.display = 'none';
 }
 }
 
-// ** 🌟 SEARCH फॉर्म रिसेट फंक्शन: सर्व Dependent Dynamic फिल्ड्स पूर्णपणे लपवून Default State मध्ये आणणे **
 function resetSearchSectionForm() {
     var fDate = document.getElementById('repFromDate');
     var tDate = document.getElementById('repToDate');
@@ -2064,14 +2084,13 @@ function printSearchResultFromPopup() {
 var title = document.getElementById('searchResultModalTitle').innerText;
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; padding-bottom:6px;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + title + '</h2></div><div style="text-align:right; font-size:11.5px;">अहवाल दिनांक: ' + todayStr + '</div></div>' + activeSearchPrintHTML;
-printA4Document(html);
+printA4Document(html, 'Search_Result_' + todayStr + '.pdf');
 }
 
 // ==================== 🌟 M.B. SMART ACTION CENTER LOGIC ====================
 var currentSacMB = null;
 var currentSacStatusObj = null;
 
-// ** 🌟 व्याकरणदृष्ट्या अचूक वाक्य तयार करणारे युटिलिटी फंक्शन (Dynamic Sentence Generator) **
 function formatTransactionSentence(h) {
     if (!h) return '-';
     var act = (h.actionType || '').trim();
@@ -2431,7 +2450,6 @@ openModule('mbModal');
 editMB(currentSacStatusObj.index);
 }
 
-// ** 🌟 Smart Action: सविस्तर इतिहास (History View) उघडणे (सुधारित भाषेसह) **
 function sacToggleHistoryView() {
 var histBox = document.getElementById('sacHistoryContainer');
 if (histBox.style.display === "block") {
@@ -2462,7 +2480,7 @@ document.getElementById('sacHistoryTableWrapper').innerHTML = html;
 histBox.style.display = "block";
 }
 
-// ** 🌟 HISTORY PRINT REPORT (अंतिम Heading: 'मोजमाप पुस्तिका हालचाल सविस्तर अहवाल' + अचूक JE Source) **
+// ** 🌟 HISTORY PRINT REPORT: मूळ कारण फिक्स (M.B. 015750 साठी 'अद्याप नोंद नाही' व अचूक PDF Heading) **
 function printHistoryFromSAC() {
 if (!currentSacMB || !currentSacStatusObj) return;
 
@@ -2475,16 +2493,19 @@ var works = getData('work_records').filter(function(w){ return normalizeMB(w.mbN
 var wName = (works.length > 0 && works[works.length - 1].name) ? works[works.length - 1].name : "अद्याप नोंद नाही";
 var wContractor = (works.length > 0 && works[works.length - 1].contractor) ? works[works.length - 1].contractor : "अद्याप नोंद नाही";
 
-// २. वास्तविक संबंधित JE शोधणे (Current Holder, Transfer Person किंवा विभागीय कार्यालयातील व्यक्तीचे नाव अजिबात JE म्हणून वापरू नये)
+// २. 🌟 ROOT CAUSE FIX: संबंधित JE फक्त अधिकृत JE Master व Work Record मधूनच घेणे (विभागीय कार्यालयीन व्यक्ती अजिबात JE म्हणून न घेणे)
+var officialJEs = getData('je_records').map(function(j){ return (j.name || '').trim().toLowerCase(); });
 var realJE = "अद्याप नोंद नाही";
+
 if (works.length > 0 && works[works.length - 1].je) {
-    realJE = works[works.length - 1].je.trim();
-} else {
-    var assigns = getData('assign_records').filter(function(a){ return normalizeMB(a.mbNo) === cleanNo; });
-    if (assigns.length > 0 && assigns[assigns.length - 1].jeName) {
-        realJE = assigns[assigns.length - 1].jeName.trim();
+    var candidateJE = works[works.length - 1].je.trim();
+    var cleanCand = candidateJE.toLowerCase().replace(/^श्री.?\s*/i, '');
+    var isOfficial = officialJEs.some(function(offJE){ return offJE.includes(cleanCand); });
+    if (isOfficial) {
+        realJE = candidateJE;
     }
 }
+
 if (realJE !== "अद्याप नोंद नाही" && !realJE.startsWith("श्री")) {
     realJE = "श्री " + realJE.replace(/^श्री.?\s*/i, '');
 }
@@ -2505,9 +2526,8 @@ if (holderDisplay !== "कार्यालय (उपलब्ध)" && holderD
     holderDisplay = "श्री " + holderDisplay.replace(/^श्री.?\s*/i, '');
 }
 
-// 🌟 CHANGE NO. 2: अहवालाचे अंतिम शीर्षक "मोजमाप पुस्तिका हालचाल सविस्तर अहवाल"
+// अहवालाचे अंतिम अधिकृत शीर्षक
 var dynamicReportHeading = "मोजमाप पुस्तिका हालचाल सविस्तर अहवाल";
-
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 
 var html = `
@@ -2570,10 +2590,11 @@ html += `
 </div>
 `;
 
-printA4Document(html);
+// 🌟 मोबाईल APK मध्ये डाऊनलोड होण्यासाठी अचूक फाईल नाव
+var pdfDownloadName = 'MB_' + currentSacMB + '_History_' + todayStr + '.pdf';
+printA4Document(html, pdfDownloadName);
 }
 
-// ** सविस्तर अहवाल फिल्टर लॉजिक **
 function generateAdvancedMBReport(sizeChoice, finalType, subTarget, subVal, fDate, tDate) {
 var allMBs = getData('mb_records');
 var stock = getAvailableStock();
@@ -2660,7 +2681,7 @@ var rawName = (subVal && subVal !== 'सर्व') ? subVal.replace(/^श्र
 var personHeaderName = rawName ? "श्री " + rawName : "";
 var periodSubHeader = "कालावधी: " + formatDateToDMY(fDate) + " ते " + formatDateToDMY(tDate);
 
-var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
+var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;">' +
 '<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + reportTitle + '</h2></div>' +
 '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div>' + (personHeaderName ? '<strong style="font-size:11.5px;">' + personHeaderName + '</strong><br>' : '') + '<span style="font-weight:700; color:#0d47a1;">' + periodSubHeader + '</span><br>अहवाल दिनांक: ' + todayStr + '</div><div style="text-align:right;"><strong>एकूण संख्या: ' + filtered.length + '</strong></div></div>' +
 '</div>' +
@@ -2677,7 +2698,7 @@ html += '<tr><td style="text-align:center;">' + (idx + 1) + '</td><td>' + format
 });
 
 html += '</tbody></table>';
-printA4Document(html);
+printA4Document(html, 'Advanced_MB_Report_' + todayStr + '.pdf');
 }
 
 function generateBillReports(subType, fDate, tDate) {
@@ -2711,8 +2732,8 @@ renderBillTableHTML(bills, '', 'संपूर्ण देयक नोंद�
 
 function renderBillTableHTML(billsList, preHTML, title) {
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-var html = preHTML + '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + title + '</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong style="font-size:11.5px;">देयक नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div></div>' +
-'<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>बिल क्र.</th><th>कंत्राटदार</th><th>कामाचे नाव</th><th>JE</th><th>M.B.</th><th>बिल प्रकार</th><th>दिनांक</th><th style="text-align:right;">पास रक्कम (₹)</th><th style="text-align:right;">कपात (₹)</th><th style="text-align:right;">नेट रक्कम (₹)</th></tr></thead><tbody>';
+var html = preHTML + '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + title + '</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong style="font-size:11.5px;">देयक नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div></div>' +
+'<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>बिल क्र.</th><th>कंत्राटदार</th><th>कामाचे नाव</th><th>JE</th><th style="text-align:center;">M.B.</th><th>बिल प्रकार</th><th>दिनांक</th><th style="text-align:right;">पास रक्कम (₹)</th><th style="text-align:right;">कपात (₹)</th><th style="text-align:right;">नेट रक्कम (₹)</th></tr></thead><tbody>';
 var total = 0, totalDedSum = 0, totalNetSum = 0;
 billsList.forEach(function(b, i) {
 var amt = parseFloat(b.passedAmt) || 0;
@@ -2722,19 +2743,19 @@ total += amt; totalDedSum += ded; totalNetSum += net;
 html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + (b.billNo || '-') + '</td><td>' + (b.contractor || '-') + '</td><td>' + (b.workName || '-') + '</td><td>' + (b.je || '-') + '</td><td style="text-align:center;">' + (b.mbNo || '-') + '</td><td>' + (b.billType || '-') + '</td><td style="text-align:right;">₹ ' + amt.toLocaleString('en-IN') + '</td><td style="text-align:right;">₹ ' + ded.toLocaleString('en-IN') + '</td><td style="text-align:right;">₹ ' + net.toLocaleString('en-IN') + '</td></tr>';
 });
 html += '<tr style="font-weight:750; background:#eee;"><td colspan="7" style="text-align:right;">एकूण (Total):</td><td style="text-align:right;">₹ ' + total.toLocaleString('en-IN') + '</td><td style="text-align:right;">₹ ' + totalDedSum.toLocaleString('en-IN') + '</td><td style="text-align:right;">₹ ' + totalNetSum.toLocaleString('en-IN') + '</td></tr></tbody></table>';
-printA4Document(html);
+printA4Document(html, 'Bill_Register_Report.pdf');
 }
 
 function generateWorkReport(fDate, tDate) {
 var works = getData('work_records');
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">कामांची यादी (Work Register)</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>कामांची यादी</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div></div>' +
+var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">कामांची यादी (Work Register)</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>कामांची यादी</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div></div>' +
 '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>कामाचे नाव</th><th>JE</th><th>कंत्राटदार</th><th>स्थिती</th><th style="text-align:center;">M.B. क्र.</th></tr></thead><tbody>';
 works.forEach(function(w, i) {
 html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + w.name + '</td><td>' + w.je + '</td><td>' + w.contractor + '</td><td>' + (w.status || 'अपूर्ण') + '</td><td style="text-align:center;">' + w.mbNo + '</td></tr>';
 });
 html += '</tbody></table>';
-printA4Document(html);
+printA4Document(html, 'Work_Register_Report.pdf');
 }
 
 function saveOrUpdateJE() {
@@ -2786,7 +2807,7 @@ function printJEReport() {
 var list = getData('je_records');
 if (list.length === 0) return showAlert('कोणतीही कनिष्ठ अभियंता (JE) नोंद उपलब्ध नाही.', 'WARNING');
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">कनिष्ठ अभियंता (JE) व्यवस्थापन अहवाल</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>JE नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div></div>' +
+var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">कनिष्ठ अभियंता (JE) व्यवस्थापन अहवाल</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>JE नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div></div>' +
 '<table class="print-table"><thead><tr><th style="text-align:center; width:15%;">अ.क्र.</th><th>कनिष्ठ अभियंत्याचे नाव</th></tr></thead><tbody>';
 
 list.forEach(function(item, i) {
@@ -2794,7 +2815,7 @@ html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td><strong>' + it
 });
 
 html += '</tbody></table>';
-printA4Document(html);
+printA4Document(html, 'JE_Management_Report.pdf');
 }
 
 function saveAssign() {
@@ -3042,7 +3063,7 @@ var title = document.getElementById('detailModalTitle').innerText;
 var bodyHTML = document.getElementById('detailModalBody').innerHTML;
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + title + '</h2></div><div style="text-align:right; font-size:11px;">अहवाल दिनांक: ' + todayStr + '</div></div>' + bodyHTML;
-printA4Document(html);
+printA4Document(html, 'Detail_Report_' + todayStr + '.pdf');
 }
 
 var otherDeductionCount = 1;
@@ -3093,8 +3114,10 @@ container.innerHTML = '<div class="form-row-compact"><label>Income Tax</label><i
 '<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="' + newLabelId + '">Other-1</span></label>' +
 '<button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="नवीन कपात जोडा">+</button>' +
 '</div>' +
-'<input type="number" class="form-control calc-ded" id="' + 'dedOther1' + '" value="0" oninput="autoCalculateDeductions()">' +
-'</div>';
+'<input type="number" class="form-control calc-ded" id="' + 'dedOther1' + '" value="0" oninput="autoCalculateDeductions()">';
+container.appendChild(div);
+autoCalculateDeductions();
+}
 
 var jeSel = document.getElementById('wJeSelect');
 if(jeSel) {
