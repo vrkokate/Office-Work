@@ -610,18 +610,19 @@ body * { visibility: hidden !important; }
 <input type="hidden" id="editMBIndex" value="-1">
 <div class="form-group"><label>नोंद प्रकार निवडा *</label><select class="form-control" id="mbActionType" onchange="onMBActionTypeChange()"><option value="">-- नोंद प्रकार निवडा --</option><option value="मिळालेली M.B.">मिळालेली M.B.</option><option value="दिलेली M.B.">दिलेली M.B.</option></select></div>
 <div class="form-group" id="groupMBSizeSelect" style="display:none;"><label>M.B. आकार *</label><select class="form-control" id="newMBSize" onchange="onMBSizeChange()"><option value="">-- M.B. आकार निवडा --</option><option value="लहान M.B.">लहान M.B.</option><option value="मोठी M.B.">मोठी M.B.</option></select></div>
-<div class="form-group" id="groupMBInput" style="display:none;">
+<div class="form-group" id="groupMBInput" style="display:none; position:relative;">
+    <!-- Similar M.B. Numbers floating display placed ABOVE the input -->
+    <div id="mbSuggestionsBox" style="position:absolute; bottom:100%; left:0; right:0; background:#fff; border:1.5px solid #f57c00; border-radius:6px; max-height:140px; overflow-y:auto; display:none; margin-bottom:4px; padding:6px; z-index:100; box-shadow:0 -4px 12px rgba(0,0,0,0.15); font-size:11px;"></div>
     <label>नवीन M.B. क्रमांक *</label>
     <input type="text" class="form-control" id="newMBNo" placeholder="उदा. 015750" oninput="checkRealTimeMBInput(this)">
     <div id="mbRealtimeStatus" style="font-size:11.5px; margin-top:3px; display:none;"></div>
-    <div id="mbSuggestionsBox" style="font-size:11px; background:#fff; border:1px solid #ccc; border-radius:4px; max-height:80px; overflow-y:auto; display:none; margin-top:2px; padding:4px;"></div>
 </div>
 <div class="form-group" id="groupMBSelect" style="display:none;"><label>उपलब्ध M.B. निवडा *</label><select class="form-control" id="selectAvailableMB" onchange="onSelectAvailableMBChange()"><option value="">-- उपलब्ध M.B. निवडा --</option></select></div>
 <div class="form-group" id="givenRecipientGroup" style="display:none;"><label>कोणाला दिली? *</label><select class="form-control" id="mbGivenRecipientType" onchange="onMBGivenRecipientTypeChange()"><option value="">-- कोणाला दिली निवडा --</option><option value="JE">कनिष्ठ अभियंता (JE)</option><option value="Office">विभागीय कार्यालय</option></select></div>
 <div class="form-group" id="givenJEGroup" style="display:none;"><label>कनिष्ठ अभियंता (JE) निवडा *</label><select class="form-control" id="selectGivenJE"><option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option></select></div>
 <div class="form-group" id="givenOfficeGroup" style="display:none;"><label>विभागीय कार्यालय तपशील / नाव *</label><input type="text" class="form-control" id="givenOfficeInput" placeholder="उदा. विभागीय कार्यालय नाव"></div>
 <div class="form-group" id="receivedMainGroup" style="display:none;"><label>कोणाकडून मिळाली? *</label><select class="form-control" id="mbReceivedType" onchange="onMBReceivedTypeChange()"><option value="">-- नवीन / चालू निवडा --</option><option value="नवीन">नवीन</option><option value="चालू">चालू</option></select></div>
-<div class="form-group" id="bhandarpalGroup" style="display:none;"><label>भंडारपाल *</label><input type="text" class="form-control" id="bhandarpalNameInput" placeholder="भंडारपाळाचे नाव टाईप करा"></div>
+<div class="form-group" id="bhandarpalGroup" style="display:none;"><label>भांडारपाल *</label><input type="text" class="form-control" id="bhandarpalNameInput" placeholder="भांडारपाल चे नाव टाईप करा"></div>
 <div class="form-group" id="chalooSourceGroup" style="display:none;"><label>चालू स्रोत निवडा *</label><select class="form-control" id="mbChalooSource" onchange="onMBChalooSourceChange()"><option value="">-- स्रोत निवडा --</option><option value="विभागीय कार्यालय">विभागीय कार्यालय</option><option value="JE">JE</option><option value="चार्ज नुसार">चार्ज नुसार</option></select></div>
 <div class="form-group" id="receivedSubGroup" style="display:none;"><label id="receivedSubLabel">तपशील निवडा *</label><select class="form-control" id="receivedSubSelect" style="display:none;"></select><input type="text" class="form-control" id="receivedSubInput" style="display:none;"></div>
 <div class="form-group"><label id="lblMBDate">दिनांक *</label><input type="date" class="form-control" id="newMBDate"></div>
@@ -1182,7 +1183,7 @@ function refreshMBDashboard() {
     if(document.getElementById('countAvailableMB')) document.getElementById('countAvailableMB').innerText = availableCount;
 }
 
-// ** 🌟 Smart M.B. Number Assistant (Updated Real-Time Validation Text & Format) **
+// ** 🌟 Smart M.B. Number Assistant (Updated Validation Text as requested) **
 function checkRealTimeMBInput(input) {
     var val = (input.value || '').trim();
     var statusEl = document.getElementById('mbRealtimeStatus');
