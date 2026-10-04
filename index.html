@@ -314,14 +314,14 @@ body * { visibility: hidden !important; }
 <!-- आधुनिक व सविस्तर अलर्ट मॉडेल -->
 <div id="customAlertModal" class="modal-overlay" style="display:none; z-index:4000;">
 <div class="modal-card" style="max-width:350px; text-align:center; padding:22px; border-radius:12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
-<div id="customAlertIcon" style="font-size:36px; margin-bottom:8px;">⚠️</div>
+<div id="customAlertIcon" style="font-size:36px; margin-bottom:8px;">⚠️️</div>
 <div id="customAlertTitle" style="font-size:15px; font-weight:800; color:#0d47a1; margin-bottom:6px;">माहिती व सूचना</div>
 <div id="customAlertText" style="font-size:13px; font-weight:600; line-height: 1.55; color: #37474f; margin-bottom:18px; white-space: pre-line; text-align:center;">मेसेज येथे येईल</div>
 <button class="btn-report" style="background:#0d47a1; margin-top:0; padding:9px 18px; width:100%;" onclick="closeCustomAlert()">समजले (OK)</button>
 </div>
 </div>
 
-<!-- 🌟 System Health Monitor Floating Card (Exact Root Cause Diagnostic for Issued vs Received) -->
+<!-- 🌟 System Health Monitor Floating Card (Exact Root Cause Diagnostic for Issued vs Received Master) -->
 <div id="systemHealthAlertCard" style="display:none; position:fixed; bottom:20px; right:20px; max-width:320px; background:#fff; border-left:4px solid #f57c00; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.2); padding:12px; z-index:3500; animation: fadeInGlow 0.4s ease;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
         <span style="font-size:12.5px; font-weight:800; color:#e65100;" id="healthAlertTitle">⚠️ M.B. DATA WARNING</span>
@@ -1041,7 +1041,7 @@ function refreshAll() {
     }
 }
 
-// ** 🌟 Advanced System Health Monitor (Issued vs Received Master exact string validation) **
+// ** 🌟 Advanced System Health Monitor with Root Cause (Issued not in Received Master detection) **
 function checkSystemHealth() {
     var uniqueReceived = getUniqueReceivedMBs();
     var activeGiven = getCurrentlyActiveGivenMBs();
@@ -1053,12 +1053,12 @@ function checkSystemHealth() {
         if (no) receivedMap[no] = true;
     });
 
-    var missingIssuedList = [];
+    var missingReceivedList = [];
     activeGiven.forEach(function(m) {
         var no = normalizeMB(m.mbNumber);
         if (no && !receivedMap[no]) {
-            if (!missingIssuedList.includes(m.mbNumber)) {
-                missingIssuedList.push(m.mbNumber);
+            if (!missingReceivedList.includes(m.mbNumber)) {
+                missingReceivedList.push(m.mbNumber);
             }
         }
     });
@@ -1071,12 +1071,12 @@ function checkSystemHealth() {
     var alertCard = document.getElementById('systemHealthAlertCard');
     if (!alertCard) return;
 
-    if (currentAvailable !== expectedAvailable || missingIssuedList.length > 0) {
+    if (currentAvailable !== expectedAvailable || missingReceivedList.length > 0) {
         document.getElementById('healthAlertTitle').innerText = '⚠️ M.B. DATA WARNING';
         var warningText = 'Available M.B. मध्ये तफावत आढळली.<br>Expected Available: ' + expectedAvailable + ' | Current Available: ' + currentAvailable + '<br>Difference: ' + Math.abs(currentAvailable - expectedAvailable);
         
-        if (missingIssuedList.length > 0) {
-            warningText += '<br><strong style="color:#d32f2f;">Root Cause:</strong> Issued M.B. क्रमांक <strong>' + missingIssuedList.join(', ') + '</strong> Received Master List मध्ये आढळला नाही.';
+        if (missingReceivedList.length > 0) {
+            warningText += '<br><strong style="color:#d32f2f;">Root Cause:</strong> Issued M.B. क्रमांक <strong>' + missingReceivedList.join(', ') + '</strong> Received Master List मध्ये आढळला नाही. (066500 आणि 0066500 हे दोन स्वतंत्र क्रमांक आहेत)';
         }
 
         document.getElementById('healthAlertText').innerHTML = warningText;
@@ -1099,21 +1099,25 @@ function showHealthDetails() {
     
     var receivedMap = {};
     uniqueReceived.forEach(function(m) { receivedMap[normalizeMB(m.mbNumber)] = true; });
-    var missingIssuedList = [];
+    var missingReceivedList = [];
     activeGiven.forEach(function(m) {
-        if (!receivedMap[normalizeMB(m.mbNumber)]) missingIssuedList.push(m.mbNumber);
+        var no = (m.mbNumber || '').trim();
+        if (no && !receivedMap[normalizeMB(no)]) {
+            missingReceivedList.push(no);
+        }
     });
 
-    var msg = 'System Health Details:\n' +
+    var msg = '⚠️ M.B. DATA INTEGRITY WARNING\n\n' +
               'एकूण Unique Received M.B.: ' + uniqueReceived.length + '\n' +
               'एकूण Active Issued M.B.: ' + activeGiven.length + '\n' +
-              'Expected Available: ' + expectedAvailable + '\n' +
-              'Current Available: ' + stock.length;
+              'Expected Available M.B.: ' + expectedAvailable + '\n' +
+              'Current Available M.B.: ' + stock.length + '\n' +
+              'Difference: ' + Math.abs(stock.length - expectedAvailable);
               
-    if (missingIssuedList.length > 0) {
-        msg += '\n\nRoot Cause Found:\nIssued M.B. "' + missingIssuedList.join(', ') + '" is NOT present in Received Master List!';
+    if (missingReceivedList.length > 0) {
+        msg += '\n\nRoot Cause:\nIssued M.B. क्रमांक "' + missingReceivedList.join(', ') + '" Received Master List मध्ये उपलब्ध नाही.\n(Note: 066500 आणि 0066500 हे दोन स्वतंत्र M.B. क्रमांक आहेत.)';
     } else {
-        msg += '\n\nAll issued MBs exist in Received Master.';
+        msg += '\n\nNo master mismatch found between Issued and Received.';
     }
 
     showAlert(msg, 'WARNING');
@@ -2709,6 +2713,15 @@ function sacConfirmIssueExecution() {
         srcText = "M.B. विभागीय कार्यालय (" + holder + ") यांना दिली";
     }
 
+    // Pre-Validation: Check if MB exists in Received Master before issuing
+    var uniqueReceived = getUniqueReceivedMBs();
+    var receivedMap = {};
+    uniqueReceived.forEach(function(m) { receivedMap[normalizeMB(m.mbNumber)] = true; });
+    
+    if (!receivedMap[normalizeMB(currentSacMB)]) {
+        return showAlert("❌ ISSUE BLOCKED:\n\nही M.B. क्रमांक '" + currentSacMB + "' प्रणालीमध्ये Received म्हणून उपलब्ध नाही. म्हणून ती कोणालाही देता येणार नाही.", "ERROR");
+    }
+
     var cleanHolderName = holder.replace(/^श्री\.?\s*/i, '').trim();
     var confirmMsg = "M.B. क्र. " + currentSacMB + " ही " + cleanHolderName + " यांना Issue करायची का?";
 
@@ -3124,7 +3137,7 @@ function saveAssign() {
 }
 
 function deleteAssign(idx) {
-    if (confirm('रद्द करायचे का?')) {
+    if (confirm('हटवायचे का?')) {
         var assignList = getData('assign_records');
         var removed = assignList.splice(idx, 1)[0];
         setData('assign_records', assignList);
