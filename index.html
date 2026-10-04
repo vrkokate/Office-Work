@@ -126,7 +126,7 @@ letter-spacing: 0.5px;
 .summary-title { font-size: 13px; font-weight: 700; text-align: center; color: #0d47a1; margin-bottom: 8px; }
 .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
-/* 🌟 Reference GIF Based Moving Border Light Effect on Stat Cards */
+/* 🌟 Reference GIF 1 Based Moving Border Light Effect on Stat Cards */
 .stat-card { 
 border: 2px solid transparent; 
 border-radius: 6px; 
@@ -150,7 +150,7 @@ inset: -2px;
 border-radius: 8px;
 background: linear-gradient(90deg, #00c853, #00e5ff, #76ff03, #00c853);
 background-size: 300% 300%;
-animation: borderLightMove 3.5s linear infinite;
+animation: borderLightMove 4s linear infinite;
 z-index: 1;
 pointer-events: none;
 mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -167,7 +167,7 @@ inset: -2px;
 border-radius: 8px;
 background: linear-gradient(90deg, #2979ff, #aa00ff, #ff4081, #2979ff);
 background-size: 300% 300%;
-animation: borderLightMove 3.5s linear infinite;
+animation: borderLightMove 4s linear infinite;
 z-index: 1;
 pointer-events: none;
 mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -184,7 +184,7 @@ inset: -2px;
 border-radius: 8px;
 background: linear-gradient(90deg, #ff9100, #ffea00, #ff1744, #ff9100);
 background-size: 300% 300%;
-animation: borderLightMove 3.5s linear infinite;
+animation: borderLightMove 4s linear infinite;
 z-index: 1;
 pointer-events: none;
 mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -1211,19 +1211,18 @@ function getCurrentlyHeldMBsByJE(jeName) {
     return heldMBs;
 }
 
-// ** 🌟 Number Count Animation (Reference GIF 2 style) **
+// ** 🌟 Number Count Animation (Smooth Speed as requested) **
 function animateNumberCount(elementId, finalVal) {
     var el = document.getElementById(elementId);
     if (!el) return;
-    var startVal = 0;
-    if (startVal === finalVal) {
-        el.innerText = finalVal;
+    var current = 0;
+    if (finalVal === 0) {
+        el.innerText = 0;
         return;
     }
-    var duration = 900; // milliseconds
-    var steps = 25;
+    var duration = 1200; // milliseconds (smooth pace)
+    var steps = 30;
     var increment = finalVal / steps;
-    var current = 0;
     var stepTime = duration / steps;
     
     var timer = setInterval(function() {
@@ -1280,7 +1279,7 @@ function refreshMBDashboard() {
     if(document.getElementById('countAvailableMB')) animateNumberCount('countAvailableMB', availableCount);
 }
 
-// ** 🌟 Smart M.B. Number Assistant (Updated Validation Text as requested) **
+// ** 🌟 Smart M.B. Number Assistant (Validation Text) **
 function checkRealTimeMBInput(input) {
     var val = (input.value || '').trim();
     var statusEl = document.getElementById('mbRealtimeStatus');
@@ -1315,7 +1314,7 @@ function checkRealTimeMBInput(input) {
 
     statusEl.style.display = 'block';
     if (exactMatch) {
-        statusEl.innerHTML = '<span style="color:#d32f2f; font-weight:700;">🔴 ⚠️️ M.B. क्रमांक ' + val + ' — ' + matchSize + ' आधीपासून उपलब्ध आहे. Add करता येत नाही.</span>';
+        statusEl.innerHTML = '<span style="color:#d32f2f; font-weight:700;">🔴 ⚠️ M.B. क्रमांक ' + val + ' — ' + matchSize + ' आधीपासून उपलब्ध आहे. Add करता येत नाही.</span>';
         statusEl.style.background = '#ffebee';
         statusEl.style.padding = '4px 6px';
         statusEl.style.borderRadius = '4px';
@@ -2250,7 +2249,7 @@ function generateGeneralReport() {
     var isoTo = normalizeDateToISO(tDate);
 
     if (isoFrom > isoTo) {
-        return showAlert("'दिनांक पासून' हा दिनांक 'दिनांक पर्यंत' नंतरचा असू शकत नाही!", 'ERROR');
+        return showAlert("'दिनांक पासून' हा दिनांक 'दिनांक पर्यंत' ನಂತರचा असू शकत नाही!", 'ERROR');
     }
 
     var mainCat = document.getElementById('repMainCategory').value;
