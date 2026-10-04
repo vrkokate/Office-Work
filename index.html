@@ -243,6 +243,12 @@ letter-spacing: 0.5px;
 .badge-avail { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
 .badge-issued { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
 
+/* 🌟 System Health Monitor Floating Card Animation */
+@keyframes fadeInGlow {
+0% { opacity: 0; transform: translateY(10px); box-shadow: 0 0 0 rgba(245,124,0,0); }
+100% { opacity: 1; transform: translateY(0); box-shadow: 0 4px 15px rgba(245,124,0,0.3); }
+}
+
 /* 🌟 ऑन-स्क्रीन डुप्लिकेट रेंडरिंग पूर्ण रोखण्यासाठी */
 #printableArea { display: none !important; }
 
@@ -267,6 +273,19 @@ body * { visibility: hidden !important; }
 <div id="customAlertText" style="font-size:13px; font-weight:600; line-height: 1.55; color: #37474f; margin-bottom:18px; white-space: pre-line; text-align:center;">मेसेज येथे येईल</div>
 <button class="btn-report" style="background:#0d47a1; margin-top:0; padding:9px 18px; width:100%;" onclick="closeCustomAlert()">समजले (OK)</button>
 </div>
+</div>
+
+<!-- 🌟 System Health Monitor Floating Card (Problem असेल तरच दिसणार) -->
+<div id="systemHealthAlertCard" style="display:none; position:fixed; bottom:20px; right:20px; max-width:320px; background:#fff; border-left:4px solid #f57c00; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.2); padding:12px; z-index:3500; animation: fadeInGlow 0.4s ease;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span style="font-size:12.5px; font-weight:800; color:#e65100;" id="healthAlertTitle">⚠️ M.B. DATA WARNING</span>
+        <button onclick="closeHealthAlert()" style="background:none; border:none; font-size:14px; font-weight:bold; cursor:pointer; color:#666;">×</button>
+    </div>
+    <div style="font-size:11.5px; color:#37474f; line-height:1.4; margin-bottom:8px;" id="healthAlertText">तफावत आढळली आहे.</div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <button class="btn-action" style="background:#0d47a1; font-size:10.5px; padding:4px 8px;" onclick="showHealthDetails()">तपशील पहा</button>
+        <span style="font-size:10px; color:#888;">System Health Monitor</span>
+    </div>
 </div>
 
 <!-- 🌟 SMART ACTION CENTER MODAL (४ बटन्स: TRANSFER, RECEIVE, EDIT, HISTORY) -->
@@ -592,7 +611,12 @@ body * { visibility: hidden !important; }
 <input type="hidden" id="editMBIndex" value="-1">
 <div class="form-group"><label>नोंद प्रकार निवडा *</label><select class="form-control" id="mbActionType" onchange="onMBActionTypeChange()"><option value="">-- नोंद प्रकार निवडा --</option><option value="मिळालेली M.B.">मिळालेली M.B.</option><option value="दिलेली M.B.">दिलेली M.B.</option></select></div>
 <div class="form-group" id="groupMBSizeSelect" style="display:none;"><label>M.B. आकार *</label><select class="form-control" id="newMBSize" onchange="onMBSizeChange()"><option value="">-- M.B. आकार निवडा --</option><option value="लहान M.B.">लहान M.B.</option><option value="मोठी M.B.">मोठी M.B.</option></select></div>
-<div class="form-group" id="groupMBInput" style="display:none;"><label>नवीन M.B. क्रमांक *</label><input type="text" class="form-control" id="newMBNo" placeholder="उदा. 015750"></div>
+<div class="form-group" id="groupMBInput" style="display:none;">
+    <label>नवीन M.B. क्रमांक *</label>
+    <input type="text" class="form-control" id="newMBNo" placeholder="उदा. 015750" oninput="checkRealTimeMBInput(this)">
+    <div id="mbRealtimeStatus" style="font-size:11.5px; margin-top:3px; display:none;"></div>
+    <div id="mbSuggestionsBox" style="font-size:11px; background:#fff; border:1px solid #ccc; border-radius:4px; max-height:80px; overflow-y:auto; display:none; margin-top:2px; padding:4px;"></div>
+</div>
 <div class="form-group" id="groupMBSelect" style="display:none;"><label>उपलब्ध M.B. निवडा *</label><select class="form-control" id="selectAvailableMB" onchange="onSelectAvailableMBChange()"><option value="">-- उपलब्ध M.B. निवडा --</option></select></div>
 <div class="form-group" id="givenRecipientGroup" style="display:none;"><label>कोणाला दिली? *</label><select class="form-control" id="mbGivenRecipientType" onchange="onMBGivenRecipientTypeChange()"><option value="">-- कोणाला दिली निवडा --</option><option value="JE">कनिष्ठ अभियंता (JE)</option><option value="Office">विभागीय कार्यालय</option></select></div>
 <div class="form-group" id="givenJEGroup" style="display:none;"><label>कनिष्ठ अभियंता (JE) निवडा *</label><select class="form-control" id="selectGivenJE"><option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option></select></div>
@@ -964,9 +988,46 @@ function refreshAll() {
         refreshWorkList();
         refreshBillDashboard();
         refreshAssignList();
+        checkSystemHealth();
     } catch(err) {
         console.warn("रिफ्रेश त्रुटी:", err);
     }
+}
+
+// ** 🌟 System Health Monitor Background Checker (Problem असेल तरच दिसणार) **
+function checkSystemHealth() {
+    var allMBs = getData('mb_records');
+    var uniqueMBMap = {};
+    allMBs.forEach(function(m) {
+        var no = normalizeMB(m.mbNumber);
+        if (no) uniqueMBMap[no] = true;
+    });
+    var totalReceived = Object.keys(uniqueMBMap).length;
+    var activeGiven = getCurrentlyActiveGivenMBs();
+    var stock = getAvailableStock();
+    
+    var expectedAvailable = totalReceived - activeGiven.length;
+    var currentAvailable = stock.length;
+
+    var alertCard = document.getElementById('systemHealthAlertCard');
+    if (!alertCard) return;
+
+    if (currentAvailable !== expectedAvailable) {
+        document.getElementById('healthAlertTitle').innerText = '⚠️ M.B. DATA WARNING';
+        document.getElementById('healthAlertText').innerHTML = 'Available M.B. मध्ये तफावत आढळली.<br>Expected: ' + expectedAvailable + ' | Current: ' + currentAvailable + '<br>Difference: ' + Math.abs(currentAvailable - expectedAvailable);
+        alertCard.style.display = 'block';
+    } else {
+        alertCard.style.display = 'none';
+    }
+}
+
+function closeHealthAlert() {
+    var alertCard = document.getElementById('systemHealthAlertCard');
+    if (alertCard) alertCard.style.display = 'none';
+}
+
+function showHealthDetails() {
+    showAlert('System Health Details:\nगणिती सुसंगतता तपासा. Received - Issued = Available चे गणित तपासले गेले आहे.', 'WARNING');
 }
 
 function openModule(id) {
@@ -1085,6 +1146,7 @@ function refreshMBDashboard() {
     if(!tbody) return;
     tbody.innerHTML = ''; 
 
+    // ✅ युनिक M.B. नंबर मोजणी (Consistent Unique Counting Logic)
     var uniqueMBMap = {};
     list.forEach(function(m) {
         var no = normalizeMB(m.mbNumber);
@@ -1121,6 +1183,63 @@ function refreshMBDashboard() {
     if(document.getElementById('countAvailableMB')) document.getElementById('countAvailableMB').innerText = availableCount;
 }
 
+// ** 🌟 Smart M.B. Number Assistant (Real-Time Validation & Suggestion) **
+function checkRealTimeMBInput(input) {
+    var val = (input.value || '').trim();
+    var statusEl = document.getElementById('mbRealtimeStatus');
+    var suggEl = document.getElementById('mbSuggestionsBox');
+    
+    if (!statusEl || !suggEl) return;
+    
+    if (!val) {
+        statusEl.style.display = 'none';
+        suggEl.style.display = 'none';
+        return;
+    }
+
+    var allMBs = getData('mb_records');
+    var normVal = normalizeMB(val);
+    var exactMatch = false;
+    var matchSize = '';
+    var similarList = [];
+
+    allMBs.forEach(function(m) {
+        var mNo = (m.mbNumber || '').trim();
+        var normNo = normalizeMB(mNo);
+        if (normNo === normVal) {
+            exactMatch = true;
+            matchSize = m.size || 'लहान M.B.';
+        } else if (normNo.includes(normVal) || normVal.includes(normNo)) {
+            if (!similarList.includes(mNo)) {
+                similarList.push(mNo);
+            }
+        }
+    });
+
+    statusEl.style.display = 'block';
+    if (exactMatch) {
+        statusEl.innerHTML = '<span style="color:#d32f2f; font-weight:700;">🔴 ⚠️ M.B. क्रमांक ' + val + ' आधीपासून उपलब्ध आहे. (साईज: ' + matchSize + ')</span>';
+        statusEl.style.background = '#ffebee';
+        statusEl.style.padding = '4px 6px';
+        statusEl.style.borderRadius = '4px';
+        suggEl.style.display = 'none';
+    } else if (similarList.length > 0) {
+        statusEl.innerHTML = '<span style="color:#f57c00; font-weight:600;">🟡 Similar M.B. Numbers found:</span>';
+        statusEl.style.background = '#fff3e0';
+        statusEl.style.padding = '4px 6px';
+        statusEl.style.borderRadius = '4px';
+        
+        suggEl.innerHTML = '<strong>जुळणारे क्रमांक:</strong> ' + similarList.slice(0, 5).join(', ');
+        suggEl.style.display = 'block';
+    } else {
+        statusEl.innerHTML = '<span style="color:#2e7d32; font-weight:700;">🟢 ✓ M.B. क्रमांक उपलब्ध आहे — नवीन M.B. Add करू शकता.</span>';
+        statusEl.style.background = '#e8f5e9';
+        statusEl.style.padding = '4px 6px';
+        statusEl.style.borderRadius = '4px';
+        suggEl.style.display = 'none';
+    }
+}
+
 // ** 🌟 कोणत्याही बाह्य लायब्ररीशिवाय थेट PDF डाऊनलोड (Mobile APK) व Chrome प्रिंट **
 function printA4Document(content, optionalFileName) {
     try {
@@ -1128,7 +1247,6 @@ function printA4Document(content, optionalFileName) {
         var fileName = optionalFileName || ('Report_' + new Date().toISOString().slice(0, 10) + '.pdf');
 
         if (isAndroidApp) {
-            // Android APK / WebView मध्ये स्क्रीनवर काहीही न दाखवता थेट डाऊनलोड
             var printDoc = `
                 <!DOCTYPE html>
                 <html>
@@ -1161,7 +1279,6 @@ function printA4Document(content, optionalFileName) {
 
             showAlert("✅ PDF यशस्वीरित्या डाउनलोड झाली.", "SUCCESS");
         } else {
-            // Google Chrome / Web मध्ये मूळ विंडो प्रिंट सुरक्षितपणे चालवणे
             var p = document.getElementById('printableArea');
             if (p) {
                 p.innerHTML = content;
@@ -1574,6 +1691,21 @@ function saveOrUpdateMB() {
         }
     }
 
+    // Save time final duplicate check for received MB
+    if (actionType === 'मिळालेली M.B.') {
+        var allMBs = getData('mb_records');
+        var normNo = normalizeMB(no);
+        var isExactDuplicate = false;
+        allMBs.forEach(function(m, i) {
+            if (i !== idx && normalizeMB(m.mbNumber) === normNo && (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी')) {
+                isExactDuplicate = true;
+            }
+        });
+        if (isExactDuplicate && idx === -1) {
+            return showAlert('हा M.B. क्रमांक आधीपासून उपलब्ध आहे. Duplicate Entry करता येणार नाही.', 'ERROR');
+        }
+    }
+
     var lastStatus = getLatestMBStatus(no, idx);
 
     if (actionType === 'दिलेली M.B.') {
@@ -1581,12 +1713,6 @@ function saveOrUpdateMB() {
             var currentHolder = lastStatus.detail || lastStatus.source || 'इतर व्यक्ती';
             var formattedLastDate = formatDateToDMY(lastStatus.date);
             return showAlert('⚠ M.B. क्र. ' + no + ' Update / Issue करता आली नाही.\n\nकारण: ही M.B. आधीच दिनांक ' + formattedLastDate + ' पासून श्री. ' + currentHolder + ' यांच्याकडे Issue आहे.\n\nकृती: कृपया प्रथम ही M.B. Receive करा, त्यानंतरच दुसऱ्या व्यक्तीला देता येईल.', 'ERROR');
-        }
-    } else if (actionType === 'मिळालेली M.B.') {
-        if (lastStatus && (lastStatus.lastAction === 'मिळालेली M.B.' || lastStatus.lastAction === 'मिळालेली एमबी')) {
-            var holder = lastStatus.detail || lastStatus.source || 'कार्यालय';
-            var formattedLastDate = formatDateToDMY(lastStatus.date);
-            return showAlert('⚠️ M.B. क्रमांक "' + no + '" ची नोंद आधीच झालेली आहे.\n\nकारण: ही M.B. दिनांक ' + formattedLastDate + ' रोजी ' + holder + ' यांच्याकडून मिळालेली असून सध्या कार्यालयात उपलब्ध आहे!', 'WARNING');
         }
     }
 
@@ -1638,6 +1764,7 @@ function editMB(idx) {
         }
     } else {
         document.getElementById('newMBNo').value = item.mbNumber;
+        checkRealTimeMBInput(document.getElementById('newMBNo'));
         var src = item.receivedSource || '';
         if (src.includes('भंडारपाल') || src.includes('भंडारपाळ') || src.includes('नवीन')) {
             document.getElementById('mbReceivedType').value = 'नवीन';
@@ -1676,6 +1803,10 @@ function cancelMBEdit() {
     onMBActionTypeChange();
     document.getElementById('newMBSize').value = '';
     document.getElementById('newMBNo').value = '';
+    var statusEl = document.getElementById('mbRealtimeStatus');
+    var suggEl = document.getElementById('mbSuggestionsBox');
+    if(statusEl) statusEl.style.display = 'none';
+    if(suggEl) suggEl.style.display = 'none';
     document.getElementById('bhandarpalNameInput').value = '';
     document.getElementById('givenOfficeInput').value = '';
     document.getElementById('receivedSubInput').value = '';
