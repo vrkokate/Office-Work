@@ -15,7 +15,45 @@ color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justif
 .hub-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; margin-top: 5px; }
 .hub-title-box { text-align: center; }
 .hub-title-box h1 { font-size: 26px; font-weight: 800; background: linear-gradient(180deg, #ffffff 40%, #00e5ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.profile-icon { font-size: 20px; cursor: pointer; background: rgba(0, 229, 255, 0.1); border: 1px solid #00e5ff; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+
+/* ३D ग्लोब रोटेशनसाठी प्रोफाईल आयकॉन कंटेनर व ॲनिमेशन */
+.profile-icon { 
+font-size: 20px; 
+cursor: pointer; 
+background: rgba(0, 229, 255, 0.1); 
+border: 1.5px solid #00e5ff; 
+border-radius: 50%; 
+width: 36px; 
+height: 36px; 
+display: flex; 
+align-items: center; 
+justify-content: center; 
+perspective: 800px;
+box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+overflow: hidden;
+flex-shrink: 0;
+}
+
+.profile-icon-rotating-photo {
+width: 100%;
+height: 100%;
+border-radius: 50%;
+object-fit: cover;
+object-position: center 10%;
+display: block;
+transform-style: preserve-3d;
+animation: globeSpin 6s linear infinite;
+will-change: transform;
+}
+
+@keyframes globeSpin {
+0% {
+transform: rotateY(0deg);
+}
+100% {
+transform: rotateY(360deg);
+}
+}
 
 .breadcrumb-bar {
 background: rgba(0, 229, 255, 0.1);
@@ -64,7 +102,7 @@ letter-spacing: 0.5px;
 .profile-info-row .label { opacity: 0.8; font-weight: 600; }
 
 .profile-social-icons-row { display: flex; justify-content: center; gap: 14px; margin-top: 6px; }
-.brand-icon-btn { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 3px 8px rgba(0,0,0,0.3); transition: 0.2s; }
+.brand-icon-btn { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 3px 8px rgba(0,0,0,0.3); transition: 0.2s; cursor: pointer; }
 .brand-icon-btn svg { width: 20px; height: 20px; fill: #ffffff; }
 .btn-call-brand { background: #00c853; }
 .btn-wa-brand { background: #25d366; }
@@ -154,11 +192,13 @@ body * { visibility: hidden; }
 </head>
 <body>
 
-<!-- कस्टम अलर्ट बॉक्स -->
+<!-- आधुनिक व सविस्तर अलर्ट मॉडेल -->
 <div id="customAlertModal" class="modal-overlay" style="display:none; z-index:4000;">
-<div class="modal-card" style="max-width:340px; text-align:center; padding:20px;">
-<div id="customAlertText" style="font-size:13.5px; font-weight:700; margin-bottom:18px; line-height: 1.5; color: #d32f2f;">मेसेज येथे येईल</div>
-<button class="btn-report" style="background:#0d47a1; margin-top:0;" onclick="closeCustomAlert()">OK</button>
+<div class="modal-card" style="max-width:350px; text-align:center; padding:22px; border-radius:12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+<div id="customAlertIcon" style="font-size:36px; margin-bottom:8px;">⚠️</div>
+<div id="customAlertTitle" style="font-size:15px; font-weight:800; color:#0d47a1; margin-bottom:6px;">माहिती व सूचना</div>
+<div id="customAlertText" style="font-size:13px; font-weight:600; line-height: 1.55; color: #37474f; margin-bottom:18px; white-space: pre-line; text-align:center;">मेसेज येथे येईल</div>
+<button class="btn-report" style="background:#0d47a1; margin-top:0; padding:9px 18px; width:100%;" onclick="closeCustomAlert()">समजले (OK)</button>
 </div>
 </div>
 
@@ -265,7 +305,10 @@ body * { visibility: hidden; }
 <h1>Digital Hub</h1>
 <p>ONE PLATFORM | MANY SOLUTIONS</p>
 </div>
-<div class="profile-icon" onclick="openProfileModal()" title="माहिती व संपर्क">👤</div>
+<!-- ३D ग्लोबप्रमाणे सतत फिरणारा प्रोफाइल फोटो (Continuous 3D Rotation) -->
+<div class="profile-icon" onclick="openProfileModal()" title="माहिती व संपर्क">
+<img src="home-bg.jpg" onerror="this.onerror=null; this.src='1000320439_2.png';" class="profile-icon-rotating-photo" alt="Profile">
+</div>
 </div>
 
 <div class="breadcrumb-bar">
@@ -292,9 +335,10 @@ body * { visibility: hidden; }
 </div>
 
 <div class="center-stage">
+<!-- फिरता स्वागत संदेश बॉक्स (Welcome Message Animation) -->
 <div class="suvichar-running-box">
 <marquee behavior="scroll" direction="left" scrollamount="4" scrolldelay="0">
-<span class="suvichar-text" id="dynamicSuvichar">✨ कष्टाशिवाय यशाला मोल नाही, सातत्य आणि प्रामाणिकपणा हीच यशाची खरी गुरुकिल्ली आहे! ✨</span>
+<span class="suvichar-text" id="dynamicSuvichar">✨ मी विठ्ठल रघुनाथ कोकाटे, आपले सर्वांचे या प्रणालीमध्ये मनःपूर्वक स्वागत करीत आहे. या प्रणालीचा सहज, सुरक्षित आणि कार्यक्षम उपयोग करून आपल्या कामाचा अधिक सुलभ व परिणामकारक लाभ घ्यावा. ✨</span>
 </marquee>
 </div>
 <div class="podium-stage-box">
@@ -649,10 +693,30 @@ body * { visibility: hidden; }
 </div></div>
 
 <script>
-function showAlert(msg) {
-document.getElementById('customAlertText').innerText = msg;
+// ** आधुनिक व सविस्तर अलर्ट/एरर फीडबॅक सिस्टम (Clear & Specific Feedback) **
+function showAlert(msg, type) {
+var iconEl = document.getElementById('customAlertIcon');
+var titleEl = document.getElementById('customAlertTitle');
+var textEl = document.getElementById('customAlertText');
+
+if (type === 'SUCCESS') {
+iconEl.innerText = '✅';
+titleEl.innerText = 'यशस्वी (Success)';
+titleEl.style.color = '#2e7d32';
+} else if (type === 'ERROR') {
+iconEl.innerText = '❌';
+titleEl.innerText = 'त्रुटी आढळली (Action Error)';
+titleEl.style.color = '#d32f2f';
+} else {
+iconEl.innerText = '⚠️';
+titleEl.innerText = 'महत्त्वाची सूचना (Validation Alert)';
+titleEl.style.color = '#e65100';
+}
+
+textEl.innerText = msg;
 document.getElementById('customAlertModal').style.display = 'flex';
 }
+
 function closeCustomAlert() {
 document.getElementById('customAlertModal').style.display = 'none';
 }
@@ -662,18 +726,12 @@ function closeSettingModal() { document.getElementById('settingModal').style.dis
 function openBackupModal() { document.getElementById('backupModal').style.display = 'flex'; }
 function closeBackupModal() { document.getElementById('backupModal').style.display = 'none'; }
 
-const marathiSuvicharList = [
-"✨ कष्टाशिवाय यशाला मोल नाही, सातत्य आणि प्रामाणिकपणा हीच यशाची खरी गुरुकिल्ली आहे! ✨",
-"🌟 यश हे एका रात्रीत मिळत नाही, त्यासाठी दररोज घेतलेली मेहनत महत्त्वाची असते! 🌟",
-"💡 स्वप्न ती नाहीत जी झोपेत पाहतात, स्वप्न ती आहेत जी झोपू देत नाहीत - डॉ. एपीजे अब्दुल कलाम 💡",
-"🚀 कठीण परिश्रमाचा कोणताही पर्याय नसतो, जिद्द आणि चिकाटी माणसाला नक्कीच यशस्वी बनवते! 🚀"
-];
+// ** स्वागत संदेश (Home Page Moving Welcome Message) **
+const welcomeMessageText = "✨ मी विठ्ठल रघुनाथ कोकाटे, आपले सर्वांचे या प्रणालीमध्ये मनःपूर्वक स्वागत करीत आहे. या प्रणालीचा सहज, सुरक्षित आणि कार्यक्षम उपयोग करून आपल्या कामाचा अधिक सुलभ व परिणामकारक लाभ घ्यावा. ✨";
 
 function updateHourlySuvichar() {
-const now = new Date();
-const hourIndex = now.getHours() % marathiSuvicharList.length;
 const suvicharEl = document.getElementById('dynamicSuvichar');
-if (suvicharEl) suvicharEl.innerText = marathiSuvicharList[hourIndex];
+if (suvicharEl) suvicharEl.innerText = welcomeMessageText;
 }
 
 function getData(key) { return JSON.parse(localStorage.getItem(key) || '[]'); }
@@ -872,7 +930,7 @@ if(document.getElementById('countAvailableMB')) document.getElementById('countAv
 
 function printMBReport() {
 var list = getData('mb_records');
-if (list.length === 0) return showAlert('कोणतीही M.B. नोंद उपलब्ध नाही.');
+if (list.length === 0) return showAlert('कोणतीही M.B. नोंद उपलब्ध नाही.', 'WARNING');
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
 '<div style="text-align:center; margin-bottom:4px;">' +
@@ -971,7 +1029,6 @@ var jeSubVal = document.getElementById('quickModalJESubSelect') ? document.getEl
 renderQuickModalContent(sizeVal, mainSrcVal, jeSubVal);
 }
 
-// ** पॉपअप व क्विक रिपोर्ट: Current Given M.B. मध्ये फक्त एका M.B. चा Current Holder दिसेल **
 function renderQuickModalContent(sizeFilter, mainSource, jeSubVal) {
 var allMBs = getData('mb_records');
 var stock = getAvailableStock();
@@ -1010,7 +1067,6 @@ listHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + format
 listHTML += '</tbody></table>';
 }
 } else if (currentQuickModalType === 'GIVEN') {
-// सध्या ॲक्टिव्हली कोणाकडे आहे तीच यादी (Active Given List)
 var givenList = activeGiven;
 if (sizeFilter !== 'ALL') givenList = givenList.filter(function(m){ return m.size === sizeFilter; });
 
@@ -1209,84 +1265,79 @@ sel.add(new Option(s.mbNumber + ' (' + s.size + ')', s.mbNumber));
 });
 }
 
-// ** सुधारित सेव्ह फंक्शन: Duplicate Active Issue पूर्णपणे ब्लॉक करणे आणि एक M.B. = एक Current Holder **
 function saveOrUpdateMB() {
 var actionType = document.getElementById('mbActionType').value;
 var size = document.getElementById('newMBSize').value;
 var date = document.getElementById('newMBDate').value;
 var idx = parseInt(document.getElementById('editMBIndex').value, 10);
 
-if (!actionType) return showAlert('कृपया नोंद प्रकार निवडा.');
-if (!size) return showAlert('कृपया M.B. आकार निवडा.');
-if (!date) return showAlert('कृपया दिनांक निवडा.');
+if (!actionType) return showAlert('कृपया नोंद प्रकार (मिळालेली / दिलेली M.B.) निवडा.', 'WARNING');
+if (!size) return showAlert('कृपया M.B. आकार (लहान / मोठी M.B.) निवडा.', 'WARNING');
+if (!date) return showAlert('कृपया नोंद दिनांक निवडा.', 'WARNING');
 
 var no = '', srcText = '', subDetail = '';
 
 if (actionType === 'दिलेली M.B.') {
 no = document.getElementById('selectAvailableMB').value;
-if (!no) return showAlert('कृपया उपलब्ध M.B. निवडा.');
+if (!no) return showAlert('कृपया उपलब्ध M.B. निवडा.', 'WARNING');
 
 var recType = document.getElementById('mbGivenRecipientType').value;
-if (!recType) return showAlert('कृपया "कोणाला दिली?" ते निवडा.');
+if (!recType) return showAlert('कृपया "कोणाला दिली?" ते निवडा.', 'WARNING');
 
 if (recType === 'JE') {
 subDetail = document.getElementById('selectGivenJE').value;
-if (!subDetail) return showAlert('कृपया कनिष्ठ अभियंता (JE) निवडा.');
+if (!subDetail) return showAlert('कृपया कनिष्ठ अभियंता (JE) निवडा.', 'WARNING');
 srcText = 'M.B. ' + subDetail + ' यांना दिली';
 } else {
 subDetail = document.getElementById('givenOfficeInput').value.trim();
-if (!subDetail) return showAlert('कृपया विभागीय कार्यालयाचे नाव टाईप करा.');
+if (!subDetail) return showAlert('कृपया विभागीय कार्यालयाचे नाव टाईप करा.', 'WARNING');
 srcText = 'M.B. विभागीय कार्यालय (' + subDetail + ') यांना दिली';
 }
 } else {
 no = document.getElementById('newMBNo').value.trim();
-if (!no) return showAlert('कृपया M.B. क्रमांक भरा.');
+if (!no) return showAlert('कृपया M.B. क्रमांक भरा.', 'WARNING');
 
 var recType = document.getElementById('mbReceivedType').value;
-if (!recType) return showAlert('कृपया नवीन किंवा चालू पर्याय निवडा.');
+if (!recType) return showAlert('कृपया नवीन किंवा चालू पर्याय निवडा.', 'WARNING');
 
 if (recType === 'नवीन') {
 subDetail = document.getElementById('bhandarpalNameInput').value.trim();
-if (!subDetail) return showAlert('कृपया भंडारपाळाचे नाव भरा.');
+if (!subDetail) return showAlert('कृपया भंडारपाळाचे नाव भरा.', 'WARNING');
 srcText = 'भंडारपाल (' + subDetail + ')';
 } else {
 var chalooSrc = document.getElementById('mbChalooSource').value;
-if (!chalooSrc) return showAlert('कृपया चालू स्रोत निवडा.');
+if (!chalooSrc) return showAlert('कृपया चालू स्रोत निवडा.', 'WARNING');
 
 if (chalooSrc === 'JE') {
 subDetail = document.getElementById('receivedSubSelect').value;
-if (!subDetail) return showAlert('कृपया कनिष्ठ अभियंता निवडा.');
+if (!subDetail) return showAlert('कृपया कनिष्ठ अभियंता निवडा.', 'WARNING');
 } else {
 subDetail = document.getElementById('receivedSubInput').value.trim();
-if (!subDetail) return showAlert('कृपया नाव टाईप करा.');
+if (!subDetail) return showAlert('कृपया नाव टाईप करा.', 'WARNING');
 }
 srcText = chalooSrc + ' (' + subDetail + ')';
 }
 }
 
-// ** सिस्टीम लेव्हल व्हॅलिडेशन: ONE M.B. = ONE CURRENT HOLDER **
 if (idx === -1) {
 var lastStatus = getLatestMBStatus(no);
 
 if (actionType === 'दिलेली M.B.') {
-// जर ती आधीच कोणाला दिली असेल आणि परत जमा झालेली नसेल, तर लगेच ब्लॉक करा
 if (lastStatus && (lastStatus.lastAction === 'दिलेली M.B.' || lastStatus.lastAction === 'दिलेली एमबी')) {
 var currentHolder = lastStatus.detail || lastStatus.source || 'इतर व्यक्ती';
 var formattedLastDate = formatDateToDMY(lastStatus.date);
-return showAlert('⚠️️ M.B. क्र. ' + no + ' सध्या ' + currentHolder + ' यांच्याकडे (दि. ' + formattedLastDate + ' पासून) दिलेली आहे.\n\nप्रथम ही M.B. परत घ्या (Receive करा), त्यानंतरच दुसऱ्या व्यक्तीला देता येईल.');
+return showAlert('⚠️️ M.B. क्र. ' + no + ' Issue करता आली नाही.\n\nकारण: ही M.B. आधीच दिनांक ' + formattedLastDate + ' पासून श्री. ' + currentHolder + ' यांच्याकडे Issue आहे.\n\nकृती: कृपया प्रथम ही M.B. Receive करा, त्यानंतरच दुसऱ्या व्यक्तीला देता येईल.', 'ERROR');
 }
 
-// उपलब्ध स्टॉकमध्ये ती M.B. आहे का याची खात्री करा
 var isAvail = getAvailableStock().some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(no); });
 if (!isAvail) {
-return showAlert('⚠️ M.B. क्र. ' + no + ' सध्या कार्यालयात उपलब्ध नाही. त्यामुळे ती वाटप करता येणार नाही.');
+return showAlert('⚠️ M.B. क्र. ' + no + ' सध्या कार्यालयात उपलब्ध नाही.\n\nकारण: ही M.B. अद्याप सिस्टीममध्ये जमा झालेली नाही किंवा आधीच वाटप आहे.', 'ERROR');
 }
 } else if (actionType === 'मिळालेली M.B.') {
-// जर ती आधीच मिळाली असेल आणि अजून कुणाला दिलीच नाही, तर पुन्हा मिळाली करू नका
 if (lastStatus && (lastStatus.lastAction === 'मिळालेली M.B.' || lastStatus.lastAction === 'मिळालेली एमबी')) {
 var holder = lastStatus.detail || lastStatus.source || 'कार्यालय';
 var formattedLastDate = formatDateToDMY(lastStatus.date);
-return showAlert('M.B. क्रमांक "' + no + '" ही आधीच दिनांक ' + formattedLastDate + ' रोजी ' + holder + ' यांच्याकडून मिळालेली असून सध्या कार्यालयात उपलब्ध आहे!');
+return showAlert('⚠️ M.B. क्रमांक "' + no + '" ची नोंद आधीच झालेली आहे.\n\nकारण: ही M.B. दिनांक ' + formattedLastDate + ' रोजी ' + holder + ' यांच्याकडून मिळालेली असून सध्या कार्यालयात उपलब्ध आहे!', 'WARNING');
 }
 }
 }
@@ -1320,7 +1371,7 @@ document.getElementById('newMBDate').value = '';
 onMBActionTypeChange();
 cancelMBEdit();
 refreshAll();
-showAlert('नोंद यशस्वीपणे जतन झाली!');
+showAlert('M.B. क्रमांक ' + no + ' ची नोंद यशस्वीरीत्या जतन झाली!', 'SUCCESS');
 }
 
 function editMB(idx) {
@@ -1356,10 +1407,10 @@ var list = getData('mb_records');
 list.splice(idx, 1);
 setData('mb_records', list);
 refreshAll();
+showAlert('M.B. नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
 }
 }
 
-// ** Work List मध्ये अचूक M.B. लोड करणे **
 function onWorkJEChange() {
 var je = document.getElementById('workJE').value;
 var mbSel = document.getElementById('workMB');
@@ -1392,17 +1443,17 @@ var con = document.getElementById('workContractor').value.trim();
 var status = document.getElementById('workStatus').value;
 var idx = parseInt(document.getElementById('editWorkIndex').value, 10);
 
-if (!je) return showAlert('कृपया कनिष्ठ अभियंता (JE) निवडा.');
-if (!mb) return showAlert('कृपया वाटप केलेली M.B. निवडा.');
-if (!name) return showAlert('कामाचे नाव टाईप करा.');
-if (!con) return showAlert('कंत्राटदाराचे नाव टाईप करा.');
+if (!je) return showAlert('कृपया कनिष्ठ अभियंता (JE) निवडा.', 'WARNING');
+if (!mb) return showAlert('कृपया वाटप केलेली M.B. निवडा.', 'WARNING');
+if (!name) return showAlert('कामाचे नाव टाईप करा.', 'WARNING');
+if (!con) return showAlert('कंत्राटदाराचे नाव टाईप करा.', 'WARNING');
 
 var works = getData('work_records');
 
 if (idx === -1) {
 var activeWork = works.find(function(w){ return w.mbNo === mb && w.status === 'अपूर्ण'; });
 if (activeWork) {
-return showAlert('M.B. क्रमांक "' + mb + '" चे काम सध्या अपूर्ण (चालू) आहे. ते पूर्ण झाल्याशिवाय या M.B. वर नवीन काम नोंदवता येणार नाही!');
+return showAlert('M.B. क्रमांक "' + mb + '" चे काम सध्या अपूर्ण (चालू) आहे. ते पूर्ण झाल्याशिवाय या M.B. वर नवीन काम नोंदवता येणार नाही!', 'ERROR');
 }
 }
 
@@ -1437,7 +1488,7 @@ document.getElementById('workStatus').value = 'अपूर्ण';
 
 cancelWorkEdit();
 refreshAll();
-showAlert('काम यशस्वीपणे अपडेट व जतन झाले!');
+showAlert('काम यशस्वीपणे अपडेट व जतन झाले!', 'SUCCESS');
 }
 
 function editWork(idx) {
@@ -1485,12 +1536,13 @@ var list = getData('work_records');
 list.splice(idx, 1);
 setData('work_records', list);
 refreshAll();
+showAlert('काम यशस्वीरीत्या हटवले!', 'SUCCESS');
 }
 }
 
 function printWorkReport() {
 var works = getData('work_records');
-if (works.length === 0) return showAlert('कोणतीही कामाची नोंद उपलब्ध नाही.');
+if (works.length === 0) return showAlert('कोणतीही कामाची नोंद उपलब्ध नाही.', 'WARNING');
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
 '<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">कामांची यादी (Work Register) अहवाल</h2></div>' +
@@ -1620,11 +1672,9 @@ inputGrp.style.display = 'none';
 }
 }
 
-// ** SEARCH बटण क्लिक झाल्यावर चालणारे मुख्य फंक्शन **
 function executeSmartSearchOrReport() {
 var searchTxt = document.getElementById('smartSearchInput').value.trim();
 
-// थेट स्मार्ट सर्च बॉक्स वापरला असल्यास थेट पॉपअप उघडा
 if (searchTxt) {
 showSmartSearchResultModal(searchTxt);
 return;
@@ -1633,40 +1683,37 @@ return;
 generateGeneralReport();
 }
 
-// ** अहवाल जनरेट करताना दोन्ही दिनांक अनिवार्य करणे **
 function generateGeneralReport() {
 var fDate = document.getElementById('repFromDate').value;
 var tDate = document.getElementById('repToDate').value;
 
-// १. दोन्ही दिनांक निवडणे अनिवार्य (Mandatory)
 if (!fDate || !tDate) {
-return showAlert("कृपया आधी 'दिनांक पासून' आणि 'दिनांक पर्यंत' दोन्ही दिनांक निवडा!");
+return showAlert("कृपया आधी 'दिनांक पासून' आणि 'दिनांक पर्यंत' दोन्ही दिनांक निवडा!", 'WARNING');
 }
 
 var isoFrom = normalizeDateToISO(fDate);
 var isoTo = normalizeDateToISO(tDate);
 
-// २. दिनांक पासून हा दिनांक पर्यंत नंतरचा नसावा
 if (isoFrom > isoTo) {
-return showAlert("'दिनांक पासून' हा दिनांक 'दिनांक पर्यंत' नंतरचा असू शकत नाही!");
+return showAlert("'दिनांक पासून' हा दिनांक 'दिनांक पर्यंत' नंतरचा असू शकत नाही!", 'ERROR');
 }
 
 var mainCat = document.getElementById('repMainCategory').value;
-if (!mainCat) return showAlert('कृपया मुख्य घटक निवडा.');
+if (!mainCat) return showAlert('कृपया मुख्य घटक निवडा.', 'WARNING');
 
 if (mainCat === 'M.B.') {
 var sizeChoice = document.getElementById('repDynamicSelect1').value;
 var finalType = document.getElementById('repDynamicSelect2').value;
-if (!sizeChoice) return showAlert('कृपया M.B. प्रकार निवडा.');
-if (!finalType) return showAlert('कृपया M.B. सविस्तर स्थिती निवडा.');
+if (!sizeChoice) return showAlert('कृपया M.B. प्रकार निवडा.', 'WARNING');
+if (!finalType) return showAlert('कृपया M.B. सविस्तर स्थिती निवडा.', 'WARNING');
 
 var givenSubTarget = '', givenSubValue = '';
 if (finalType === 'GIVEN') {
 givenSubTarget = document.getElementById('repDynamicSelect3').value;
-if (!givenSubTarget) return showAlert('कृपया "वाटप कोणाला केले?" ते निवडा.');
+if (!givenSubTarget) return showAlert('कृपया "वाटप कोणाला केले?" ते निवडा.', 'WARNING');
 if (givenSubTarget === 'JE') {
 givenSubValue = document.getElementById('repDynamicJEList').value;
-if (!givenSubValue) return showAlert('कृपया कनिष्ठ अभियंता (JE) निवडा.');
+if (!givenSubValue) return showAlert('कृपया कनिष्ठ अभियंता (JE) निवडा.', 'WARNING');
 } else if (givenSubTarget === 'Office') {
 givenSubValue = 'विभागीय कार्यालय';
 } else if (givenSubTarget === 'ALL') {
@@ -1677,18 +1724,17 @@ givenSubValue = 'सर्व';
 generateAdvancedMBReport(sizeChoice, finalType, givenSubTarget, givenSubValue, fDate, tDate);
 } else if (mainCat === 'J.E.') {
 var sub = document.getElementById('repDynamicSelect1').value;
-if (!sub) return showAlert('कृपया कनिष्ठ अभियंता निवडा.');
+if (!sub) return showAlert('कृपया कनिष्ठ अभियंता निवडा.', 'WARNING');
 printJEReport();
 } else if (mainCat === 'Bill') {
 var sub = document.getElementById('repDynamicSelect1').value;
-if (!sub) return showAlert('कृपया देयक प्रकार निवडा.');
+if (!sub) return showAlert('कृपया देयक प्रकार निवडा.', 'WARNING');
 generateBillReports(sub, fDate, tDate);
 } else if (mainCat === 'Contractor' || mainCat === 'Agency') {
 generateWorkReport(fDate, tDate);
 }
 }
 
-// ** सर्च पॉपअप मॉडेल व सद्यस्थिती काढणे **
 var activeSearchPrintHTML = '';
 
 function showSmartSearchResultModal(query) {
@@ -1726,7 +1772,7 @@ if (latestMap[k]) resultList.push(latestMap[k]);
 }
 
 if (resultList.length === 0) {
-return showAlert('स्मार्ट शोध "' + query + '" नुसार कोणतीही नोंद आढळली नाही!');
+return showAlert('स्मार्ट शोध "' + query + '" नुसार कोणतीही नोंद आढळली नाही!', 'WARNING');
 }
 
 var tableHTML = '<table class="data-table"><thead><tr>' +
@@ -1784,7 +1830,6 @@ var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; paddin
 printA4Document(html);
 }
 
-// ** सविस्तर रिपोर्ट फिल्टर अहवाल - दिनांक कालावधी अचूक फिल्टर **
 function generateAdvancedMBReport(sizeChoice, finalType, subTarget, subVal, fDate, tDate) {
 var allMBs = getData('mb_records');
 var stock = getAvailableStock();
@@ -1808,7 +1853,6 @@ return true;
 });
 } else if (finalType === 'GIVEN') {
 reportTitle = "सध्या दिलेली मोजमाप पुस्तिका अहवाल";
-// केवळ Current Active Holders ची यादी आणि निवडलेला कालावधी
 filtered = activeGiven.filter(function(m) {
 var itemDateISO = normalizeDateToISO(m.date);
 if (!itemDateISO) return false;
@@ -1836,7 +1880,6 @@ if (sizeChoice === 'Big M.B.' && m.size !== 'मोठी M.B.') return false;
 return true;
 });
 } else {
-// ALL स्थिती: प्रत्येक M.B. ची सर्वात ताजी नोंद
 var latestMap = {};
 allMBs.forEach(function(m) {
 var no = (m.mbNumber || m.mbNo || '').trim();
@@ -1857,7 +1900,7 @@ return true;
 
 if (filtered.length === 0) {
 var periodMsg = 'निवडलेल्या कालावधीत (' + formatDateToDMY(fDate) + ' ते ' + formatDateToDMY(tDate) + ') ';
-return showAlert(periodMsg + 'कोणतीही नोंद आढळली नाही.');
+return showAlert(periodMsg + 'कोणतीही नोंद आढळली नाही.', 'WARNING');
 }
 
 filtered.sort(function(a, b) {
@@ -1921,7 +1964,7 @@ renderBillTableHTML(bills, '', 'देयक नोंदवही अहवा�
 
 function printMasterBillRegister() {
 var bills = getData('dmbms_bills');
-if (bills.length === 0) return showAlert('कोणतीही देयक नोंद उपलब्ध नाही.');
+if (bills.length === 0) return showAlert('कोणतीही देयक नोंद उपलब्ध नाही.', 'WARNING');
 renderBillTableHTML(bills, '', 'संपूर्ण देयक नोंदवही (Master Bill Register)');
 }
 
@@ -1964,13 +2007,14 @@ p.style.display = 'none';
 function saveOrUpdateJE() {
 var name = document.getElementById('newJEName').value.trim();
 var idx = parseInt(document.getElementById('editJEIndex').value, 10);
-if (!name) return showAlert('नाव भरा.');
+if (!name) return showAlert('कृपया कनिष्ठ अभियंत्याचे पूर्ण नाव भरा.', 'WARNING');
 var list = getData('je_records');
 if (idx === -1) list.push({ name: name }); else list[idx].name = name;
 setData('je_records', list);
 cancelJEEdit();
 refreshAll();
 onMainCategoryChange();
+showAlert('कनिष्ठ अभियंता नोंद यशस्वीपणे सेव्ह झाली!', 'SUCCESS');
 }
 function editJE(idx) {
 var item = getData('je_records')[idx];
@@ -1992,6 +2036,7 @@ list.splice(idx, 1);
 setData('je_records', list);
 refreshAll();
 onMainCategoryChange();
+showAlert('कनिष्ठ अभियंता नोंद हटवली!', 'SUCCESS');
 }
 }
 function refreshJEList() {
@@ -2006,7 +2051,7 @@ tbody.innerHTML += '<tr><td>' + (idx+1) + '</td><td>' + item.name + '</td><td cl
 
 function printJEReport() {
 var list = getData('je_records');
-if (list.length === 0) return showAlert('कोणतीही कनिष्ठ अभियंता (JE) नोंद उपलब्ध नाही.');
+if (list.length === 0) return showAlert('कोणतीही कनिष्ठ अभियंता (JE) नोंद उपलब्ध नाही.', 'WARNING');
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">कनिष्ठ अभियंता (JE) व्यवस्थापन अहवाल</h2></div><div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>JE नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div></div>' +
 '<table class="print-table"><thead><tr><th style="text-align:center; width:15%;">अ.क्र.</th><th>कनिष्ठ अभियंत्याचे नाव</th></tr></thead><tbody>';
@@ -2023,15 +2068,14 @@ function saveAssign() {
 var mb = document.getElementById('assignMBSelect').value;
 var je = document.getElementById('assignJESelect').value;
 var dt = document.getElementById('assignDate').value;
-if (!mb || !je) return showAlert('M.B. आणि JE निवडा.');
+if (!mb || !je) return showAlert('कृपया M.B. आणि JE दोन्ही निवडा.', 'WARNING');
 
-// M.B. उपलब्ध आहे का तपासणी
 var stock = getAvailableStock();
 var isAvailable = stock.some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(mb); });
 if (!isAvailable) {
 var lastStatus = getLatestMBStatus(mb);
 var holder = lastStatus ? (lastStatus.detail || lastStatus.source || 'इतर व्यक्ती') : 'इतर व्यक्ती';
-return showAlert('⚠️ M.B. क्र. ' + mb + ' सध्या ' + holder + ' यांच्याकडे दिलेली आहे. प्रथम ती Receive करा, त्यानंतरच Assign करता येईल.');
+return showAlert('⚠️ M.B. क्र. ' + mb + ' वाटप करता आली नाही.\n\nकारण: ही M.B. सध्या ' + holder + ' यांच्याकडे दिलेली आहे.\n\nकृती: प्रथम ती Receive करा, त्यानंतरच Assign करता येईल.', 'ERROR');
 }
 
 var stockMB = stock.find(function(s){ return s.mbNumber === mb; });
@@ -2046,7 +2090,7 @@ list.push({ mbNo: mb, jeName: je, assignDate: dt });
 setData('assign_records', list);
 
 refreshAll();
-showAlert('वाटप यशस्वी!');
+showAlert('M.B. क्र. ' + mb + ' चे श्री. ' + je + ' यांना वाटप यशस्वी!', 'SUCCESS');
 }
 
 function deleteAssign(idx) {
@@ -2064,6 +2108,7 @@ break;
 }
 setData('mb_records', mbList);
 refreshAll();
+showAlert('M.B. वाटप नोंद रद्द केली!', 'SUCCESS');
 }
 }
 
@@ -2315,7 +2360,7 @@ container.innerHTML = '<div class="form-row-compact"><label>Income Tax</label><i
 '<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="' + newLabelId + '">Other-1</span></label>' +
 '<button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="नवीन कपात जोडा">+</button>' +
 '</div>' +
-'<input type="number" class="form-control calc-ded" id="' +献dedOther1" value="0" oninput="autoCalculateDeductions()">' +
+'<input type="number" class="form-control calc-ded" id="dedOther1" value="0" oninput="autoCalculateDeductions()">' +
 '</div>';
 
 var jeSel = document.getElementById('wJeSelect');
@@ -2342,7 +2387,6 @@ goToStep(step);
 
 function closeWizard() { document.getElementById('wizardModal').style.display = 'none'; }
 
-// ** देयक नोंदवही (Bill Wizard) मध्ये JE कडील अचूक M.B. लोड करणे **
 function onWizardJEChange() {
 var jeName = document.getElementById('wJeSelect').value;
 var mbSel = document.getElementById('wMbSelect');
@@ -2391,7 +2435,7 @@ return b.mbNo === selectedMb && b.billType === selectedBillType;
 });
 
 if (found) {
-showAlert('हे बिल (' + selectedBillType + ') या पूर्वी या M.B. साठी देण्यात आले आहे. कृपया पुढील/दुसरा बिलाचा प्रकार निवडा.');
+showAlert('हे बिल (' + selectedBillType + ') या पूर्वी या M.B. साठी देण्यात आले आहे. कृपया पुढील/दुसरा बिलाचा प्रकार निवडा.', 'WARNING');
 }
 }
 
@@ -2515,6 +2559,7 @@ document.getElementById('succBillNo').innerText = billData.billNo;
 document.getElementById('succNetPay').innerText = '₹ ' + netPay.toLocaleString('en-IN');
 document.getElementById('successModal').style.display = 'flex';
 refreshBillDashboard();
+showAlert('देयक यशस्वीरीत्या जतन झाले!', 'SUCCESS');
 }
 
 function editBill(idx) {
@@ -2568,6 +2613,7 @@ var bills = getData('dmbms_bills');
 bills.splice(idx, 1);
 setData('dmbms_bills', bills);
 refreshBillDashboard();
+showAlert('देयक नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
 }
 }
 
@@ -2586,6 +2632,7 @@ var a = document.createElement('a');
 a.href = URL.createObjectURL(blob);
 a.download = 'MBMS_PayFixation_Backup_' + new Date().toISOString().slice(0, 10) + '.json'; 
 a.click();
+showAlert('बॅकअप फाईल यशस्वीरीत्या डाऊनलोड झाली!', 'SUCCESS');
 }
 
 function restoreBackup(evt) {
@@ -2603,10 +2650,10 @@ if(d.assign_records) setData('assign_records', d.assign_records);
 
 if(d.savedPayFixationsList) setData('savedPayFixationsList', d.savedPayFixationsList);
 
-showAlert('M.B. आणि Pay Fixation चा संपूर्ण डेटा यशस्वीरीत्या पूर्ववत (Restore) झाला!'); 
+showAlert('M.B. आणि Pay Fixation चा संपूर्ण डेटा यशस्वीरीत्या पूर्ववत (Restore) झाला!', 'SUCCESS'); 
 refreshAll(); 
 closeBackupModal();
-} catch(err) { showAlert('चुकीची फाईल किंवा फॉरमॅट.'); }
+} catch(err) { showAlert('चुकीची फाईल किंवा फॉरमॅट. कृपया वैध JSON फाईल अपलोड करा.', 'ERROR'); }
 };
 reader.readAsText(file);
 }
@@ -2616,10 +2663,10 @@ function toggleSelectAll(master) { document.querySelectorAll('.del-chk').forEach
 function deleteSelectedData() {
 var selected = []; 
 document.querySelectorAll('.del-chk:checked').forEach(function(c){ selected.push(c.value); });
-if (selected.length === 0) return showAlert('किमान एक पर्याय निवडा.');
+if (selected.length === 0) return showAlert('किमान एक पर्याय निवडा.', 'WARNING');
 if (confirm('निवडलेली माहिती कायमची नष्ट करायची का?')) {
 selected.forEach(function(key){ localStorage.removeItem(key); });
-showAlert('माहिती यशस्वीरित्या हटवली!'); 
+showAlert('निवडलेली माहिती यशस्वीरित्या हटवली!', 'SUCCESS'); 
 refreshAll(); 
 closeModule('settingsModal');
 }
