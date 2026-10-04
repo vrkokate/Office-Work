@@ -625,7 +625,7 @@ body * { visibility: hidden; }
 
 <!-- 6. Data Manager मोडल -->
 <div id="settingsModal" class="modal-overlay"><div class="modal-card">
-<div class="modal-header"><h3 style="font-size: 14px; color:#c2185b;">⚙️️ Data Manager</h3><button class="btn-close" onclick="closeModule('settingsModal')">X</button></div>
+<div class="modal-header"><h3 style="font-size: 14px; color:#c2185b;">⚙ Data Manager</h3><button class="btn-close" onclick="closeModule('settingsModal')">X</button></div>
 <h4 style="font-size:12px; color:#c2185b; border-bottom:1px solid #ddd; padding-bottom:4px; margin-bottom:6px;">डेटा हटवा (Select & Delete)</h4>
 <div style="font-size:12px; display:flex; flex-direction:column; gap:6px;">
 <label><input type="checkbox" id="delAll" onchange="toggleSelectAll(this)"> <strong>सर्व डेटा निवडा (Select All)</strong></label>
@@ -760,7 +760,7 @@ body * { visibility: hidden; }
 </div></div>
 
 <script>
-// ** आधुनिक व सविस्तर अलर्ट/एरर फीडबॅक सिस्टम (Clear & Specific Feedback) **
+// ** आधुनिक व सविस्तर अलर्ट/एरर फीडबॅक सिस्टम **
 function showAlert(msg, type) {
 var iconEl = document.getElementById('customAlertIcon');
 var titleEl = document.getElementById('customAlertTitle');
@@ -898,7 +898,7 @@ index: i
 return null;
 }
 
-// ** उपलब्ध M.B. यादी (दिनांकासह ट्रॅक करणे) **
+// ** उपलब्ध M.B. यादी **
 function getAvailableStock(excludeIndex = -1) {
 var allMBs = getData('mb_records');
 var statusMap = {};
@@ -923,7 +923,7 @@ available.push(statusMap[k]);
 return available;
 }
 
-// ** सध्या प्रत्यक्ष एकाच व्यक्तीकडे Active Issued असणाऱ्या सर्व M.B. ची यादी (One Holder Validation) **
+// ** सध्या प्रत्यक्ष एकाच व्यक्तीकडे Active Issued असणाऱ्या सर्व M.B. ची यादी **
 function getCurrentlyActiveGivenMBs(excludeIndex = -1) {
 var allMBs = getData('mb_records');
 var latestMap = {};
@@ -1393,7 +1393,7 @@ subDetail = document.getElementById('receivedSubSelect').value;
 if (!subDetail) return showAlert('कृपया कनिष्ठ अभियंता निवडा.', 'WARNING');
 } else {
 subDetail = document.getElementById('receivedSubInput').value.trim();
-if (!subDetail) return showAlert('कृपया नाव टाईप करा.', 'WARNING');
+if (!subDetail) return showAlert('कृपया नाव टाईप करा.');
 }
 srcText = chalooSrc + ' (' + subDetail + ')';
 }
@@ -1437,7 +1437,7 @@ refreshAll();
 showAlert((idx === -1 ? 'M.B. नोंद यशस्वीरीत्या जतन झाली!' : 'M.B. नोंद यशस्वीरीत्या अद्ययावत (Update) झाली!'), 'SUCCESS');
 }
 
-// ** सुधारित EDIT फंक्शन: Existing Record ची सर्व माहिती व M.B. अचूकपणे लोड करणे **
+// ** सुधारित EDIT फंक्शन **
 function editMB(idx) {
 var item = getData('mb_records')[idx];
 if (!item) return;
@@ -1850,7 +1850,7 @@ generateWorkReport(fDate, tDate);
 
 var activeSearchPrintHTML = '';
 
-// ** स्मार्ट शोध निकाल: M.B. क्र. ठळक, निळा आणि क्लिकेबल लिंक बनवणे **
+// ** 🌟 CHANGE NO. 1: Search Result मध्ये "(क्लिक करा)" व "🔵" काढून फक्त 015750 क्लिकेबल ठेवणे **
 function showSmartSearchResultModal(query) {
 var queryClean = query.trim();
 var queryLower = queryClean.toLowerCase();
@@ -1889,9 +1889,10 @@ if (resultList.length === 0) {
 return showAlert('स्मार्ट शोध "' + query + '" नुसार कोणतीही नोंद आढळली नाही!', 'WARNING');
 }
 
+// १. हेडरमधून "(क्लिक करा)" मजकूर काढला आहे
 var tableHTML = '<table class="data-table"><thead><tr>' +
 '<th style="text-align:center;">अ.क्र.</th>' +
-'<th>M.B. क्र. (क्लिक करा)</th>' +
+'<th>M.B. क्र.</th>' +
 '<th>आकार</th>' +
 '<th>दिनांक</th>' +
 '<th>सद्यस्थिती</th>' +
@@ -1916,10 +1917,10 @@ statusText = '<span style="color:#e65100; font-weight:700;">श्री. ' + pe
 statusText = '<span style="color:#0d47a1; font-weight:600;">मिळालेली M.B.</span>';
 }
 
-// 🔵 BLUE + BOLD + CLICKABLE + TOUCH-FRIENDLY M.B. LINK
+// २. डाव्या बाजूचा मोठा 🔵 Blue Circle काढला आहे, पण नंबर पूर्णपणे CLICKABLE ठेवला आहे
 tableHTML += '<tr>' +
 '<td style="text-align:center;">' + (idx + 1) + '</td>' +
-'<td><a href="javascript:void(0)" onclick="openSmartActionCenter(\'' + mbNo + '\')" style="color:#0d47a1; font-size:12.5px; font-weight:800; text-decoration:underline; display:inline-block; padding:3px 2px;" title="M.B. Smart Action Center उघडा">🔵 ' + mbNo + '</a></td>' +
+'<td><a href="javascript:void(0)" onclick="openSmartActionCenter(\'' + mbNo + '\')" style="color:#0d47a1; font-size:12.5px; font-weight:800; text-decoration:underline; display:inline-block; padding:3px 2px;" title="M.B. Smart Action Center उघडा">' + mbNo + '</a></td>' +
 '<td>' + size + '</td>' +
 '<td>' + dateStr + '</td>' +
 '<td>' + statusText + '</td>' +
@@ -1949,6 +1950,7 @@ printA4Document(html);
 var currentSacMB = null;
 var currentSacStatusObj = null;
 
+// ** 🌟 CHANGE NO. 2: "स्रोत / हस्तांतरण" पूर्णपणे काढून टाकले आहे **
 function openSmartActionCenter(mbNo) {
 var cleanNo = (mbNo || '').trim();
 if (!cleanNo) return;
@@ -1964,7 +1966,6 @@ currentSacStatusObj = status;
 var stock = getAvailableStock();
 var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(cleanNo); });
 
-// वर्क डेटा लिंक तपासणे
 var works = getData('work_records').filter(function(w){ return normalizeMB(w.mbNo) === normalizeMB(cleanNo); });
 var currentWorkName = works.length > 0 ? works[works.length - 1].name : "काम नोंदवलेले नाही";
 
@@ -1979,6 +1980,7 @@ if (isAvail) {
     holderDisplay = status.detail || status.source || "संबंधित व्यक्ती";
 }
 
+// "स्रोत / हस्तांतरण" चा संपूर्ण भाग काढून टाकला आहे, कोणताही रिकामा रो ठेवलेला नाही
 var detailsHtml = `
 <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
     <span><strong>M.B. क्रमांक:</strong> <span style="color:#0d47a1; font-weight:800; font-size:13.5px;">${cleanNo}</span></span>
@@ -1988,23 +1990,19 @@ var detailsHtml = `
 <div><strong>सध्याचे धारक (Current Holder):</strong> <span style="color:#e65100; font-weight:700;">${holderDisplay}</span></div>
 <div><strong>शेवटचा दिनांक:</strong> ${formatDateToDMY(status.date)}</div>
 <div><strong>संबंधित काम:</strong> ${currentWorkName}</div>
-<div><strong>स्रोत / हस्तांतरण:</strong> ${status.receivedFrom || '-'}</div>
 `;
 
 document.getElementById('sacDetailsBox').innerHTML = detailsHtml;
 
-// स्थितीनुसार उपलब्ध स्मार्ट ॲक्शन्स तयार करणे
 var btnGrid = document.getElementById('sacActionButtonsGrid');
 btnGrid.innerHTML = "";
 
 if (isAvail) {
-    // स्थिती = Available असल्यास: ISSUE, EDIT, HISTORY, REPORT
     btnGrid.innerHTML += `<button class="btn-smart-act btn-act-give" onclick="sacOpenIssueForm()">📤 ISSUE / GIVE</button>`;
     btnGrid.innerHTML += `<button class="btn-smart-act btn-act-edit" onclick="sacTriggerEditRecord()">✏️ EDIT</button>`;
     btnGrid.innerHTML += `<button class="btn-smart-act btn-act-history" onclick="sacToggleHistoryView()">🕘 HISTORY</button>`;
     btnGrid.innerHTML += `<button class="btn-smart-act btn-act-report" onclick="sacPrintSingleMBReport()">📄 REPORT / PRINT</button>`;
 } else {
-    // स्थिती = Issued असल्यास: TRANSFER, RECEIVE, EDIT, HISTORY, REPORT
     btnGrid.innerHTML += `<button class="btn-smart-act btn-act-transfer" onclick="sacOpenTransferForm()">📤 TRANSFER</button>`;
     btnGrid.innerHTML += `<button class="btn-smart-act btn-act-receive" onclick="sacTriggerReceiveMB()">📥 RECEIVE</button>`;
     btnGrid.innerHTML += `<button class="btn-smart-act btn-act-edit" onclick="sacTriggerEditRecord()">✏️ EDIT</button>`;
@@ -2023,7 +2021,7 @@ currentSacMB = null;
 currentSacStatusObj = null;
 }
 
-// ** Smart Action: थेट रिसीव्ह करणे (Receive / Return) **
+// ** Smart Action: थेट रिसीव्ह करणे **
 function sacTriggerReceiveMB() {
 if (!currentSacMB || !currentSacStatusObj) return;
 
@@ -2055,7 +2053,7 @@ if (confirm(confirmMsg)) {
     setData('mb_records', list);
     refreshAll();
     showAlert("✅ M.B. क्र. " + currentSacMB + " कार्यालयात यशस्वीरीत्या जमा (Receive) झाली असून आता उपलब्ध (Available) आहे.", "SUCCESS");
-    openSmartActionCenter(currentSacMB); // स्टेट्स तत्काळ रिफ्रेश करणे
+    openSmartActionCenter(currentSacMB);
 }
 }
 
@@ -2135,13 +2133,12 @@ if (tType === 'JE') {
 
 var currentHolder = currentSacStatusObj.detail || currentSacStatusObj.source || "संबंधित व्यक्ती";
 if (newHolder.toLowerCase() === currentHolder.toLowerCase()) {
-    return showAlert("⚠️ नवीन धारक आणि सध्याचे धारक एकच असू शकत नाहीत.", "WARNING");
+    return showAlert("⚠️️ नवीन धारक आणि सध्याचे धारक एकच असू शकत नाहीत.", "WARNING");
 }
 
 if (confirm("M.B. क्र. " + currentSacMB + " ही श्री. " + currentHolder + " यांच्याकडून श्री. " + newHolder + " यांना हस्तांतरित करायची का?")) {
     var list = getData('mb_records');
     
-    // १. जुन्या व्यक्तीकडून परत आल्याची एन्ट्री
     list.push({
         actionType: "मिळालेली M.B.",
         mbNumber: currentSacMB,
@@ -2152,7 +2149,6 @@ if (confirm("M.B. क्र. " + currentSacMB + " ही श्री. " + curre
         date: dt
     });
 
-    // २. नवीन व्यक्तीला दिल्याची एन्ट्री
     list.push({
         actionType: "दिलेली M.B.",
         mbNumber: currentSacMB,
@@ -2318,29 +2314,13 @@ var historyEntries = allMBs.filter(function(m){ return normalizeMB(m.mbNumber) =
 
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; padding-bottom:6px;">' +
-'<div style="text-align:center; margin-bottom:4px;">' +
-'<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
-'<h2 style="font-size:12px; font-weight:700; margin:2px 0;">मोजमाप पुस्तिका (M.B.) सविस्तर व्यवहार अहवाल</h2>' +
+'<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">मोजमाप पुस्तिका (M.B.) सविस्तर व्यवहार अहवाल</h2></div>' +
+'<div style="display:flex; justify-content:space-between; font-size:11.5px; margin-top:6px;"><div><strong>M.B. क्रमांक: ' + currentSacMB + '</strong> (' + (currentSacStatusObj.size || 'लहान M.B.') + ')</div><div>अहवाल दिनांक: ' + todayStr + '</div></div>' +
 '</div>' +
-'<div style="display:flex; justify-content:space-between; font-size:11.5px; margin-top:6px;">' +
-'<div><strong>M.B. क्रमांक: ' + currentSacMB + '</strong> (' + (currentSacStatusObj.size || 'लहान M.B.') + ')</div>' +
-'<div>अहवाल दिनांक: ' + todayStr + '</div>' +
-'</div>' +
-'</div>' +
-'<table class="print-table"><thead><tr>' +
-'<th style="width:10%; text-align:center;">अ.क्र.</th>' +
-'<th style="width:18%;">दिनांक</th>' +
-'<th style="width:25%;">नोंद प्रकार</th>' +
-'<th style="width:47%;">हस्तांतरण / कोणाकडून - कोणाला</th>' +
-'</tr></thead><tbody>';
+'<table class="print-table"><thead><tr><th style="width:10%; text-align:center;">अ.क्र.</th><th style="width:18%;">दिनांक</th><th style="width:25%;">नोंद प्रकार</th><th style="width:47%;">हस्तांतरण / कोणाकडून - कोणाला</th></tr></thead><tbody>';
 
 historyEntries.forEach(function(h, i) {
-    html += '<tr>' +
-    '<td style="text-align:center;">' + (i+1) + '</td>' +
-    '<td>' + formatDateToDMY(h.date) + '</td>' +
-    '<td><strong>' + h.actionType + '</strong></td>' +
-    '<td>' + (h.receivedFrom || h.receivedDetail || '-') + '</td>' +
-    '</tr>';
+    html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formatDateToDMY(h.date) + '</td><td><strong>' + h.actionType + '</strong></td><td>' + (h.receivedFrom || h.receivedDetail || '-') + '</td></tr>';
 });
 
 html += '</tbody></table>';
@@ -2436,12 +2416,9 @@ var periodSubHeader = "कालावधी: " + formatDateToDMY(fDate) + " त
 
 var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
 '<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + reportTitle + '</h2></div>' +
-'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
-'<div>' + (personHeaderName ? '<strong style="font-size:11.5px;">' + personHeaderName + '</strong><br>' : '') + '<span style="font-weight:700; color:#0d47a1;">' + periodSubHeader + '</span><br>अहवाल दिनांक: ' + todayStr + '</div>' +
-'<div style="text-align:right;"><strong>एकूण संख्या: ' + filtered.length + '</strong></div>' +
-'</div></div>' +
-'<table class="print-table">' +
-'<thead><tr><th style="width:8%; text-align:center;">अ.क्र.</th><th style="width:17%;">दिनांक</th><th style="width:25%;">मोजमाप पुस्तिका क्रमांक</th><th style="width:20%; text-align:center;">प्रकार (आकार)</th><th style="width:30%;">सध्यस्थिती / हस्तांतरण</th></tr></thead><tbody>';
+'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div>' + (personHeaderName ? '<strong style="font-size:11.5px;">' + personHeaderName + '</strong><br>' : '') + '<span style="font-weight:700; color:#0d47a1;">' + periodSubHeader + '</span><br>अहवाल दिनांक: ' + todayStr + '</div><div style="text-align:right;"><strong>एकूण संख्या: ' + filtered.length + '</strong></div></div>' +
+'</div>' +
+'<table class="print-table"><thead><tr><th style="width:8%; text-align:center;">अ.क्र.</th><th style="width:17%;">दिनांक</th><th style="width:25%;">मोजमाप पुस्तिका क्रमांक</th><th style="width:20%; text-align:center;">प्रकार (आकार)</th><th style="width:30%;">सध्यस्थिती / हस्तांतरण</th></tr></thead><tbody>';
 
 filtered.forEach(function(item, idx) {
 var mbNo = item.mbNumber || item.mbNo;
@@ -2875,7 +2852,7 @@ container.innerHTML = '<div class="form-row-compact"><label>Income Tax</label><i
 
 '<div class="form-row-compact" id="otherRow1">' +
 '<div style="display:flex; align-items:center; justify-content:space-between;">' +
-'<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="otherLabel1">Other-1</span></label>' +
+'<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="' + newLabelId + '">Other-1</span></label>' +
 '<button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="नवीन कपात जोडा">+</button>' +
 '</div>' +
 '<input type="number" class="form-control calc-ded" id="dedOther1" value="0" oninput="autoCalculateDeductions()">' +
@@ -3135,7 +3112,7 @@ showAlert('देयक नोंद यशस्वीरीत्या हट
 }
 }
 
-/* ==================== सेटिंग्स व बॅकअप लॉजिक (Pay Fixation सह संपूर्ण) ==================== */
+/* ==================== सेटिंग्स व बॅकअप लॉजिक ==================== */
 function downloadBackup() {
 var allData = { 
 je_records: getData('je_records'), 
