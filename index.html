@@ -126,10 +126,86 @@ letter-spacing: 0.5px;
 .summary-title { font-size: 13px; font-weight: 700; text-align: center; color: #0d47a1; margin-bottom: 8px; }
 .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
-.stat-card { border: 1px solid #bbdefb; border-radius: 6px; text-align: center; padding: 10px 4px; cursor: pointer; background: #fcfdfe; transition: 0.2s; position: relative; z-index: 10; pointer-events: auto !important; }
+/* 🌟 Animated Lighting Effect on Stat Cards */
+.stat-card { 
+border: 1px solid #bbdefb; 
+border-radius: 6px; 
+text-align: center; 
+padding: 10px 4px; 
+cursor: pointer; 
+background: #fcfdfe; 
+transition: 0.2s; 
+position: relative; 
+z-index: 10; 
+pointer-events: auto !important; 
+overflow: hidden;
+}
 .stat-card:hover { background: #e3f2fd; transform: scale(1.02); }
-.stat-num { font-size: 18px; font-weight: 700; color: #0d47a1; pointer-events: none; }
-.stat-label { font-size: 11px; color: #555; margin-top: 2px; pointer-events: none; }
+
+/* Moving Border Light Effect */
+.stat-card::after {
+content: '';
+position: absolute;
+inset: -2px;
+border-radius: 8px;
+background: linear-gradient(90deg, #00e5ff, #00c853, #e040fb, #00e5ff);
+background-size: 300% 300%;
+animation: borderLightMove 6s linear infinite;
+z-index: 1;
+pointer-events: none;
+opacity: 0.6;
+mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+-webkit-mask-composite: xor;
+mask-composite: exclude;
+}
+
+@keyframes borderLightMove {
+0% { background-position: 0% 50%; }
+50% { background-position: 100% 50%; }
+100% { background-position: 0% 50%; }
+}
+
+/* Inner Electric Spark / Mini Light Burst Effect */
+.stat-card::before {
+content: '';
+position: absolute;
+top: 25%;
+left: 35%;
+width: 4px;
+height: 4px;
+background: #00e5ff;
+border-radius: 50%;
+box-shadow: 0 0 8px 3px rgba(0, 229, 255, 0.8);
+opacity: 0;
+animation: electricSpark 4s ease-in-out infinite;
+pointer-events: none;
+z-index: 2;
+}
+.stat-card:nth-child(2)::before {
+top: 60%;
+left: 70%;
+animation-delay: 1.5s;
+background: #e040fb;
+box-shadow: 0 0 8px 3px rgba(224, 64, 251, 0.8);
+}
+.stat-card:nth-child(3)::before {
+top: 45%;
+left: 50%;
+animation-delay: 2.8s;
+background: #00c853;
+box-shadow: 0 0 8px 3px rgba(0, 200, 83, 0.8);
+}
+
+@keyframes electricSpark {
+0%, 80% { opacity: 0; transform: scale(0.5); }
+85% { opacity: 1; transform: scale(1.5); }
+90% { opacity: 0.8; transform: scale(2); box-shadow: 0 0 12px 6px rgba(255,255,255,0.9); }
+100% { opacity: 0; transform: scale(1); }
+}
+
+.stat-num { font-size: 18px; font-weight: 700; color: #0d47a1; pointer-events: none; position: relative; z-index: 3; }
+.stat-label { font-size: 11px; color: #555; margin-top: 2px; pointer-events: none; position: relative; z-index: 3; }
 
 .filter-card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .form-group { margin-bottom: 10px; text-align: left; }
@@ -1183,7 +1259,7 @@ function refreshMBDashboard() {
     if(document.getElementById('countAvailableMB')) document.getElementById('countAvailableMB').innerText = availableCount;
 }
 
-// ** 🌟 Smart M.B. Number Assistant (Updated Validation Text as requested) **
+// ** 🌟 Smart M.B. Number Assistant (Updated Exact and New Messages as requested) **
 function checkRealTimeMBInput(input) {
     var val = (input.value || '').trim();
     var statusEl = document.getElementById('mbRealtimeStatus');
