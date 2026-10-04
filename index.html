@@ -179,6 +179,49 @@ letter-spacing: 0.5px;
 .sum-card-clickable { background: #fff; border: 1px solid #bbdefb; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
 .sum-card-clickable:hover { background: #e3f2fd; }
 
+/* 🌟 SMART ACTION CENTER STYLES */
+.smart-action-btn-grid {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 8px;
+margin-top: 12px;
+margin-bottom: 6px;
+}
+.btn-smart-act {
+border: none;
+border-radius: 6px;
+padding: 10px 6px;
+font-size: 12px;
+font-weight: 700;
+color: #fff;
+cursor: pointer;
+text-align: center;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 5px;
+box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+transition: 0.2s;
+}
+.btn-smart-act:active { transform: scale(0.98); }
+.btn-act-give { background: #2e7d32; }
+.btn-act-receive { background: #0277bd; }
+.btn-act-transfer { background: #7b1fa2; }
+.btn-act-edit { background: #f57c00; }
+.btn-act-history { background: #455a64; }
+.btn-act-report { background: #0d47a1; grid-column: span 2; }
+
+.status-badge-pill {
+display: inline-block;
+padding: 3px 8px;
+border-radius: 12px;
+font-size: 11px;
+font-weight: 800;
+letter-spacing: 0.5px;
+}
+.badge-avail { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.badge-issued { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
+
 @media print {
 body * { visibility: hidden; }
 #printableArea, #printableArea * { visibility: visible; }
@@ -202,12 +245,36 @@ body * { visibility: hidden; }
 </div>
 </div>
 
+<!-- 🌟 SMART ACTION CENTER MODAL (स्मार्ट ॲक्शन सेंटर) -->
+<div id="smartActionCenterModal" class="quick-info-overlay" style="z-index: 3900;">
+<div class="quick-info-card" style="max-width: 460px; padding: 18px;">
+<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0d47a1; padding-bottom:8px; margin-bottom:12px;">
+<h3 id="sacHeaderTitle" style="font-size: 15px; color:#0d47a1; font-weight: 800;">📘 M.B. SMART ACTION CENTER</h3>
+<button class="btn-close" onclick="closeSmartActionCenter()">X</button>
+</div>
+
+<div id="sacDetailsBox" style="background:#f4f7f9; border:1px solid #cfd8dc; border-radius:8px; padding:12px; font-size:12px; line-height:1.6; margin-bottom:12px;"></div>
+
+<!-- ॲक्शन बटनांचा ग्रिड -->
+<div id="sacActionButtonsGrid" class="smart-action-btn-grid"></div>
+
+<!-- ॲक्शन इनपुट / कन्फर्मेशन बॉक्स -->
+<div id="sacSubActionContainer" style="display:none; background:#fff; border:1.5px solid #0d47a1; border-radius:8px; padding:12px; margin-top:10px;"></div>
+
+<!-- हिस्ट्री तक्ता कंटेनर -->
+<div id="sacHistoryContainer" style="display:none; margin-top:10px; max-height:200px; overflow-y:auto; border:1px solid #ddd; border-radius:6px;"></div>
+</div>
+</div>
+
 <!-- सर्च केल्यानंतर ओपन होणारे पॉपअप मॉडेल (Search Detail Popup Modal) -->
 <div id="searchResultModal" class="quick-info-overlay" style="z-index: 3800;">
 <div class="quick-info-card" style="max-width: 500px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
 <h3 id="searchResultModalTitle" style="font-size: 14px; color:#0d47a1; font-weight: 800;">🔍 शोध तपशील व सद्यस्थिती</h3>
 <button class="btn-close" onclick="closeSearchResultModal()">X</button>
+</div>
+<div style="background:#e3f2fd; color:#0d47a1; font-size:11px; padding:6px 10px; border-radius:6px; margin-bottom:8px; font-weight:600;">
+👉 <b>टीप:</b> ॲक्शन सेंटर, ट्रान्सफर, रिसिव्ह व हिस्ट्री पाहण्यासाठी खालील <b>M.B. क्रमांकावर टच/क्लिक करा</b>.
 </div>
 <div class="table-responsive-box" id="searchResultModalBody" style="max-height: 270px; margin-bottom: 12px;"></div>
 <button class="btn-report" style="background:#0d47a1; margin-top:4px;" onclick="printSearchResultFromPopup()">📄 REPORT / PRINT</button>
@@ -558,7 +625,7 @@ body * { visibility: hidden; }
 
 <!-- 6. Data Manager मोडल -->
 <div id="settingsModal" class="modal-overlay"><div class="modal-card">
-<div class="modal-header"><h3 style="font-size: 14px; color:#c2185b;">⚙️ Data Manager</h3><button class="btn-close" onclick="closeModule('settingsModal')">X</button></div>
+<div class="modal-header"><h3 style="font-size: 14px; color:#c2185b;">⚙️️ Data Manager</h3><button class="btn-close" onclick="closeModule('settingsModal')">X</button></div>
 <h4 style="font-size:12px; color:#c2185b; border-bottom:1px solid #ddd; padding-bottom:4px; margin-bottom:6px;">डेटा हटवा (Select & Delete)</h4>
 <div style="font-size:12px; display:flex; flex-direction:column; gap:6px;">
 <label><input type="checkbox" id="delAll" onchange="toggleSelectAll(this)"> <strong>सर्व डेटा निवडा (Select All)</strong></label>
@@ -809,10 +876,11 @@ return val.toString().trim().toLowerCase().replace(/^m\.?b\.?[\s\-_]*/i, '');
 }
 
 // ** M.B. ची सर्वात ताजी स्थिती तपासणी **
-function getLatestMBStatus(mbNumber) {
+function getLatestMBStatus(mbNumber, excludeIndex = -1) {
 var allMBs = getData('mb_records');
 var normalizedNo = normalizeMB(mbNumber);
 for (var i = allMBs.length - 1; i >= 0; i--) {
+if (i === excludeIndex) continue;
 var m = allMBs[i];
 if (normalizeMB(m.mbNumber) === normalizedNo) {
 return {
@@ -831,10 +899,11 @@ return null;
 }
 
 // ** उपलब्ध M.B. यादी (दिनांकासह ट्रॅक करणे) **
-function getAvailableStock() {
+function getAvailableStock(excludeIndex = -1) {
 var allMBs = getData('mb_records');
 var statusMap = {};
-allMBs.forEach(function(m) {
+allMBs.forEach(function(m, i) {
+if (i === excludeIndex) return;
 var no = (m.mbNumber || '').trim();
 if (!no) return;
 var type = (m.actionType || '').trim();
@@ -855,11 +924,12 @@ return available;
 }
 
 // ** सध्या प्रत्यक्ष एकाच व्यक्तीकडे Active Issued असणाऱ्या सर्व M.B. ची यादी (One Holder Validation) **
-function getCurrentlyActiveGivenMBs() {
+function getCurrentlyActiveGivenMBs(excludeIndex = -1) {
 var allMBs = getData('mb_records');
 var latestMap = {};
 
-allMBs.forEach(function(m) {
+allMBs.forEach(function(m, i) {
+if (i === excludeIndex) return;
 var no = (m.mbNumber || '').trim();
 if (no) latestMap[no] = m;
 });
@@ -933,13 +1003,8 @@ var list = getData('mb_records');
 if (list.length === 0) return showAlert('कोणतीही M.B. नोंद उपलब्ध नाही.', 'WARNING');
 var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
-'<div style="text-align:center; margin-bottom:4px;">' +
-'<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
-'<h2 style="font-size:12px; font-weight:700; margin:2px 0;">मोजमाप पुस्तिका (M.B.) नोंद अहवाल</h2>' +
-'</div>' +
-'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
-'<div><strong>M.B. नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div>' +
-'</div>' +
+'<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">मोजमाप पुस्तिका (M.B.) नोंद अहवाल</h2></div>' +
+'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>M.B. नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div>' +
 '</div>' +
 '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>M.B. हस्तांतरण</th></tr></thead><tbody>';
 
@@ -1153,7 +1218,6 @@ if(officeGrp) officeGrp.style.display = 'none';
 
 if (actionType !== '' && sizeGrp) {
 sizeGrp.style.display = 'block';
-document.getElementById('newMBSize').value = "";
 }
 }
 
@@ -1173,11 +1237,16 @@ if(recipientGrp) recipientGrp.style.display = 'none';
 if (!sizeVal) return;
 if (actionType === 'दिलेली M.B.') {
 if(grpSel) grpSel.style.display = 'block';
-populateAvailableMBs();
+var currentEditIdx = parseInt(document.getElementById('editMBIndex').value, 10);
+var existingMB = "";
+if (currentEditIdx !== -1) {
+    var rec = getData('mb_records')[currentEditIdx];
+    if (rec) existingMB = rec.mbNumber;
+}
+populateAvailableMBs(currentEditIdx, existingMB);
 } else if (actionType === 'मिळालेली M.B.') {
 if(grpInp) grpInp.style.display = 'block';
 if(mainGroup) mainGroup.style.display = 'block';
-document.getElementById('mbReceivedType').value = "";
 }
 }
 
@@ -1186,7 +1255,6 @@ var val = document.getElementById('selectAvailableMB').value;
 var recipientGrp = document.getElementById('givenRecipientGroup');
 if (val !== '' && recipientGrp) {
 recipientGrp.style.display = 'block';
-document.getElementById('mbGivenRecipientType').value = "";
 } else if(recipientGrp) {
 recipientGrp.style.display = 'none';
 }
@@ -1207,7 +1275,6 @@ jeSel.innerHTML = '<option value="">-- कनिष्ठ अभियंता 
 getData('je_records').forEach(function(j) { jeSel.add(new Option(j.name, j.name)); });
 } else if (type === 'Office' && officeGrp) {
 officeGrp.style.display = 'block';
-document.getElementById('givenOfficeInput').value = '';
 }
 }
 
@@ -1225,7 +1292,6 @@ if (typeVal === 'नवीन' && bhandarpalGrp) {
 bhandarpalGrp.style.display = 'block';
 } else if (typeVal === 'चालू' && chalooGrp) {
 chalooGrp.style.display = 'block';
-document.getElementById('mbChalooSource').value = "";
 }
 }
 
@@ -1255,16 +1321,30 @@ inp.placeholder = 'उदा. व्यक्तीचे किंवा का
 }
 }
 
-function populateAvailableMBs() {
+// ** सुधारित ड्रॉपडाऊन: Edit Mode मध्ये Current Record मधील M.B. नेहमी उपलब्ध राहते **
+function populateAvailableMBs(excludeIndex = -1, includeMB = "") {
 var selectedSize = document.getElementById('newMBSize').value;
 var sel = document.getElementById('selectAvailableMB');
 if(!sel) return;
 sel.innerHTML = '<option value="">-- उपलब्ध M.B. निवडा --</option>';
-getAvailableStock().filter(function(s){ return s.size === selectedSize; }).forEach(function(s) {
-sel.add(new Option(s.mbNumber + ' (' + s.size + ')', s.mbNumber));
+
+var stock = getAvailableStock(excludeIndex).filter(function(s){ return s.size === selectedSize; });
+var addedMap = {};
+
+if (includeMB) {
+    sel.add(new Option(includeMB + ' (' + selectedSize + ') [सध्याची M.B.]', includeMB));
+    addedMap[includeMB] = true;
+}
+
+stock.forEach(function(s) {
+    if (!addedMap[s.mbNumber]) {
+        sel.add(new Option(s.mbNumber + ' (' + s.size + ')', s.mbNumber));
+        addedMap[s.mbNumber] = true;
+    }
 });
 }
 
+// ** M.B. Save व Update: Edit Mode मध्ये स्वतःचा रेकॉर्ड Exclude करणे व Duplicate Block करणे **
 function saveOrUpdateMB() {
 var actionType = document.getElementById('mbActionType').value;
 var size = document.getElementById('newMBSize').value;
@@ -1319,27 +1399,21 @@ srcText = chalooSrc + ' (' + subDetail + ')';
 }
 }
 
-if (idx === -1) {
-var lastStatus = getLatestMBStatus(no);
+// ** सिस्टीम लेव्हल अचूक व्हॅलिडेशन: स्वतःचा चालू रेकॉर्ड वगळून तपासणी करणे **
+var lastStatus = getLatestMBStatus(no, idx);
 
 if (actionType === 'दिलेली M.B.') {
-if (lastStatus && (lastStatus.lastAction === 'दिलेली M.B.' || lastStatus.lastAction === 'दिलेली एमबी')) {
-var currentHolder = lastStatus.detail || lastStatus.source || 'इतर व्यक्ती';
-var formattedLastDate = formatDateToDMY(lastStatus.date);
-return showAlert('⚠️️ M.B. क्र. ' + no + ' Issue करता आली नाही.\n\nकारण: ही M.B. आधीच दिनांक ' + formattedLastDate + ' पासून श्री. ' + currentHolder + ' यांच्याकडे Issue आहे.\n\nकृती: कृपया प्रथम ही M.B. Receive करा, त्यानंतरच दुसऱ्या व्यक्तीला देता येईल.', 'ERROR');
-}
-
-var isAvail = getAvailableStock().some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(no); });
-if (!isAvail) {
-return showAlert('⚠️ M.B. क्र. ' + no + ' सध्या कार्यालयात उपलब्ध नाही.\n\nकारण: ही M.B. अद्याप सिस्टीममध्ये जमा झालेली नाही किंवा आधीच वाटप आहे.', 'ERROR');
-}
+    if (lastStatus && (lastStatus.lastAction === 'दिलेली M.B.' || lastStatus.lastAction === 'दिलेली एमबी')) {
+        var currentHolder = lastStatus.detail || lastStatus.source || 'इतर व्यक्ती';
+        var formattedLastDate = formatDateToDMY(lastStatus.date);
+        return showAlert('⚠ M.B. क्र. ' + no + ' Update / Issue करता आली नाही.\n\nकारण: ही M.B. आधीच दिनांक ' + formattedLastDate + ' पासून श्री. ' + currentHolder + ' यांच्याकडे Issue आहे.\n\nकृती: कृपया प्रथम ही M.B. Receive करा, त्यानंतरच दुसऱ्या व्यक्तीला देता येईल.', 'ERROR');
+    }
 } else if (actionType === 'मिळालेली M.B.') {
-if (lastStatus && (lastStatus.lastAction === 'मिळालेली M.B.' || lastStatus.lastAction === 'मिळालेली एमबी')) {
-var holder = lastStatus.detail || lastStatus.source || 'कार्यालय';
-var formattedLastDate = formatDateToDMY(lastStatus.date);
-return showAlert('⚠️ M.B. क्रमांक "' + no + '" ची नोंद आधीच झालेली आहे.\n\nकारण: ही M.B. दिनांक ' + formattedLastDate + ' रोजी ' + holder + ' यांच्याकडून मिळालेली असून सध्या कार्यालयात उपलब्ध आहे!', 'WARNING');
-}
-}
+    if (lastStatus && (lastStatus.lastAction === 'मिळालेली M.B.' || lastStatus.lastAction === 'मिळालेली एमबी')) {
+        var holder = lastStatus.detail || lastStatus.source || 'कार्यालय';
+        var formattedLastDate = formatDateToDMY(lastStatus.date);
+        return showAlert('⚠️ M.B. क्रमांक "' + no + '" ची नोंद आधीच झालेली आहे.\n\nकारण: ही M.B. दिनांक ' + formattedLastDate + ' रोजी ' + holder + ' यांच्याकडून मिळालेली असून सध्या कार्यालयात उपलब्ध आहे!', 'WARNING');
+    }
 }
 
 var displayParty = (actionType === 'दिलेली M.B.') ? srcText : (actionType + ' : ' + srcText);
@@ -1358,7 +1432,76 @@ list[idx] = { actionType: actionType, mbNumber: no, size: size, receivedSource: 
 
 setData('mb_records', list);
 
+cancelMBEdit();
+refreshAll();
+showAlert((idx === -1 ? 'M.B. नोंद यशस्वीरीत्या जतन झाली!' : 'M.B. नोंद यशस्वीरीत्या अद्ययावत (Update) झाली!'), 'SUCCESS');
+}
+
+// ** सुधारित EDIT फंक्शन: Existing Record ची सर्व माहिती व M.B. अचूकपणे लोड करणे **
+function editMB(idx) {
+var item = getData('mb_records')[idx];
+if (!item) return;
+
+document.getElementById('editMBIndex').value = idx;
+document.getElementById('mbActionType').value = item.actionType;
+onMBActionTypeChange();
+
+document.getElementById('newMBSize').value = item.size;
+onMBSizeChange();
+
+if (item.actionType === 'दिलेली M.B.' || item.actionType === 'दिलेली एमबी') {
+    populateAvailableMBs(idx, item.mbNumber);
+    document.getElementById('selectAvailableMB').value = item.mbNumber;
+    onSelectAvailableMBChange();
+
+    var recFrom = item.receivedFrom || '';
+    if (recFrom.includes('विभागीय कार्यालय') || (item.receivedSource && item.receivedSource.includes('विभागीय कार्यालय'))) {
+        document.getElementById('mbGivenRecipientType').value = 'Office';
+        onMBGivenRecipientTypeChange();
+        document.getElementById('givenOfficeInput').value = item.receivedDetail || '';
+    } else {
+        document.getElementById('mbGivenRecipientType').value = 'JE';
+        onMBGivenRecipientTypeChange();
+        document.getElementById('selectGivenJE').value = item.receivedDetail || '';
+    }
+} else {
+    document.getElementById('newMBNo').value = item.mbNumber;
+    var src = item.receivedSource || '';
+    if (src.includes('भंडारपाल') || src.includes('भंडारपाळ') || src.includes('नवीन')) {
+        document.getElementById('mbReceivedType').value = 'नवीन';
+        onMBReceivedTypeChange();
+        document.getElementById('bhandarpalNameInput').value = item.receivedDetail || '';
+    } else {
+        document.getElementById('mbReceivedType').value = 'चालू';
+        onMBReceivedTypeChange();
+        if (src.includes('JE')) {
+            document.getElementById('mbChalooSource').value = 'JE';
+            onMBChalooSourceChange();
+            document.getElementById('receivedSubSelect').value = item.receivedDetail || '';
+        } else if (src.includes('विभागीय कार्यालय')) {
+            document.getElementById('mbChalooSource').value = 'विभागीय कार्यालय';
+            onMBChalooSourceChange();
+            document.getElementById('receivedSubInput').value = item.receivedDetail || '';
+        } else {
+            document.getElementById('mbChalooSource').value = 'चार्ज नुसार';
+            onMBChalooSourceChange();
+            document.getElementById('receivedSubInput').value = item.receivedDetail || '';
+        }
+    }
+}
+
+document.getElementById('newMBDate').value = item.date;
+document.getElementById('btnSaveMB').textContent = 'Update Entry';
+document.getElementById('btnCancelMB').style.display = 'block';
+
+var modalBox = document.querySelector('#mbModal .modal-card');
+if(modalBox) modalBox.scrollTop = 0;
+}
+
+function cancelMBEdit() {
+document.getElementById('editMBIndex').value = '-1';
 document.getElementById('mbActionType').value = '';
+onMBActionTypeChange();
 document.getElementById('newMBSize').value = '';
 document.getElementById('newMBNo').value = '';
 document.getElementById('bhandarpalNameInput').value = '';
@@ -1367,36 +1510,6 @@ document.getElementById('receivedSubInput').value = '';
 document.getElementById('mbReceivedType').value = '';
 document.getElementById('mbGivenRecipientType').value = '';
 document.getElementById('newMBDate').value = '';
-
-onMBActionTypeChange();
-cancelMBEdit();
-refreshAll();
-showAlert('M.B. क्रमांक ' + no + ' ची नोंद यशस्वीरीत्या जतन झाली!', 'SUCCESS');
-}
-
-function editMB(idx) {
-var item = getData('mb_records')[idx];
-document.getElementById('mbActionType').value = item.actionType;
-onMBActionTypeChange();
-document.getElementById('newMBSize').value = item.size;
-onMBSizeChange();
-if (item.actionType === 'दिलेली M.B.' || item.actionType === 'दिलेली एमबी') {
-document.getElementById('selectAvailableMB').value = item.mbNumber;
-onSelectAvailableMBChange();
-} else {
-document.getElementById('newMBNo').value = item.mbNumber;
-}
-document.getElementById('newMBDate').value = item.date;
-document.getElementById('editMBIndex').value = idx;
-document.getElementById('btnSaveMB').textContent = 'Update Entry';
-document.getElementById('btnCancelMB').style.display = 'block';
-}
-
-function cancelMBEdit() {
-document.getElementById('mbActionType').value = '';
-onMBActionTypeChange();
-document.getElementById('newMBNo').value = '';
-document.getElementById('editMBIndex').value = '-1';
 document.getElementById('btnSaveMB').textContent = 'Save Entry';
 document.getElementById('btnCancelMB').style.display = 'none';
 }
@@ -1737,6 +1850,7 @@ generateWorkReport(fDate, tDate);
 
 var activeSearchPrintHTML = '';
 
+// ** स्मार्ट शोध निकाल: M.B. क्र. ठळक, निळा आणि क्लिकेबल लिंक बनवणे **
 function showSmartSearchResultModal(query) {
 var queryClean = query.trim();
 var queryLower = queryClean.toLowerCase();
@@ -1777,10 +1891,10 @@ return showAlert('स्मार्ट शोध "' + query + '" नुसा�
 
 var tableHTML = '<table class="data-table"><thead><tr>' +
 '<th style="text-align:center;">अ.क्र.</th>' +
-'<th>M.B. क्र.</th>' +
+'<th>M.B. क्र. (क्लिक करा)</th>' +
 '<th>आकार</th>' +
 '<th>दिनांक</th>' +
-'<th>सद्यस्थिती (कोणाकडे आहे / कुठे आहे)</th>' +
+'<th>सद्यस्थिती</th>' +
 '</tr></thead><tbody>';
 
 var isAvailableMap = {};
@@ -1793,18 +1907,19 @@ var dateStr = formatDateToDMY(item.date);
 var statusText = '';
 
 if (isAvailableMap[mbNo]) {
-statusText = '<span style="color:#2e7d32; font-weight:700;">कार्यालयात उपलब्ध आहे</span>';
+statusText = '<span style="color:#2e7d32; font-weight:700;">कार्यालयात उपलब्ध</span>';
 } else if (item.lastAction === 'दिलेली M.B.' || item.lastAction === 'दिलेली एमबी') {
 var person = item.detail || item.source || 'संबंधित';
 person = person.replace(/^श्री.?\s*/i, '');
-statusText = '<span style="color:#e65100; font-weight:700;">श्री. ' + person + ' यांना दिलेली आहे</span>';
+statusText = '<span style="color:#e65100; font-weight:700;">श्री. ' + person + ' यांच्याकडे</span>';
 } else {
 statusText = '<span style="color:#0d47a1; font-weight:600;">मिळालेली M.B.</span>';
 }
 
+// 🔵 BLUE + BOLD + CLICKABLE + TOUCH-FRIENDLY M.B. LINK
 tableHTML += '<tr>' +
 '<td style="text-align:center;">' + (idx + 1) + '</td>' +
-'<td><strong>' + mbNo + '</strong></td>' +
+'<td><a href="javascript:void(0)" onclick="openSmartActionCenter(\'' + mbNo + '\')" style="color:#0d47a1; font-size:12.5px; font-weight:800; text-decoration:underline; display:inline-block; padding:3px 2px;" title="M.B. Smart Action Center उघडा">🔵 ' + mbNo + '</a></td>' +
 '<td>' + size + '</td>' +
 '<td>' + dateStr + '</td>' +
 '<td>' + statusText + '</td>' +
@@ -1830,6 +1945,409 @@ var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; paddin
 printA4Document(html);
 }
 
+// ==================== 🌟 M.B. SMART ACTION CENTER LOGIC ====================
+var currentSacMB = null;
+var currentSacStatusObj = null;
+
+function openSmartActionCenter(mbNo) {
+var cleanNo = (mbNo || '').trim();
+if (!cleanNo) return;
+
+var status = getLatestMBStatus(cleanNo);
+if (!status) {
+return showAlert("⚠️ M.B. क्रमांक '" + cleanNo + "' चा सविस्तर डेटा उपलब्ध नाही.", "ERROR");
+}
+
+currentSacMB = cleanNo;
+currentSacStatusObj = status;
+
+var stock = getAvailableStock();
+var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(cleanNo); });
+
+// वर्क डेटा लिंक तपासणे
+var works = getData('work_records').filter(function(w){ return normalizeMB(w.mbNo) === normalizeMB(cleanNo); });
+var currentWorkName = works.length > 0 ? works[works.length - 1].name : "काम नोंदवलेले नाही";
+
+var holderDisplay = "-";
+var statusBadgeHtml = "";
+
+if (isAvail) {
+    statusBadgeHtml = '<span class="status-badge-pill badge-avail">कार्यालयात उपलब्ध (AVAILABLE)</span>';
+    holderDisplay = "कार्यालय (Store / Office)";
+} else {
+    statusBadgeHtml = '<span class="status-badge-pill badge-issued">दिलेली (ISSUED)</span>';
+    holderDisplay = status.detail || status.source || "संबंधित व्यक्ती";
+}
+
+var detailsHtml = `
+<div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+    <span><strong>M.B. क्रमांक:</strong> <span style="color:#0d47a1; font-weight:800; font-size:13.5px;">${cleanNo}</span></span>
+    <span>${statusBadgeHtml}</span>
+</div>
+<div><strong>M.B. आकार:</strong> ${status.size || 'लहान M.B.'}</div>
+<div><strong>सध्याचे धारक (Current Holder):</strong> <span style="color:#e65100; font-weight:700;">${holderDisplay}</span></div>
+<div><strong>शेवटचा दिनांक:</strong> ${formatDateToDMY(status.date)}</div>
+<div><strong>संबंधित काम:</strong> ${currentWorkName}</div>
+<div><strong>स्रोत / हस्तांतरण:</strong> ${status.receivedFrom || '-'}</div>
+`;
+
+document.getElementById('sacDetailsBox').innerHTML = detailsHtml;
+
+// स्थितीनुसार उपलब्ध स्मार्ट ॲक्शन्स तयार करणे
+var btnGrid = document.getElementById('sacActionButtonsGrid');
+btnGrid.innerHTML = "";
+
+if (isAvail) {
+    // स्थिती = Available असल्यास: ISSUE, EDIT, HISTORY, REPORT
+    btnGrid.innerHTML += `<button class="btn-smart-act btn-act-give" onclick="sacOpenIssueForm()">📤 ISSUE / GIVE</button>`;
+    btnGrid.innerHTML += `<button class="btn-smart-act btn-act-edit" onclick="sacTriggerEditRecord()">✏️ EDIT</button>`;
+    btnGrid.innerHTML += `<button class="btn-smart-act btn-act-history" onclick="sacToggleHistoryView()">🕘 HISTORY</button>`;
+    btnGrid.innerHTML += `<button class="btn-smart-act btn-act-report" onclick="sacPrintSingleMBReport()">📄 REPORT / PRINT</button>`;
+} else {
+    // स्थिती = Issued असल्यास: TRANSFER, RECEIVE, EDIT, HISTORY, REPORT
+    btnGrid.innerHTML += `<button class="btn-smart-act btn-act-transfer" onclick="sacOpenTransferForm()">📤 TRANSFER</button>`;
+    btnGrid.innerHTML += `<button class="btn-smart-act btn-act-receive" onclick="sacTriggerReceiveMB()">📥 RECEIVE</button>`;
+    btnGrid.innerHTML += `<button class="btn-smart-act btn-act-edit" onclick="sacTriggerEditRecord()">✏️ EDIT</button>`;
+    btnGrid.innerHTML += `<button class="btn-smart-act btn-act-history" onclick="sacToggleHistoryView()">🕘 HISTORY</button>`;
+    btnGrid.innerHTML += `<button class="btn-smart-act btn-act-report" onclick="sacPrintSingleMBReport()">📄 REPORT / PRINT</button>`;
+}
+
+document.getElementById('sacSubActionContainer').style.display = "none";
+document.getElementById('sacHistoryContainer').style.display = "none";
+document.getElementById('smartActionCenterModal').style.display = "flex";
+}
+
+function closeSmartActionCenter() {
+document.getElementById('smartActionCenterModal').style.display = "none";
+currentSacMB = null;
+currentSacStatusObj = null;
+}
+
+// ** Smart Action: थेट रिसीव्ह करणे (Receive / Return) **
+function sacTriggerReceiveMB() {
+if (!currentSacMB || !currentSacStatusObj) return;
+
+var holder = currentSacStatusObj.detail || currentSacStatusObj.source || "संबंधित व्यक्ती";
+var todayISO = new Date().toISOString().slice(0, 10);
+var todayDMY = formatDateToDMY(todayISO);
+
+var confirmMsg = "⚠️ CONFIRM RECEIVE\n\n" +
+"M.B. क्रमांक: " + currentSacMB + "\n" +
+"धारक: " + holder + "\n" +
+"दिनांक: " + todayDMY + "\n\n" +
+"ही M.B. कार्यालयात परत जमा (Receive) करून 'Available' करायची आहे का?";
+
+if (confirm(confirmMsg)) {
+    var list = getData('mb_records');
+    var srcText = "JE (" + holder + ")";
+    var displayParty = "मिळालेली M.B. : JE (" + holder + ")";
+
+    list.push({
+        actionType: "मिळालेली M.B.",
+        mbNumber: currentSacMB,
+        size: currentSacStatusObj.size || "लहान M.B.",
+        receivedSource: srcText,
+        receivedDetail: holder,
+        receivedFrom: displayParty,
+        date: todayISO
+    });
+
+    setData('mb_records', list);
+    refreshAll();
+    showAlert("✅ M.B. क्र. " + currentSacMB + " कार्यालयात यशस्वीरीत्या जमा (Receive) झाली असून आता उपलब्ध (Available) आहे.", "SUCCESS");
+    openSmartActionCenter(currentSacMB); // स्टेट्स तत्काळ रिफ्रेश करणे
+}
+}
+
+// ** Smart Action: ट्रान्सफर फॉर्म दाखवणे **
+function sacOpenTransferForm() {
+var holder = currentSacStatusObj.detail || currentSacStatusObj.source || "संबंधित व्यक्ती";
+var todayISO = new Date().toISOString().slice(0, 10);
+
+var jes = getData('je_records');
+var jeOptions = '<option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option>';
+jes.forEach(function(j) {
+    if (j.name.trim().toLowerCase() !== holder.trim().toLowerCase()) {
+        jeOptions += '<option value="' + j.name + '">' + j.name + '</option>';
+    }
+});
+
+var html = `
+<div style="font-size:13px; font-weight:800; color:#7b1fa2; border-bottom:1px solid #7b1fa2; padding-bottom:4px; margin-bottom:8px;">📤 M.B. अधिकृत हस्तांतरण (Transfer)</div>
+<div style="font-size:11.5px; margin-bottom:8px;"><strong>सध्याचे धारक (Current Holder):</strong> ${holder}</div>
+
+<div class="form-group" style="margin-bottom:6px;">
+    <label style="font-size:11px;">हस्तांतरण प्रकार:</label>
+    <select class="form-control" id="sacTransferType" onchange="sacOnTransferTypeChange()" style="padding:6px; font-size:12px;">
+        <option value="JE">कनिष्ठ अभियंता (JE)</option>
+        <option value="Office">विभागीय कार्यालय</option>
+    </select>
+</div>
+
+<div class="form-group" id="sacTransferJEGroup" style="margin-bottom:6px;">
+    <label style="font-size:11px;">नवीन कनिष्ठ अभियंता (New Holder):</label>
+    <select class="form-control" id="sacTransferJESelect" style="padding:6px; font-size:12px;">${jeOptions}</select>
+</div>
+
+<div class="form-group" id="sacTransferOfficeGroup" style="display:none; margin-bottom:6px;">
+    <label style="font-size:11px;">विभागीय कार्यालय नाव:</label>
+    <input type="text" class="form-control" id="sacTransferOfficeInput" placeholder="विभागीय कार्यालय नाव" style="padding:6px; font-size:12px;">
+</div>
+
+<div class="form-group" style="margin-bottom:8px;">
+    <label style="font-size:11px;">हस्तांतरण दिनांक:</label>
+    <input type="date" class="form-control" id="sacTransferDate" value="${todayISO}" style="padding:6px; font-size:12px;">
+</div>
+
+<div style="display:flex; gap:6px;">
+    <button class="btn-report" style="background:#7b1fa2; margin:0; flex:1;" onclick="sacConfirmTransferExecution()">हस्तांतरण पूर्ण करा (Confirm)</button>
+    <button class="btn-report" style="background:#78909c; margin:0; width:80px;" onclick="document.getElementById('sacSubActionContainer').style.display='none'">रद्द करा</button>
+</div>
+`;
+
+var container = document.getElementById('sacSubActionContainer');
+container.innerHTML = html;
+container.style.display = "block";
+}
+
+function sacOnTransferTypeChange() {
+var tType = document.getElementById('sacTransferType').value;
+document.getElementById('sacTransferJEGroup').style.display = (tType === 'JE') ? 'block' : 'none';
+document.getElementById('sacTransferOfficeGroup').style.display = (tType === 'Office') ? 'block' : 'none';
+}
+
+function sacConfirmTransferExecution() {
+var tType = document.getElementById('sacTransferType').value;
+var dt = document.getElementById('sacTransferDate').value;
+if (!dt) return showAlert("कृपया हस्तांतरण दिनांक निवडा.", "WARNING");
+
+var newHolder = "";
+var srcText = "";
+if (tType === 'JE') {
+    newHolder = document.getElementById('sacTransferJESelect').value;
+    if (!newHolder) return showAlert("कृपया नवीन कनिष्ठ अभियंता (JE) निवडा.", "WARNING");
+    srcText = "M.B. " + newHolder + " यांना दिली";
+} else {
+    newHolder = document.getElementById('sacTransferOfficeInput').value.trim();
+    if (!newHolder) return showAlert("कृपया विभागीय कार्यालयाचे नाव भरा.", "WARNING");
+    srcText = "M.B. विभागीय कार्यालय (" + newHolder + ") यांना दिली";
+}
+
+var currentHolder = currentSacStatusObj.detail || currentSacStatusObj.source || "संबंधित व्यक्ती";
+if (newHolder.toLowerCase() === currentHolder.toLowerCase()) {
+    return showAlert("⚠️ नवीन धारक आणि सध्याचे धारक एकच असू शकत नाहीत.", "WARNING");
+}
+
+if (confirm("M.B. क्र. " + currentSacMB + " ही श्री. " + currentHolder + " यांच्याकडून श्री. " + newHolder + " यांना हस्तांतरित करायची का?")) {
+    var list = getData('mb_records');
+    
+    // १. जुन्या व्यक्तीकडून परत आल्याची एन्ट्री
+    list.push({
+        actionType: "मिळालेली M.B.",
+        mbNumber: currentSacMB,
+        size: currentSacStatusObj.size || "लहान M.B.",
+        receivedSource: "हस्तांतरण पूर्व प्राप्त",
+        receivedDetail: currentHolder,
+        receivedFrom: "मिळालेली M.B. : हस्तांतरण (" + currentHolder + ")",
+        date: dt
+    });
+
+    // २. नवीन व्यक्तीला दिल्याची एन्ट्री
+    list.push({
+        actionType: "दिलेली M.B.",
+        mbNumber: currentSacMB,
+        size: currentSacStatusObj.size || "लहान M.B.",
+        receivedSource: srcText,
+        receivedDetail: newHolder,
+        receivedFrom: srcText,
+        date: dt
+    });
+
+    setData('mb_records', list);
+
+    if (tType === 'JE') {
+        var assigns = getData('assign_records');
+        assigns.push({ mbNo: currentSacMB, jeName: newHolder, assignDate: dt });
+        setData('assign_records', assigns);
+    }
+
+    refreshAll();
+    showAlert("✅ M.B. क्र. " + currentSacMB + " यशस्वीरीत्या श्री. " + newHolder + " यांना हस्तांतरित झाली आहे.", "SUCCESS");
+    openSmartActionCenter(currentSacMB);
+}
+}
+
+// ** Smart Action: उपलब्ध M.B. इश्यू फॉर्म उघडणे **
+function sacOpenIssueForm() {
+var todayISO = new Date().toISOString().slice(0, 10);
+var jes = getData('je_records');
+var jeOptions = '<option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option>';
+jes.forEach(function(j) { jeOptions += '<option value="' + j.name + '">' + j.name + '</option>'; });
+
+var html = `
+<div style="font-size:13px; font-weight:800; color:#2e7d32; border-bottom:1px solid #2e7d32; padding-bottom:4px; margin-bottom:8px;">📤 M.B. वाटप (Issue / Give)</div>
+
+<div class="form-group" style="margin-bottom:6px;">
+    <label style="font-size:11px;">कोणाला द्यायची आहे?:</label>
+    <select class="form-control" id="sacIssueType" onchange="sacOnIssueTypeChange()" style="padding:6px; font-size:12px;">
+        <option value="JE">कनिष्ठ अभियंता (JE)</option>
+        <option value="Office">विभागीय कार्यालय</option>
+    </select>
+</div>
+
+<div class="form-group" id="sacIssueJEGroup" style="margin-bottom:6px;">
+    <label style="font-size:11px;">कनिष्ठ अभियंता (JE):</label>
+    <select class="form-control" id="sacIssueJESelect" style="padding:6px; font-size:12px;">${jeOptions}</select>
+</div>
+
+<div class="form-group" id="sacIssueOfficeGroup" style="display:none; margin-bottom:6px;">
+    <label style="font-size:11px;">विभागीय कार्यालय नाव:</label>
+    <input type="text" class="form-control" id="sacIssueOfficeInput" placeholder="विभागीय कार्यालय नाव" style="padding:6px; font-size:12px;">
+</div>
+
+<div class="form-group" style="margin-bottom:8px;">
+    <label style="font-size:11px;">वाटप दिनांक:</label>
+    <input type="date" class="form-control" id="sacIssueDate" value="${todayISO}" style="padding:6px; font-size:12px;">
+</div>
+
+<div style="display:flex; gap:6px;">
+    <button class="btn-report" style="background:#2e7d32; margin:0; flex:1;" onclick="sacConfirmIssueExecution()">वाटप पूर्ण करा (Confirm)</button>
+    <button class="btn-report" style="background:#78909c; margin:0; width:80px;" onclick="document.getElementById('sacSubActionContainer').style.display='none'">रद्द करा</button>
+</div>
+`;
+
+var container = document.getElementById('sacSubActionContainer');
+container.innerHTML = html;
+container.style.display = "block";
+}
+
+function sacOnIssueTypeChange() {
+var iType = document.getElementById('sacIssueType').value;
+document.getElementById('sacIssueJEGroup').style.display = (iType === 'JE') ? 'block' : 'none';
+document.getElementById('sacIssueOfficeGroup').style.display = (iType === 'Office') ? 'block' : 'none';
+}
+
+function sacConfirmIssueExecution() {
+var iType = document.getElementById('sacIssueType').value;
+var dt = document.getElementById('sacIssueDate').value;
+if (!dt) return showAlert("कृपया वाटप दिनांक निवडा.", "WARNING");
+
+var holder = "";
+var srcText = "";
+if (iType === 'JE') {
+    holder = document.getElementById('sacIssueJESelect').value;
+    if (!holder) return showAlert("कृपया कनिष्ठ अभियंता (JE) निवडा.", "WARNING");
+    srcText = "M.B. " + holder + " यांना दिली";
+} else {
+    holder = document.getElementById('sacIssueOfficeInput').value.trim();
+    if (!holder) return showAlert("कृपया विभागीय कार्यालयाचे नाव भरा.", "WARNING");
+    srcText = "M.B. विभागीय कार्यालय (" + holder + ") यांना दिली";
+}
+
+if (confirm("M.B. क्र. " + currentSacMB + " ही श्री. " + holder + " यांना Issue करायची का?")) {
+    var list = getData('mb_records');
+    list.push({
+        actionType: "दिलेली M.B.",
+        mbNumber: currentSacMB,
+        size: currentSacStatusObj.size || "लहान M.B.",
+        receivedSource: srcText,
+        receivedDetail: holder,
+        receivedFrom: srcText,
+        date: dt
+    });
+
+    setData('mb_records', list);
+
+    if (iType === 'JE') {
+        var assigns = getData('assign_records');
+        assigns.push({ mbNo: currentSacMB, jeName: holder, assignDate: dt });
+        setData('assign_records', assigns);
+    }
+
+    refreshAll();
+    showAlert("✅ M.B. क्र. " + currentSacMB + " चे श्री. " + holder + " यांना वाटप यशस्वी झाले आहे.", "SUCCESS");
+    openSmartActionCenter(currentSacMB);
+}
+}
+
+// ** Smart Action: मूळ Edit Form थेट उघडणे **
+function sacTriggerEditRecord() {
+if (!currentSacMB || !currentSacStatusObj) return;
+closeSmartActionCenter();
+closeSearchResultModal();
+openModule('mbModal');
+editMB(currentSacStatusObj.index);
+}
+
+// ** Smart Action: हिस्ट्री तक्ता पाहणे **
+function sacToggleHistoryView() {
+var histBox = document.getElementById('sacHistoryContainer');
+if (histBox.style.display === "block") {
+    histBox.style.display = "none";
+    return;
+}
+
+var allMBs = getData('mb_records');
+var cleanNo = normalizeMB(currentSacMB);
+var historyEntries = allMBs.filter(function(m){ return normalizeMB(m.mbNumber) === cleanNo; });
+
+var html = '<table class="data-table"><thead><tr>' +
+'<th>दिनांक</th><th>प्रकार</th><th>हस्तांतरण / तपशील</th>' +
+'</tr></thead><tbody>';
+
+historyEntries.forEach(function(h) {
+    html += '<tr>' +
+    '<td>' + formatDateToDMY(h.date) + '</td>' +
+    '<td><strong>' + h.actionType + '</strong></td>' +
+    '<td>' + (h.receivedFrom || h.receivedDetail || '-') + '</td>' +
+    '</tr>';
+});
+html += '</tbody></table>';
+
+histBox.innerHTML = html;
+histBox.style.display = "block";
+}
+
+// ** Smart Action: विशिष्ट M.B. चा स्वतंत्र अहवाल प्रिंट करणे **
+function sacPrintSingleMBReport() {
+if (!currentSacMB || !currentSacStatusObj) return;
+
+var allMBs = getData('mb_records');
+var cleanNo = normalizeMB(currentSacMB);
+var historyEntries = allMBs.filter(function(m){ return normalizeMB(m.mbNumber) === cleanNo; });
+
+var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
+var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; padding-bottom:6px;">' +
+'<div style="text-align:center; margin-bottom:4px;">' +
+'<h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>' +
+'<h2 style="font-size:12px; font-weight:700; margin:2px 0;">मोजमाप पुस्तिका (M.B.) सविस्तर व्यवहार अहवाल</h2>' +
+'</div>' +
+'<div style="display:flex; justify-content:space-between; font-size:11.5px; margin-top:6px;">' +
+'<div><strong>M.B. क्रमांक: ' + currentSacMB + '</strong> (' + (currentSacStatusObj.size || 'लहान M.B.') + ')</div>' +
+'<div>अहवाल दिनांक: ' + todayStr + '</div>' +
+'</div>' +
+'</div>' +
+'<table class="print-table"><thead><tr>' +
+'<th style="width:10%; text-align:center;">अ.क्र.</th>' +
+'<th style="width:18%;">दिनांक</th>' +
+'<th style="width:25%;">नोंद प्रकार</th>' +
+'<th style="width:47%;">हस्तांतरण / कोणाकडून - कोणाला</th>' +
+'</tr></thead><tbody>';
+
+historyEntries.forEach(function(h, i) {
+    html += '<tr>' +
+    '<td style="text-align:center;">' + (i+1) + '</td>' +
+    '<td>' + formatDateToDMY(h.date) + '</td>' +
+    '<td><strong>' + h.actionType + '</strong></td>' +
+    '<td>' + (h.receivedFrom || h.receivedDetail || '-') + '</td>' +
+    '</tr>';
+});
+
+html += '</tbody></table>';
+printA4Document(html);
+}
+
+// ** सविस्तर अहवाल फिल्टर लॉजिक **
 function generateAdvancedMBReport(sizeChoice, finalType, subTarget, subVal, fDate, tDate) {
 var allMBs = getData('mb_records');
 var stock = getAvailableStock();
@@ -2357,7 +2875,7 @@ container.innerHTML = '<div class="form-row-compact"><label>Income Tax</label><i
 
 '<div class="form-row-compact" id="otherRow1">' +
 '<div style="display:flex; align-items:center; justify-content:space-between;">' +
-'<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="' + newLabelId + '">Other-1</span></label>' +
+'<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="otherLabel1">Other-1</span></label>' +
 '<button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="नवीन कपात जोडा">+</button>' +
 '</div>' +
 '<input type="number" class="form-control calc-ded" id="dedOther1" value="0" oninput="autoCalculateDeductions()">' +
