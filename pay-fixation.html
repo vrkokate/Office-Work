@@ -945,7 +945,7 @@
         </div>
 
         <div class="ill-no-print" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; margin-bottom: 8px;">
-            <button type="button" onclick="printIllustrationChrome()" style="background:#0277bd; color:#fff; border:none; padding:6px 12px; font-size:11.5px; font-weight:bold; border-radius:4px; cursor:pointer;">🖨️ प्रिंट काढा (Chrome)</button>
+            <button type="button" onclick="printIllustrationChrome()" style="background:#0277bd; color:#fff; border:none; padding:6px 12px; font-size:11.5px; font-weight:bold; border-radius:4px; cursor:pointer;">🖨️️ प्रिंट काढा (Chrome)</button>
             <button type="button" onclick="downloadIllustrationPDF()" style="background:#455a64; color:#fff; border:none; padding:6px 12px; font-size:11.5px; font-weight:bold; border-radius:4px; cursor:pointer;">📥 PDF डाऊनलोड (App)</button>
         </div>
 
@@ -1486,11 +1486,11 @@
             alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या अद्ययावत झाली!`);
         } else {
             list.unshift(recordData);
-            currentEditingRecordId = recordData.id;
             alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या सेव्ह झाली!`);
         }
 
         saveRecordsListToStorage(list);
+        currentEditingRecordId = null; // Save पूर्ण झाल्यावर ID reset करा
     }
 
     function renderSavedRecordsTable() {
@@ -1658,7 +1658,6 @@
         const modal = document.getElementById(modalId);
         if (modal) modal.classList.remove('hidden');
         if (modalId === 'rulesModal') {
-            // 🌟 नियुक्ती दिनांकावर आधारित Date Restriction लागू करण्यासाठी
             const joinDateVal = document.getElementById('empJoinDate').value;
             const fixationFromInput = document.getElementById('fixationFrom');
             const fixationToInput = document.getElementById('fixationTo');
@@ -3350,9 +3349,8 @@
             outputBox.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
-            // 🌟 सबमिट डाटा केल्यानंतर सर्व फील्ड्स ब्लँक/रिसेट करण्यासाठीचा कोड
+            // 🌟 सबमिट डाटा केल्यानंतर सर्व फील्ड्स ब्लँक/रिसेट करण्यासाठीचा कोड (परंतु currentEditingRecordId इथे null केला नाही, जेणेकरून Update काम करेल)
             selectedWithheldDates.clear();
-            currentEditingRecordId = null;
             
             document.getElementById('empName').value = "";
             document.getElementById('empDesignation').value = "";
