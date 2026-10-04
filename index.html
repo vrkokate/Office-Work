@@ -845,7 +845,7 @@ function showAlert(msg, type) {
             if(iconEl) iconEl.innerText = '❌';
             if(titleEl) { titleEl.innerText = 'त्रुटी आढळली (Action Error)'; titleEl.style.color = '#d32f2f'; }
         } else {
-            if(iconEl) iconEl.innerText = '⚠️️';
+            if(iconEl) iconEl.innerText = '⚠️';
             if(titleEl) { titleEl.innerText = 'महत्त्वाची सूचना (Validation Alert)'; titleEl.style.color = '#e65100'; }
         }
 
@@ -1182,7 +1182,7 @@ function refreshMBDashboard() {
     if(document.getElementById('countAvailableMB')) document.getElementById('countAvailableMB').innerText = availableCount;
 }
 
-// ** 🌟 Smart M.B. Number Assistant (Real-Time Validation & Suggestion) **
+// ** 🌟 Smart M.B. Number Assistant (Updated Real-Time Validation Text & Format) **
 function checkRealTimeMBInput(input) {
     var val = (input.value || '').trim();
     var statusEl = document.getElementById('mbRealtimeStatus');
@@ -1217,7 +1217,7 @@ function checkRealTimeMBInput(input) {
 
     statusEl.style.display = 'block';
     if (exactMatch) {
-        statusEl.innerHTML = '<span style="color:#d32f2f; font-weight:700;">🔴 ⚠️ M.B. क्रमांक ' + val + ' आधीपासून उपलब्ध आहे. (साईज: ' + matchSize + ')</span>';
+        statusEl.innerHTML = '<span style="color:#d32f2f; font-weight:700;">🔴 ⚠️ M.B. क्रमांक ' + val + ' — ' + matchSize + ' आधीपासून उपलब्ध आहे. Add करता येत नाही.</span>';
         statusEl.style.background = '#ffebee';
         statusEl.style.padding = '4px 6px';
         statusEl.style.borderRadius = '4px';
@@ -1231,7 +1231,7 @@ function checkRealTimeMBInput(input) {
         suggEl.innerHTML = '<strong>जुळणारे क्रमांक:</strong> ' + similarList.slice(0, 5).join(', ');
         suggEl.style.display = 'block';
     } else {
-        statusEl.innerHTML = '<span style="color:#2e7d32; font-weight:700;">🟢 ✓ M.B. क्रमांक उपलब्ध आहे — नवीन M.B. Add करू शकता.</span>';
+        statusEl.innerHTML = '<span style="color:#2e7d32; font-weight:700;">🟢 ✓ M.B. Add करू शकता.</span>';
         statusEl.style.background = '#e8f5e9';
         statusEl.style.padding = '4px 6px';
         statusEl.style.borderRadius = '4px';
@@ -1418,9 +1418,11 @@ function renderQuickModalContent(sizeFilter, mainSource, jeSubVal) {
 
         if (rcvList.length === 0) listHTML = '<p style="text-align:center; padding:15px; color:#666;">कोणतीही नोंद नाही.</p>';
         else {
-            listHTML = '<table class="data-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>कोणाकडून मिळाली</th></tr></thead><tbody>';
+            listHTML = '<table class="data-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>कोणाकडून मिळाली</th><th style="text-align:center;">Action</th></tr></thead><tbody>';
             rcvList.forEach(function(m, i) {
-                listHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formatDateToDMY(m.date) + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + (m.receivedSource || m.receivedFrom || '-') + '</td></tr>';
+                var actualIdx = allMBs.indexOf(m);
+                listHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formatDateToDMY(m.date) + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + (m.receivedSource || m.receivedFrom || '-') + '</td>' +
+                '<td class="action-cell"><button class="btn-action" style="background:#2e7d32; padding:2px 5px; font-size:9.5px;" onclick="closeQuickInfoModal(); openModule(\'mbModal\'); editMB(' + actualIdx + ')">Edit</button><button class="btn-action" style="background:#d32f2f; padding:2px 5px; font-size:9.5px;" onclick="quickPopupDelete(' + actualIdx + ')">Delete</button></td></tr>';
             });
             listHTML += '</tbody></table>';
         }
@@ -1447,9 +1449,12 @@ function renderQuickModalContent(sizeFilter, mainSource, jeSubVal) {
 
         if (givenList.length === 0) listHTML = '<p style="text-align:center; padding:15px; color:#666;">कोणतीही नोंद नाही.</p>';
         else {
-            listHTML = '<table class="data-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>कोणाला दिली (Current Holder)</th></tr></thead><tbody>';
+            listHTML = '<table class="data-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>कोणाला दिली (Current Holder)</th><th style="text-align:center;">Action</th></tr></thead><tbody>';
             givenList.forEach(function(m, i) {
-                listHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formatDateToDMY(m.date) + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + (m.receivedDetail || m.receivedFrom || '-') + '</td></tr>';
+                var statusObj = getLatestMBStatus(m.mbNumber);
+                var actualIdx = statusObj ? statusObj.index : -1;
+                listHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formatDateToDMY(m.date) + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + (m.receivedDetail || m.receivedFrom || '-') + '</td>' +
+                '<td class="action-cell"><button class="btn-action" style="background:#2e7d32; padding:2px 5px; font-size:9.5px;" onclick="closeQuickInfoModal(); openModule(\'mbModal\'); editMB(' + actualIdx + ')">Edit</button><button class="btn-action" style="background:#d32f2f; padding:2px 5px; font-size:9.5px;" onclick="quickPopupDelete(' + actualIdx + ')">Delete</button></td></tr>';
             });
             listHTML += '</tbody></table>';
         }
@@ -1461,15 +1466,29 @@ function renderQuickModalContent(sizeFilter, mainSource, jeSubVal) {
         title = "उपलब्ध M.B. स्टॉक (एकूण: " + stock.length + " | लहान: " + smallStock + ", मोठी: " + bigStock + ")";
         if (availableList.length === 0) listHTML = '<p style="text-align:center; padding:15px; color:#666;">सध्या एकही M.B. उपलब्ध नाही.</p>';
         else {
-            listHTML = '<table class="data-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>उपलब्ध दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>स्थिती</th></tr></thead><tbody>';
+            listHTML = '<table class="data-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>उपलब्ध दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>स्थिती</th><th style="text-align:center;">Action</th></tr></thead><tbody>';
             availableList.forEach(function(s, i) {
-                listHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formatDateToDMY(s.date) + '</td><td><strong>' + s.mbNumber + '</strong></td><td>' + s.size + '</td><td style="color:green; font-weight:700;">उपलब्ध</td></tr>';
+                var statusObj = getLatestMBStatus(s.mbNumber);
+                var actualIdx = statusObj ? statusObj.index : -1;
+                listHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formatDateToDMY(s.date) + '</td><td><strong>' + s.mbNumber + '</strong></td><td>' + s.size + '</td><td style="color:green; font-weight:700;">उपलब्ध</td>' +
+                '<td class="action-cell"><button class="btn-action" style="background:#2e7d32; padding:2px 5px; font-size:9.5px;" onclick="closeQuickInfoModal(); openModule(\'mbModal\'); editMB(' + actualIdx + ')">Edit</button><button class="btn-action" style="background:#d32f2f; padding:2px 5px; font-size:9.5px;" onclick="quickPopupDelete(' + actualIdx + ')">Delete</button></td></tr>';
             });
             listHTML += '</tbody></table>';
         }
     }
     document.getElementById('quickModalTitle').innerText = title;
     document.getElementById('quickModalBody').innerHTML = listHTML;
+}
+
+function quickPopupDelete(idx) {
+    if (confirm('ही M.B. Entry Delete करायची आहे का?')) {
+        var list = getData('mb_records');
+        list.splice(idx, 1);
+        setData('mb_records', list);
+        refreshAll();
+        onQuickFilterChange();
+        showAlert('M.B. नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
+    }
 }
 
 function closeQuickInfoModal() { 
