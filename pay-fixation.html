@@ -1658,6 +1658,18 @@
         const modal = document.getElementById(modalId);
         if (modal) modal.classList.remove('hidden');
         if (modalId === 'rulesModal') {
+            // 🌟 नियुक्ती दिनांकावर आधारित Date Restriction लागू करण्यासाठी
+            const joinDateVal = document.getElementById('empJoinDate').value;
+            const fixationFromInput = document.getElementById('fixationFrom');
+            const fixationToInput = document.getElementById('fixationTo');
+            if (joinDateVal) {
+                fixationFromInput.setAttribute('min', joinDateVal);
+                fixationToInput.setAttribute('min', joinDateVal);
+            } else {
+                fixationFromInput.removeAttribute('min');
+                fixationToInput.removeAttribute('min');
+            }
+
             const withheldVal = document.getElementById('incrementWithheld').value;
             const effectDiv = document.getElementById('withheldEffectDiv');
             if (withheldVal === 'Yes') effectDiv.classList.remove('hidden');
@@ -3337,6 +3349,50 @@
             const outputBox = document.getElementById('outputBox');
             outputBox.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // 🌟 सबमिट डाटा केल्यानंतर सर्व फील्ड्स ब्लँक/रिसेट करण्यासाठीचा कोड
+            selectedWithheldDates.clear();
+            currentEditingRecordId = null;
+            
+            document.getElementById('empName').value = "";
+            document.getElementById('empDesignation').value = "";
+            document.getElementById('empJoinDate').value = "";
+            document.getElementById('empJoinDate_disp').value = "";
+            document.getElementById('payCommission').value = "";
+            document.getElementById('currentPayScale').value = "";
+            document.getElementById('basicPay').value = "";
+            document.getElementById('gradePay').value = "0";
+
+            for (let i = 1; i <= 3; i++) {
+                document.getElementById(`b${i}_type`).value = "None";
+                document.getElementById(`b${i}_fields`).classList.add('hidden');
+                document.getElementById(`b${i}_date`).value = "";
+                document.getElementById(`b${i}_date_disp`).value = "";
+                document.getElementById(`b${i}_optDate`).value = "";
+                document.getElementById(`b${i}_optDate_disp`).value = "";
+                document.getElementById(`b${i}_comm`).value = "";
+                document.getElementById(`b${i}_post`).value = "";
+                document.getElementById(`b${i}_scale`).value = "";
+                let adv = document.getElementById(`b${i}_advisor`);
+                if(adv) adv.classList.add('hidden');
+            }
+
+            document.getElementById('fixationFrom').value = "";
+            document.getElementById('fixationFrom_disp').value = "";
+            document.getElementById('fixationTo').value = "";
+            document.getElementById('fixationTo_disp').value = "";
+            document.getElementById('hasScaleRev').value = "No";
+            document.getElementById('scaleRevContainer').classList.add('hidden');
+            document.getElementById('scaleRevList').innerHTML = "";
+            document.getElementById('incrementWithheld').value = "No";
+            document.getElementById('withheldListContainer').classList.add('hidden');
+            document.getElementById('withheldEffectDiv').classList.add('hidden');
+            document.getElementById('withheldEffect').value = "non_cumulative";
+
+            validateCard1();
+            validateCard2();
+            validateCard3();
+
         } catch (err) {
             console.error("Process Fixation Error:", err);
             alert("वेतन निश्चिती प्रक्रिया करताना त्रुटी आली: " + err.message);
