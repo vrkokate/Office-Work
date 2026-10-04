@@ -839,7 +839,7 @@ body * { visibility: hidden !important; }
 <div class="form-row-compact" id="otherRow1">
 <div style="display:flex; align-items:center; justify-content:space-between;">
 <label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="otherLabel1">Other-1</span></label>
-<button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="नवीन कपात जोडा">+</button>
+<button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11.5px;" title="नवीन कपात जोडा">+</button>
 </div>
 <input type="number" class="form-control calc-ded" id="dedOther1" value="0" oninput="autoCalculateDeductions()">
 </div>
@@ -1041,7 +1041,7 @@ function refreshAll() {
     }
 }
 
-// ** 🌟 System Health Monitor Background Checker (Problem असेल तरच दिसणार) **
+// ** 🌟 System Health Monitor Background Checker (Exact M.B. String Matching) **
 function checkSystemHealth() {
     var allMBs = getData('mb_records');
     var uniqueReceivedMap = {};
@@ -1095,9 +1095,10 @@ function closeModule(id) {
     refreshMBDashboard(); 
 }
 
+// ** 🌟 EXACT M.B. NUMBER MATCHING RULE (No zero stripping, strict string comparison) **
 function normalizeMB(val) {
     if (!val) return '';
-    return val.toString().trim().toLowerCase().replace(/^m\.?b\.?[\s\-_]*/i, '');
+    return val.toString().trim();
 }
 
 function getLatestMBStatus(mbNumber, excludeIndex = -1) {
@@ -1122,7 +1123,7 @@ function getLatestMBStatus(mbNumber, excludeIndex = -1) {
     return null;
 }
 
-// ** 🌟 Unique Received M.B. Collection (Strict Unique Logic) **
+// ** 🌟 Unique Received M.B. Collection (Strict Exact String Unique Logic) **
 function getUniqueReceivedMBs(excludeIndex = -1) {
     var allMBs = getData('mb_records');
     var uniqueMap = {};
@@ -1198,13 +1199,13 @@ function getAvailableStock(excludeIndex = -1) {
 
 function getCurrentlyHeldMBsByJE(jeName) {
     if (!jeName) return [];
-    var normalizedJE = jeName.trim().toLowerCase();
+    var normalizedJE = jeName.trim();
     var activeGiven = getCurrentlyActiveGivenMBs();
 
     var heldMBs = [];
     activeGiven.forEach(function(item) {
-        var detailMatch = (item.receivedDetail || '').trim().toLowerCase() === normalizedJE;
-        var sourceMatch = (item.receivedSource || '').trim().toLowerCase() === normalizedJE;
+        var detailMatch = (item.receivedDetail || '').trim() === normalizedJE;
+        var sourceMatch = (item.receivedSource || '').trim() === normalizedJE;
         if (detailMatch || sourceMatch) {
             heldMBs.push({ mbNo: item.mbNumber, size: item.size || 'लहान M.B.', date: item.date });
         }
@@ -1273,7 +1274,7 @@ function refreshMBDashboard() {
     if(document.getElementById('countAvailableMB')) animateNumberCount('countAvailableMB', stock.length);
 }
 
-// ** 🌟 Smart M.B. Number Assistant (Strict Duplicate Block & Real-time Warning) **
+// ** 🌟 Smart M.B. Number Assistant (Strict Exact Duplicate Block & Real-time Warning) **
 function checkRealTimeMBInput(input) {
     var val = (input.value || '').trim();
     var statusEl = document.getElementById('mbRealtimeStatus');
@@ -1528,6 +1529,17 @@ function renderQuickModalContent(sizeFilter, mainSource, jeSubVal) {
     document.getElementById('quickModalBody').innerHTML = listHTML;
 }
 
+function quickPopupDelete(idx) {
+    if (confirm('ही M.B. Entry Delete करायची आहे का?')) {
+        var list = getData('mb_records');
+        list.splice(idx, 1);
+        setData('mb_records', list);
+        refreshAll();
+        onQuickFilterChange();
+        showAlert('M.B. नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
+    }
+}
+
 function closeQuickInfoModal() { 
     var modal = document.getElementById('quickInfoModal');
     if (modal) modal.style.display = 'none'; 
@@ -1724,7 +1736,7 @@ function saveOrUpdateMB() {
         no = document.getElementById('newMBNo').value.trim();
         if (!no) return showAlert('कृपया M.B. क्रमांक भरा.', 'WARNING');
 
-        // ✅ Strict Duplicate Check for Received MB on Save/Add
+        // ✅ Strict Exact Match Duplicate Check for Received MB on Save/Add
         if (idx === -1) {
             var allMBs = getData('mb_records');
             var normNo = normalizeMB(no);
@@ -2418,7 +2430,7 @@ function openSmartActionCenter(mbNo) {
     if (isAvail) {
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-give" onclick="sacOpenIssueForm()">📤 ISSUE / GIVE</button>`;
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-receive" style="opacity:0.5; cursor:not-allowed;" title="ही M.B. आधीच कार्यालयात उपलब्ध आहे">📥 RECEIVE</button>`;
-        btnGrid.innerHTML += `<button class="btn-smart-act btn-act-edit" onclick="sacTriggerEditRecord()">✏️ EDIT</button>`;
+        btnGrid.innerHTML += `<button class="btn-smart-act btn-act-edit" onclick="sacTriggerEditRecord()">✏️️ EDIT</button>`;
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-history" onclick="sacToggleHistoryView()">🕘 HISTORY</button>`;
     } else {
         btnGrid.innerHTML += `<button class="btn-smart-act btn-act-transfer" onclick="sacOpenTransferForm()">📤 TRANSFER</button>`;
@@ -2480,7 +2492,7 @@ function sacOpenTransferForm() {
     var jes = getData('je_records');
     var jeOptions = '<option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option>';
     jes.forEach(function(j) {
-        if (j.name.trim().toLowerCase() !== holder.trim().toLowerCase()) {
+        if (j.name.trim() !== holder.trim()) {
             jeOptions += '<option value="' + j.name + '">' + j.name + '</option>';
         }
     });
@@ -2547,11 +2559,14 @@ function sacConfirmTransferExecution() {
     }
 
     var currentHolder = currentSacStatusObj.detail || currentSacStatusObj.source || "संबंधित व्यक्ती";
-    if (newHolder.toLowerCase() === currentHolder.toLowerCase()) {
+    if (newHolder.trim() === currentHolder.trim()) {
         return showAlert("⚠ नवीन धारक आणि सध्याचे धारक एकच असू शकत नाहीत.", "WARNING");
     }
 
-    if (confirm("M.B. क्र. " + currentSacMB + " ही श्री. " + currentHolder + " यांच्याकडून श्री. " + newHolder + " यांना हस्तांतरित करायची का?")) {
+    var cleanNewHolder = newHolder.replace(/^श्री\.?\s*/i, '').trim();
+    var confirmMsg = "M.B. क्र. " + currentSacMB + " ही " + cleanNewHolder + " यांना Issue करायची का?";
+
+    if (confirm(confirmMsg)) {
         var list = getData('mb_records');
         
         list.push({
@@ -2583,7 +2598,7 @@ function sacConfirmTransferExecution() {
         }
 
         refreshAll();
-        showAlert("✅ M.B. क्र. " + currentSacMB + " यशस्वीरीत्या श्री. " + newHolder + " यांना हस्तांतरित झाली आहे.", "SUCCESS");
+        showAlert("✅ M.B. क्र. " + currentSacMB + " यशस्वीरीत्या " + cleanNewHolder + " यांना हस्तांतरित झाली आहे.", "SUCCESS");
         openSmartActionCenter(currentSacMB);
     }
 }
@@ -2593,9 +2608,6 @@ function sacOpenIssueForm() {
     var jes = getData('je_records');
     var jeOptions = '<option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option>';
     jes.forEach(function(j) { jeOptions += '<option value="' + j.name + '">' + j.name + '</option>'; });
-
-    var holder = currentSacStatusObj.detail || currentSacStatusObj.source || "";
-    var cleanHolder = holder.replace(/^श्री\.?\s*/i, '').trim();
 
     var html = `
     <div style="font-size:13px; font-weight:800; color:#2e7d32; border-bottom:1px solid #2e7d32; padding-bottom:4px; margin-bottom:8px;">📤 M.B. वाटप (Issue / Give)</div>
@@ -2658,9 +2670,9 @@ function sacConfirmIssueExecution() {
     }
 
     var cleanHolderName = holder.replace(/^श्री\.?\s*/i, '').trim();
-    var customConfirmMsg = "M.B. क्र. " + currentSacMB + " ही " + cleanHolderName + " यांना Issue करायची का?";
+    var confirmMsg = "M.B. क्र. " + currentSacMB + " ही " + cleanHolderName + " यांना Issue करायची का?";
 
-    if (confirm(customConfirmMsg)) {
+    if (confirm(confirmMsg)) {
         var list = getData('mb_records');
         list.push({
             actionType: "दिलेली M.B.",
@@ -2735,20 +2747,15 @@ function printHistoryFromSAC() {
     var wName = (works.length > 0 && works[works.length - 1].name) ? works[works.length - 1].name : "अद्याप नोंद नाही";
     var wContractor = (works.length > 0 && works[works.length - 1].contractor) ? works[works.length - 1].contractor : "अद्याप नोंद नाही";
 
-    var officialJEs = getData('je_records').map(function(j){ return (j.name || '').trim().toLowerCase(); });
+    var officialJEs = getData('je_records').map(function(j){ return (j.name || '').trim(); });
     var realJE = "अद्याप नोंद नाही";
 
     if (works.length > 0 && works[works.length - 1].je) {
         var candidateJE = works[works.length - 1].je.trim();
-        var cleanCand = candidateJE.toLowerCase().replace(/^श्री.?\s*/i, '');
-        var isOfficial = officialJEs.some(function(offJE){ return offJE.includes(cleanCand); });
+        var isOfficial = officialJEs.some(function(offJE){ return offJE === candidateJE; });
         if (isOfficial) {
             realJE = candidateJE;
         }
-    }
-
-    if (realJE !== "अद्याप नोंद नाही" && !realJE.startsWith("श्री")) {
-        realJE = "श्री " + realJE.replace(/^श्री.?\s*/i, '');
     }
 
     var bills = getData('dmbms_bills').filter(function(b){ return normalizeMB(b.mbNo) === cleanNo; });
@@ -2762,9 +2769,6 @@ function printHistoryFromSAC() {
     var stock = getAvailableStock();
     var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === cleanNo; });
     var holderDisplay = isAvail ? "कार्यालय (उपलब्ध)" : (currentSacStatusObj.detail || currentSacStatusObj.source || "अद्याप नोंद नाही");
-    if (holderDisplay !== "कार्यालय (उपलब्ध)" && holderDisplay !== "अद्याप नोंद नाही" && !holderDisplay.startsWith("श्री")) {
-        holderDisplay = "श्री " + holderDisplay.replace(/^श्री.?\s*/i, '');
-    }
 
     var dynamicReportHeading = "मोजमाप पुस्तिका हालचाल सविस्तर अहवाल";
     var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
@@ -2864,7 +2868,7 @@ function generateAdvancedMBReport(sizeChoice, finalType, subTarget, subVal, fDat
             if (sizeChoice === 'Big M.B.' && m.size !== 'मोठी M.B.') return false;
 
             if (subTarget === 'JE' && subVal && subVal !== 'सर्व') {
-                return (m.receivedDetail || '').toLowerCase() === subVal.toLowerCase();
+                return (m.receivedDetail || '').trim() === subVal.trim();
             } else if (subTarget === 'Office') {
                 return (m.receivedSource || '').includes('विभागीय कार्यालय');
             }
@@ -2905,8 +2909,8 @@ function generateAdvancedMBReport(sizeChoice, finalType, subTarget, subVal, fDat
     });
 
     var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-    var rawName = (subVal && subVal !== 'सर्व') ? subVal.replace(/^श्री.?\s*/i, '') : "";
-    var personHeaderName = rawName ? "श्री " + rawName : "";
+    var rawName = (subVal && subVal !== 'सर्व') ? subVal.replace(/^श्री.?\s*/i, '').trim() : "";
+    var personHeaderName = rawName ? rawName : "";
     var periodSubHeader = "कालावधी: " + formatDateToDMY(fDate) + " ते " + formatDateToDMY(tDate);
 
     var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;">' +
@@ -2920,7 +2924,7 @@ function generateAdvancedMBReport(sizeChoice, finalType, subTarget, subVal, fDat
         var size = item.size || 'लहान M.B.';
         var statusObj = getLatestMBStatus(mbNo);
         var isAvail = getAvailableStock().some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(mbNo); });
-        var currentStatus = isAvail ? 'कार्यालयात उपलब्ध' : ("श्री " + (statusObj ? (statusObj.detail || statusObj.source) : '') + " यांच्याकडे");
+        var currentStatus = isAvail ? 'कार्यालयात उपलब्ध' : ((statusObj ? (statusObj.detail || statusObj.source) : ''));
 
         html += '<tr><td style="text-align:center;">' + (idx + 1) + '</td><td>' + formatDateToDMY(item.date) + '</td><td><strong>' + mbNo + '</strong></td><td style="text-align:center;">' + size + '</td><td>' + currentStatus + '</td></tr>';
     });
@@ -3031,7 +3035,7 @@ function refreshJEList() {
     if(!tbody) return;
     tbody.innerHTML = '';
     list.forEach(function(item, idx) {
-        tbody.innerHTML += '<tr><td>' + (idx+1) + '</td><td>' + item.name + '</td><td class="action-cell"><button class="btn-action" style="background:#2e7d32;" onclick="editJE(' + idx + ')">Edit</button><button class="btn-action" style="background:#d32f2f;" onclick="deleteJE(' + idx + ')">Delete</button></td></tr>';
+        tbody.innerHTML += '<tr><td>' + (idx+1)  + '</td><td>' + item.name + '</td><td class="action-cell"><button class="btn-action" style="background:#2e7d32;" onclick="editJE(' + idx + ')">Edit</button><button class="btn-action" style="background:#d32f2f;" onclick="deleteJE(' + idx + ')">Delete</button></td></tr>';
     });
 }
 
@@ -3061,7 +3065,7 @@ function saveAssign() {
     if (!isAvailable) {
         var lastStatus = getLatestMBStatus(mb);
         var holder = lastStatus ? (lastStatus.detail || lastStatus.source || 'इतर व्यक्ती') : 'इतर व्यक्ती';
-        return showAlert('⚠️️ M.B. क्र. ' + mb + ' वाटप करता आली नाही.\n\nकारण: ही M.B. सध्या ' + holder + ' यांच्याकडे दिलेली आहे.\n\nकृती: प्रथम ती Receive करा, त्यानंतरच Assign करता येईल.', 'ERROR');
+        return showAlert('⚠️ M.B. क्र. ' + mb + ' वाटप करता आली नाही.\n\nकारण: ही M.B. सध्या ' + holder + ' यांच्याकडे दिलेली आहे.\n\nकृती: प्रथम ती Receive करा, त्यानंतरच Assign करता येईल.', 'ERROR');
     }
 
     var stockMB = stock.find(function(s){ return s.mbNumber === mb; });
@@ -3076,7 +3080,7 @@ function saveAssign() {
     setData('assign_records', list);
 
     refreshAll();
-    showAlert('M.B. क्र. ' + mb + ' चे श्री ' + je + ' यांना वाटप यशस्वी!', 'SUCCESS');
+    showAlert('M.B. क्र. ' + mb + ' चे ' + je + ' यांना वाटप यशस्वी!', 'SUCCESS');
 }
 
 function deleteAssign(idx) {
