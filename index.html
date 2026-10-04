@@ -1014,23 +1014,29 @@ function getLatestMBStatus(mbNumber, excludeIndex = -1) {
 
 function getAvailableStock(excludeIndex = -1) {
     var allMBs = getData('mb_records');
-    var statusMap = {};
+    var mbDetailsMap = {};
     allMBs.forEach(function(m, i) {
         if (i === excludeIndex) return;
         var no = (m.mbNumber || '').trim();
         if (!no) return;
-        var type = (m.actionType || '').trim();
-        if (type === 'मिळालेली M.B.' || type === 'मिळालेली एमबी') {
-            statusMap[no] = { available: true, size: m.size || 'लहान M.B.', date: m.date, mbNumber: no };
-        } else if (type === 'दिलेली M.B.' || type === 'दिलेली एमबी') {
-            statusMap[no] = { available: false, size: m.size || 'लहान M.B.', date: m.date, mbNumber: no };
-        }
+        mbDetailsMap[no] = {
+            mbNumber: no,
+            size: m.size || 'लहान M.B.',
+            date: m.date
+        };
+    });
+
+    var activeGiven = getCurrentlyActiveGivenMBs(excludeIndex);
+    var issuedMap = {};
+    activeGiven.forEach(function(m) {
+        var no = (m.mbNumber || '').trim();
+        if (no) issuedMap[no] = true;
     });
 
     var available = [];
-    for (var k in statusMap) {
-        if (statusMap[k].available) {
-            available.push(statusMap[k]);
+    for (var no in mbDetailsMap) {
+        if (!issuedMap[no]) {
+            available.push(mbDetailsMap[no]);
         }
     }
     return available;
@@ -1078,10 +1084,15 @@ function refreshMBDashboard() {
     var tbody = document.getElementById('mbListBody'); 
     if(!tbody) return;
     tbody.innerHTML = ''; 
-    var rcvCount = 0;
+
+    var uniqueMBMap = {};
+    list.forEach(function(m) {
+        var no = normalizeMB(m.mbNumber);
+        if (no) uniqueMBMap[no] = true;
+    });
+    var rcvCount = Object.keys(uniqueMBMap).length;
 
     list.forEach(function(m, idx) {
-        if (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी') rcvCount++;
         var displaySource = m.receivedFrom || '-';
         if (displaySource.includes('भंडारपाल') || displaySource.includes('भंडारपाळ') || displaySource.includes('नवीन')) displaySource = 'भंडारपाल कडून प्राप्त';
         if (displaySource.startsWith('दिलेली M.B. :')) {
@@ -1102,12 +1113,12 @@ function refreshMBDashboard() {
         '<td class="action-cell"><button class="btn-action" style="background:#2e7d32;" onclick="editMB(' + idx + ')">Edit</button><button class="btn-action" style="background:#d32f2f;" onclick="deleteMB(' + idx + ')">Delete</button></td></tr>';
     });
 
-    var stock = getAvailableStock();
     var activeGiven = getCurrentlyActiveGivenMBs();
+    var availableCount = rcvCount - activeGiven.length;
 
     if(document.getElementById('countReceivedMB')) document.getElementById('countReceivedMB').innerText = rcvCount;
     if(document.getElementById('countGivenMB')) document.getElementById('countGivenMB').innerText = activeGiven.length;
-    if(document.getElementById('countAvailableMB')) document.getElementById('countAvailableMB').innerText = stock.length;
+    if(document.getElementById('countAvailableMB')) document.getElementById('countAvailableMB').innerText = availableCount;
 }
 
 // ** 🌟 कोणत्याही बाह्य लायब्ररीशिवाय थेट PDF डाऊनलोड (Mobile APK) व Chrome प्रिंट **
@@ -2274,7 +2285,7 @@ function sacTriggerReceiveMB() {
 
         setData('mb_records', list);
         refreshAll();
-        showAlert("✅ M.B. क्र. " + currentSacMB + " कार्यालयात यशस्वीरीत्या जमा (Receive) झाली असून आता उपलब्ध (Available) आहे.", "SUCCESS");
+        showAlert("✅ M.B. क्र. " + currentSacMB + " कार्यालयात यशस्वीरीत्या जमा (Receive) झाली असून उपलब्ध (Available) आहे.", "SUCCESS");
         openSmartActionCenter(currentSacMB);
     }
 }
