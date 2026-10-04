@@ -1,1 +1,523 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📜 Central History - Digital Hub & Office Work</title>
+    <!-- Tailwind CSS for Clean, Professional & Mobile-First UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col text-gray-800">
 
+    <!-- Top Header Bar -->
+    <header class="bg-blue-700 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <a href="index.html" class="bg-blue-600 hover:bg-blue-500 p-2 rounded-lg text-white transition" title="Home">
+                    <i class="fa-solid fa-house"></i>
+                </a>
+                <h1 class="text-xl font-bold tracking-wide flex items-center gap-2">
+                    <i class="fa-solid fa-scroll"><span>📜 Central System History</span></i>
+                </h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="openBackupModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1.5 transition shadow">
+                    <i class="fa-solid fa-download"></i> Backup / Restore
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
+
+        <!-- Search & Filters Section -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <!-- Global Search -->
+                <div class="md:col-span-2 relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="searchInput" oninput="filterHistory()" placeholder="Search text, Record Name, M.B. Number, ID..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                </div>
+                <!-- Module Filter (सर्व मॉड्यूल्सचा समावेश) -->
+                <div>
+                    <select id="moduleFilter" onchange="filterHistory()" class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white font-medium">
+                        <option value="">सर्व Modules (All)</option>
+                        <option value="M.B.">M.B.</option>
+                        <option value="Pay Fixation">Pay Fixation</option>
+                        <option value="Est.">Est.</option>
+                        <option value="Form">Form</option>
+                        <option value="Work List">Work List</option>
+                        <option value="Bill Register">Bill Register</option>
+                        <option value="Assign">Assign</option>
+                        <option value="JE Management">JE Management</option>
+                        <option value="Data Manager">Data Manager</option>
+                        <option value="General">General</option>
+                    </select>
+                </div>
+                <!-- Action Filter -->
+                <div>
+                    <select id="actionFilter" onchange="filterHistory()" class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white font-medium">
+                        <option value="">सर्व Actions (All)</option>
+                        <option value="ADD">ADD</option>
+                        <option value="EDIT">EDIT</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="ISSUE">ISSUE</option>
+                        <option value="RECEIVE">RECEIVE</option>
+                        <option value="RETURN">RETURN</option>
+                        <option value="STATUS CHANGE">STATUS CHANGE</option>
+                        <option value="UPDATE">UPDATE</option>
+                        <option value="IMPORT">IMPORT</option>
+                        <option value="EXPORT">EXPORT</option>
+                        <option value="BACKUP">BACKUP</option>
+                        <option value="RESTORE">RESTORE</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Date Filters -->
+            <div class="flex flex-wrap items-center gap-3 pt-2 border-t border-gray-100 text-sm">
+                <div class="flex items-center gap-2">
+                    <label class="text-gray-600 font-medium">From:</label>
+                    <input type="date" id="dateFrom" onchange="filterHistory()" class="border border-gray-300 rounded-lg px-2.5 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-gray-600 font-medium">To:</label>
+                    <input type="date" id="dateTo" onchange="filterHistory()" class="border border-gray-300 rounded-lg px-2.5 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                </div>
+                <button onclick="resetFilters()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-lg transition text-xs font-semibold">
+                    <i class="fa-solid fa-rotate-right"></i> Reset Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- History Content Area (Date-wise Grouped) -->
+        <div id="historyContainer" class="space-y-6">
+            <!-- Dynamic History Records will load here -->
+        </div>
+
+    </main>
+
+    <!-- Detail View Modal -->
+    <div id="detailModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-blue-600"></i> History Record Complete Details
+                </h3>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+            </div>
+            <div id="modalContent" class="space-y-3 text-sm">
+                <!-- Details injected dynamically -->
+            </div>
+            <div class="text-right pt-3 border-t">
+                <button onclick="closeDetailModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition shadow">बंद करा</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup / Restore Modal -->
+    <div id="backupModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl space-y-5">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-database text-emerald-600"></i> History Backup & Restore
+                </h3>
+                <button onclick="closeBackupModal()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-100 space-y-2">
+                    <h4 class="font-semibold text-emerald-800 text-sm">💾 Export History Backup</h4>
+                    <p class="text-xs text-emerald-600">संपूर्ण प्रणालीचा हिस्ट्री डेटा सुरक्षित JSON फाईलमध्ये डाऊनलोड करा.</p>
+                    <button onclick="exportHistoryBackup()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 shadow">
+                        <i class="fa-solid fa-download"></i> Download Backup JSON
+                    </button>
+                </div>
+                <div class="p-4 bg-blue-50 rounded-lg border border-blue-100 space-y-2">
+                    <h4 class="font-semibold text-blue-800 text-sm">♻️ Restore History Backup</h4>
+                    <p class="text-xs text-blue-600">बॅकअप फाईल अपलोड करून रेकॉर्ड्स पुन्हा प्रणालीत मर्च (Merge) करा.</p>
+                    <input type="file" id="restoreFile" accept=".json" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                    <button onclick="importHistoryRestore()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 shadow">
+                        <i class="fa-solid fa-upload"></i> Restore from JSON
+                    </button>
+                </div>
+            </div>
+            <div class="text-right pt-2 border-t">
+                <button onclick="closeBackupModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium transition">बंद करा</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Central History Core Logic -->
+    <script>
+        const STORAGE_KEY = "digital_hub_central_history";
+
+        // Initial Dummy data for demonstration if storage is empty
+        function getInitialDummyData() {
+            return [
+                {
+                    id: "HIS-20261005-000001",
+                    date: "05-10-2026",
+                    time: "10:15 AM",
+                    module: "M.B.",
+                    action: "ADD",
+                    recordName: "M.B. क्रमांक 0019850",
+                    recordId: "MB-0019850",
+                    mbNumber: "0019850",
+                    mbSize: "Small / लहान",
+                    receivedFrom: "भांडारपाल",
+                    givenTo: "—",
+                    oldData: "—",
+                    newData: "नवीन M.B. प्राप्त झाली",
+                    changes: "Added new M.B. record into system",
+                    status: "Active",
+                    user: "Operator",
+                    remark: "यशस्वी नोंद"
+                },
+                {
+                    id: "HIS-20261005-000002",
+                    date: "05-10-2026",
+                    time: "10:32 AM",
+                    module: "M.B.",
+                    action: "ISSUE",
+                    recordName: "M.B. क्रमांक 015750",
+                    recordId: "MB-015750",
+                    mbNumber: "015750",
+                    mbSize: "Small / लहान",
+                    receivedFrom: "—",
+                    givenTo: "श्री महिंद्रकर रावसाहेब",
+                    oldData: "Available",
+                    newData: "Issued to श्री महिंद्रकर रावसाहेब",
+                    changes: "Status changed to Issued",
+                    status: "Issued",
+                    user: "Operator",
+                    remark: "कामांनुसार जारी"
+                },
+                {
+                    id: "HIS-20261005-000003",
+                    date: "05-10-2026",
+                    time: "11:05 AM",
+                    module: "Pay Fixation",
+                    action: "EDIT",
+                    recordName: "कर्मचारी Pay Fixation Record",
+                    recordId: "EMP-402",
+                    mbNumber: "—",
+                    mbSize: "—",
+                    receivedFrom: "—",
+                    givenTo: "—",
+                    oldData: "Basic Pay: 56100",
+                    newData: "Basic Pay: 57800",
+                    changes: "Basic Pay बदलला",
+                    status: "Updated",
+                    user: "Admin",
+                    remark: "वार्षिक वेतनवाढ"
+                }
+            ];
+        }
+
+        // Get all history data
+        function getAllHistory() {
+            let data = localStorage.getItem(STORAGE_KEY);
+            if (!data) {
+                let initial = getInitialDummyData();
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+                return initial;
+            }
+            try {
+                return JSON.parse(data);
+            } catch (e) {
+                return [];
+            }
+        }
+
+        // Global Central API Function: सर्व मॉड्यूल्समधून हिस्ट्री रेकॉर्ड पाठवण्यासाठी (Universal Logger)
+        function addHistory(recordData) {
+            let historyList = getAllHistory();
+            
+            // Generate Unique History ID: HIS-YYYYMMDD-XXXXXX
+            let now = new Date();
+            let dd = String(now.getDate()).padStart(2, '0');
+            let mm = String(now.getMonth() + 1).padStart(2, '0');
+            let yyyy = now.getFullYear();
+            let dateStr = `${dd}-${mm}-${yyyy}`;
+            let timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+
+            let seq = historyList.length + 1;
+            let uniqueId = `HIS-${yyyy}${mm}${dd}-${String(seq).padStart(6, '0')}`;
+
+            let newRecord = {
+                id: recordData.id || uniqueId,
+                date: recordData.date || dateStr,
+                time: recordData.time || timeStr,
+                module: recordData.module || "General",
+                action: recordData.action || "UPDATE",
+                recordName: recordData.recordName || "Unknown Record",
+                recordId: recordData.recordId || "—",
+                mbNumber: recordData.mbNumber || "—",
+                mbSize: recordData.mbSize || "—",
+                receivedFrom: recordData.receivedFrom || "—",
+                givenTo: recordData.givenTo || "—",
+                oldData: recordData.oldData || "—",
+                newData: recordData.newData || "—",
+                changes: recordData.changes || "—",
+                status: recordData.status || "—",
+                user: recordData.user || "Operator",
+                remark: recordData.remark || "—"
+            };
+
+            historyList.unshift(newRecord); // Add new record to top
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(historyList));
+            loadHistoryUI();
+        }
+
+        // Make addHistory globally accessible across all modules/pages
+        window.addHistory = addHistory;
+
+        // Render History UI Date-wise
+        function loadHistoryUI(filteredData = null) {
+            let list = filteredData || getAllHistory();
+            let container = document.getElementById("historyContainer");
+            container.innerHTML = "";
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white p-8 rounded-xl shadow-sm text-center text-gray-500">
+                        <i class="fa-solid fa-folder-open text-4xl mb-2 text-gray-300"></i>
+                        <p class="font-medium">कोणतीही हिस्ट्री सापडली नाही.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group by Date
+            let grouped = {};
+            list.forEach(item => {
+                if (!grouped[item.date]) {
+                    grouped[item.date] = [];
+                }
+                grouped[item.date].push(item);
+            });
+
+            // Render each date group
+            for (let date in grouped) {
+                let dateSection = document.createElement("div");
+                dateSection.className = "space-y-3";
+
+                let dateHeader = document.createElement("div");
+                dateHeader.className = "flex items-center gap-2 text-blue-800 font-bold text-base pt-2 pb-1";
+                dateHeader.innerHTML = `<i class="fa-solid fa-calendar-days"></i> 📅 ${date} <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold">(${grouped[date].length} Entries)</span>`;
+                dateSection.appendChild(dateHeader);
+
+                let rowsContainer = document.createElement("div");
+                rowsContainer.className = "space-y-2";
+
+                grouped[date].forEach(item => {
+                    let badgeColor = getActionBadgeColor(item.action);
+                    let row = document.createElement("div");
+                    row.className = "bg-white p-3.5 rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer";
+                    row.onclick = () => openDetailModal(item.id);
+
+                    row.innerHTML = `
+                        <div class="flex items-start md:items-center gap-3 flex-grow">
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-md ${badgeColor} uppercase tracking-wide whitespace-nowrap shadow-sm">${item.action}</span>
+                            <div class="space-y-0.5">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-xs font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded"><i class="fa-solid fa-layer-group text-[10px]"></i> ${item.module}</span>
+                                    <span class="text-xs text-gray-500"><i class="fa-regular fa-clock"></i> ${item.time}</span>
+                                </div>
+                                <div class="text-sm font-semibold text-gray-800">
+                                    ${item.recordName} ${item.mbNumber !== '—' ? '(' + item.mbNumber + ')' : ''} 
+                                    ${item.givenTo !== '—' ? '<span class="text-gray-500 font-normal">→ ' + item.givenTo + '</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between md:justify-end gap-3 text-xs text-gray-500 border-t md:border-t-0 pt-2 md:pt-0">
+                            <span class="font-mono text-gray-400 bg-gray-50 px-2 py-1 rounded">${item.id}</span>
+                            <span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded font-medium hover:bg-blue-100"><i class="fa-solid fa-eye"></i> Detail</span>
+                        </div>
+                    `;
+                    rowsContainer.appendChild(row);
+                });
+
+                dateSection.appendChild(rowsContainer);
+                container.appendChild(dateSection);
+            }
+        }
+
+        // Action Badge Color mapping
+        function getActionBadgeColor(action) {
+            switch(action) {
+                case 'ADD': return 'bg-emerald-100 text-emerald-800';
+                case 'EDIT': case 'UPDATE': return 'bg-amber-100 text-amber-800';
+                case 'DELETE': return 'bg-red-100 text-red-800';
+                case 'ISSUE': case 'EXPORT': return 'bg-blue-100 text-blue-800';
+                case 'RECEIVE': case 'RETURN': return 'bg-purple-100 text-purple-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        // Filter Functionality
+        function filterHistory() {
+            let text = document.getElementById("searchInput").value.toLowerCase();
+            let module = document.getElementById("moduleFilter").value;
+            let action = document.getElementById("actionFilter").value;
+            let dateFrom = document.getElementById("dateFrom").value;
+            let dateTo = document.getElementById("dateTo").value;
+
+            let all = getAllHistory();
+
+            let filtered = all.filter(item => {
+                let matchesText = (
+                    item.recordName.toLowerCase().includes(text) ||
+                    item.id.toLowerCase().includes(text) ||
+                    item.mbNumber.toLowerCase().includes(text) ||
+                    item.changes.toLowerCase().includes(text) ||
+                    item.remark.toLowerCase().includes(text) ||
+                    item.module.toLowerCase().includes(text)
+                );
+                let matchesModule = module === "" || item.module === module;
+                let matchesAction = action === "" || item.action === action;
+
+                // Date range comparison
+                let matchesDate = true;
+                if (dateFrom || dateTo) {
+                    let parts = item.date.split('-');
+                    let itemDateObj = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+                    if (dateFrom && itemDateObj < new Date(dateFrom)) matchesDate = false;
+                    if (dateTo && itemDateObj > new Date(dateTo)) matchesDate = false;
+                }
+
+                return matchesText && matchesModule && matchesAction && matchesDate;
+            });
+
+            loadHistoryUI(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById("searchInput").value = "";
+            document.getElementById("moduleFilter").value = "";
+            document.getElementById("actionFilter").value = "";
+            document.getElementById("dateFrom").value = "";
+            document.getElementById("dateTo").value = "";
+            loadHistoryUI();
+        }
+
+        // Detail Modal Operations
+        function openDetailModal(id) {
+            let all = getAllHistory();
+            let item = all.find(x => x.id === id);
+            if (!item) return;
+
+            let content = `
+                <div class="grid grid-cols-2 gap-2 bg-gray-50 p-3 rounded-lg border">
+                    <div><strong>Unique ID:</strong> <span class="font-mono text-xs">${item.id}</span></div>
+                    <div><strong>दिनांक व वेळ:</strong> ${item.date} | ${item.time}</div>
+                    <div><strong>Module:</strong> <span class="text-blue-600 font-semibold">${item.module}</span></div>
+                    <div><strong>Action:</strong> <span class="font-semibold">${item.action}</span></div>
+                </div>
+                <div class="space-y-2 pt-2 text-xs md:text-sm">
+                    <div><strong>Record / Item Name:</strong> ${item.recordName}</div>
+                    <div><strong>Record ID / Reference:</strong> ${item.recordId}</div>
+                    <div><strong>M.B. क्रमांक:</strong> ${item.mbNumber}</div>
+                    <div><strong>M.B. Size:</strong> ${item.mbSize}</div>
+                    <div><strong>कोणाकडून मिळाली:</strong> ${item.receivedFrom}</div>
+                    <div><strong>कोणाला दिली:</strong> ${item.givenTo}</div>
+                    <div class="p-2.5 bg-red-50 text-red-900 rounded border border-red-100"><strong>जुनी माहिती:</strong> ${item.oldData}</div>
+                    <div class="p-2.5 bg-emerald-50 text-emerald-900 rounded border border-emerald-100"><strong>नवीन माहिती:</strong> ${item.newData}</div>
+                    <div><strong>बदलाचा तपशील / Changes:</strong> ${item.changes}</div>
+                    <div><strong>Status / परिणाम:</strong> ${item.status}</div>
+                    <div><strong>Operator / User:</strong> ${item.user}</div>
+                    <div><strong>Remark:</strong> ${item.remark}</div>
+                </div>
+            `;
+            document.getElementById("modalContent").innerHTML = content;
+            document.getElementById("detailModal").classList.remove("hidden");
+        }
+
+        function closeDetailModal() {
+            document.getElementById("detailModal").classList.add("hidden");
+        }
+
+        // Backup & Restore Modals
+        function openBackupModal() { document.getElementById("backupModal").classList.remove("hidden"); }
+        function closeBackupModal() { document.getElementById("backupModal").classList.add("hidden"); }
+
+        function exportHistoryBackup() {
+            let data = localStorage.getItem(STORAGE_KEY) || "[]";
+            let blob = new Blob([data], { type: "application/json" });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement("a");
+            let today = new Date().toISOString().split('T')[0];
+            a.href = url;
+            a.download = `Central_History_Backup_${today}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            addHistory({
+                module: "Data Manager",
+                action: "BACKUP",
+                recordName: "Central History Backup Exported",
+                changes: "Backup JSON file downloaded successfully",
+                status: "Success"
+            });
+        }
+
+        function importHistoryRestore() {
+            let fileInput = document.getElementById("restoreFile");
+            if (fileInput.files.length === 0) {
+                alert("कृपया प्रथम बॅकअप JSON फाईल निवडा.");
+                return;
+            }
+            let file = fileInput.files[0];
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let importedData = JSON.parse(e.target.result);
+                    if (!Array.isArray(importedData)) throw new Error("Invalid format");
+
+                    let existing = getAllHistory();
+                    let existingIds = new Set(existing.map(x => x.id));
+                    let addedCount = 0;
+
+                    // Merge avoiding duplicates by ID
+                    importedData.forEach(item => {
+                        if (item.id && !existingIds.has(item.id)) {
+                            existing.push(item);
+                            existingIds.add(item.id);
+                            addedCount++;
+                        }
+                    });
+
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+                    alert(`Restore यशस्वी! नवीन जोडलेले रेकॉर्ड्स: ${addedCount}`);
+                    closeBackupModal();
+                    loadHistoryUI();
+
+                    addHistory({
+                        module: "Data Manager",
+                        action: "RESTORE",
+                        recordName: "Central History Backup Restored",
+                        changes: `${addedCount} new records merged successfully`,
+                        status: "Success"
+                    });
+                } catch (err) {
+                    alert("अयोग्य फाईल स्वरूप (Invalid JSON File).");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Initial Load on Page Startup
+        window.onload = function() {
+            loadHistoryUI();
+        };
+    </script>
+</body>
+</html>
