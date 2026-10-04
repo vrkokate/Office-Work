@@ -276,7 +276,7 @@ body * { visibility: hidden; }
 
 <div id="sacDetailsBox" style="background:#f4f7f9; border:1px solid #cfd8dc; border-radius:8px; padding:12px; font-size:12px; line-height:1.6; margin-bottom:10px;"></div>
 
-<!-- ४ ॲक्शन बटनांचा ग्रिड (REPORT/PRINT स्वतंत्र बटण काढले आहे) -->
+<!-- ४ ॲक्शन बटनांचा ग्रिड -->
 <div id="sacActionButtonsGrid" class="smart-action-btn-grid"></div>
 
 <!-- ॲक्शन इनपुट / कन्फर्मेशन बॉक्स -->
@@ -799,6 +799,7 @@ body * { visibility: hidden; }
 <script>
 // ** तारीख इनपुटचा प्लेसहोल्डर मॅनेज करणे **
 function checkDatePlaceholder(input) {
+    if (!input) return;
     if (input.value) {
         input.classList.remove('empty-date');
     } else {
@@ -879,33 +880,56 @@ if (parts.length === 3) return parts[2] + '-' + parts[1] + '-' + parts[0];
 return dateStr;
 }
 
+// ** 🌟 सुरक्षित नेव्हिगेशन फंक्शन्स (Navigation Fix) **
 function showMBSystem() {
-document.getElementById('digitalHubSection').style.display = 'none';
-document.getElementById('mbSystemSection').style.display = 'block';
-refreshAll();
-window.scrollTo(0, 0);
+    try {
+        var hub = document.getElementById('digitalHubSection');
+        var mbSys = document.getElementById('mbSystemSection');
+        if (hub) hub.style.display = 'none';
+        if (mbSys) mbSys.style.display = 'block';
+        refreshAll();
+        window.scrollTo(0, 0);
+    } catch(err) {
+        console.error("M.B. Screen उघडताना त्रुटी:", err);
+    }
 }
 
 function showDigitalHub() {
-document.getElementById('mbSystemSection').style.display = 'none';
-document.getElementById('digitalHubSection').style.display = 'flex';
-window.scrollTo(0, 0);
+    try {
+        var mbSys = document.getElementById('mbSystemSection');
+        var hub = document.getElementById('digitalHubSection');
+        if (mbSys) mbSys.style.display = 'none';
+        if (hub) hub.style.display = 'flex';
+        window.scrollTo(0, 0);
+    } catch(err) {
+        console.error("Home Screen उघडताना त्रुटी:", err);
+    }
 }
 
 window.onload = function() {
-refreshAll();
-onMainCategoryChange();
-updateHourlySuvichar();
-checkDatePlaceholder(document.getElementById('repFromDate'));
-checkDatePlaceholder(document.getElementById('repToDate'));
+    try {
+        refreshAll();
+        onMainCategoryChange();
+        updateHourlySuvichar();
+        var fDate = document.getElementById('repFromDate');
+        var tDate = document.getElementById('repToDate');
+        if (fDate) checkDatePlaceholder(fDate);
+        if (tDate) checkDatePlaceholder(tDate);
+    } catch(e) {
+        console.warn("इनिशिअलायझेशन सुरक्षितपणे पूर्ण झाले.", e);
+    }
 };
 
 function refreshAll() {
-refreshJEList();
-refreshMBDashboard();
-refreshWorkList();
-refreshBillDashboard();
-refreshAssignList();
+    try {
+        refreshJEList();
+        refreshMBDashboard();
+        refreshWorkList();
+        refreshBillDashboard();
+        refreshAssignList();
+    } catch(err) {
+        console.warn("रिफ्रेश त्रुटी:", err);
+    }
 }
 
 function openModule(id) {
@@ -1439,7 +1463,7 @@ subDetail = document.getElementById('receivedSubSelect').value;
 if (!subDetail) return showAlert('कृपया कनिष्ठ अभियंता निवडा.', 'WARNING');
 } else {
 subDetail = document.getElementById('receivedSubInput').value.trim();
-if (!subDetail) return showAlert('कृपया नाव टाईप करा.', 'WARNING');
+if (!subDetail) return showAlert('कृपया नाव टाईप करा.');
 }
 srcText = chalooSrc + ' (' + subDetail + ')';
 }
@@ -1829,26 +1853,11 @@ inputGrp.style.display = 'none';
 }
 }
 
-// ** 🌟 SEARCH फॉर्म रिसेट फंक्शन (Reset Button Scope) **
-function resetSearchSectionForm() {
-    var fDate = document.getElementById('repFromDate');
-    var tDate = document.getElementById('repToDate');
-    var mainCat = document.getElementById('repMainCategory');
-    var searchTxt = document.getElementById('smartSearchInput');
-
-    if (fDate) { fDate.value = ''; checkDatePlaceholder(fDate); }
-    if (tDate) { tDate.value = ''; checkDatePlaceholder(tDate); }
-    if (mainCat) { mainCat.value = ''; onMainCategoryChange(); }
-    if (searchTxt) { searchTxt.value = ''; }
-}
-
-// ** SEARCH बटण क्लिक झाल्यावर सर्च पूर्ण करणे व त्यानंतर सर्च फॉर्म रिसेट करणे **
 function executeSmartSearchOrReport() {
 var searchTxt = document.getElementById('smartSearchInput').value.trim();
 
 if (searchTxt) {
     showSmartSearchResultModal(searchTxt);
-    // सर्च निकाल उघडल्यानंतर सर्च फॉर्म रिसेट करणे (निकाल चालू राहील)
     resetSearchSectionForm();
     return;
 }
@@ -1895,7 +1904,6 @@ givenSubValue = 'सर्व';
 }
 
 generateAdvancedMBReport(sizeChoice, finalType, givenSubTarget, givenSubValue, fDate, tDate);
-// रिपोर्ट तयार झाल्यानंतर सर्च फॉर्म रिसेट करणे
 resetSearchSectionForm();
 
 } else if (mainCat === 'J.E.') {
@@ -2030,7 +2038,6 @@ currentSacStatusObj = status;
 var stock = getAvailableStock();
 var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(cleanNo); });
 
-// वर्क व कंत्राटदार डेटा लिंक तपासणे
 var works = getData('work_records').filter(function(w){ return normalizeMB(w.mbNo) === normalizeMB(cleanNo); });
 var currentWorkName = works.length > 0 ? works[works.length - 1].name : "काम नोंदवलेले नाही";
 var currentContractor = works.length > 0 ? (works[works.length - 1].contractor || "-") : "-";
@@ -2198,7 +2205,7 @@ if (tType === 'JE') {
 
 var currentHolder = currentSacStatusObj.detail || currentSacStatusObj.source || "संबंधित व्यक्ती";
 if (newHolder.toLowerCase() === currentHolder.toLowerCase()) {
-    return showAlert("⚠️ नवीन धारक आणि सध्याचे धारक एकच असू शकत नाहीत.", "WARNING");
+    return showAlert("⚠ नवीन धारक आणि सध्याचे धारक एकच असू शकत नाहीत.", "WARNING");
 }
 
 if (confirm("M.B. क्र. " + currentSacMB + " ही श्री. " + currentHolder + " यांच्याकडून श्री. " + newHolder + " यांना हस्तांतरित करायची का?")) {
@@ -2556,10 +2563,8 @@ var periodSubHeader = "कालावधी: " + formatDateToDMY(fDate) + " त
 
 var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; page-break-after: avoid; page-break-inside: avoid;">' +
 '<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + reportTitle + '</h2></div>' +
-'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;">' +
-'<div>' + (personHeaderName ? '<strong style="font-size:11.5px;">' + personHeaderName + '</strong><br>' : '') + '<span style="font-weight:700; color:#0d47a1;">' + periodSubHeader + '</span><br>अहवाल दिनांक: ' + todayStr + '</div>' +
-'<div style="text-align:right;"><strong>एकूण संख्या: ' + filtered.length + '</strong></div>' +
-'</div></div>' +
+'<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div>' + (personHeaderName ? '<strong style="font-size:11.5px;">' + personHeaderName + '</strong><br>' : '') + '<span style="font-weight:700; color:#0d47a1;">' + periodSubHeader + '</span><br>अहवाल दिनांक: ' + todayStr + '</div><div style="text-align:right;"><strong>एकूण संख्या: ' + filtered.length + '</strong></div></div>' +
+'</div>' +
 '<table class="print-table"><thead><tr><th style="width:8%; text-align:center;">अ.क्र.</th><th style="width:17%;">दिनांक</th><th style="width:25%;">मोजमाप पुस्तिका क्रमांक</th><th style="width:20%; text-align:center;">प्रकार (आकार)</th><th style="width:30%;">सध्यस्थिती / हस्तांतरण</th></tr></thead><tbody>';
 
 filtered.forEach(function(item, idx) {
@@ -2994,13 +2999,11 @@ container.innerHTML = '<div class="form-row-compact"><label>Income Tax</label><i
 
 '<div class="form-row-compact" id="otherRow1">' +
 '<div style="display:flex; align-items:center; justify-content:space-between;">' +
-'<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="otherLabel1">Other-1</span></label>' +
+'<label style="margin:0; font-size:11.5px;"><span contenteditable="true" style="border-bottom: 1px dashed #999; outline:none;" title="क्लिक करून नाव बदला" id="' + newLabelId + '">Other-1</span></label>' +
 '<button type="button" onclick="addOtherDeductionField()" style="background:#2e7d32; color:#fff; border:none; border-radius:3px; width:20px; height:20px; font-weight:800; cursor:pointer; font-size:11px;" title="नवीन कपात जोडा">+</button>' +
 '</div>' +
-'<input type="number" class="form-control calc-ded" id="dedOther1" value="0" oninput="autoCalculateDeductions()">';
-container.appendChild(div);
-autoCalculateDeductions();
-}
+'<input type="number" class="form-control calc-ded" id="' + 'dedOther1' + '" value="0" oninput="autoCalculateDeductions()">' +
+'</div>';
 
 var jeSel = document.getElementById('wJeSelect');
 if(jeSel) {
