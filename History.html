@@ -11,6 +11,14 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; }
         
+        /* Custom Scrollbox for 5 rows visible with scroll */
+        .history-scroll-box {
+            max-height: 250px; /* अंदाजे ५ ओळी बसतील एवढी उंची */
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 2px;
+        }
+
         /* Print / PDF Styling */
         @media print {
             body * { visibility: hidden !important; }
@@ -43,12 +51,12 @@
     <!-- Main Container -->
     <main class="max-w-4xl mx-auto px-3 py-4 flex-grow w-full space-y-3">
 
-        <!-- Summary & Report / Print Action Bar -->
-        <div class="bg-white px-4 py-2.5 rounded-xl shadow-sm border border-gray-200 flex flex-wrap justify-between items-center gap-2 text-xs">
-            <div class="flex items-center gap-3 font-semibold text-gray-600">
-                <span id="totalHistoryCount">Total: 0</span>
+        <!-- Summary & Report / Print Action Bar (스크린शॉटप्रमाणे वर व्यवस्थित डिझाईन) -->
+        <div class="bg-white px-4 py-2.5 rounded-xl shadow-sm border border-gray-200 flex flex-wrap justify-between items-center gap-2 text-xs font-semibold text-gray-700">
+            <div class="flex items-center gap-2">
+                <span id="totalHistoryCount" class="bg-blue-50 text-blue-800 px-2.5 py-1 rounded-md border border-blue-100">Total: 0</span>
                 <span>|</span>
-                <span id="filteredHistoryCount">Showing: 0</span>
+                <span id="filteredHistoryCount" class="bg-gray-50 text-gray-700 px-2.5 py-1 rounded-md border border-gray-200">Showing: 0</span>
             </div>
             <div>
                 <button onclick="printHistoryReport()" class="bg-[#0d47a1] hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg font-medium transition shadow flex items-center gap-1.5 text-xs">
@@ -58,48 +66,53 @@
         </div>
 
         <!-- Search & Filters Section -->
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-200 space-y-2.5">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div class="bg-white p-3.5 rounded-xl shadow-sm border border-gray-200 space-y-3">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                 <!-- Global Search -->
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
                         <i class="fa-solid fa-magnifying-glass text-xs"></i>
                     </span>
-                    <input type="text" id="searchInput" oninput="filterHistory()" placeholder="Search text, ID, Module, Action, Remark..." class="w-full pl-9 pr-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs">
+                    <input type="text" id="searchInput" oninput="filterHistory()" placeholder="Search text, ID, Module, Action, Remark..." class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs">
                 </div>
                 <!-- Module Filter -->
                 <div>
-                    <select id="moduleFilter" onchange="filterHistory()" class="w-full py-1.5 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white font-medium">
+                    <select id="moduleFilter" onchange="filterHistory()" class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white font-medium">
                         <option value="">सर्व Modules (All)</option>
                     </select>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                 <!-- Action Filter -->
                 <div>
-                    <select id="actionFilter" onchange="filterHistory()" class="w-full py-1.5 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white font-medium">
+                    <select id="actionFilter" onchange="filterHistory()" class="w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white font-medium">
                         <option value="">सर्व Actions (All)</option>
                     </select>
                 </div>
                 <!-- Date Filters -->
                 <div class="flex items-center gap-1.5">
-                    <input type="date" id="dateFrom" onchange="filterHistory()" class="border border-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs flex-1">
+                    <input type="date" id="dateFrom" onchange="filterHistory()" class="border border-gray-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs flex-1">
                     <span class="text-xs text-gray-500">ते</span>
-                    <input type="date" id="dateTo" onchange="filterHistory()" class="border border-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs flex-1">
+                    <input type="date" id="dateTo" onchange="filterHistory()" class="border border-gray-300 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs flex-1">
                 </div>
             </div>
 
             <div class="text-right pt-0.5">
-                <button onclick="resetFilters()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2.5 py-1 rounded-md transition text-[11px] font-semibold">
+                <button onclick="resetFilters()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded-md transition text-xs font-semibold">
                     <i class="fa-solid fa-rotate-right"></i> Reset Filters
                 </button>
             </div>
         </div>
 
-        <!-- History Content Area (Compact Date-wise Grouped Rows) -->
-        <div id="historyContainer" class="space-y-3">
-            <!-- Dynamic History Records will load here -->
+        <!-- History Content Area (Scrollable Box for continuous rows) -->
+        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-200">
+            <h3 class="text-xs font-bold text-[#0d47a1] mb-2 flex items-center gap-1.5 border-b pb-1.5">
+                <i class="fa-solid fa-list-check"></i> सर्व हिस्ट्री नोंदी (क्रमशः ओळी)
+            </h3>
+            <div id="historyContainer" class="history-scroll-box space-y-2">
+                <!-- Dynamic History Records will load here inside scrollbox -->
+            </div>
         </div>
 
     </main>
@@ -276,10 +289,12 @@
 
         let currentFilteredList = [];
 
+        // Load History UI into Scrollable Box (All records sorted sequentially by timestamp, without splitting into separate date headers)
         function loadHistoryUI(filteredData = null) {
             let list = filteredData || getAllHistory();
             currentFilteredList = list;
             
+            // Sort by Timestamp (Newest -> Oldest)
             list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
             let container = document.getElementById("historyContainer");
@@ -291,7 +306,7 @@
 
             if (list.length === 0) {
                 container.innerHTML = `
-                    <div class="bg-white p-5 rounded-xl shadow-sm text-center text-gray-500 text-xs">
+                    <div class="py-6 text-center text-gray-400 text-xs">
                         <i class="fa-solid fa-folder-open text-2xl mb-1 text-gray-300"></i>
                         <p class="font-medium">📜 History उपलब्ध नाही.</p>
                     </div>
@@ -299,56 +314,33 @@
                 return;
             }
 
-            let grouped = {};
-            list.forEach(item => {
-                if (!grouped[item.date]) {
-                    grouped[item.date] = [];
-                }
-                grouped[item.date].push(item);
+            // Render each record sequentially in a single scrollable box
+            list.forEach((item, idx) => {
+                let badgeColor = getActionBadgeColor(item.action);
+                let row = document.createElement("div");
+                row.className = "bg-white px-2.5 py-1.5 rounded border border-gray-200 flex items-center justify-between gap-2 text-xs hover:bg-gray-50 transition";
+
+                let recordNameEsc = escapeHTML(item.recordName);
+                let mbNoEsc = item.mbNumber !== '—' ? '(' + escapeHTML(item.mbNumber) + ')' : '';
+                let givenToEsc = item.givenTo !== '—' ? '<span class="text-gray-500 font-normal">→ ' + escapeHTML(item.givenTo) + '</span>' : '';
+
+                row.innerHTML = `
+                    <div class="flex items-center gap-2 flex-grow overflow-hidden">
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${badgeColor} uppercase tracking-wide whitespace-nowrap shadow-sm">${escapeHTML(item.action)}</span>
+                        <div class="truncate space-y-0 text-[11px]">
+                            <span class="font-bold text-gray-700 bg-gray-100 px-1 py-0.2 rounded text-[10px]">${escapeHTML(item.module)}</span>
+                            <span class="text-gray-400 text-[10px]">${escapeHTML(item.date)} ${escapeHTML(item.time)}</span>
+                            <span class="font-semibold text-gray-800 truncate ml-1">${recordNameEsc} ${mbNoEsc} ${givenToEsc}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <button onclick="openDetailModal('${item.id}')" class="bg-[#0d47a1] hover:bg-blue-800 text-white px-2 py-0.5 rounded text-[10px] font-medium transition shadow flex items-center gap-1" title="सविस्तर माहिती पहा">
+                            details
+                        </button>
+                    </div>
+                `;
+                container.appendChild(row);
             });
-
-            for (let date in grouped) {
-                let dateSection = document.createElement("div");
-                dateSection.className = "space-y-1.5"; // अत्यंत कमी अंतर (Compact spacing)
-
-                let dateHeader = document.createElement("div");
-                dateHeader.className = "flex items-center gap-2 text-blue-900 font-bold text-xs pt-1 pb-0.5";
-                dateHeader.innerHTML = `<i class="fa-solid fa-calendar-days text-blue-700"></i> 📅 ${escapeHTML(date)} <span class="text-[10px] bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded-full font-semibold">(${grouped[date].length})</span>`;
-                dateSection.appendChild(dateHeader);
-
-                let rowsContainer = document.createElement("div");
-                rowsContainer.className = "space-y-1.5"; // ओळींमध्ये जास्त अंतर नाही
-
-                grouped[date].forEach(item => {
-                    let badgeColor = getActionBadgeColor(item.action);
-                    let row = document.createElement("div");
-                    row.className = "bg-white px-3 py-2 rounded-md shadow-sm border border-gray-200 flex items-center justify-between gap-2 text-xs";
-
-                    let recordNameEsc = escapeHTML(item.recordName);
-                    let mbNoEsc = item.mbNumber !== '—' ? '(' + escapeHTML(item.mbNumber) + ')' : '';
-                    let givenToEsc = item.givenTo !== '—' ? '<span class="text-gray-500 font-normal">→ ' + escapeHTML(item.givenTo) + '</span>' : '';
-
-                    row.innerHTML = `
-                        <div class="flex items-center gap-2 flex-grow overflow-hidden">
-                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${badgeColor} uppercase tracking-wide whitespace-nowrap shadow-sm">${escapeHTML(item.action)}</span>
-                            <div class="truncate space-y-0 text-[11px]">
-                                <span class="font-bold text-gray-700 bg-gray-100 px-1 py-0.2 rounded text-[10px]">${escapeHTML(item.module)}</span>
-                                <span class="text-gray-400 text-[10px]">${escapeHTML(item.time)}</span>
-                                <span class="font-semibold text-gray-800 truncate ml-1">${recordNameEsc} ${mbNoEsc} ${givenToEsc}</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-1.5 flex-shrink-0">
-                            <button onclick="openDetailModal('${item.id}')" class="bg-[#0d47a1] hover:bg-blue-800 text-white px-2 py-0.5 rounded text-[10px] font-medium transition shadow flex items-center gap-1" title="सविस्तर माहिती पहा">
-                                details
-                            </button>
-                        </div>
-                    `;
-                    rowsContainer.appendChild(row);
-                });
-
-                dateSection.appendChild(rowsContainer);
-                container.appendChild(dateSection);
-            }
         }
 
         function getActionBadgeColor(action) {
@@ -494,7 +486,7 @@
                     <div><strong>M.B. No:</strong> ${escapeHTML(item.mbNumber)} | <strong>Size:</strong> ${escapeHTML(item.mbSize)}</div>
                     <div><strong>कोणाकडून:</strong> ${escapeHTML(item.receivedFrom)} | <strong>कोणाला:</strong> ${escapeHTML(item.givenTo)}</div>
                     <div class="p-2 bg-red-50 text-red-900 rounded border border-red-100"><strong>जुनी माहिती:</strong><div class="mt-0.5">${oldDataRender}</div></div>
-                    <div class="p-2 bg-emerald-50 text-emerald-900 rounded border border-emerald-100"><strong>नवीन माहिती:</strong><div class="mt-0.5">${newDataRender}</div></div>
+                    <div class="p-2 bg-emerald-50 text-emerald-900 rounded border border-red-100"><strong>नवीन माहिती:</strong><div class="mt-0.5">${newDataRender}</div></div>
                     ${comparisonView}
                     <div><strong>बदल:</strong> ${escapeHTML(item.changes)}</div>
                     <div><strong>Status:</strong> ${escapeHTML(item.status)} | <strong>User:</strong> ${escapeHTML(item.user)}</div>
