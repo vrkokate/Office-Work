@@ -977,7 +977,7 @@
             <label>३. नियुक्ती दिनांक:</label>
             <div class="date-box-wrapper">
                 <input type="text" id="empJoinDate_disp" placeholder="नियुक्ती दिनांक निवडा" readonly>
-                <input type="date" id="empJoinDate" class="overlay-date-input" onchange="handleDatePicked('empJoinDate', 'empJoinDate_disp'); reEvaluateAllOptionSuggestions(); validateCard1();">
+                <input type="date" id="empJoinDate" class="overlay-date-input" onchange="handleJoinDateChange();">
                 <span class="cal-btn-icon">📅</span>
             </div>
         </div>
@@ -1173,7 +1173,7 @@
                 <label>कालावधी सुरू (पासून):</label>
                 <div class="date-box-wrapper">
                     <input type="text" id="fixationFrom_disp" placeholder="सुरू दिनांक निवडा" readonly>
-                    <input type="date" id="fixationFrom" class="overlay-date-input" onchange="handleDatePicked('fixationFrom', 'fixationFrom_disp'); validateCard3();">
+                    <input type="date" id="fixationFrom" class="overlay-date-input" onchange="onFixationFromChange();">
                     <span class="cal-btn-icon">📅</span>
                 </div>
             </div>
@@ -1181,7 +1181,7 @@
                 <label>कालावधी अखेर (पर्यंत):</label>
                 <div class="date-box-wrapper">
                     <input type="text" id="fixationTo_disp" placeholder="अखेर दिनांक निवडा" readonly>
-                    <input type="date" id="fixationTo" class="overlay-date-input" onchange="handleDatePicked('fixationTo', 'fixationTo_disp'); validateCard3();">
+                    <input type="date" id="fixationTo" class="overlay-date-input" onchange="onFixationToChange();">
                     <span class="cal-btn-icon">📅</span>
                 </div>
             </div>
@@ -1554,6 +1554,8 @@
         document.getElementById('fixationTo').value = d.fixationTo || '';
         handleDatePicked('fixationTo', 'fixationTo_disp');
 
+        updateDateConstraints();
+
         document.getElementById('autoCommissionChange').value = d.autoCommissionChange || 'Yes';
         document.getElementById('incrementMonthRule7th').value = d.incrementMonthRule7th || 'july';
 
@@ -1654,10 +1656,72 @@
         }
     }
 
+    function handleJoinDateChange() {
+        handleDatePicked('empJoinDate', 'empJoinDate_disp');
+        reEvaluateAllOptionSuggestions();
+        validateCard1();
+        updateDateConstraints();
+    }
+
+    function updateDateConstraints() {
+        const joinDate = document.getElementById('empJoinDate').value;
+        const fromInput = document.getElementById('fixationFrom');
+        const toInput = document.getElementById('fixationTo');
+
+        if (joinDate) {
+            fromInput.min = joinDate;
+            if (!fromInput.value || fromInput.value < joinDate) {
+                fromInput.value = joinDate;
+                handleDatePicked('fixationFrom', 'fixationFrom_disp');
+            }
+            toInput.min = fromInput.value || joinDate;
+            if (!toInput.value || toInput.value < toInput.min) {
+                toInput.value = toInput.min;
+                handleDatePicked('fixationTo', 'fixationTo_disp');
+            }
+        }
+    }
+
+    function onFixationFromChange() {
+        handleDatePicked('fixationFrom', 'fixationFrom_disp');
+        const joinDate = document.getElementById('empJoinDate').value;
+        const fromInput = document.getElementById('fixationFrom');
+        const toInput = document.getElementById('fixationTo');
+
+        if (joinDate && fromInput.value && fromInput.value < joinDate) {
+            alert("अहवालाची सुरुवातीची तारीख कर्मचाऱ्याच्या नियुक्ती दिनांकापूर्वीची असू शकत नाही.");
+            fromInput.value = joinDate;
+            handleDatePicked('fixationFrom', 'fixationFrom_disp');
+        }
+
+        if (fromInput.value) {
+            toInput.min = fromInput.value;
+            if (toInput.value && toInput.value < toInput.min) {
+                toInput.value = toInput.min;
+                handleDatePicked('fixationTo', 'fixationTo_disp');
+            }
+        }
+        validateCard3();
+    }
+
+    function onFixationToChange() {
+        handleDatePicked('fixationTo', 'fixationTo_disp');
+        const fromInput = document.getElementById('fixationFrom');
+        const toInput = document.getElementById('fixationTo');
+
+        if (fromInput.value && toInput.value && toInput.value < fromInput.value) {
+            alert("अहवालाची अखेरची तारीख सुरुवातीच्या तारखेपूर्वीची असू शकत नाही.");
+            toInput.value = fromInput.value;
+            handleDatePicked('fixationTo', 'fixationTo_disp');
+        }
+        validateCard3();
+    }
+
     function openModal(modalId) { 
         const modal = document.getElementById(modalId);
         if (modal) modal.classList.remove('hidden');
         if (modalId === 'rulesModal') {
+            updateDateConstraints();
             const withheldVal = document.getElementById('incrementWithheld').value;
             const effectDiv = document.getElementById('withheldEffectDiv');
             if (withheldVal === 'Yes') effectDiv.classList.remove('hidden');
@@ -1951,12 +2015,13 @@
     function validateCard3() {
         const fromDate = document.getElementById('fixationFrom').value;
         const toDate = document.getElementById('fixationTo').value;
+        const joinDate = document.getElementById('empJoinDate').value;
 
         const card = document.getElementById('cardRules');
         const status = document.getElementById('cardRulesStatus');
         const badge = document.getElementById('cardRulesBadge');
 
-        if (fromDate && toDate) {
+        if (fromDate && toDate && (!joinDate || fromDate >= joinDate)) {
             card.classList.remove('card-pending');
             card.classList.add('card-filled');
             status.textContent = "✓ माहिती पूर्ण भरली आहे";
@@ -2724,6 +2789,19 @@
                 return;
             }
 
+            let joinDateObj = parseLocalDate(joinDateInput);
+            let startDate = parseLocalDate(fromDateInput);
+            let endDate = parseLocalDate(toDateInput);
+
+            if (startDate < joinDateObj) {
+                alert("अहवालाची सुरुवातीची तारीख कर्मचाऱ्याच्या नियुक्ती दिनांकापूर्वीची असू शकत नाही.");
+                return;
+            }
+            if (endDate < startDate) {
+                alert("अहवालाची अखेरची तारीख सुरुवातीच्या तारखेपूर्वीची असू शकत नाही.");
+                return;
+            }
+
             globalCalcDataList = [];
 
             let gpMatch = scale.match(/GP\s*(\d+)/i);
@@ -2831,9 +2909,6 @@
             tableBody.innerHTML = "";
 
             let events = [];
-            let startDate = parseLocalDate(fromDateInput);
-            let endDate = parseLocalDate(toDateInput);
-            let joinDateObj = parseLocalDate(joinDateInput);
             let joinMonth = joinDateObj.getMonth();
 
             events.push({
@@ -3087,7 +3162,7 @@
                 }
                 else if (ev.type === 'COMMISSION_7TH') {
                     currentCommission = '7th';
-                    let totalBefore7th = currentBasic; // In 6th, currentBasic is already Pay in Band + Grade Pay
+                    let totalBefore7th = currentBasic;
                     currentLevel = mapGpTo7thLevel(prevGpForSheet);
                     let fitmentResult = fitInMatrix(currentLevel, totalBefore7th * 2.57);
                     let oldB = currentBasic - prevGpForSheet;
@@ -3221,7 +3296,6 @@
                         let oldGP = currentGP;
                         currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
                         
-                        // 🌟 नियम १३ / नियम ११(१) विकल्पानुसार अचूक सूत्र: (३% मूळ वेतनातील वाढ + नवीन ग्रेड पे आणि जुना ग्रेड पे मधील फरक)
                         let inc = Math.ceil((lBasic * 0.03) / 10) * 10;
                         let gpDiff = currentGP - oldGP;
                         currentBasic = lBasic + inc + gpDiff;
@@ -3270,7 +3344,6 @@
                         let oldGP = currentGP;
                         currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
                         
-                        // 🌟 थेट लाभाच्या दिनांकावर फिक्सेशन (3% Increment + GP Difference)
                         let inc = Math.ceil((currentBasic * 0.03) / 10) * 10;
                         let gpDiff = currentGP - oldGP;
                         currentBasic = currentBasic + inc + gpDiff;
