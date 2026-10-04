@@ -321,7 +321,7 @@ body * { visibility: hidden !important; }
 </div>
 </div>
 
-<!-- 🌟 System Health Monitor Floating Card (Exact Root Cause Diagnostic) -->
+<!-- 🌟 System Health Monitor Floating Card (Exact Root Cause Diagnostic for Issued vs Received) -->
 <div id="systemHealthAlertCard" style="display:none; position:fixed; bottom:20px; right:20px; max-width:320px; background:#fff; border-left:4px solid #f57c00; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.2); padding:12px; z-index:3500; animation: fadeInGlow 0.4s ease;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
         <span style="font-size:12.5px; font-weight:800; color:#e65100;" id="healthAlertTitle">⚠️ M.B. DATA WARNING</span>
@@ -1041,12 +1041,28 @@ function refreshAll() {
     }
 }
 
-// ** 🌟 System Health Monitor Background Checker (Exact Root Cause Diagnostic) **
+// ** 🌟 Advanced System Health Monitor (Issued vs Received Master exact string validation) **
 function checkSystemHealth() {
     var uniqueReceived = getUniqueReceivedMBs();
     var activeGiven = getCurrentlyActiveGivenMBs();
     var stock = getAvailableStock();
     
+    var receivedMap = {};
+    uniqueReceived.forEach(function(m) {
+        var no = normalizeMB(m.mbNumber);
+        if (no) receivedMap[no] = true;
+    });
+
+    var missingIssuedList = [];
+    activeGiven.forEach(function(m) {
+        var no = normalizeMB(m.mbNumber);
+        if (no && !receivedMap[no]) {
+            if (!missingIssuedList.includes(m.mbNumber)) {
+                missingIssuedList.push(m.mbNumber);
+            }
+        }
+    });
+
     var totalReceivedCount = uniqueReceived.length;
     var activeGivenCount = activeGiven.length;
     var expectedAvailable = totalReceivedCount - activeGivenCount;
@@ -1055,29 +1071,12 @@ function checkSystemHealth() {
     var alertCard = document.getElementById('systemHealthAlertCard');
     if (!alertCard) return;
 
-    // Check intersection (Issued ∩ Available)
-    var issuedMap = {};
-    activeGiven.forEach(function(m) {
-        var no = (m.mbNumber || '').trim();
-        if (no) issuedMap[no] = true;
-    });
-
-    var overlapList = [];
-    stock.forEach(function(s) {
-        var no = (s.mbNumber || '').trim();
-        if (no && issuedMap[no]) {
-            if (!overlapList.includes(no)) {
-                overlapList.push(no);
-            }
-        }
-    });
-
-    if (currentAvailable !== expectedAvailable || overlapList.length > 0) {
+    if (currentAvailable !== expectedAvailable || missingIssuedList.length > 0) {
         document.getElementById('healthAlertTitle').innerText = '⚠️ M.B. DATA WARNING';
         var warningText = 'Available M.B. मध्ये तफावत आढळली.<br>Expected Available: ' + expectedAvailable + ' | Current Available: ' + currentAvailable + '<br>Difference: ' + Math.abs(currentAvailable - expectedAvailable);
         
-        if (overlapList.length > 0) {
-            warningText += '<br><strong style="color:#d32f2f;">समस्या:</strong> M.B. क्र. <strong>' + overlapList.join(', ') + '</strong> ही Issued आणि Available दोन्हीमध्ये आढळली.';
+        if (missingIssuedList.length > 0) {
+            warningText += '<br><strong style="color:#d32f2f;">Root Cause:</strong> Issued M.B. क्रमांक <strong>' + missingIssuedList.join(', ') + '</strong> Received Master List मध्ये आढळला नाही.';
         }
 
         document.getElementById('healthAlertText').innerHTML = warningText;
@@ -1098,15 +1097,11 @@ function showHealthDetails() {
     var stock = getAvailableStock();
     var expectedAvailable = uniqueReceived.length - activeGiven.length;
     
-    var issuedMap = {};
+    var receivedMap = {};
+    uniqueReceived.forEach(function(m) { receivedMap[normalizeMB(m.mbNumber)] = true; });
+    var missingIssuedList = [];
     activeGiven.forEach(function(m) {
-        var no = (m.mbNumber || '').trim();
-        if (no) issuedMap[no] = true;
-    });
-    var overlapList = [];
-    stock.forEach(function(s) {
-        var no = (s.mbNumber || '').trim();
-        if (no && issuedMap[no]) overlapList.push(no);
+        if (!receivedMap[normalizeMB(m.mbNumber)]) missingIssuedList.push(m.mbNumber);
     });
 
     var msg = 'System Health Details:\n' +
@@ -1115,10 +1110,10 @@ function showHealthDetails() {
               'Expected Available: ' + expectedAvailable + '\n' +
               'Current Available: ' + stock.length;
               
-    if (overlapList.length > 0) {
-        msg += '\n\nOverlap Found (Issued & Available both): ' + overlapList.join(', ');
+    if (missingIssuedList.length > 0) {
+        msg += '\n\nRoot Cause Found:\nIssued M.B. "' + missingIssuedList.join(', ') + '" is NOT present in Received Master List!';
     } else {
-        msg += '\n\nNo direct overlap found between Issued and Available.';
+        msg += '\n\nAll issued MBs exist in Received Master.';
     }
 
     showAlert(msg, 'WARNING');
@@ -1140,7 +1135,7 @@ function closeModule(id) {
     refreshMBDashboard(); 
 }
 
-// ** 🌟 EXACT M.B. NUMBER MATCHING RULE (No zero stripping, strict string comparison) **
+// ** 🌟 EXACT M.B. NUMBER MATCHING RULE (Strict String Match, no normalization/zero stripping) **
 function normalizeMB(val) {
     if (!val) return '';
     return val.toString().trim();
@@ -2502,7 +2497,7 @@ function sacTriggerReceiveMB() {
     var todayISO = new Date().toISOString().slice(0, 10);
     var todayDMY = formatDateToDMY(todayISO);
 
-    var confirmMsg = "⚠️️ CONFIRM RECEIVE\n\n" +
+    var confirmMsg = "⚠️ CONFIRM RECEIVE\n\n" +
     "M.B. क्रमांक: " + currentSacMB + "\n" +
     "धारक: " + holder + "\n" +
     "दिनांक: " + todayDMY + "\n\n" +
@@ -3699,7 +3694,7 @@ function deleteSelectedData() {
     if (selected.length === 0) return showAlert('किमान एक पर्याय निवडा.', 'WARNING');
     if (confirm('निवडलेली माहिती कायमची नष्ट करायची का?')) {
         selected.forEach(key => localStorage.removeItem(key));
-        showAlert('निवडलेली माहिती यशस्वीरित्या हटवली!', 'SUCCESS'); 
+        showAlert('निवडलेली माहिती यशस्वीरीत्या हटवली!', 'SUCCESS'); 
         refreshAll(); 
         closeModule('settingsModal');
     }
