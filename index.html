@@ -126,7 +126,7 @@ letter-spacing: 0.5px;
 .summary-title { font-size: 13px; font-weight: 700; text-align: center; color: #0d47a1; margin-bottom: 8px; }
 .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
-/* 🌟 Reference GIF Based Moving Color Border Light Effect on Stat Cards */
+/* 🌟 Reference GIF 1 Based Distinct Moving Color Border Light Effect on Stat Cards */
 .stat-card { 
 border: none !important; 
 border-radius: 8px; 
@@ -142,7 +142,7 @@ box-shadow: 0 3px 10px rgba(0,0,0,0.08);
 }
 .stat-card:hover { transform: scale(1.02); }
 
-/* Card 1: मिळालेले M.B. -> Green / Cyan / Lime Moving Border Flow */
+/* Card 1: एकूण M.B. -> Green / Cyan / Lime Moving Border Flow */
 .stat-card:nth-child(1) {
 background: linear-gradient(#fcfdfe, #fcfdfe) padding-box,
             linear-gradient(90deg, #00c853, #00e5ff, #76ff03, #00c853) border-box;
@@ -560,7 +560,7 @@ body * { visibility: hidden !important; }
 <div class="card-grid">
 <div class="stat-card" onclick="openQuickInfoModal('RECEIVED'); event.stopPropagation();">
     <div class="stat-num" id="countReceivedMB">0</div>
-    <div class="stat-label">मिळालेली M.B.</div>
+    <div class="stat-label">एकूण M.B.</div>
 </div>
 <div class="stat-card" onclick="openQuickInfoModal('GIVEN'); event.stopPropagation();">
     <div class="stat-num" id="countGivenMB">0</div>
@@ -1044,12 +1044,14 @@ function refreshAll() {
 // ** 🌟 System Health Monitor Background Checker (Problem असेल तरच दिसणार) **
 function checkSystemHealth() {
     var allMBs = getData('mb_records');
-    var uniqueMBMap = {};
+    var uniqueReceivedMap = {};
     allMBs.forEach(function(m) {
-        var no = normalizeMB(m.mbNumber);
-        if (no) uniqueMBMap[no] = true;
+        if (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी') {
+            var no = normalizeMB(m.mbNumber);
+            if (no) uniqueReceivedMap[no] = true;
+        }
     });
-    var totalReceived = Object.keys(uniqueMBMap).length;
+    var totalReceived = Object.keys(uniqueReceivedMap).length;
     var activeGiven = getCurrentlyActiveGivenMBs();
     var stock = getAvailableStock();
     
@@ -1120,34 +1122,30 @@ function getLatestMBStatus(mbNumber, excludeIndex = -1) {
     return null;
 }
 
-function getAvailableStock(excludeIndex = -1) {
+// ** 🌟 Unique Received M.B. Collection (Strict Unique Logic) **
+function getUniqueReceivedMBs(excludeIndex = -1) {
     var allMBs = getData('mb_records');
-    var mbDetailsMap = {};
+    var uniqueMap = {};
     allMBs.forEach(function(m, i) {
         if (i === excludeIndex) return;
-        var no = (m.mbNumber || '').trim();
-        if (!no) return;
-        mbDetailsMap[no] = {
-            mbNumber: no,
-            size: m.size || 'लहान M.B.',
-            date: m.date
-        };
-    });
-
-    var activeGiven = getCurrentlyActiveGivenMBs(excludeIndex);
-    var issuedMap = {};
-    activeGiven.forEach(function(m) {
-        var no = (m.mbNumber || '').trim();
-        if (no) issuedMap[no] = true;
-    });
-
-    var available = [];
-    for (var no in mbDetailsMap) {
-        if (!issuedMap[no]) {
-            available.push(mbDetailsMap[no]);
+        var isRcv = (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी');
+        if (isRcv) {
+            var no = (m.mbNumber || '').trim();
+            var norm = normalizeMB(no);
+            if (norm && !uniqueMap[norm]) {
+                uniqueMap[norm] = {
+                    mbNumber: no,
+                    size: m.size || 'लहान M.B.',
+                    date: m.date
+                };
+            }
         }
+    });
+    var list = [];
+    for (var k in uniqueMap) {
+        list.push(uniqueMap[k]);
     }
-    return available;
+    return list;
 }
 
 function getCurrentlyActiveGivenMBs(excludeIndex = -1) {
@@ -1157,18 +1155,45 @@ function getCurrentlyActiveGivenMBs(excludeIndex = -1) {
     allMBs.forEach(function(m, i) {
         if (i === excludeIndex) return;
         var no = (m.mbNumber || '').trim();
-        if (no) latestMap[no] = m;
+        var norm = normalizeMB(no);
+        if (norm) {
+            latestMap[norm] = m;
+        }
     });
 
-    var activeGivenList = [];
-    for (var no in latestMap) {
-        var item = latestMap[no];
+    var activeGivenMap = {};
+    for (var norm in latestMap) {
+        var item = latestMap[norm];
         var isGiven = (item.actionType === 'दिलेली M.B.' || item.actionType === 'दिलेली एमबी');
         if (isGiven) {
-            activeGivenList.push(item);
+            activeGivenMap[norm] = item;
         }
     }
-    return activeGivenList;
+
+    var list = [];
+    for (var k in activeGivenMap) {
+        list.push(activeGivenMap[k]);
+    }
+    return list;
+}
+
+function getAvailableStock(excludeIndex = -1) {
+    var received = getUniqueReceivedMBs(excludeIndex);
+    var activeGiven = getCurrentlyActiveGivenMBs(excludeIndex);
+    var issuedMap = {};
+    activeGiven.forEach(function(m) {
+        var norm = normalizeMB(m.mbNumber);
+        if (norm) issuedMap[norm] = true;
+    });
+
+    var available = [];
+    received.forEach(function(rec) {
+        var norm = normalizeMB(rec.mbNumber);
+        if (!issuedMap[norm]) {
+            available.push(rec);
+        }
+    });
+    return available;
 }
 
 function getCurrentlyHeldMBsByJE(jeName) {
@@ -1187,7 +1212,7 @@ function getCurrentlyHeldMBsByJE(jeName) {
     return heldMBs;
 }
 
-// ** 🌟 Number Count Animation (Slightly Slower Smooth Speed as requested) **
+// ** 🌟 Number Count Animation (Smooth Speed) **
 function animateNumberCount(elementId, finalVal) {
     var el = document.getElementById(elementId);
     if (!el) return;
@@ -1196,7 +1221,7 @@ function animateNumberCount(elementId, finalVal) {
         el.innerText = 0;
         return;
     }
-    var duration = 1600; // milliseconds (slower, smooth pace)
+    var duration = 1600;
     var steps = 35;
     var increment = finalVal / steps;
     var stepTime = duration / steps;
@@ -1217,14 +1242,6 @@ function refreshMBDashboard() {
     var tbody = document.getElementById('mbListBody'); 
     if(!tbody) return;
     tbody.innerHTML = ''; 
-
-    // ✅ युनिक M.B. नंबर मोजणी (Consistent Unique Counting Logic)
-    var uniqueMBMap = {};
-    list.forEach(function(m) {
-        var no = normalizeMB(m.mbNumber);
-        if (no) uniqueMBMap[no] = true;
-    });
-    var rcvCount = Object.keys(uniqueMBMap).length;
 
     list.forEach(function(m, idx) {
         var displaySource = m.receivedFrom || '-';
@@ -1247,15 +1264,16 @@ function refreshMBDashboard() {
         '<td class="action-cell"><button class="btn-action" style="background:#2e7d32;" onclick="editMB(' + idx + ')">Edit</button><button class="btn-action" style="background:#d32f2f;" onclick="deleteMB(' + idx + ')">Delete</button></td></tr>';
     });
 
+    var uniqueReceived = getUniqueReceivedMBs();
     var activeGiven = getCurrentlyActiveGivenMBs();
-    var availableCount = rcvCount - activeGiven.length;
+    var stock = getAvailableStock();
 
-    if(document.getElementById('countReceivedMB')) animateNumberCount('countReceivedMB', rcvCount);
+    if(document.getElementById('countReceivedMB')) animateNumberCount('countReceivedMB', uniqueReceived.length);
     if(document.getElementById('countGivenMB')) animateNumberCount('countGivenMB', activeGiven.length);
-    if(document.getElementById('countAvailableMB')) animateNumberCount('countAvailableMB', availableCount);
+    if(document.getElementById('countAvailableMB')) animateNumberCount('countAvailableMB', stock.length);
 }
 
-// ** 🌟 Smart M.B. Number Assistant (Validation Text) **
+// ** 🌟 Smart M.B. Number Assistant (Strict Duplicate Block & Real-time Warning) **
 function checkRealTimeMBInput(input) {
     var val = (input.value || '').trim();
     var statusEl = document.getElementById('mbRealtimeStatus');
@@ -1276,14 +1294,16 @@ function checkRealTimeMBInput(input) {
     var similarList = [];
 
     allMBs.forEach(function(m) {
-        var mNo = (m.mbNumber || '').trim();
-        var normNo = normalizeMB(mNo);
-        if (normNo === normVal) {
-            exactMatch = true;
-            matchSize = m.size || 'लहान M.B.';
-        } else if (normNo.includes(normVal) || normVal.includes(normNo)) {
-            if (!similarList.includes(mNo)) {
-                similarList.push(mNo);
+        if (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी') {
+            var mNo = (m.mbNumber || '').trim();
+            var normNo = normalizeMB(mNo);
+            if (normNo === normVal) {
+                exactMatch = true;
+                matchSize = m.size || 'लहान M.B.';
+            } else if (normNo.includes(normVal) || normVal.includes(normNo)) {
+                if (!similarList.includes(mNo)) {
+                    similarList.push(mNo);
+                }
             }
         }
     });
@@ -1365,37 +1385,25 @@ function printA4Document(content, optionalFileName) {
 }
 
 function printMBReport() {
-    var list = getData('mb_records');
+    var list = getUniqueReceivedMBs();
     if (list.length === 0) return showAlert('कोणतीही M.B. नोंद उपलब्ध नाही.', 'WARNING');
     var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
     var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;">' +
-    '<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">मोजमाप पुस्तिका (M.B.) नोंद अहवाल</h2></div>' +
-    '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>M.B. नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div>' +
+    '<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">एकूण मोजमाप पुस्तिका (M.B.) नोंद अहवाल</h2></div>' +
+    '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>एकूण M.B. नोंदवही</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div>' +
     '</div>' +
-    '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>M.B. हस्तांतरण</th></tr></thead><tbody>';
+    '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>सद्यस्थिती</th></tr></thead><tbody>';
 
     list.forEach(function(m, i) {
-        var displaySource = m.receivedFrom || '-';
-        if (displaySource.includes('भंडारपाल') || displaySource.includes('भंडारपाळ') || displaySource.includes('नवीन')) displaySource = 'भंडारपाल कडून प्राप्त';
-        if (displaySource.startsWith('दिलेली M.B. :')) {
-            var parts = displaySource.split(':');
-            if (parts.length > 1) {
-                var sub = parts[1].trim();
-                if (sub.startsWith('JE')) {
-                    var jeName = sub.replace(/JE\s*\((.*?)\)/, '$1').trim();
-                    displaySource = 'M.B. ' + jeName + ' यांना दिली';
-                } else if (sub.startsWith('विभागीय कार्यालय')) {
-                    var officeName = sub.replace(/विभागीय कार्यालय\s*\((.*?)\)/, '$1').trim();
-                    displaySource = 'M.B. विभागीय कार्यालय (' + officeName + ') यांना दिली';
-                }
-            }
-        }
+        var statusObj = getLatestMBStatus(m.mbNumber);
+        var isAvail = getAvailableStock().some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(m.mbNumber); });
+        var statusText = isAvail ? "कार्यालयात उपलब्ध" : "श्री. " + (statusObj ? (statusObj.detail || statusObj.source) : '') + " यांच्याकडे";
         var formattedDate = m.date ? formatDateToDMY(m.date) : '-';
-        html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formattedDate + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + displaySource + '</td></tr>';
+        html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formattedDate + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + statusText + '</td></tr>';
     });
 
     html += '</tbody></table>';
-    printA4Document(html, 'MB_Register_Report.pdf');
+    printA4Document(html, 'Total_MB_Report.pdf');
 }
 
 var currentQuickModalType = '';
@@ -1461,41 +1469,27 @@ function onQuickFilterChange() {
 }
 
 function renderQuickModalContent(sizeFilter, mainSource, jeSubVal) {
-    var allMBs = getData('mb_records');
+    var uniqueReceived = getUniqueReceivedMBs();
     var stock = getAvailableStock();
     var activeGiven = getCurrentlyActiveGivenMBs();
     var title = "", listHTML = "";
 
     if (currentQuickModalType === 'RECEIVED') {
-        var rcvList = allMBs.filter(function(m){ return m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी'; });
+        var rcvList = uniqueReceived;
         if (sizeFilter !== 'ALL') rcvList = rcvList.filter(function(m){ return m.size === sizeFilter; });
-
-        if (mainSource !== 'ALL') {
-            if (mainSource === 'विभागीय कार्यालय') {
-                rcvList = rcvList.filter(function(m){ return m.receivedSource && m.receivedSource.includes('विभागीय कार्यालय'); });
-            } else if (mainSource === 'भंडारपाल') {
-                rcvList = rcvList.filter(function(m){ return m.receivedSource && (m.receivedSource.includes('भंडारपाल') || m.receivedSource.includes('भंडारपाळ') || m.receivedSource.includes('नवीन')); });
-            } else if (mainSource === 'JE') {
-                if (jeSubVal !== 'सर्व JE') {
-                    rcvList = rcvList.filter(function(m){ return m.receivedDetail && m.receivedDetail.toLowerCase() === jeSubVal.toLowerCase(); });
-                } else {
-                    var jeNames = getData('je_records').map(function(j){ return j.name.toLowerCase(); });
-                    rcvList = rcvList.filter(function(m){ return m.receivedDetail && jeNames.some(function(name){ return m.receivedDetail.toLowerCase().includes(name); }); });
-                }
-            }
-        }
 
         var smallCount = rcvList.filter(function(m){ return m.size === 'लहान M.B.'; }).length;
         var bigCount = rcvList.filter(function(m){ return m.size === 'मोठी M.B.'; }).length;
-        title = "मिळालेली M.B. (एकूण: " + rcvList.length + " | लहान: " + smallCount + ", मोठी: " + bigCount + ")";
+        title = "एकूण M.B. (एकूण: " + rcvList.length + " | लहान: " + smallCount + ", मोठी: " + bigCount + ")";
 
         if (rcvList.length === 0) listHTML = '<p style="text-align:center; padding:15px; color:#666;">कोणतीही नोंद नाही.</p>';
         else {
-            listHTML = '<table class="data-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>कोणाकडून मिळाली</th><th style="text-align:center;">Action</th></tr></thead><tbody>';
+            listHTML = '<table class="data-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>सद्यस्थिती</th></tr></thead><tbody>';
             rcvList.forEach(function(m, i) {
-                var actualIdx = allMBs.indexOf(m);
-                listHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formatDateToDMY(m.date) + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + (m.receivedSource || m.receivedFrom || '-') + '</td>' +
-                '<td class="action-cell"><button class="btn-action" style="background:#2e7d32; padding:2px 5px; font-size:9.5px;" onclick="closeQuickInfoModal(); openModule(\'mbModal\'); editMB(' + actualIdx + ')">Edit</button><button class="btn-action" style="background:#d32f2f; padding:2px 5px; font-size:9.5px;" onclick="quickPopupDelete(' + actualIdx + ')">Delete</button></td></tr>';
+                var statusObj = getLatestMBStatus(m.mbNumber);
+                var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(m.mbNumber); });
+                var statusText = isAvail ? "कार्यालयात उपलब्ध" : "श्री. " + (statusObj ? (statusObj.detail || statusObj.source) : '') + " यांच्याकडे";
+                listHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formatDateToDMY(m.date) + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + statusText + '</td></tr>';
             });
             listHTML += '</tbody></table>';
         }
@@ -1503,31 +1497,15 @@ function renderQuickModalContent(sizeFilter, mainSource, jeSubVal) {
         var givenList = activeGiven;
         if (sizeFilter !== 'ALL') givenList = givenList.filter(function(m){ return m.size === sizeFilter; });
 
-        if (mainSource !== 'ALL') {
-            if (mainSource === 'विभागीय कार्यालय') {
-                givenList = givenList.filter(function(m){ return m.receivedSource && m.receivedSource.includes('विभागीय कार्यालय'); });
-            } else if (mainSource === 'JE') {
-                if (jeSubVal !== 'सर्व JE') {
-                    givenList = givenList.filter(function(m){ return m.receivedDetail && m.receivedDetail.toLowerCase() === jeSubVal.toLowerCase(); });
-                } else {
-                    var jeNames = getData('je_records').map(function(j){ return j.name.toLowerCase(); });
-                    givenList = givenList.filter(function(m){ return m.receivedDetail && jeNames.some(function(name){ return m.receivedDetail.toLowerCase().includes(name); }); });
-                }
-            }
-        }
-
         var smallCount = givenList.filter(function(m){ return m.size === 'लहान M.B.'; }).length;
         var bigCount = givenList.filter(function(m){ return m.size === 'मोठी M.B.'; }).length;
         title = "सध्या दिलेली M.B. (सद्यस्थिती: " + givenList.length + " | लहान: " + smallCount + ", मोठी: " + bigCount + ")";
 
         if (givenList.length === 0) listHTML = '<p style="text-align:center; padding:15px; color:#666;">कोणतीही नोंद नाही.</p>';
         else {
-            listHTML = '<table class="data-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>कोणाला दिली (Current Holder)</th><th style="text-align:center;">Action</th></tr></thead><tbody>';
+            listHTML = '<table class="data-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>कोणाला दिली (Current Holder)</th></tr></thead><tbody>';
             givenList.forEach(function(m, i) {
-                var statusObj = getLatestMBStatus(m.mbNumber);
-                var actualIdx = statusObj ? statusObj.index : -1;
-                listHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formatDateToDMY(m.date) + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + (m.receivedDetail || m.receivedFrom || '-') + '</td>' +
-                '<td class="action-cell"><button class="btn-action" style="background:#2e7d32; padding:2px 5px; font-size:9.5px;" onclick="closeQuickInfoModal(); openModule(\'mbModal\'); editMB(' + actualIdx + ')">Edit</button><button class="btn-action" style="background:#d32f2f; padding:2px 5px; font-size:9.5px;" onclick="quickPopupDelete(' + actualIdx + ')">Delete</button></td></tr>';
+                listHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formatDateToDMY(m.date) + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + (m.receivedDetail || m.receivedFrom || '-') + '</td></tr>';
             });
             listHTML += '</tbody></table>';
         }
@@ -1539,29 +1517,15 @@ function renderQuickModalContent(sizeFilter, mainSource, jeSubVal) {
         title = "उपलब्ध M.B. स्टॉक (एकूण: " + stock.length + " | लहान: " + smallStock + ", मोठी: " + bigStock + ")";
         if (availableList.length === 0) listHTML = '<p style="text-align:center; padding:15px; color:#666;">सध्या एकही M.B. उपलब्ध नाही.</p>';
         else {
-            listHTML = '<table class="data-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>उपलब्ध दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>स्थिती</th><th style="text-align:center;">Action</th></tr></thead><tbody>';
+            listHTML = '<table class="data-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>उपलब्ध दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>स्थिती</th></tr></thead><tbody>';
             availableList.forEach(function(s, i) {
-                var statusObj = getLatestMBStatus(s.mbNumber);
-                var actualIdx = statusObj ? statusObj.index : -1;
-                listHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formatDateToDMY(s.date) + '</td><td><strong>' + s.mbNumber + '</strong></td><td>' + s.size + '</td><td style="color:green; font-weight:700;">उपलब्ध</td>' +
-                '<td class="action-cell"><button class="btn-action" style="background:#2e7d32; padding:2px 5px; font-size:9.5px;" onclick="closeQuickInfoModal(); openModule(\'mbModal\'); editMB(' + actualIdx + ')">Edit</button><button class="btn-action" style="background:#d32f2f; padding:2px 5px; font-size:9.5px;" onclick="quickPopupDelete(' + actualIdx + ')">Delete</button></td></tr>';
+                listHTML += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + formatDateToDMY(s.date) + '</td><td><strong>' + s.mbNumber + '</strong></td><td>' + s.size + '</td><td style="color:green; font-weight:700;">उपलब्ध</td></tr>';
             });
             listHTML += '</tbody></table>';
         }
     }
     document.getElementById('quickModalTitle').innerText = title;
     document.getElementById('quickModalBody').innerHTML = listHTML;
-}
-
-function quickPopupDelete(idx) {
-    if (confirm('ही M.B. Entry Delete करायची आहे का?')) {
-        var list = getData('mb_records');
-        list.splice(idx, 1);
-        setData('mb_records', list);
-        refreshAll();
-        onQuickFilterChange();
-        showAlert('M.B. नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
-    }
 }
 
 function closeQuickInfoModal() { 
@@ -1760,6 +1724,18 @@ function saveOrUpdateMB() {
         no = document.getElementById('newMBNo').value.trim();
         if (!no) return showAlert('कृपया M.B. क्रमांक भरा.', 'WARNING');
 
+        // ✅ Strict Duplicate Check for Received MB on Save/Add
+        if (idx === -1) {
+            var allMBs = getData('mb_records');
+            var normNo = normalizeMB(no);
+            var alreadyExists = allMBs.some(function(m) {
+                return (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी') && normalizeMB(m.mbNumber) === normNo;
+            });
+            if (alreadyExists) {
+                return showAlert('⚠️ M.B. क्रमांक ' + no + ' आधीपासून उपलब्ध आहे. Duplicate Entry करता येणार नाही.', 'ERROR');
+            }
+        }
+
         var recType = document.getElementById('mbReceivedType').value;
         if (!recType) return showAlert('कृपया नवीन किंवा चालू पर्याय निवडा.', 'WARNING');
 
@@ -1779,21 +1755,6 @@ function saveOrUpdateMB() {
                 if (!subDetail) return showAlert('कृपया नाव टाईप करा.');
             }
             srcText = chalooSrc + ' (' + subDetail + ')';
-        }
-    }
-
-    // Save time final duplicate check for received MB
-    if (actionType === 'मिळालेली M.B.') {
-        var allMBs = getData('mb_records');
-        var normNo = normalizeMB(no);
-        var isExactDuplicate = false;
-        allMBs.forEach(function(m, i) {
-            if (i !== idx && normalizeMB(m.mbNumber) === normNo && (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी')) {
-                isExactDuplicate = true;
-            }
-        });
-        if (isExactDuplicate && idx === -1) {
-            return showAlert('हा M.B. क्रमांक आधीपासून उपलब्ध आहे. Duplicate Entry करता येणार नाही.', 'ERROR');
         }
     }
 
@@ -2134,7 +2095,7 @@ function onDynamicSelect1Change() {
         '<option value="ALL">सर्व M.B. (All M.B.)</option>' +
         '<option value="AVAILABLE">उपलब्ध M.B. (Available)</option>' +
         '<option value="GIVEN">वाटप केलेली M.B. (Given)</option>' +
-        '<option value="RECEIVED">मिळालेली M.B. (Received)</option>';
+        '<option value="RECEIVED">एकूण M.B. (Received)</option>';
     } else if(grp2) {
         grp2.style.display = 'none';
     }
@@ -2225,7 +2186,7 @@ function generateGeneralReport() {
     var isoTo = normalizeDateToISO(tDate);
 
     if (isoFrom > isoTo) {
-        return showAlert("'दिनांक पासून' हा दिनांक 'दिनांक पर्यंत' ನಂತರचा असू शकत नाही!", 'ERROR');
+        return showAlert("'दिनांक पासून' हा दिनांक 'दिनांक पर्यंत' नंतरचा असू शकत नाही!", 'ERROR');
     }
 
     var mainCat = document.getElementById('repMainCategory').value;
@@ -2334,7 +2295,7 @@ function showSmartSearchResultModal(query) {
             person = person.replace(/^श्री.?\s*/i, '');
             statusText = '<span style="color:#e65100; font-weight:700;">श्री. ' + person + ' यांच्याकडे</span>';
         } else {
-            statusText = '<span style="color:#0d47a1; font-weight:600;">मिळालेली M.B.</span>';
+            statusText = '<span style="color:#0d47a1; font-weight:600;">एकूण M.B.</span>';
         }
 
         tableHTML += '<tr>' +
@@ -2633,6 +2594,9 @@ function sacOpenIssueForm() {
     var jeOptions = '<option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option>';
     jes.forEach(function(j) { jeOptions += '<option value="' + j.name + '">' + j.name + '</option>'; });
 
+    var holder = currentSacStatusObj.detail || currentSacStatusObj.source || "";
+    var cleanHolder = holder.replace(/^श्री\.?\s*/i, '').trim();
+
     var html = `
     <div style="font-size:13px; font-weight:800; color:#2e7d32; border-bottom:1px solid #2e7d32; padding-bottom:4px; margin-bottom:8px;">📤 M.B. वाटप (Issue / Give)</div>
 
@@ -2693,7 +2657,10 @@ function sacConfirmIssueExecution() {
         srcText = "M.B. विभागीय कार्यालय (" + holder + ") यांना दिली";
     }
 
-    if (confirm("M.B. क्र. " + currentSacMB + " ही श्री. " + holder + " यांना Issue करायची का?")) {
+    var cleanHolderName = holder.replace(/^श्री\.?\s*/i, '').trim();
+    var customConfirmMsg = "M.B. क्र. " + currentSacMB + " ही " + cleanHolderName + " यांना Issue करायची का?";
+
+    if (confirm(customConfirmMsg)) {
         var list = getData('mb_records');
         list.push({
             actionType: "दिलेली M.B.",
@@ -2714,7 +2681,7 @@ function sacConfirmIssueExecution() {
         }
 
         refreshAll();
-        showAlert("✅ M.B. क्र. " + currentSacMB + " चे श्री. " + holder + " यांना वाटप यशस्वी झाले आहे.", "SUCCESS");
+        showAlert("✅ M.B. क्र. " + currentSacMB + " चे " + cleanHolderName + " यांना वाटप यशस्वी झाले आहे.", "SUCCESS");
         openSmartActionCenter(currentSacMB);
     }
 }
@@ -2904,10 +2871,8 @@ function generateAdvancedMBReport(sizeChoice, finalType, subTarget, subVal, fDat
             return true;
         });
     } else if (finalType === 'RECEIVED') {
-        reportTitle = "मिळालेली मोजमाप पुस्तिका अहवाल";
-        filtered = allMBs.filter(function(m) {
-            var isRcv = (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी');
-            if (!isRcv) return false;
+        reportTitle = "एकूण मोजमाप पुस्तिका अहवाल";
+        filtered = getUniqueReceivedMBs().filter(function(m) {
             var itemDateISO = normalizeDateToISO(m.date);
             if (!itemDateISO) return false;
             if (itemDateISO < isoFrom || itemDateISO > isoTo) return false;
@@ -2916,15 +2881,7 @@ function generateAdvancedMBReport(sizeChoice, finalType, subTarget, subVal, fDat
             return true;
         });
     } else {
-        var latestMap = {};
-        allMBs.forEach(function(m) {
-            var no = (m.mbNumber || m.mbNo || '').trim();
-            if (no) latestMap[no] = m;
-        });
-        var uniqueMBs = [];
-        for (var k in latestMap) { uniqueMBs.push(latestMap[k]); }
-
-        filtered = uniqueMBs.filter(function(m) {
+        filtered = getUniqueReceivedMBs().filter(function(m) {
             var itemDateISO = normalizeDateToISO(m.date);
             if (!itemDateISO) return false;
             if (itemDateISO < isoFrom || itemDateISO > isoTo) return false;
@@ -2961,9 +2918,9 @@ function generateAdvancedMBReport(sizeChoice, finalType, subTarget, subVal, fDat
     filtered.forEach(function(item, idx) {
         var mbNo = item.mbNumber || item.mbNo;
         var size = item.size || 'लहान M.B.';
-        var assignedPerson = item.receivedDetail || item.receivedSource || 'संबंधित';
-        var cleanPersonName = assignedPerson.replace(/^श्री.?\s*/i, '');
-        var currentStatus = (finalType === 'AVAILABLE') ? 'उपलब्ध' : ("श्री " + cleanPersonName + " यांच्याकडे आहे");
+        var statusObj = getLatestMBStatus(mbNo);
+        var isAvail = getAvailableStock().some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(mbNo); });
+        var currentStatus = isAvail ? 'कार्यालयात उपलब्ध' : ("श्री " + (statusObj ? (statusObj.detail || statusObj.source) : '') + " यांच्याकडे");
 
         html += '<tr><td style="text-align:center;">' + (idx + 1) + '</td><td>' + formatDateToDMY(item.date) + '</td><td><strong>' + mbNo + '</strong></td><td style="text-align:center;">' + size + '</td><td>' + currentStatus + '</td></tr>';
     });
@@ -3104,7 +3061,7 @@ function saveAssign() {
     if (!isAvailable) {
         var lastStatus = getLatestMBStatus(mb);
         var holder = lastStatus ? (lastStatus.detail || lastStatus.source || 'इतर व्यक्ती') : 'इतर व्यक्ती';
-        return showAlert('⚠️ M.B. क्र. ' + mb + ' वाटप करता आली नाही.\n\nकारण: ही M.B. सध्या ' + holder + ' यांच्याकडे दिलेली आहे.\n\nकृती: प्रथम ती Receive करा, त्यानंतरच Assign करता येईल.', 'ERROR');
+        return showAlert('⚠️️ M.B. क्र. ' + mb + ' वाटप करता आली नाही.\n\nकारण: ही M.B. सध्या ' + holder + ' यांच्याकडे दिलेली आहे.\n\nकृती: प्रथम ती Receive करा, त्यानंतरच Assign करता येईल.', 'ERROR');
     }
 
     var stockMB = stock.find(function(s){ return s.mbNumber === mb; });
@@ -3675,7 +3632,7 @@ function restoreBackup(evt) {
 
             if(d.savedPayFixationsList) setData('savedPayFixationsList', d.savedPayFixationsList);
 
-            showAlert('M.B. आणि Pay Fixation चा संपूर्ण डेटा यशस्वीरीत्या पूर्ववत (Restore) झाला!', 'SUCCESS'); 
+            showAlert('M.B. आणि Pay Fixation साठीचा संपूर्ण डेटा यशस्वीरीत्या पूर्ववत (Restore) झाला!', 'SUCCESS'); 
             refreshAll(); 
             closeBackupModal();
         } catch(err) { showAlert('चुकीची फाईल किंवा फॉरमॅट. कृपया वैध JSON फाईल अपलोड करा.', 'ERROR'); }
