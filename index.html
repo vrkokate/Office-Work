@@ -82,8 +82,27 @@ letter-spacing: 0.5px;
 .btn-setting { background: linear-gradient(180deg, #c2185b, #880e4f); border: 1.5px solid #ff80ab; }
 
 .center-stage { position: relative; text-align: center; padding: 5px 0; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 480px; margin: 0 auto; }
-.suvichar-running-box { width: 100%; margin: 8px 0 12px 0; overflow: hidden; white-space: nowrap; padding: 0 10px; }
-.suvichar-text { display: inline-block; font-size: 13.5px; font-weight: 800; color: #00e5ff; text-shadow: 0 0 8px rgba(0,229,255,0.6); }
+
+/* 🌟 नवीन सुंदर संस्कृत श्लोक निऑन ग्लो डिस्प्ले स्टाइल */
+.suvichar-running-box { 
+width: 100%; 
+margin: 12px 0 16px 0; 
+padding: 0 15px; 
+text-align: center;
+}
+.sanskrit-shloka-box {
+display: inline-block;
+font-size: 14.5px;
+font-weight: 800;
+color: #00e5ff;
+text-shadow: 0 0 10px rgba(0,229,255,0.7), 0 0 20px rgba(0,229,255,0.4);
+line-height: 1.8;
+letter-spacing: 0.5px;
+word-spacing: 1px;
+}
+.sanskrit-shloka-box span {
+display: block;
+}
 
 .podium-stage-box { position: relative; width: 280px; height: 280px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
 .avatar-on-podium { position: relative; z-index: 3; width: 170px; height: 170px; border-radius: 50%; object-fit: cover; object-position: center 10%; border: 3px solid #00e5ff; box-shadow: 0 0 22px #00e5ff; background: #010a14; margin-bottom: -12px; }
@@ -498,11 +517,12 @@ body * { visibility: hidden !important; }
 </div>
 
 <div class="center-stage">
-<!-- फिरता स्वागत संदेश बॉक्स (Welcome Message Animation) -->
+<!-- 🌟 संस्कृत श्लोक Neon Glow डिस्प्ले (जुना स्वागत संदेश काढून टाकला आहे) -->
 <div class="suvichar-running-box">
-<marquee behavior="scroll" direction="left" scrollamount="4" scrolldelay="0">
-<span class="suvichar-text" id="dynamicSuvichar">✨ मी विठ्ठल रघुनाथ कोकाटे, आपले सर्वांचे या प्रणालीमध्ये मनःपूर्वक स्वागत करीत आहे. या प्रणालीचा सहज, सुरक्षित आणि कार्यक्षम उपयोग करून आपल्या कामाचा अधिक सुलभ व परिणामकारक लाभ घ्यावा. ✨</span>
-</marquee>
+<div class="sanskrit-shloka-box">
+<span>विद्या वितर्को विज्ञानं स्मृतिस्तत्परता क्रिया ।</span>
+<span>यस्यैते षड्गुणास्तस्य नासाध्यमतिवर्तते ॥</span>
+</div>
 </div>
 <div class="podium-stage-box">
 <img src="home-bg.jpg" onerror="this.onerror=null; this.src='1000320439_2.png';" class="avatar-on-podium" alt="User Photo">
@@ -931,13 +951,6 @@ function closeBackupModal() {
     if(modal) modal.style.display = 'none'; 
 }
 
-const welcomeMessageText = "✨ मी विठ्ठल रघुनाथ कोकाटे, आपले सर्वांचे या प्रणालीमध्ये मनःपूर्वक स्वागत करीत आहे. या प्रणालीचा सहज, सुरक्षित आणि कार्यक्षम उपयोग करून आपल्या कामाचा अधिक सुलभ व परिणामकारक लाभ घ्यावा. ✨";
-
-function updateHourlySuvichar() {
-    var suvicharEl = document.getElementById('dynamicSuvichar');
-    if (suvicharEl) suvicharEl.innerText = welcomeMessageText;
-}
-
 function getData(key) { 
     try {
         return JSON.parse(localStorage.getItem(key) || '[]'); 
@@ -1017,7 +1030,6 @@ function showDigitalHub() {
 
 window.onload = function() {
     try {
-        updateHourlySuvichar();
         var fDate = document.getElementById('repFromDate');
         var tDate = document.getElementById('repToDate');
         if (fDate) checkDatePlaceholder(fDate);
@@ -2421,7 +2433,7 @@ function confirmPermanentDeleteFromSearch(mbNo) {
         if (normalizeMB(b.mbNo) === targetMB) billRefCount++;
     });
 
-    var impactMsg = "⚠️ PERMANENT DELETE IMPACT SCAN\n\n" +
+    var impactMsg = "⚠️️ PERMANENT DELETE IMPACT SCAN\n\n" +
                     "M.B. क्रमांक: " + cleanMB + "\n\n" +
                     "• Received Entries: " + receivedCount + "\n" +
                     "• Issued/Transaction Entries: " + issuedCount + "\n" +
@@ -3800,7 +3812,7 @@ function deleteSelectedData() {
     if (selected.length === 0) return showAlert('किमान एक पर्याय निवडा.', 'WARNING');
     if (confirm('निवडलेली माहिती कायमची नष्ट करायची का?')) {
         selected.forEach(key => localStorage.removeItem(key));
-        showAlert('निवडलेली माहिती यशस्वीरित्या हटवली!', 'SUCCESS'); 
+        showAlert('निवडलेली माहिती यशस्वीरीत्या हटवली!', 'SUCCESS'); 
         refreshAll(); 
         closeModule('settingsModal');
     }
