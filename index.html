@@ -82,8 +82,33 @@ letter-spacing: 0.5px;
 .btn-setting { background: linear-gradient(180deg, #c2185b, #880e4f); border: 1.5px solid #ff80ab; }
 
 .center-stage { position: relative; text-align: center; padding: 5px 0; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 480px; margin: 0 auto; }
-.suvichar-running-box { width: 100%; margin: 8px 0 12px 0; overflow: hidden; white-space: nowrap; padding: 0 10px; }
-.suvichar-text { display: inline-block; font-size: 13.5px; font-weight: 800; color: #00e5ff; text-shadow: 0 0 8px rgba(0,229,255,0.6); }
+
+/* 🌟 सुंदर संस्कृत श्लोक निऑन ग्लो व ॲनिमेशन बॉक्स */
+.shloka-container {
+width: 100%;
+margin: 8px 0 14px 0;
+padding: 0 12px;
+text-align: center;
+}
+.shloka-line {
+font-size: 13.5px;
+font-weight: 800;
+color: #00e5ff;
+text-shadow: 0 0 10px rgba(0,229,255,0.7), 0 0 20px rgba(0,229,255,0.4);
+line-height: 1.6;
+display: block;
+animation: fadeInShloka 1.2s ease-in-out;
+letter-spacing: 0.3px;
+}
+.shloka-line:nth-child(2) {
+margin-top: 2px;
+animation-delay: 0.4s;
+}
+
+@keyframes fadeInShloka {
+0% { opacity: 0; transform: translateY(6px); }
+100% { opacity: 1; transform: translateY(0); }
+}
 
 .podium-stage-box { position: relative; width: 280px; height: 280px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
 .avatar-on-podium { position: relative; z-index: 3; width: 170px; height: 170px; border-radius: 50%; object-fit: cover; object-position: center 10%; border: 3px solid #00e5ff; box-shadow: 0 0 22px #00e5ff; background: #010a14; margin-bottom: -12px; }
@@ -322,7 +347,7 @@ body * { visibility: hidden !important; }
 </div>
 </div>
 
-<!-- 🌟 System Health Monitor Floating Card (Exact Root Cause Diagnostic for Issued vs Received Master) -->
+<!-- 🌟 System Health Monitor Floating Card -->
 <div id="systemHealthAlertCard" style="display:none; position:fixed; bottom:20px; right:20px; max-width:320px; background:#fff; border-left:4px solid #f57c00; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.2); padding:12px; z-index:3500; animation: fadeInGlow 0.4s ease;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
         <span style="font-size:12.5px; font-weight:800; color:#e65100;" id="healthAlertTitle">⚠️ M.B. DATA WARNING</span>
@@ -1108,7 +1133,7 @@ function showHealthDetails() {
         }
     });
 
-    var msg = '⚠️ M.B. DATA INTEGRITY WARNING\n\n' +
+    var msg = '⚠️️ M.B. DATA INTEGRITY WARNING\n\n' +
               'एकूण Unique Received M.B.: ' + uniqueReceived.length + '\n' +
               'एकूण Active Issued M.B.: ' + activeGiven.length + '\n' +
               'Expected Available M.B.: ' + expectedAvailable + '\n' +
@@ -2297,176 +2322,6 @@ function generateGeneralReport() {
 
 var activeSearchPrintHTML = '';
 
-// ** 🌟 Updated Search Result Modal with PERMANENT DELETE Button in Table **
-function showSmartSearchResultModal(query) {
-    var queryClean = query.trim();
-    var queryLower = queryClean.toLowerCase();
-    var queryMB = normalizeMB(queryClean);
-    var allMBs = getData('mb_records');
-    var stock = getAvailableStock();
-
-    var matched = allMBs.filter(function(m) {
-        var rawNo = (m.mbNumber || '').trim();
-        var noLower = rawNo.toLowerCase();
-        var noMB = normalizeMB(rawNo);
-        var je = (m.receivedDetail || '').toLowerCase();
-        var src = (m.receivedSource || '').toLowerCase();
-        var from = (m.receivedFrom || '').toLowerCase();
-
-        var isExactMB = (noLower === queryLower) || (noMB !== '' && noMB === queryMB);
-        var isTextMatch = je.includes(queryLower) || src.includes(queryLower) || from.includes(queryLower);
-
-        return isExactMB || isTextMatch;
-    });
-
-    var latestMap = {};
-    matched.forEach(function(m) {
-        var no = (m.mbNumber || '').trim();
-        if (!latestMap[no]) {
-            latestMap[no] = getLatestMBStatus(no);
-        }
-    });
-
-    var resultList = [];
-    for (var k in latestMap) {
-        if (latestMap[k]) resultList.push(latestMap[k]);
-    }
-
-    if (resultList.length === 0) {
-        return showAlert('स्मार्ट शोध "' + query + '" नुसार कोणतीही नोंद आढळली नाही!', 'WARNING');
-    }
-
-    var tableHTML = '<table class="data-table"><thead><tr>' +
-    '<th style="text-align:center;">अ.क्र.</th>' +
-    '<th>M.B. क्र.</th>' +
-    '<th>आकार</th>' +
-    '<th>दिनांक</th>' +
-    '<th>सद्यस्थिती</th>' +
-    '<th style="text-align:center;">Action</th>' +
-    '</tr></thead><tbody>';
-
-    var isAvailableMap = {};
-    stock.forEach(function(s) { isAvailableMap[s.mbNumber] = true; });
-
-    resultList.forEach(function(item, idx) {
-        var mbNo = item.mbNumber || (getData('mb_records')[item.index] ? getData('mb_records')[item.index].mbNumber : '-');
-        var size = item.size || 'लहान M.B.';
-        var dateStr = formatDateToDMY(item.date);
-        var statusText = '';
-
-        if (isAvailableMap[mbNo]) {
-            statusText = '<span style="color:#2e7d32; font-weight:700;">कार्यालयात उपलब्ध</span>';
-        } else if (item.lastAction === 'दिलेली M.B.' || item.lastAction === 'दिलेली एमबी') {
-            var person = item.detail || item.source || 'संबंधित';
-            person = person.replace(/^श्री.?\s*/i, '');
-            statusText = '<span style="color:#e65100; font-weight:700;">श्री. ' + person + ' यांच्याकडे</span>';
-        } else {
-            statusText = '<span style="color:#0d47a1; font-weight:600;">एकूण M.B.</span>';
-        }
-
-        tableHTML += '<tr>' +
-        '<td style="text-align:center;">' + (idx + 1) + '</td>' +
-        '<td><a href="javascript:void(0)" onclick="openSmartActionCenter(\'' + mbNo + '\')" style="color:#0d47a1; font-size:12.5px; font-weight:800; text-decoration:underline; display:inline-block; padding:3px 2px;" title="M.B. Smart Action Center उघडा">' + mbNo + '</a></td>' +
-        '<td>' + size + '</td>' +
-        '<td>' + dateStr + '</td>' +
-        '<td>' + statusText + '</td>' +
-        '<td style="text-align:center;"><button class="btn-action" style="background:#d32f2f; padding:3px 6px; font-size:10px; font-weight:700;" onclick="confirmPermanentDeleteFromSearch(\'' + mbNo + '\')">🗑️ Delete</button></td>' +
-        '</tr>';
-    });
-
-    tableHTML += '</tbody></table>';
-
-    activeSearchPrintHTML = tableHTML;
-    document.getElementById('searchResultModalTitle').innerText = '🔍 शोध तपशील (M.B. / नाव: "' + query + '")';
-    document.getElementById('searchResultModalBody').innerHTML = tableHTML;
-    document.getElementById('searchResultModal').style.display = 'flex';
-}
-
-// ** 🌟 Central Cascade Deletion with Dependency Impact Scan & Double Confirmation **
-function confirmPermanentDeleteFromSearch(mbNo) {
-    var cleanMB = (mbNo || '').trim();
-    if (!cleanMB) return;
-    var targetMB = normalizeMB(cleanMB);
-
-    var mbList = getData('mb_records');
-    var workList = getData('work_records');
-    var billList = getData('dmbms_bills');
-    var assignList = getData('assign_records');
-
-    var receivedCount = 0;
-    var issuedCount = 0;
-    var historyCount = 0;
-
-    mbList.forEach(function(m) {
-        if (normalizeMB(m.mbNumber) === targetMB) {
-            historyCount++;
-            var act = (m.actionType || '').trim();
-            if (act === 'मिळालेली M.B.' || act === 'मिळालेली एमबी') receivedCount++;
-            if (act === 'दिलेली M.B.' || act === 'दिलेली एमबी') issuedCount++;
-        }
-    });
-
-    var assignRefCount = 0;
-    assignList.forEach(function(a) {
-        if (normalizeMB(a.mbNo) === targetMB) assignRefCount++;
-    });
-
-    var workRefCount = 0;
-    workList.forEach(function(w) {
-        if (normalizeMB(w.mbNo) === targetMB) workRefCount++;
-    });
-
-    var billRefCount = 0;
-    billList.forEach(function(b) {
-        if (normalizeMB(b.mbNo) === targetMB) billRefCount++;
-    });
-
-    var impactMsg = "⚠️ PERMANENT DELETE IMPACT SCAN\n\n" +
-                    "M.B. क्रमांक: " + cleanMB + "\n\n" +
-                    "• Received Entries: " + receivedCount + "\n" +
-                    "• Issued/Transaction Entries: " + issuedCount + "\n" +
-                    "• History Records: " + historyCount + "\n" +
-                    "• JE Assignment Records: " + assignRefCount + "\n" +
-                    "• Work Register References: " + workRefCount + "\n" +
-                    "• Bill Register References: " + billRefCount + "\n\n" +
-                    "ही M.B. आणि तिच्याशी संबंधित वरील सर्व नोंदी कायमस्वरूपी Delete करायच्या आहेत का?";
-
-    if (confirm(impactMsg)) {
-        var finalConfirm = prompt("अंतिम पुष्टी:\n\npermanent delete करण्यासाठी संबंधित M.B. क्रमांक अगदी तसाच ('" + cleanMB + "') खाली टाईप करा:");
-        if (finalConfirm && finalConfirm.trim() === cleanMB) {
-            
-            var newMBList = mbList.filter(function(m) { return normalizeMB(m.mbNumber) !== targetMB; });
-            var newWorkList = workList.filter(function(w) { return normalizeMB(w.mbNo) !== targetMB; });
-            var newBillList = billList.filter(function(b) { return normalizeMB(b.mbNo) !== targetMB; });
-            var newAssignList = assignList.filter(function(a) { return normalizeMB(a.mbNo) !== targetMB; });
-
-            setData('mb_records', newMBList);
-            setData('work_records', newWorkList);
-            setData('dmbms_bills', newBillList);
-            setData('assign_records', newAssignList);
-
-            var postCheckMB = getData('mb_records').some(function(m) { return normalizeMB(m.mbNumber) === targetMB; });
-            var postCheckWork = getData('work_records').some(function(w) { return normalizeMB(w.mbNo) === targetMB; });
-            var postCheckBill = getData('dmbms_bills').some(function(b) { return normalizeMB(b.mbNo) === targetMB; });
-
-            closeSearchResultModal();
-            refreshAll();
-
-            if (!postCheckMB && !postCheckWork && !postCheckBill) {
-                showAlert("✅ M.B. क्रमांक " + cleanMB + " ची माहिती आणि सर्व संबंधित नोंदी यशस्वीपणे कायमस्वरूपी हटवण्यात आल्या आहेत (0 References Found).", "SUCCESS");
-            } else {
-                showAlert("⚠️ Delete पूर्ण झाली नाही. काही Orphan References अजूनही सिस्टममध्ये शिल्लक आहेत.", "ERROR");
-            }
-        } else {
-            showAlert("❌ Permanent Delete रद्द करण्यात आले कारण क्रमांक जुळला नाही.", "WARNING");
-        }
-    }
-}
-
-function closeSearchResultModal() {
-    document.getElementById('searchResultModal').style.display = 'none';
-}
-
 function printSearchResultFromPopup() {
     var title = document.getElementById('searchResultModalTitle').innerText;
     var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
@@ -2595,7 +2450,7 @@ function sacTriggerReceiveMB() {
     var todayISO = new Date().toISOString().slice(0, 10);
     var todayDMY = formatDateToDMY(todayISO);
 
-    var confirmMsg = "⚠️ CONFIRM RECEIVE\n\n" +
+    var confirmMsg = "⚠️️ CONFIRM RECEIVE\n\n" +
     "M.B. क्रमांक: " + currentSacMB + "\n" +
     "धारक: " + holder + "\n" +
     "दिनांक: " + todayDMY + "\n\n" +
