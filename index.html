@@ -523,11 +523,10 @@ body * { visibility: hidden !important; }
 </div>
 
 <div class="center-stage">
-<!-- फिरता स्वागत संदेश बॉक्स (Welcome Message Animation) -->
-<div class="suvichar-running-box">
-<marquee behavior="scroll" direction="left" scrollamount="4" scrolldelay="0">
-<span class="suvichar-text" id="dynamicSuvichar">✨ मी विठ्ठल रघुनाथ कोकाटे, आपले सर्वांचे या प्रणालीमध्ये मनःपूर्वक स्वागत करीत आहे. या प्रणालीचा सहज, सुरक्षित आणि कार्यक्षम उपयोग करून आपल्या कामाचा अधिक सुलभ व परिणामकारक लाभ घ्यावा. ✨</span>
-</marquee>
+<!-- 🌟 संस्कृत श्लोक Neon Glow Animation (Replaced old welcome text) -->
+<div class="shloka-container">
+<span class="shloka-line">विद्या वितर्को विज्ञानं स्मृतिस्तत्परता क्रिया ।</span>
+<span class="shloka-line">यस्यैते षड्गुणास्तस्य नासाध्यमतिवर्तते ॥</span>
 </div>
 <div class="podium-stage-box">
 <img src="home-bg.jpg" onerror="this.onerror=null; this.src='1000320439_2.png';" class="avatar-on-podium" alt="User Photo">
@@ -956,7 +955,7 @@ function closeBackupModal() {
     if(modal) modal.style.display = 'none'; 
 }
 
-const welcomeMessageText = "✨ मी विठ्ठल रघुनाथ कोकाटे, आपले सर्वांचे या प्रणालीमध्ये मनःपूर्वक स्वागत करीत आहे. या प्रणालीचा सहज, सुरक्षित आणि कार्यक्षम उपयोग करून आपल्या कामाचा अधिक सुलभ व परिणामकारक लाभ घ्यावा. ✨";
+const welcomeMessageText = "विद्या वितर्को विज्ञानं स्मृतिस्तत्परता क्रिया ।\nयस्यैते षड्गुणास्तस्य नासाध्यमतिवर्तते ॥";
 
 function updateHourlySuvichar() {
     var suvicharEl = document.getElementById('dynamicSuvichar');
@@ -1133,7 +1132,7 @@ function showHealthDetails() {
         }
     });
 
-    var msg = '⚠️️ M.B. DATA INTEGRITY WARNING\n\n' +
+    var msg = '⚠️ M.B. DATA INTEGRITY WARNING\n\n' +
               'एकूण Unique Received M.B.: ' + uniqueReceived.length + '\n' +
               'एकूण Active Issued M.B.: ' + activeGiven.length + '\n' +
               'Expected Available M.B.: ' + expectedAvailable + '\n' +
@@ -2275,7 +2274,7 @@ function generateGeneralReport() {
     var isoTo = normalizeDateToISO(tDate);
 
     if (isoFrom > isoTo) {
-        return showAlert("'दिनांक पासून' हा दिनांक 'दिनांक पर्यंत' नंतरचा असू शकत नाही!", 'ERROR');
+        return showAlert("'दिनांक पासून' हा दिनांक 'दिनांक पर्यंत' ನಂತರचा असू शकत नाही!", 'ERROR');
     }
 
     var mainCat = document.getElementById('repMainCategory').value;
@@ -2443,6 +2442,88 @@ function closeSmartActionCenter() {
     currentSacStatusObj = null;
 }
 
+// ** 🌟 PERMANENT DELETE SYSTEM WITH EXACT DEPENDENCY SCAN & CASCADE REMOVAL **
+function confirmPermanentDeleteFromSearch(mbNo) {
+    var cleanMB = (mbNo || '').trim();
+    if (!cleanMB) return;
+    var targetMB = normalizeMB(cleanMB);
+
+    var mbList = getData('mb_records');
+    var workList = getData('work_records');
+    var billList = getData('dmbms_bills');
+    var assignList = getData('assign_records');
+
+    var receivedCount = 0;
+    var issuedCount = 0;
+    var historyCount = 0;
+
+    mbList.forEach(function(m) {
+        if (normalizeMB(m.mbNumber) === targetMB) {
+            historyCount++;
+            var act = (m.actionType || '').trim();
+            if (act === 'मिळालेली M.B.' || act === 'मिळालेली एमबी') receivedCount++;
+            if (act === 'दिलेली M.B.' || act === 'दिलेली एमबी') issuedCount++;
+        }
+    });
+
+    var assignRefCount = 0;
+    assignList.forEach(function(a) {
+        if (normalizeMB(a.mbNo) === targetMB) assignRefCount++;
+    });
+
+    var workRefCount = 0;
+    workList.forEach(function(w) {
+        if (normalizeMB(w.mbNo) === targetMB) workRefCount++;
+    });
+
+    var billRefCount = 0;
+    billList.forEach(function(b) {
+        if (normalizeMB(b.mbNo) === targetMB) billRefCount++;
+    });
+
+    var impactMsg = "⚠️ PERMANENT DELETE IMPACT SCAN\n\n" +
+                    "M.B. क्रमांक: " + cleanMB + "\n\n" +
+                    "• Received Entries: " + receivedCount + "\n" +
+                    "• Issued/Transaction Entries: " + issuedCount + "\n" +
+                    "• History Records: " + historyCount + "\n" +
+                    "• JE Assignment Records: " + assignRefCount + "\n" +
+                    "• Work Register References: " + workRefCount + "\n" +
+                    "• Bill Register References: " + billRefCount + "\n\n" +
+                    "ही M.B. आणि तिच्याशी संबंधित वरील सर्व नोंदी कायमस्वरूपी Delete करायच्या आहेत का?";
+
+    if (confirm(impactMsg)) {
+        var finalConfirm = prompt("अंतिम पुष्टी:\n\npermanent delete करण्यासाठी संबंधित M.B. क्रमांक अगदी तसाच ('" + cleanMB + "') खाली टाईप करा:");
+        if (finalConfirm && finalConfirm.trim() === cleanMB) {
+            
+            var newMBList = mbList.filter(function(m) { return normalizeMB(m.mbNumber) !== targetMB; });
+            var newWorkList = workList.filter(function(w) { return normalizeMB(w.mbNo) !== targetMB; });
+            var newBillList = billList.filter(function(b) { return normalizeMB(b.mbNo) !== targetMB; });
+            var newAssignList = assignList.filter(function(a) { return normalizeMB(a.mbNo) !== targetMB; });
+
+            setData('mb_records', newMBList);
+            setData('work_records', newWorkList);
+            setData('dmbms_bills', newBillList);
+            setData('assign_records', newAssignList);
+
+            var postCheckMB = getData('mb_records').some(function(m) { return normalizeMB(m.mbNumber) === targetMB; });
+            var postCheckWork = getData('work_records').some(function(w) { return normalizeMB(w.mbNo) === targetMB; });
+            var postCheckBill = getData('dmbms_bills').some(function(b) { return normalizeMB(b.mbNo) === targetMB; });
+
+            closeSmartActionCenter();
+            closeSearchResultModal();
+            refreshAll();
+
+            if (!postCheckMB && !postCheckWork && !postCheckBill) {
+                showAlert("✅ M.B. क्रमांक " + cleanMB + " ची माहिती आणि सर्व संबंधित नोंदी यशस्वीपणे कायमस्वरूपी हटवण्यात आल्या आहेत (0 References Found).", "SUCCESS");
+            } else {
+                showAlert("⚠️ Delete पूर्ण झाली नाही. काही Orphan References अजूनही सिस्टममध्ये शिल्लक आहेत.", "ERROR");
+            }
+        } else {
+            showAlert("❌ Permanent Delete रद्द करण्यात आले कारण क्रमांक जुळला नाही.", "WARNING");
+        }
+    }
+}
+
 function sacTriggerReceiveMB() {
     if (!currentSacMB || !currentSacStatusObj) return;
 
@@ -2450,7 +2531,7 @@ function sacTriggerReceiveMB() {
     var todayISO = new Date().toISOString().slice(0, 10);
     var todayDMY = formatDateToDMY(todayISO);
 
-    var confirmMsg = "⚠️️ CONFIRM RECEIVE\n\n" +
+    var confirmMsg = "⚠️ CONFIRM RECEIVE\n\n" +
     "M.B. क्रमांक: " + currentSacMB + "\n" +
     "धारक: " + holder + "\n" +
     "दिनांक: " + todayDMY + "\n\n" +
@@ -3066,7 +3147,7 @@ function saveAssign() {
     if (!isAvailable) {
         var lastStatus = getLatestMBStatus(mb);
         var holder = lastStatus ? (lastStatus.detail || lastStatus.source || 'इतर व्यक्ती') : 'इतर व्यक्ती';
-        return showAlert('⚠️ M.B. क्र. ' + mb + ' वाटप करता आली नाही.\n\nकारण: ही M.B. सध्या ' + holder + ' यांच्याकडे दिलेली आहे.\n\nकृती: प्रथम ती Receive करा, त्यानंतरच Assign करता येईल.', 'ERROR');
+        return showAlert('⚠️️ M.B. क्र. ' + mb + ' वाटप करता आली नाही.\n\nकारण: ही M.B. सध्या ' + holder + ' यांच्याकडे दिलेली आहे.\n\nकृती: प्रथम ती Receive करा, त्यानंतरच Assign करता येईल.', 'ERROR');
     }
 
     var stockMB = stock.find(function(s){ return s.mbNumber === mb; });
