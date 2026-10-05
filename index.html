@@ -387,7 +387,7 @@ body * { visibility: hidden !important; }
 </div>
 </div>
 
-<!-- सर्च केल्यानंतर ओपन होणारे पॉपअप मॉडेल (Search Detail Popup Modal with PERMANENT DELETE Button in Table) -->
+<!-- सर्च केल्यानंतर ओपन होणारे पॉपअप मॉडेल (Search Detail Popup Modal with Working Links & Print Report) -->
 <div id="searchResultModal" class="quick-info-overlay" style="z-index: 3800;">
 <div class="quick-info-card" style="max-width: 520px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
@@ -395,7 +395,7 @@ body * { visibility: hidden !important; }
 <button class="btn-close" onclick="closeSearchResultModal()">X</button>
 </div>
 <div style="background:#e3f2fd; color:#0d47a1; font-size:11px; padding:6px 10px; border-radius:6px; margin-bottom:8px; font-weight:600;">
-👉 <b>टीप:</b> ॲक्शन सेंटर, ट्रान्सफर, रिसिव्ह व हिस्ट्री पाहण्यासाठी M.B. क्रमांकावर क्लिक करा. किंवा खालील <b>🗑️ Delete</b> बटणावरून कायमस्वरूपी काढा.
+👉 <b>टीप:</b> ॲक्शन सेंटर, ट्रान्सफर, रिसिव्ह व हिस्ट्री पाहण्यासाठी खालील <b>M.B. क्रमांकावर टच/क्लिक करा</b>.
 </div>
 <div class="table-responsive-box" id="searchResultModalBody" style="max-height: 270px; margin-bottom: 12px;"></div>
 <button class="btn-report" style="background:#0d47a1; margin-top:4px;" onclick="printSearchResultFromPopup()">📄 REPORT / PRINT</button>
@@ -1097,7 +1097,7 @@ function checkSystemHealth() {
     if (!alertCard) return;
 
     if (currentAvailable !== expectedAvailable || missingReceivedList.length > 0) {
-        document.getElementById('healthAlertTitle').innerText = '⚠️️ M.B. DATA WARNING';
+        document.getElementById('healthAlertTitle').innerText = '⚠️ M.B. DATA WARNING';
         var warningText = 'Available M.B. मध्ये तफावत आढळली.<br>Expected Available: ' + expectedAvailable + ' | Current Available: ' + currentAvailable + '<br>Difference: ' + Math.abs(currentAvailable - expectedAvailable);
         
         if (missingReceivedList.length > 0) {
@@ -2256,7 +2256,6 @@ function executeSmartSearchOrReport() {
     var tDate = document.getElementById('repToDate').value.trim();
     var mainCat = document.getElementById('repMainCategory').value.trim();
 
-    // जर स्मार्ट शोध टेक्स्ट किंवा इतर कोणतेही क्रायटेरिया दिले असेल तर सर्वसमावेशक सर्च चालवा
     if (searchTxt || fDate || tDate || mainCat) {
         showSmartSearchResultModal(searchTxt, fDate, tDate, mainCat);
         return;
@@ -2345,7 +2344,6 @@ function showSmartSearchResultModal(query, fDate, tDate, mainCategory) {
         var size = (m.size || '').toLowerCase();
         var itemDateISO = normalizeDateToISO(m.date || '');
 
-        // Text query condition
         var matchesText = true;
         if (queryClean) {
             var isExactMB = (noLower === queryLower) || (noMB !== '' && noMB === queryMB);
@@ -2353,7 +2351,6 @@ function showSmartSearchResultModal(query, fDate, tDate, mainCategory) {
             matchesText = isExactMB || isTextMatch;
         }
 
-        // Date range condition
         var matchesDate = true;
         if (isoFrom || isoTo) {
             if (!itemDateISO) {
@@ -2364,7 +2361,6 @@ function showSmartSearchResultModal(query, fDate, tDate, mainCategory) {
             }
         }
 
-        // Main Category condition
         var matchesCat = true;
         if (mainCategory) {
             if (mainCategory === 'M.B.') {
@@ -2425,6 +2421,7 @@ function showSmartSearchResultModal(query, fDate, tDate, mainCategory) {
             statusText = '<span style="color:#0d47a1; font-weight:600;">एकूण M.B.</span>';
         }
 
+        // ✅ FIXED: M.B. number is now fully clickable to open Smart Action Center, and Delete button is available
         tableHTML += '<tr>' +
         '<td style="text-align:center;">' + (idx + 1) + '</td>' +
         '<td><a href="javascript:void(0)" onclick="openSmartActionCenter(\'' + mbNo + '\')" style="color:#0d47a1; font-size:12.5px; font-weight:800; text-decoration:underline; display:inline-block; padding:3px 2px;" title="M.B. Smart Action Center उघडा">' + mbNo + '</a></td>' +
@@ -2441,6 +2438,14 @@ function showSmartSearchResultModal(query, fDate, tDate, mainCategory) {
     document.getElementById('searchResultModalTitle').innerText = '🔍 शोध निकाल (जुळणाऱ्या नोंदी: ' + resultList.length + ')';
     document.getElementById('searchResultModalBody').innerHTML = tableHTML;
     document.getElementById('searchResultModal').style.display = 'flex';
+}
+
+// ** 🌟 REPORT / PRINT Generator for Search Results Modal **
+function printSearchResultFromPopup() {
+    var title = document.getElementById('searchResultModalTitle').innerText;
+    var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
+    var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; padding-bottom:6px;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + title + '</h2></div><div style="text-align:right; font-size:11.5px;">अहवाल दिनांक: ' + todayStr + '</div></div>' + activeSearchPrintHTML;
+    printA4Document(html, 'Search_Result_Report_' + todayStr + '.pdf');
 }
 
 // ** 🌟 Central Cascade Deletion with Dependency Impact Scan & Double Confirmation **
@@ -2482,7 +2487,7 @@ function confirmPermanentDeleteFromSearch(mbNo) {
         if (normalizeMB(b.mbNo) === targetMB) billRefCount++;
     });
 
-    var impactMsg = "⚠️ PERMANENT DELETE IMPACT SCAN\n\n" +
+    var impactMsg = "⚠️️ PERMANENT DELETE IMPACT SCAN\n\n" +
                     "M.B. क्रमांक: " + cleanMB + "\n\n" +
                     "• Received Entries: " + receivedCount + "\n" +
                     "• Issued/Transaction Entries: " + issuedCount + "\n" +
@@ -3737,7 +3742,7 @@ function deleteSelectedData() {
     if (selected.length === 0) return showAlert('किमान एक पर्याय निवडा.', 'WARNING');
     if (confirm('निवडलेली माहिती कायमची नष्ट करायची का?')) {
         selected.forEach(key => localStorage.removeItem(key));
-        showAlert('निवडलेली माहिती यशस्वीरीत्या हटवली!', 'SUCCESS'); 
+        showAlert('निवडलेली माहिती यशस्वीरित्या हटवली!', 'SUCCESS'); 
         refreshAll(); 
         closeModule('settingsModal');
     }
