@@ -7,16 +7,45 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>कामांची यादी (Work List) - M.B. System</title>
-<link rel="stylesheet" href="style.css">
 <style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+body { background: #f0f2f5; color: #212121; min-height: 100vh; padding-bottom: 20px; }
+.top-header { background: #00897b; color: #fff; text-align: center; padding: 12px 15px; position: relative; }
+.top-header h1 { font-size: 15px; font-weight: 700; margin-left: 70px; text-align: left; }
+.top-header p { font-size: 11px; opacity: 0.9; margin-left: 70px; text-align: left; }
+.btn-back-hub { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: #ff9800; color: #000; border: none; border-radius: 6px; padding: 6px 10px; font-size: 11.5px; font-weight: 800; cursor: pointer; z-index: 5; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+
 .container { padding: 15px; max-width: 650px; margin: auto; background: #fff; border-radius: 8px; margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.form-group { margin-bottom: 10px; text-align: left; }
+.form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 4px; }
+.form-control { width: 100%; padding: 8px 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 5px; outline: none; background: #fff; display: block; }
+.btn-report { width: 100%; background: #00897b; color: #fff; border: none; padding: 11px; font-size: 13.5px; font-weight: 800; border-radius: 6px; cursor: pointer; margin-top: 6px; letter-spacing: 0.5px; }
+
+.data-table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+.data-table th, .data-table td { border: 1px solid #ddd; padding: 5px 6px; text-align: left; vertical-align: middle; }
+.data-table th { background: #f5f5f5; font-weight: 600; }
+.table-scroll-box { max-height: 220px; overflow-y: auto; overflow-x: auto; border: 1px solid #ddd; border-radius: 6px; margin-top: 8px; }
+.btn-action { border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; cursor: pointer; color: #fff; }
+
+#printableArea { display: none !important; }
+@media print {
+body * { visibility: hidden !important; }
+#printableArea, #printableArea * { visibility: visible !important; }
+#printableArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 4mm; display: block !important; }
+@page { size: A4 portrait; margin: 4mm; }
+.print-table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+.print-table th, .print-table td { border: 1px solid #222; padding: 4px 5px; text-align: left; }
+.print-table th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+}
 </style>
 </head>
 <body>
 
-<div class="top-header" style="background:#00897b;">
+<div class="top-header">
 <a href="MB.html" class="btn-back-hub">◀ मागे</a>
-<h1 style="text-align:center; margin-left:0;">📋 कामांची यादी (Work List)</h1>
+<h1>कामांची यादी (Work List)</h1>
+<p>सार्वजनिक बांधकाम विभाग</p>
 </div>
 
 <div class="container">
@@ -59,7 +88,7 @@
 </div>
 <button id="btnCancelWork" class="btn-report" style="background:#757575; margin-bottom:6px; display:none;" onclick="cancelWorkEdit()">रद्द करा</button>
 
-<div class="table-scroll-box" style="margin-top:15px;">
+<div class="table-scroll-box">
 <table class="data-table">
     <thead>
         <tr>
@@ -85,9 +114,22 @@ window.onload = function() {
     refreshWorkList();
 };
 
+function refreshWorkJEList() {
+    var wJE = document.getElementById('workJE');
+    if(!wJE) return;
+    var currentVal = wJE.value;
+    wJE.innerHTML = '<option value="">-- कनिष्ठ अभियंता निवडा --</option>';
+    var jeList = getData('je_records');
+    jeList.forEach(function(j) {
+        wJE.add(new Option(j.name, j.name));
+    });
+    if (currentVal) wJE.value = currentVal;
+}
+
 function onWorkJEChange() {
     var je = document.getElementById('workJE').value;
     var mbSel = document.getElementById('workMB');
+    if(!mbSel) return;
     mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';
     if (!je) return;
 
@@ -100,7 +142,7 @@ function onWorkJEChange() {
     }
 
     heldMBs.forEach(function(a) {
-        var activeWork = works.find(function(w){ return w.mbNo === a.mbNo && w.status === 'अपूर्ण'; });
+        var activeWork = works.find(function(w){ return normalizeMB(w.mbNo) === normalizeMB(a.mbNo) && w.status === 'अपूर्ण'; });
         if (!activeWork) {
             mbSel.add(new Option(a.mbNo + ' (' + a.size + ')', a.mbNo));
         }
@@ -123,7 +165,7 @@ function saveOrUpdateWork() {
     var works = getData('work_records');
 
     if (idx === -1) {
-        var activeWork = works.find(function(w){ return w.mbNo === mb && w.status === 'अपूर्ण'; });
+        var activeWork = works.find(function(w){ return normalizeMB(w.mbNo) === normalizeMB(mb) && w.status === 'अपूर्ण'; });
         if (activeWork) {
             return showAlert('M.B. क्रमांक "' + mb + '" चे काम सध्या अपूर्ण (चालू) आहे. ते पूर्ण झाल्याशिवाय या M.B. वर नवीन काम नोंदवता येणार नाही!', 'ERROR');
         }
@@ -132,22 +174,7 @@ function saveOrUpdateWork() {
     if (idx === -1) {
         works.push({ name: name, je: je, contractor: con, mbNo: mb, status: status });
     } else {
-        var oldWork = works[idx];
         works[idx] = { name: name, je: je, contractor: con, mbNo: mb, status: status };
-
-        var bills = getData('dmbms_bills');
-        var billUpdated = false;
-        bills.forEach(function(b) {
-            if (b.mbNo === mb || b.workName === oldWork.name) {
-                b.workName = name;
-                b.contractor = con;
-                b.je = je;
-                billUpdated = true;
-            }
-        });
-        if (billUpdated) {
-            setData('dmbms_bills', bills);
-        }
     }
 
     setData('work_records', works);
@@ -159,24 +186,7 @@ function saveOrUpdateWork() {
 function editWork(idx) {
     var item = getData('work_records')[idx];
     document.getElementById('workJE').value = item.je;
-
-    var mbSel = document.getElementById('workMB');
-    mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';
-    var heldMBs = getCurrentlyHeldMBsByJE(item.je);
-    var works = getData('work_records');
-
-    var foundActive = false;
-    heldMBs.forEach(function(a) {
-        var activeWork = works.find(function(w){ return w.mbNo === a.mbNo && w.status === 'अपूर्ण'; });
-        if (!activeWork || a.mbNo === item.mbNo) {
-            mbSel.add(new Option(a.mbNo + ' (' + a.size + ')', a.mbNo));
-            foundActive = true;
-        }
-    });
-
-    if (!foundActive && item.mbNo) {
-        mbSel.add(new Option(item.mbNo, item.mbNo));
-    }
+    onWorkJEChange();
 
     document.getElementById('workMB').value = item.mbNo;
     document.getElementById('workName').value = item.name;
@@ -209,6 +219,7 @@ function deleteWork(idx) {
 }
 
 function refreshWorkList() {
+    refreshWorkJEList();
     var list = getData('work_records');
     var tbody = document.getElementById('workListBody');
     if(!tbody) return;
@@ -228,14 +239,6 @@ function refreshWorkList() {
         '</td>' +
         '</tr>';
     });
-
-    var wJE = document.getElementById('workJE');
-    if(wJE) {
-        var currentJe = wJE.value;
-        wJE.innerHTML = '<option value="">-- कनिष्ठ अभियंता निवडा --</option>';
-        getData('je_records').forEach(function(j){ wJE.add(new Option(j.name, j.name)); });
-        if(currentJe) wJE.value = currentJe;
-    }
 }
 
 function printWorkReport() {
