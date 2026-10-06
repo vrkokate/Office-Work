@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>कामांची यादी (Work List)</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.container { padding: 15px; max-width: 650px; margin: auto; background: #fff; border-radius: 8px; margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body>
+<div class="top-header" style="background:#00897b; color:#fff; padding:12px; position:relative; text-align:center;">
+<button class="btn-back-hub" onclick="location.href='MB.html'" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); background:#ff9800; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;">◀ मागे</button>
+<h1 style="font-size:15px; margin:0;">📋 कामांची यादी (Work List)</h1>
+</div>
+
+<div class="breadcrumb-bar" style="background:rgba(0, 229, 255, 0.1); padding:4px 12px; font-size:11px;">
+    <span class="breadcrumb-link" onclick="location.href='index.html'" style="cursor:pointer; text-decoration:underline; color:#0d47a1;">🏠 मुख्य पृष्ठ</span> &gt; <span onclick="location.href='MB.html'" style="cursor:pointer; text-decoration:underline; color:#0d47a1;">M.B. नियंत्रण प्रणाली</span> &gt; <span>Work List</span>
+</div>
+
+<div class="container">
+<input type="hidden" id="editWorkIndex" value="-1">
+<div class="form-group"><label>कनिष्ठ अभियंता (JE) निवडा *</label><select class="form-control" id="workJE" onchange="onWorkJEChange()"><option value="">-- JE निवडा --</option></select></div>
+<div class="form-group"><label>वाटप केलेली M.B. निवडा *</label><select class="form-control" id="workMB"><option value="">-- आधी JE निवडा --</option></select></div>
+<div class="form-group"><label>कामाचे नाव *</label><input type="text" class="form-control" id="workName" placeholder="कामाचे नाव"></div>
+<div class="form-group"><label>कंत्राटदार / एजन्सी चे नाव *</label><input type="text" class="form-control" id="workContractor" placeholder="कंत्राटदाराचे नाव"></div>
+<div class="form-group"><label>कामाची स्थिती (Status) *</label><select class="form-control" id="workStatus"><option value="अपूर्ण">अपूर्ण (चालू काम)</option><option value="पूर्ण">पूर्ण</option></select></div>
+
+<div style="display:flex; gap:6px; margin-top:10px;">
+<button id="btnSaveWork" class="btn-report" style="background:#00897b; flex:1; margin:0;" onclick="saveOrUpdateWork()">Save Work</button>
+<button class="btn-report" style="background:#0d47a1; flex:1; margin:0;" onclick="printWorkReport()">📄 प्रिंट रिपोर्ट</button>
+</div>
+<button id="btnCancelWork" class="btn-report" style="background:#757575; margin-top:6px; display:none;" onclick="cancelWorkEdit()">रद्द करा</button>
+
+<div style="max-height:260px; overflow-y:auto; margin-top:15px;">
+<table class="data-table"><thead><tr><th>अ.क्र.</th><th>काम</th><th>JE</th><th>M.B.</th><th>स्थिती</th><th>Action</th></tr></thead><tbody id="workListBody"></tbody></table>
+</div>
+</div>
+
+<div id="printableArea"></div>
+<script src="common.js"></script>
+<script>
+window.onload = function() { refreshWorkList(); };
+function onWorkJEChange() {
+    var je = document.getElementById('workJE').value;
+    var mbSel = document.getElementById('workMB');
+    mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';
+    if (!je) return;
+    var heldMBs = getCurrentlyHeldMBsByJE(je);
+    var works = getData('work_records');
+    heldMBs.forEach(function(a) {
+        var activeWork = works.find(function(w){ return w.mbNo === a.mbNo && w.status === 'अपूर्ण'; });
+        if (!activeWork) mbSel.add(new Option(a.mbNo + ' (' + a.size + ')', a.mbNo));
+    });
+}
+function saveOrUpdateWork() {
+    var je = document.getElementById('workJE').value;
+    var mb = document.getElementById('workMB').value;
+    var name = document.getElementById('workName').value.trim();
+    var con = document.getElementById('workContractor').value.trim();
+    var status = document.getElementById('workStatus').value;
+    var idx = parseInt(document.getElementById('editWorkIndex').value, 10);
+    if (!je || !mb || !name || !con) return showAlert('सर्व आवश्यक माहिती भरा.', 'WARNING');
+    var works = getData('work_records');
+    if (idx === -1) {
+        works.push({ name: name, je: je, contractor: con, mbNo: mb, status: status });
+    } else {
+        works[idx] = { name: name, je: je, contractor: con, mbNo: mb, status: status };
+    }
+    setData('work_records', works);
+    cancelWorkEdit();
+    refreshWorkList();
+    showAlert('काम यशस्वीरित्या जतन झाले!', 'SUCCESS');
+}
+function refreshWorkList() {
+    var list = getData('work_records');
+    var tbody = document.getElementById('workListBody');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    list.forEach(function(w, idx) {
+        tbody.innerHTML += '<tr><td>'+(idx+1)+'</td><td>'+w.name+'</td><td>'+w.je+'</td><td>'+w.mbNo+'</td><td style="color:'+(w.status==='पूर्ण'?'green':'red')+';">'+(w.status||'अपूर्ण')+'</td><td><button onclick="editWork('+idx+')">Edit</button></td></tr>';
+    });
+    var wJE = document.getElementById('workJE');
+    if(wJE) {
+        wJE.innerHTML = '<option value="">-- JE निवडा --</option>';
+        getData('je_records').forEach(function(j){ wJE.add(new Option(j.name, j.name)); });
+    }
+}
+function editWork(idx) {
+    var item = getData('work_records')[idx];
+    document.getElementById('workJE').value = item.je;
+    onWorkJEChange();
+    document.getElementById('workMB').value = item.mbNo;
+    document.getElementById('workName').value = item.name;
+    document.getElementById('workContractor').value = item.contractor;
+    document.getElementById('workStatus').value = item.status;
+    document.getElementById('editWorkIndex').value = idx;
+    document.getElementById('btnSaveWork').textContent = 'Update Work';
+    document.getElementById('btnCancelWork').style.display = 'block';
+}
+function cancelWorkEdit() {
+    document.getElementById('workName').value = '';
+    document.getElementById('workContractor').value = '';
+    document.getElementById('editWorkIndex').value = '-1';
+    document.getElementById('btnSaveWork').textContent = 'Save Work';
+    document.getElementById('btnCancelWork').style.display = 'none';
+}
+function printWorkReport() {
+    var works = getData('work_records');
+    var html = '<h2 style="text-align:center;">कामांची यादी (Work Register)</h2><table class="print-table"><thead><tr><th>अ.क्र.</th><th>काम</th><th>JE</th><th>कंत्राटदार</th><th>स्थिती</th><th>M.B.</th></tr></thead><tbody>';
+    works.forEach(function(w, i){ html += '<tr><td>'+(i+1)+'</td><td>'+w.name+'</td><td>'+w.je+'</td><td>'+w.contractor+'</td><td>'+w.status+'</td><td>'+w.mbNo+'</td></tr>'; });
+    html += '</tbody></table>';
+    printA4Document(html, 'WorkList.pdf');
+}
+</script>
+</body>
+</html>
