@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.B. वाटप (Assign)</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.container { padding: 15px; max-width: 550px; margin: auto; background: #fff; border-radius: 8px; margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body>
+<div class="top-header" style="background:#7b1fa2; color:#fff; padding:12px; position:relative; text-align:center;">
+<button class="btn-back-hub" onclick="location.href='MB.html'" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); background:#ff9800; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;">◀ मागे</button>
+<h1 style="font-size:15px; margin:0;">📁 M.B. वाटप (Assign)</h1>
+</div>
+
+<div class="breadcrumb-bar" style="background:rgba(0, 229, 255, 0.1); padding:4px 12px; font-size:11px;">
+    <span class="breadcrumb-link" onclick="location.href='index.html'" style="cursor:pointer; text-decoration:underline; color:#0d47a1;">🏠 मुख्य पृष्ठ</span> &gt; <span onclick="location.href='MB.html'" style="cursor:pointer; text-decoration:underline; color:#0d47a1;">M.B. नियंत्रण प्रणाली</span> &gt; <span>Assign</span>
+</div>
+
+<div class="container">
+<div class="form-group"><label>उपलब्ध M.B. निवडा *</label><select class="form-control" id="assignMBSelect"></select></div>
+<div class="form-group"><label>कनिष्ठ अभियंता (JE) निवडा *</label><select class="form-control" id="assignJESelect"></select></div>
+<div class="form-group"><label>वाटप दिनांक *</label><input type="date" class="form-control" id="assignDate"></div>
+<button class="btn-report" style="background:#7b1fa2;" onclick="saveAssign()">Assign M.B.</button>
+
+<div style="max-height:250px; overflow-y:auto; margin-top:15px;">
+<table class="data-table"><thead><tr><th>M.B.</th><th>JE</th><th>वाटप दिनांक</th><th>Action</th></tr></thead><tbody id="assignListBody"></tbody></table>
+</div>
+</div>
+
+<script src="common.js"></script>
+<script>
+window.onload = function() { refreshAssignList(); };
+function refreshAssignList() {
+    var list = getData('assign_records');
+    var tbody = document.getElementById('assignListBody');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    list.forEach(function(a, idx) {
+        tbody.innerHTML += '<tr><td>'+a.mbNo+'</td><td>'+a.jeName+'</td><td>'+formatDateToDMY(a.assignDate)+'</td><td><button onclick="deleteAssign('+idx+')">रद्द करा</button></td></tr>';
+    });
+    var mbSel = document.getElementById('assignMBSelect');
+    if(mbSel) {
+        mbSel.innerHTML = '<option value="">-- उपलब्ध M.B. निवडा --</option>';
+        getAvailableStock().forEach(function(m){ mbSel.add(new Option(m.mbNumber, m.mbNumber)); });
+    }
+    var jeSel = document.getElementById('assignJESelect');
+    if(jeSel) {
+        jeSel.innerHTML = '<option value="">-- JE निवडा --</option>';
+        getData('je_records').forEach(function(j){ jeSel.add(new Option(j.name, j.name)); });
+    }
+}
+function saveAssign() {
+    var mb = document.getElementById('assignMBSelect').value;
+    var je = document.getElementById('assignJESelect').value;
+    var dt = document.getElementById('assignDate').value;
+    if (!mb || !je) return showAlert('कृपया M.B. आणि JE दोन्ही निवडा.', 'WARNING');
+    var list = getData('assign_records');
+    list.push({ mbNo: mb, jeName: je, assignDate: dt });
+    setData('assign_records', list);
+    refreshAssignList();
+    showAlert('M.B. वाटप यशस्वी!', 'SUCCESS');
+}
+function deleteAssign(idx) {
+    var list = getData('assign_records');
+    list.splice(idx, 1);
+    setData('assign_records', list);
+    refreshAssignList();
+    showAlert('वाटप नोंद रद्द केली!', 'SUCCESS');
+}
+</script>
+</body>
+</html>
