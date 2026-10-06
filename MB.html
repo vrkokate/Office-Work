@@ -4,131 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>मोजमाप पुस्तिका नियंत्रण प्रणाली</title>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-#mbSystemSection { background: #f0f2f5; color: #212121; min-height: 100vh; padding-bottom: 20px; display: block; }
-.top-header { background: #0d47a1; color: #fff; text-align: center; padding: 12px 15px; position: relative; }
-.top-header h1 { font-size: 15px; font-weight: 700; margin-left: 70px; text-align: left; }
-.top-header p { font-size: 11px; opacity: 0.9; margin-left: 70px; text-align: left; }
-.btn-back-hub { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: #ff9800; color: #000; border: none; border-radius: 6px; padding: 6px 10px; font-size: 11.5px; font-weight: 800; cursor: pointer; z-index: 5; }
-.breadcrumb-bar { background: rgba(0, 229, 255, 0.1); border-bottom: 1px solid rgba(0, 229, 255, 0.2); padding: 4px 12px; font-size: 11px; color: #00e5ff; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-.breadcrumb-link { cursor: pointer; text-decoration: underline; color: #0d47a1; }
-.action-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 10px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-.action-btn { border: none; border-radius: 8px; color: #fff; padding: 10px 4px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; }
-.btn-je { background: #1976d2; } .btn-mb-act { background: #2e7d32; } .btn-work { background: #00897b; } .btn-bill { background: #f57c00; } .btn-assign { background: #7b1fa2; } .btn-settings { background: #c2185b; }
-.container { padding: 10px; max-width: 800px; margin: auto; }
-.summary-box { background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.summary-title { font-size: 13px; font-weight: 700; text-align: center; color: #0d47a1; margin-bottom: 8px; }
-.card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.stat-card { border-radius: 8px; text-align: center; padding: 11px 4px; cursor: pointer; background: #fcfdfe; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
-.stat-num { font-size: 18px; font-weight: 700; color: #0d47a1; }
-.stat-label { font-size: 11px; color: #555; margin-top: 2px; }
-.filter-card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.form-group { margin-bottom: 10px; text-align: left; }
-.form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 4px; }
-.form-control { width: 100%; padding: 8px 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 5px; outline: none; background: #fff; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 8px; }
-.btn-report { width: 100%; background: #0d47a1; color: #fff; border: none; padding: 11px; font-size: 13.5px; font-weight: 800; border-radius: 6px; cursor: pointer; margin-top: 6px; }
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 999; justify-content: center; align-items: center; padding: 10px; }
-.modal-card { background: #fff; border-radius: 8px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; padding: 16px; position: relative; }
-.data-table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; }
-.data-table th, .data-table td { border: 1px solid #ddd; padding: 5px 6px; text-align: left; }
-.data-table th { background: #f5f5f5; font-weight: 600; }
-.quick-info-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); z-index: 3500; justify-content: center; align-items: center; padding: 15px; }
-.quick-info-card { background: #ffffff; border-radius: 12px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 18px; position: relative; }
-.btn-close { background: #e53935; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
-.smart-action-btn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px; margin-bottom: 6px; }
-.btn-smart-act { border: none; border-radius: 6px; padding: 11px 6px; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; text-align: center; }
-.btn-act-give { background: #2e7d32; } .btn-act-receive { background: #0277bd; } .btn-act-transfer { background: #7b1fa2; } .btn-act-edit { background: #f57c00; } .btn-act-history { background: #455a64; } .btn-act-delete { background: #d32f2f; grid-column: span 2; }
-.status-badge-pill { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 800; }
-.badge-avail { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
-.badge-issued { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
-#printableArea { display: none !important; }
-@media print {
-body * { visibility: hidden !important; }
-#printableArea, #printableArea * { visibility: visible !important; }
-#printableArea { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
-}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div id="customAlertModal" class="modal-overlay" style="z-index:4000; display:none;">
-<div class="modal-card" style="max-width:350px; text-align:center;">
-<div id="customAlertIcon" style="font-size:36px; margin-bottom:8px;">⚠️</div>
-<div id="customAlertTitle" style="font-size:15px; font-weight:800; color:#0d47a1; margin-bottom:6px;">माहिती व सूचना</div>
-<div id="customAlertText" style="font-size:13px; font-weight:600; line-height: 1.55; color: #37474f; margin-bottom:18px;"></div>
-<button class="btn-report" onclick="closeCustomAlert()">समजले (OK)</button>
-</div>
-</div>
-
-<div id="systemHealthAlertCard" style="display:none; position:fixed; bottom:20px; right:20px; max-width:320px; background:#fff; border-left:4px solid #f57c00; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.2); padding:12px; z-index:3500;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-        <span style="font-size:12.5px; font-weight:800; color:#e65100;" id="healthAlertTitle">⚠️ M.B. DATA WARNING</span>
-        <button onclick="closeHealthAlert()" style="background:none; border:none; font-weight:bold; cursor:pointer;">×</button>
-    </div>
-    <div style="font-size:11.5px; color:#37474f; margin-bottom:8px;" id="healthAlertText">तफावत आढळली आहे.</div>
-    <button class="btn-report" style="font-size:10.5px; padding:4px 8px; margin:0;" onclick="showHealthDetails()">तपशील पहा</button>
-</div>
-
-<div id="smartActionCenterModal" class="quick-info-overlay" style="z-index: 3900;">
-<div class="quick-info-card" style="max-width: 470px;">
-<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0d47a1; padding-bottom:8px; margin-bottom:12px;">
-<h3 style="font-size: 15px; color:#0d47a1; font-weight: 800;">📘 M.B. SMART ACTION CENTER</h3>
-<button class="btn-close" onclick="closeSmartActionCenter()">X</button>
-</div>
-<div id="sacDetailsBox" style="background:#f4f7f9; border:1px solid #cfd8dc; border-radius:8px; padding:12px; font-size:12px; line-height:1.6; margin-bottom:10px;"></div>
-<div id="sacActionButtonsGrid" class="smart-action-btn-grid"></div>
-<div id="sacSubActionContainer" style="display:none; background:#fff; border:1.5px solid #0d47a1; border-radius:8px; padding:12px; margin-top:10px;"></div>
-<div id="sacHistoryContainer" style="display:none; margin-top:10px; background:#fff; border:1.5px solid #455a64; border-radius:8px; padding:10px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <span style="font-size:12.5px; font-weight:700;">📜 संपूर्ण व्यवहार व इतिहास</span>
-        <button class="btn-report" style="width:auto; padding:4px 8px; margin:0;" onclick="printHistoryFromSAC()">🖨️ PRINT</button>
-    </div>
-    <div id="sacHistoryTableWrapper" style="max-height:220px; overflow-y:auto;"></div>
-</div>
-</div>
-</div>
-
-<div id="searchResultModal" class="quick-info-overlay" style="z-index: 3800;">
-<div class="quick-info-card" style="max-width: 520px;">
-<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
-<h3 id="searchResultModalTitle" style="font-size: 14px; color:#0d47a1; font-weight: 800;">🔍 शोध तपशील व सद्यस्थिती</h3>
-<button class="btn-close" onclick="closeSearchResultModal()">X</button>
-</div>
-<div style="max-height: 270px; overflow-y:auto; margin-bottom: 12px;" id="searchResultModalBody"></div>
-<button class="btn-report" onclick="printSearchResultFromPopup()">📄 REPORT / PRINT</button>
-</div>
-</div>
-
-<div id="quickInfoModal" class="quick-info-overlay">
-<div class="quick-info-card">
-<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
-<h3 id="quickModalTitle" style="font-size: 14px; color:#0d47a1;">तपशील</h3>
-<button class="btn-close" onclick="closeQuickInfoModal()">X</button>
-</div>
-<div class="form-group" id="quickSourceGroup">
-<label>स्रोत:</label>
-<select class="form-control" id="quickModalMainSource" onchange="onQuickMainSourceChange()">
-<option value="ALL">सर्व (All)</option><option value="विभागीय कार्यालय">विभागीय कार्यालय</option><option value="JE">JE</option><option value="भंडारपाल">भंडारपाल</option>
-</select>
-</div>
-<div class="form-group" id="quickModalJESubGroup" style="display:none;">
-<label>कनिष्ठ अभियंता (JE):</label>
-<select class="form-control" id="quickModalJESubSelect" onchange="onQuickFilterChange()"><option value="सर्व JE">सर्व JE</option></select>
-</div>
-<div class="form-group">
-<label>M.B. आकारानुसार:</label>
-<select class="form-control" id="quickModalSizeFilter" onchange="onQuickFilterChange()">
-<option value="ALL">सर्व M.B.</option><option value="लहान M.B.">लहान M.B.</option><option value="मोठी M.B.">मोठी M.B.</option>
-</select>
-</div>
-<div style="max-height:220px; overflow-y:auto; margin-bottom:10px;" id="quickModalBody"></div>
-<button class="btn-report" onclick="printQuickModalReport()">📄 REPORT / PRINT</button>
-</div>
-</div>
-
-<div id="mbSystemSection">
+<div id="mbSystemSection" style="display:block;">
 <div class="top-header">
 <button class="btn-back-hub" onclick="location.href='index.html'">🏠 मुखपृष्ठ</button>
 <h1>मोजमाप पुस्तिका नियंत्रण प्रणाली</h1>
@@ -140,12 +19,12 @@ body * { visibility: hidden !important; }
 </div>
 
 <div class="action-grid">
-<a href="JE.html" class="action-btn btn-je"><span>👷</span>JE</a>
-<a href="MB.html" class="action-btn btn-mb-act"><span>📖</span>M.B.</a>
-<a href="WorkList.html" class="action-btn btn-work"><span>📋</span>Work list</a>
-<a href="BillRegister.html" class="action-btn btn-bill"><span>📄</span>Bill reg.</a>
-<a href="Assign.html" class="action-btn btn-assign"><span>📁</span>Assign</a>
-<a href="DataManager.html" class="action-btn btn-settings"><span>⚙</span>Data Manager</a>
+<a href="JE.html" class="action-btn btn-je" style="text-decoration:none;"><span>👷</span>JE</a>
+<a href="MB.html" class="action-btn btn-mb-act" style="text-decoration:none;"><span>📖</span>M.B.</a>
+<a href="WorkList.html" class="action-btn btn-work" style="text-decoration:none;"><span>📋</span>Work list</a>
+<a href="BillRegister.html" class="action-btn btn-bill" style="text-decoration:none;"><span>📄</span>Bill reg.</a>
+<a href="Assign.html" class="action-btn btn-assign" style="text-decoration:none;"><span>📁</span>Assign</a>
+<a href="DataManager.html" class="action-btn btn-settings" style="text-decoration:none;"><span>⚙</span>Data Manager</a>
 </div>
 
 <div class="container">
@@ -186,41 +65,13 @@ body * { visibility: hidden !important; }
 <div class="form-group" id="dynamicInputGroup" style="display:none;"><label id="lblDynamicInput">JE</label><select class="form-control" id="repDynamicJEList"></select></div>
 <div class="form-group"><label>स्मार्ट शोध (M.B. क्र., नाव)</label><input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका"></div>
 <div style="display:flex; gap:8px;">
-    <button class="btn-report" style="flex:1; background:#0d47a1;" onclick="executeSmartSearchOrReport()">🔍 SEARCH</button>
-    <button class="btn-report" style="flex:1; background:#546e7a;" onclick="resetSearchSectionForm()">🔄 RESET</button>
-</div>
-</div>
-
-<div class="filter-card" style="margin-top:12px;">
-<h3 style="font-size: 13.5px; color:#2e7d32; margin-bottom: 8px;">📖 मोजमाप पुस्तिका (M.B.) रेकॉर्ड व नोंदी</h3>
-<div style="max-height:240px; overflow-y:auto;">
-<table class="data-table"><thead><tr><th>अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>हस्तांतरण</th></tr></thead><tbody id="mbListBody"></tbody></table>
+    <button class="btn-report" style="flex:1; background:#0d47a1; margin:0;" onclick="executeSmartSearchOrReport()">🔍 SEARCH</button>
+    <button class="btn-report" style="flex:1; background:#546e7a; margin:0;" onclick="resetSearchSectionForm()">🔄 RESET</button>
 </div>
 </div>
 </div>
-
-<div id="printableArea"></div>
 </div>
 
 <script src="common.js"></script>
-<script>
-window.onload = function() { refreshAll(); onMainCategoryChange(); };
-function refreshAll() {
-    refreshMBDashboard();
-    checkSystemHealth();
-}
-function refreshMBDashboard() {
-    var list = getData('mb_records');
-    var tbody = document.getElementById('mbListBody'); 
-    if(!tbody) return;
-    tbody.innerHTML = ''; 
-    list.forEach(function(m, idx) {
-        tbody.innerHTML += '<tr><td>'+(idx+1)+'</td><td>'+formatDateToDMY(m.date)+'</td><td>'+m.mbNumber+'</td><td>'+m.size+'</td><td>'+(m.receivedFrom || '-')+'</td></tr>';
-    });
-    if(document.getElementById('countReceivedMB')) animateNumberCount('countReceivedMB', getUniqueReceivedMBs().length);
-    if(document.getElementById('countGivenMB')) animateNumberCount('countGivenMB', getCurrentlyActiveGivenMBs().length);
-    if(document.getElementById('countAvailableMB')) animateNumberCount('countAvailableMB', getAvailableStock().length);
-}
-</script>
 </body>
 </html>
