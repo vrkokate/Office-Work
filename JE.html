@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>कनिष्ठ अभियंता (JE) व्यवस्थापन</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.container { padding: 15px; max-width: 600px; margin: auto; background: #fff; border-radius: 8px; margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body>
+<div class="top-header" style="background:#1976d2; color:#fff; padding:12px; position:relative; text-align:center;">
+<button class="btn-back-hub" onclick="location.href='MB.html'" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); background:#ff9800; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;">◀ मागे</button>
+<h1 style="font-size:15px; margin:0;">कनिष्ठ अभियंता (JE) व्यवस्थापन</h1>
+</div>
+
+<div class="breadcrumb-bar" style="background:rgba(0, 229, 255, 0.1); padding:4px 12px; font-size:11px;">
+    <span class="breadcrumb-link" onclick="location.href='index.html'" style="cursor:pointer; text-decoration:underline; color:#0d47a1;">🏠 मुख्य पृष्ठ</span> &gt; <span onclick="location.href='MB.html'" style="cursor:pointer; text-decoration:underline; color:#0d47a1;">M.B. नियंत्रण प्रणाली</span> &gt; <span>JE व्यवस्थापन</span>
+</div>
+
+<div class="container">
+<input type="hidden" id="editJEIndex" value="-1">
+<div class="form-group"><label>कनिष्ठ अभियंत्याचे पूर्ण नाव *</label><input type="text" class="form-control" id="newJEName" placeholder="उदा. श्री. ए. बी. पाटील"></div>
+<div style="display:flex; gap:6px;"><button id="btnSaveJE" class="btn-report" style="background:#1976d2; flex:1;" onclick="saveOrUpdateJE()">Save JE</button><button id="btnCancelJE" class="btn-report" style="background:#757575; width:80px; display:none;" onclick="cancelJEEdit()">रद्द करा</button></div>
+
+<div style="max-height:300px; overflow-y:auto; margin-top:12px;">
+<table class="data-table" id="jeTableToPrint"><thead><tr><th>अ.क्र.</th><th>नाव</th><th style="width:25%; text-align:center;">Action</th></tr></thead><tbody id="jeListBody"></tbody></table>
+</div>
+<button class="btn-report" style="background:#0d47a1; margin-top:12px;" onclick="printJEReport()">📄 REPORT / PRINT</button>
+</div>
+
+<div id="printableArea"></div>
+<script src="common.js"></script>
+<script>
+window.onload = function() { refreshJEList(); };
+function saveOrUpdateJE() {
+    var name = document.getElementById('newJEName').value.trim();
+    var idx = parseInt(document.getElementById('editJEIndex').value, 10);
+    if (!name) return showAlert('कृपया कनिष्ठ अभियंत्याचे पूर्ण नाव भरा.', 'WARNING');
+    var list = getData('je_records');
+    if (idx === -1) list.push({ name: name }); else list[idx].name = name;
+    setData('je_records', list);
+    cancelJEEdit();
+    refreshJEList();
+    showAlert('कनिष्ठ अभियंता नोंद यशस्वीपणे सेव्ह झाली!', 'SUCCESS');
+}
+function editJE(idx) {
+    var item = getData('je_records')[idx];
+    document.getElementById('newJEName').value = item.name;
+    document.getElementById('editJEIndex').value = idx;
+    document.getElementById('btnSaveJE').textContent = 'Update JE';
+    document.getElementById('btnCancelJE').style.display = 'block';
+}
+function cancelJEEdit() {
+    document.getElementById('newJEName').value = '';
+    document.getElementById('editJEIndex').value = '-1';
+    document.getElementById('btnSaveJE').textContent = 'Save JE';
+    document.getElementById('btnCancelJE').style.display = 'none';
+}
+function deleteJE(idx) {
+    if (confirm('हटवायचे का?')) {
+        var list = getData('je_records');
+        list.splice(idx, 1);
+        setData('je_records', list);
+        refreshJEList();
+        showAlert('कनिष्ठ अभियंता नोंद हटवली!', 'SUCCESS');
+    }
+}
+function refreshJEList() {
+    var list = getData('je_records');
+    var tbody = document.getElementById('jeListBody');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    list.forEach(function(item, idx) {
+        tbody.innerHTML += '<tr><td>'+(idx+1)+'</td><td>'+item.name+'</td><td class="action-cell" style="text-align:center;"><button class="btn-action" style="background:#2e7d32; padding:3px 6px; color:#fff; border:none; border-radius:3px;" onclick="editJE('+idx+')">Edit</button> <button class="btn-action" style="background:#d32f2f; padding:3px 6px; color:#fff; border:none; border-radius:3px;" onclick="deleteJE('+idx+')">Delete</button></td></tr>';
+    });
+}
+function printJEReport() {
+    var list = getData('je_records');
+    if (list.length === 0) return showAlert('कोणतीही कनिष्ठ अभियंता (JE) नोंद उपलब्ध नाही.', 'WARNING');
+    var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
+    var html = '<h2 style="text-align:center;">कनिष्ठ अभियंता (JE) व्यवस्थापन अहवाल</h2><table class="print-table"><thead><tr><th>अ.क्र.</th><th>कनिष्ठ अभियंत्याचे नाव</th></tr></thead><tbody>';
+    list.forEach(function(item, i) { html += '<tr><td>'+(i+1)+'</td><td><strong>'+item.name+'</strong></td></tr>'; });
+    html += '</tbody></table>';
+    printA4Document(html, 'JE_Report.pdf');
+}
+</script>
+</body>
+</html>
