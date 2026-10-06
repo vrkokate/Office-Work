@@ -15,63 +15,36 @@
 </div>
 
 <div class="breadcrumb-bar">
-    <span class="breadcrumb-link" onclick="location.href='index.html'">🏠 मुखपृष्ठ</span> &gt; <span>M.B. नियंत्रण प्रणाली</span>
+    <span class="breadcrumb-link" onclick="location.href='index.html'">🏠 मुख्य पृष्ठ</span> &gt; <span>M.B. नियंत्रण प्रणाली</span>
 </div>
 
 <div class="action-grid">
-<a href="JE.html" class="action-btn btn-je" style="text-decoration:none;"><span>👷</span>JE</a>
-<a href="MB.html" class="action-btn btn-mb-act" style="text-decoration:none;"><span>📖</span>M.B.</a>
-<a href="WorkList.html" class="action-btn btn-work" style="text-decoration:none;"><span>📋</span>Work list</a>
-<a href="BillRegister.html" class="action-btn btn-bill" style="text-decoration:none;"><span>📄</span>Bill reg.</a>
-<a href="Assign.html" class="action-btn btn-assign" style="text-decoration:none;"><span>📁</span>Assign</a>
-<a href="DataManager.html" class="action-btn btn-settings" style="text-decoration:none;"><span>⚙</span>Data Manager</a>
+<a href="JE.html" class="action-btn btn-je"><span>👷</span>JE</a>
+<a href="MB.html" class="action-btn btn-mb-act"><span>📖</span>M.B.</a>
+<a href="WorkList.html" class="action-btn btn-work"><span>📋</span>Work list</a>
+<a href="BillRegister.html" class="action-btn btn-bill"><span>📄</span>Bill reg.</a>
+<a href="Assign.html" class="action-btn btn-assign"><span>📁</span>Assign</a>
+<a href="DataManager.html" class="action-btn btn-settings"><span>⚙</span>Data Manager</a>
 </div>
 
 <div class="container">
 <div class="summary-box">
 <div class="summary-title">📖 मोजमाप पुस्तिका (M.B.) स्थिती</div>
 <div class="card-grid">
-<div class="stat-card" onclick="openQuickInfoModal('RECEIVED')">
-    <div class="stat-num" id="countReceivedMB">0</div>
-    <div class="stat-label">एकूण M.B.</div>
-</div>
-<div class="stat-card" onclick="openQuickInfoModal('GIVEN')">
-    <div class="stat-num" id="countGivenMB">0</div>
-    <div class="stat-label">दिलेली M.B.</div>
-</div>
-<div class="stat-card" onclick="openQuickInfoModal('AVAILABLE')">
-    <div class="stat-num" id="countAvailableMB">0</div>
-    <div class="stat-label">उपलब्ध M.B.</div>
-</div>
-</div>
-</div>
-
-<div class="filter-card">
-<h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
-<div class="form-row">
-<div class="form-group"><label>दिनांक पासून *</label><input type="date" class="form-control" id="repFromDate"></div>
-<div class="form-group"><label>दिनांक पर्यंत *</label><input type="date" class="form-control" id="repToDate"></div>
-</div>
-<div class="form-group">
-<label>मुख्य घटक</label>
-<select class="form-control" id="repMainCategory" onchange="onMainCategoryChange()">
-<option value="">-- मुख्य घटक निवडा --</option>
-<option value="M.B.">M.B.</option><option value="J.E.">J.E.</option><option value="Bill">Bill</option><option value="Contractor">Contractor</option><option value="Agency">Agency</option>
-</select>
-</div>
-<div class="form-group" id="dynamicOptionGroup1" style="display:none;"><label id="lblDynamic1">पुढील पर्याय</label><select class="form-control" id="repDynamicSelect1" onchange="onDynamicSelect1Change()"></select></div>
-<div class="form-group" id="dynamicOptionGroup2" style="display:none;"><label id="lblDynamic2">M.B. सविस्तर स्थिती</label><select class="form-control" id="repDynamicSelect2" onchange="onDynamicSelect2Change()"></select></div>
-<div class="form-group" id="dynamicOptionGroup3" style="display:none;"><label id="lblDynamic3">वाटप कोणाला केले?</label><select class="form-control" id="repDynamicSelect3" onchange="onDynamicSelect3Change()"><option value="">-- निवडा --</option><option value="ALL">सर्व</option><option value="JE">JE</option><option value="Office">विभागीय कार्यालय</option></select></div>
-<div class="form-group" id="dynamicInputGroup" style="display:none;"><label id="lblDynamicInput">JE</label><select class="form-control" id="repDynamicJEList"></select></div>
-<div class="form-group"><label>स्मार्ट शोध (M.B. क्र., नाव)</label><input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका"></div>
-<div style="display:flex; gap:8px;">
-    <button class="btn-report" style="flex:1; background:#0d47a1; margin:0;" onclick="executeSmartSearchOrReport()">🔍 SEARCH</button>
-    <button class="btn-report" style="flex:1; background:#546e7a; margin:0;" onclick="resetSearchSectionForm()">🔄 RESET</button>
+<div class="stat-card"><div class="stat-num" id="countReceivedMB">0</div><div class="stat-label">एकूण M.B.</div></div>
+<div class="stat-card"><div class="stat-num" id="countGivenMB">0</div><div class="stat-label">दिलेली M.B.</div></div>
+<div class="stat-card"><div class="stat-num" id="countAvailableMB">0</div><div class="stat-label">उपलब्ध M.B.</div></div>
 </div>
 </div>
 </div>
 </div>
-
 <script src="common.js"></script>
+<script>
+window.onload = function() {
+    animateNumberCount('countReceivedMB', getUniqueReceivedMBs().length);
+    animateNumberCount('countGivenMB', getCurrentlyActiveGivenMBs().length);
+    animateNumberCount('countAvailableMB', getAvailableStock().length);
+};
+</script>
 </body>
 </html>
