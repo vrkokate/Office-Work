@@ -4,53 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Digital Hub & M.B. System</title>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-#digitalHubSection { background: radial-gradient(circle at 50% 25%, #051d3b 0%, #020b18 55%, #00050d 100%); color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; overflow-x: hidden; padding-bottom: 25px; }
-.hub-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; margin-top: 5px; }
-.hub-title-box { text-align: center; }
-.hub-title-box h1 { font-size: 26px; font-weight: 800; background: linear-gradient(180deg, #ffffff 40%, #00e5ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.profile-icon { font-size: 20px; cursor: pointer; background: rgba(0, 229, 255, 0.1); border: 1.5px solid #00e5ff; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(0, 229, 255, 0.4); overflow: hidden; flex-shrink: 0; }
-.profile-icon-rotating-photo { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: center 10%; display: block; animation: globeSpin 6s linear infinite; }
-@keyframes globeSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
-.breadcrumb-bar { background: rgba(0, 229, 255, 0.1); border-bottom: 1px solid rgba(0, 229, 255, 0.2); padding: 4px 12px; font-size: 11px; color: #00e5ff; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-.breadcrumb-link { cursor: pointer; text-decoration: underline; }
-.tabs-wrapper { display: flex; flex-direction: column; gap: 5px; padding: 6px 8px; z-index: 5; }
-.tab-card { flex: 1; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 700; color: #ffffff; cursor: pointer; text-align: center; padding: 0 2px; }
-.btn-est { background: linear-gradient(180deg, #0051ff, #002b99); border: 1.5px solid #00d2ff; }
-.btn-mb { background: linear-gradient(180deg, #00a843, #006626); border: 1.5px solid #00ff6a; text-decoration: none; }
-.btn-form { background: linear-gradient(180deg, #ff7b00, #b34700); border: 1.5px solid #ffaa00; text-decoration: none; display: flex; align-items: center; justify-content: center; }
-.btn-tab4 { background: linear-gradient(180deg, #7c1fa2, #4a0072); border: 1.5px solid #e040fb; text-decoration: none; display: flex; align-items: center; justify-content: center; }
-.btn-setting { background: linear-gradient(180deg, #c2185b, #880e4f); border: 1.5px solid #ff80ab; text-decoration: none; display: flex; align-items: center; justify-content: center; }
-.center-stage { position: relative; text-align: center; padding: 5px 0; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 480px; margin: 0 auto; }
-.suvichar-running-box { width: 100%; margin: 12px 0 16px 0; padding: 0 15px; text-align: center; }
-.sanskrit-shloka-box { display: inline-block; font-size: 14.5px; font-weight: 800; color: #00e5ff; text-shadow: 0 0 10px rgba(0,229,255,0.7); line-height: 1.8; }
-.sanskrit-shloka-box span { display: block; }
-.podium-stage-box { position: relative; width: 280px; height: 280px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
-.avatar-on-podium { position: relative; z-index: 3; width: 170px; height: 170px; border-radius: 50%; object-fit: cover; object-position: center 10%; border: 3px solid #00e5ff; box-shadow: 0 0 22px #00e5ff; background: #010a14; margin-bottom: -12px; }
-.podium-base-layer { position: relative; z-index: 2; width: 250px; height: 50px; background: radial-gradient(ellipse at center, #002b5c 0%, #000c1a 75%); border: 2px solid #00e5ff; border-radius: 50%; box-shadow: 0 0 20px #00e5ff; }
-.stage-bottom-text { text-align: center; margin-top: 8px; }
-.text-smart-strong { font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #ffffff; text-transform: uppercase; }
-.text-smart-strong span { color: #00e5ff; }
-.text-created-by { font-size: 10px; color: #8be4ff; margin-top: 4px; font-weight: 600; }
-.profile-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 5, 15, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
-.profile-card { background: #051d3b; border: 2px solid #00e5ff; border-radius: 18px; width: 100%; max-width: 340px; padding: 22px 18px; text-align: center; position: relative; box-shadow: 0 5px 25px rgba(0,229,255,0.4); }
-.profile-card-close { position: absolute; right: 12px; top: 12px; color: #ff3d57; font-weight: 800; cursor: pointer; border: 1.5px solid #ff3d57; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
-.profile-avatar-small { width: 85px; height: 85px; border-radius: 50%; object-fit: cover; object-position: center 10%; border: 2px solid #00e5ff; margin-bottom: 6px; }
-.profile-name { font-size: 18px; font-weight: 800; color: #ffffff; margin-bottom: 2px; }
-.profile-title-tag { font-size: 10.5px; color: #00e5ff; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
-.profile-info-box { background: rgba(0, 229, 255, 0.08); border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; font-size: 12px; color: #e0f7fa; display: flex; flex-direction: column; gap: 4px; text-align: left; }
-.profile-info-row { display: flex; justify-content: space-between; }
-.profile-social-icons-row { display: flex; justify-content: center; gap: 14px; margin-top: 6px; }
-.brand-icon-btn { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; cursor: pointer; }
-.brand-icon-btn svg { width: 20px; height: 20px; fill: #ffffff; }
-.btn-call-brand { background: #00c853; }
-.btn-wa-brand { background: #25d366; }
-.btn-ig-brand { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #285AEB 90%); }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div id="digitalHubSection">
 <div class="hub-header">
 <div class="header-space"></div>
@@ -58,7 +14,7 @@
 <h1>Digital Hub</h1>
 <p>ONE PLATFORM | MANY SOLUTIONS</p>
 </div>
-<div class="profile-icon" onclick="openProfileModal()" title="माहिती व संपर्क">
+<div class="profile-icon" onclick="openProfileModal()">
 <img src="home-bg.jpg" onerror="this.onerror=null; this.src='1000320439_2.png';" class="profile-icon-rotating-photo" alt="Profile">
 </div>
 </div>
@@ -103,28 +59,8 @@
 </div>
 </div>
 </div>
-
-<div id="profileModal" class="profile-modal-overlay">
-<div class="profile-card">
-<div class="profile-card-close" onclick="closeProfileModal()">✕</div>
-<img src="home-bg.jpg" onerror="this.onerror=null; this.src='1000320439_2.png';" class="profile-avatar-small" alt="Profile Photo">
-<div class="profile-name">विठ्ठल रघुनाथ कोकाटे</div>
-<div class="profile-title-tag">सार्वजनिक बांधकाम विभाग</div>
-<div class="profile-info-box">
-<div class="profile-info-row"><span class="label">नाव:</span> <span>विठ्ठल रघुनाथ कोकाटे</span></div>
-<div class="profile-info-row"><span class="label">मोबाईल:</span> <span>8446556141</span></div>
-</div>
-<div class="profile-social-icons-row">
-<a href="tel:8446556141" class="brand-icon-btn btn-call-brand"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></a>
-<a href="https://wa.me/message/P4JXAKSDU4CBH1" target="_blank" class="brand-icon-btn btn-wa-brand"><svg viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01C17.18 3.03 14.69 2 12.04 2z"/></svg></a>
-<a href="https://www.instagram.com/vitthal_kokate" target="_blank" class="brand-icon-btn btn-ig-brand"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/></svg></a>
-</div>
-</div>
-</div>
-
 <script>
-function openProfileModal() { document.getElementById('profileModal').style.display = 'flex'; }
-function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
+function openProfileModal() { alert('विठ्ठल रघुनाथ कोकाटे\nमोबाईल: 8446556141'); }
 </script>
 </body>
 </html>
