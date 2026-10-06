@@ -229,12 +229,28 @@ body * { visibility: hidden !important; }
 <div id="workModal" class="modal-overlay"><div class="modal-card">
 <div class="modal-header"><h3 style="font-size: 14px; color:#00897b;">📋 कामांची यादी (Work List)</h3><button class="btn-close" onclick="closeModule('workModal')">X</button></div>
 <input type="hidden" id="editWorkIndex" value="-1">
-<div class="form-group"><label>कनिष्ठ अभियंता (JE) निवडा *</label><select class="form-control" id="workJE" onchange="onWorkJEChange()"><option value="">-- निवडा --</option></select></div>
-<div class="form-group"><label>वाटप केलेली M.B. निवडा *</label><select class="form-control" id="workMB" onchange="onWorkMBChange()"><option value="">-- आधी JE निवडा --</option></select></div>
+<div class="form-group"><label>कनिष्ठ अभियंता (JE) निवडा *</label><select class="form-control" id="workJE" onchange="onWorkJEChange()"><option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option></select></div>
+<div class="form-group"><label>वाटप केलेली M.B. निवडा *</label><select class="form-control" id="workMB" onchange="onWorkMBChange()"><option value="">-- वाटप केलेली M.B. निवडा --</option></select></div>
 <div class="form-group"><label>कामाचे नाव *</label><input type="text" class="form-control" id="workName" placeholder="कामाचे नाव"></div>
-<div class="form-group"><label>कंत्राटदार नाव *</label><input type="text" class="form-control" id="workContractor" placeholder="कंत्राटदार"></div>
-<div style="display:flex; gap:6px;"><button class="btn-report" style="background:#00897b; flex:1;" onclick="saveOrUpdateWork()">Save Work</button><button class="btn-report" style="background:#0d47a1; flex:1;" onclick="printWorkReport()">📄 प्रिंट</button></div>
-<div class="table-scroll-box" style="margin-top:10px;"><table class="data-table"><thead><tr><th>काम</th><th>JE</th><th>M.B.</th></tr></thead><tbody id="workListBody"></tbody></table></div>
+<div class="form-group"><label>कंत्राटदार / एजन्सीचे नाव *</label><input type="text" class="form-control" id="workContractor" placeholder="कंत्राटदार / एजन्सीचे नाव"></div>
+<div style="display:flex; gap:6px;"><button id="btnSaveWork" class="btn-report" style="background:#00897b; flex:1;" onclick="saveOrUpdateWork()">Save Work</button><button class="btn-report" style="background:#0d47a1; flex:1;" onclick="printWorkReport()">📄 प्रिंट</button></div>
+<button id="btnCancelWork" class="btn-report" style="background:#757575; margin-top:6px; display:none;" onclick="cancelWorkEdit()">रद्द करा</button>
+
+<div class="table-scroll-box" style="margin-top:10px;">
+<table class="data-table">
+    <thead>
+        <tr>
+            <th style="text-align:center;">अ.क्र.</th>
+            <th>कामाचे नाव</th>
+            <th>कंत्राटदार / एजन्सी</th>
+            <th>संबंधित JE</th>
+            <th>M.B. क्रमांक</th>
+            <th style="text-align:center;">Action</th>
+        </tr>
+    </thead>
+    <tbody id="workListBody"></tbody>
+</table>
+</div>
 </div></div>
 
 <!-- 4. Bill Reg. मोडल -->
@@ -654,14 +670,12 @@ function refreshAssignList() {
     }
 }
 
-/* 🌟 UPDATED: Work List JE Dropdown & Data Linking Fix */
+/* 🌟 UPDATED: Work List JE Dropdown, Form Reset & Table Columns (Edit/Delete) */
 function onWorkJEChange() {
     var je = document.getElementById('workJE').value;
     var mbSel = document.getElementById('workMB');
     if(!mbSel) return;
-    mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';
-    document.getElementById('workName').value = '';
-    document.getElementById('workContractor').value = '';
+    mbSel.innerHTML = '<option value="">-- वाटप केलेली M.B. निवडा --</option>';
     if (!je) return;
 
     var heldMBs = getCurrentlyHeldMBsByJE(je);
@@ -680,31 +694,20 @@ function onWorkJEChange() {
     });
 }
 
-function onWorkMBChange() {
-    var mbNo = document.getElementById('workMB').value;
-    document.getElementById('workName').value = '';
-    document.getElementById('workContractor').value = '';
-    if (!mbNo) return;
-    var works = getData('work_records').filter(function(w){ return w.mbNo === mbNo; });
-    if (works.length > 0) {
-        var latestWork = works[works.length - 1];
-        document.getElementById('workName').value = latestWork.name || '';
-        document.getElementById('workContractor').value = latestWork.contractor || '';
-    }
-}
+function onWorkMBChange() {}
 
 function saveOrUpdateWork() {
     var je = document.getElementById('workJE').value;
     var mb = document.getElementById('workMB').value;
     var name = document.getElementById('workName').value.trim();
     var con = document.getElementById('workContractor').value.trim();
-    var status = document.getElementById('workStatus') ? document.getElementById('workStatus').value : 'अपूर्ण';
+    var status = 'अपूर्ण';
     var idx = parseInt(document.getElementById('editWorkIndex').value, 10);
 
     if (!je) return showAlert('कृपया कनिष्ठ अभियंता (JE) निवडा.', 'WARNING');
     if (!mb) return showAlert('कृपया वाटप केलेली M.B. निवडा.', 'WARNING');
     if (!name) return showAlert('कामाचे नाव टाईप करा.', 'WARNING');
-    if (!con) return showAlert('कंत्राटदाराचे नाव टाईप करा.', 'WARNING');
+    if (!con) return showAlert('कंत्राटदार / एजन्सीचे नाव टाईप करा.', 'WARNING');
 
     var works = getData('work_records');
 
@@ -718,13 +721,52 @@ function saveOrUpdateWork() {
     if (idx === -1) {
         works.push({ name: name, je: je, contractor: con, mbNo: mb, status: status });
     } else {
-        var oldWork = works[idx];
         works[idx] = { name: name, je: je, contractor: con, mbNo: mb, status: status };
     }
 
     setData('work_records', works);
+    cancelWorkEdit();
     refreshWorkList();
     showAlert('काम यशस्वीपणे जतन झाले!', 'SUCCESS');
+}
+
+function editWork(idx) {
+    var item = getData('work_records')[idx];
+    document.getElementById('workJE').value = item.je;
+    onWorkJEChange();
+
+    var mbSel = document.getElementById('workMB');
+    var exists = Array.from(mbSel.options).some(function(opt){ return opt.value === item.mbNo; });
+    if (!exists && item.mbNo) {
+        mbSel.add(new Option(item.mbNo, item.mbNo));
+    }
+
+    document.getElementById('workMB').value = item.mbNo;
+    document.getElementById('workName').value = item.name;
+    document.getElementById('workContractor').value = item.contractor;
+    document.getElementById('editWorkIndex').value = idx;
+    document.getElementById('btnSaveWork').textContent = 'Update Work';
+    document.getElementById('btnCancelWork').style.display = 'block';
+}
+
+function cancelWorkEdit() {
+    document.getElementById('workJE').value = '';
+    document.getElementById('workMB').innerHTML = '<option value="">-- वाटप केलेली M.B. निवडा --</option>';
+    document.getElementById('workName').value = '';
+    document.getElementById('workContractor').value = '';
+    document.getElementById('editWorkIndex').value = '-1';
+    document.getElementById('btnSaveWork').textContent = 'Save Work';
+    document.getElementById('btnCancelWork').style.display = 'none';
+}
+
+function deleteWork(idx) {
+    if (confirm('ही कामाची नोंद कायमची हटवायची का?')) {
+        var list = getData('work_records');
+        list.splice(idx, 1);
+        setData('work_records', list);
+        refreshWorkList();
+        showAlert('काम यशस्वीरीत्या हटवले!', 'SUCCESS');
+    }
 }
 
 function refreshWorkList() {
@@ -732,14 +774,30 @@ function refreshWorkList() {
     var tbody = document.getElementById('workListBody');
     if(!tbody) return;
     tbody.innerHTML = '';
-    list.forEach(function(w, idx) {
-        tbody.innerHTML += '<tr><td>'+w.name+'</td><td>'+w.je+'</td><td>'+w.mbNo+'</td></tr>';
-    });
+    
+    if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:10px; color:#666;">कोणतीही कामाची नोंद उपलब्ध नाही.</td></tr>';
+    } else {
+        list.forEach(function(w, idx) {
+            var mbDisplay = w.mbNo || '-';
+            tbody.innerHTML += '<tr>' +
+            '<td style="text-align:center;">' + (idx + 1) + '</td>' +
+            '<td>' + w.name + '</td>' +
+            '<td>' + w.contractor + '</td>' +
+            '<td>' + w.je + '</td>' +
+            '<td>' + mbDisplay + '</td>' +
+            '<td class="action-cell" style="text-align:center;">' +
+            '<button class="btn-action" style="background:#2e7d32; padding:3px 6px;" onclick="editWork(' + idx + ')">Edit</button> ' +
+            '<button class="btn-action" style="background:#d32f2f; padding:3px 6px;" onclick="deleteWork(' + idx + ')">Delete</button>' +
+            '</td>' +
+            '</tr>';
+        });
+    }
 
     var wJE = document.getElementById('workJE');
     if(wJE) {
         var currentJe = wJE.value;
-        wJE.innerHTML = '<option value="">-- कनिष्ठ अभियंता निवडा --</option>';
+        wJE.innerHTML = '<option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option>';
         getData('je_records').forEach(function(j){ wJE.add(new Option(j.name, j.name)); });
         if(currentJe) wJE.value = currentJe;
     }
@@ -747,10 +805,20 @@ function refreshWorkList() {
 
 function printWorkReport() {
     var works = getData('work_records');
-    var html = '<table class="print-table"><thead><tr><th>काम</th><th>JE</th><th>M.B.</th></tr></thead><tbody>';
-    works.forEach(w => html += '<tr><td>'+w.name+'</td><td>'+w.je+'</td><td>'+w.mbNo+'</td></tr>');
+    if (works.length === 0) return showAlert('कोणतीही कामाची नोंद उपलब्ध नाही.', 'WARNING');
+    var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
+    var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;">' +
+    '<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">कामांची यादी (Work Register) अहवाल</h2></div>' +
+    '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>कामांची यादी</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div>' +
+    '</div>' +
+    '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>कामाचे नाव</th><th>JE</th><th>कंत्राटदार</th><th>स्थिती</th><th style="text-align:center;">M.B. क्र.</th></tr></thead><tbody>';
+
+    works.forEach(function(w, i) {
+        html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + w.name + '</td><td>' + w.je + '</td><td>' + w.contractor + '</td><td>' + (w.status || 'अपूर्ण') + '</td><td style="text-align:center;">' + w.mbNo + '</td></tr>';
+    });
+
     html += '</tbody></table>';
-    printA4Document(html, 'Work_Report.pdf');
+    printA4Document(html, 'Work_Register_Report.pdf');
 }
 
 function printMasterBillRegister() {
