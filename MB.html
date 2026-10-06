@@ -348,13 +348,41 @@ function printMBReport() {
     if (list.length === 0) return showAlert('कोणतीही नोंद उपलब्ध नाही.', 'WARNING');
     var html = '<table class="print-table"><thead><tr><th>अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>कोणाकडून मिळाली</th></tr></thead><tbody>';
     list.forEach(function(m, i) {
-        html += '<tr><td>' + (i+1) + '</td><td>' + formatDateToDMY(m.date) + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + (m.receivedSource || m.receivedFrom || '-') + '</td></tr>';
+        var srcVal = m.receivedSource || m.receivedFrom || '-';
+        html += '<tr><td>' + (i+1) + '</td><td>' + formatDateToDMY(m.date) + '</td><td><strong>' + m.mbNumber + '</strong></td><td>' + m.size + '</td><td>' + srcVal + '</td></tr>';
     });
     html += '</tbody></table>';
     printA4Document(html, 'Total_MB_Report.pdf');
 }
 
-/* 🌟 UPDATED: एकूण M.B. पॉपअप टेबल मध्ये कुणाकडून मिळाली, दिनांक आणि Edit/Delete एक्शन बटणे समाविष्ट केली आहेत */
+/* 🌟 UPDATED: प्रत्येक M.B. ची स्वतःची 'कुणाकडून मिळाली' माहिती Record मधून घ्यावी (Default 'भंडारपाल' काढले) */
+function getUniqueReceivedMBs(excludeIndex = -1) {
+    var allMBs = getData('mb_records');
+    var uniqueMap = {};
+    allMBs.forEach(function(m, i) {
+        if (i === excludeIndex) return;
+        var isRcv = (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी');
+        if (isRcv) {
+            var no = (m.mbNumber || '').trim();
+            var norm = normalizeMB(no);
+            if (norm && !uniqueMap[norm]) {
+                uniqueMap[norm] = {
+                    mbNumber: no,
+                    size: m.size || 'लहान M.B.',
+                    date: m.date,
+                    receivedSource: m.receivedSource || m.receivedFrom || '-',
+                    receivedDetail: m.receivedDetail || '-'
+                };
+            }
+        }
+    });
+    var list = [];
+    for (var k in uniqueMap) {
+        list.push(uniqueMap[k]);
+    }
+    return list;
+}
+
 function openQuickInfoModal(type) {
     currentQuickModalType = type;
     var title = type === 'RECEIVED' ? 'एकूण M.B.' : (type === 'GIVEN' ? 'दिलेली M.B.' : 'उपलब्ध M.B.');
@@ -384,7 +412,7 @@ function openQuickInfoModal(type) {
                 }
             }
 
-            var sourceText = m.receivedSource || m.receivedFrom || 'भंडारपाल';
+            var sourceText = m.receivedSource || m.receivedFrom || '-';
             var dateStr = formatDateToDMY(m.date);
             var sizeStr = m.size || 'लहान M.B.';
 
@@ -478,22 +506,22 @@ function saveOrUpdateMB() {
     var idx = parseInt(document.getElementById('editMBIndex').value, 10);
     if (!actionType || !size || !date) return showAlert('सर्व माहिती भरा.', 'WARNING');
 
-    var no = '', subDetail = '', srcText = '';
+    var no = '', subDetail = '', srcText = '-';
     if (actionType === 'दिलेली M.B.') {
         no = document.getElementById('selectAvailableMB').value;
         subDetail = document.getElementById('selectGivenJE').value || document.getElementById('givenOfficeInput').value;
-        srcText = 'M.B. ' + subDetail + ' यांना दिली';
+        srcText = subDetail ? ('M.B. ' + subDetail + ' यांना दिली') : '-';
     } else {
         no = document.getElementById('newMBNo').value.trim();
-        subDetail = document.getElementById('bhandarpalNameInput').value;
-        srcText = 'भांडारपाल (' + subDetail + ')';
+        subDetail = document.getElementById('bhandarpalNameInput').value.trim();
+        srcText = subDetail ? ('भांडारपाल (' + subDetail + ')') : '-';
     }
 
     var list = getData('mb_records');
     if (idx === -1) {
-        list.push({ actionType, mbNumber: no, size, receivedSource: srcText, receivedDetail: subDetail, receivedFrom: actionType + ' : ' + srcText, date });
+        list.push({ actionType, mbNumber: no, size, receivedSource: srcText, receivedDetail: subDetail, receivedFrom: srcText, date });
     } else {
-        list[idx] = { actionType, mbNumber: no, size, receivedSource: srcText, receivedDetail: subDetail, receivedFrom: actionType + ' : ' + srcText, date };
+        list[idx] = { actionType, mbNumber: no, size, receivedSource: srcText, receivedDetail: subDetail, receivedFrom: srcText, date };
     }
     setData('mb_records', list);
     cancelMBEdit();
