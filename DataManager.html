@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚙ Data Manager</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.container { padding: 15px; max-width: 500px; margin: auto; background: #fff; border-radius: 8px; margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body>
+<div class="top-header" style="background:#c2185b; color:#fff; padding:12px; position:relative; text-align:center;">
+<button class="btn-back-hub" onclick="location.href='MB.html'" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); background:#ff9800; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;">◀ मागे</button>
+<h1 style="font-size:15px; margin:0;">⚙ Data Manager & Backup</h1>
+</div>
+
+<div class="breadcrumb-bar" style="background:rgba(0, 229, 255, 0.1); padding:4px 12px; font-size:11px;">
+    <span class="breadcrumb-link" onclick="location.href='index.html'" style="cursor:pointer; text-decoration:underline; color:#0d47a1;">🏠 मुख्य पृष्ठ</span> &gt; <span onclick="location.href='MB.html'" style="cursor:pointer; text-decoration:underline; color:#0d47a1;">M.B. नियंत्रण प्रणाली</span> &gt; <span>Data Manager</span>
+</div>
+
+<div class="container">
+<h4 style="font-size:13px; color:#1976d2; margin-bottom:8px;">💾 डेटा बॅकअप व रेस्टोअर</h4>
+<button class="btn-report" style="background:#1976d2;" onclick="downloadBackup()">BACKUP SAVE (डेटा डाऊनलोड)</button>
+<button class="btn-report" style="background:#455a64; margin-top:8px;" onclick="document.getElementById('restoreFileInput').click()">BACKUP RESTORE (डेटा अपलोड)</button>
+<input type="file" id="restoreFileInput" style="display:none;" accept=".json" onchange="restoreBackup(event)">
+
+<hr style="margin:20px 0;">
+
+<h4 style="font-size:13px; color:#c2185b; margin-bottom:8px;">डेटा हटवा (Select & Delete)</h4>
+<div style="font-size:12px; display:flex; flex-direction:column; gap:6px;">
+<label><input type="checkbox" id="delAll" onchange="toggleSelectAll(this)"> <strong>सर्व डेटा निवडा</strong></label>
+<label><input type="checkbox" class="del-chk" value="je_records"> JE डेटा</label>
+<label><input type="checkbox" class="del-chk" value="mb_records"> M.B. डेटा</label>
+<label><input type="checkbox" class="del-chk" value="work_records"> कामांची यादी डेटा</label>
+<label><input type="checkbox" class="del-chk" value="dmbms_bills"> देयक नोंदवही डेटा</label>
+<label><input type="checkbox" class="del-chk" value="assign_records"> M.B. वाटप डेटा</label>
+</div>
+<button class="btn-report" style="background:#d32f2f; margin-top:12px;" onclick="deleteSelectedData()">निवडलेली माहिती कायमची हटवा</button>
+</div>
+
+<script src="common.js"></script>
+<script>
+function downloadBackup() {
+    var allData = { 
+        je_records: getData('je_records'), 
+        mb_records: getData('mb_records'), 
+        work_records: getData('work_records'), 
+        dmbms_bills: getData('dmbms_bills'), 
+        assign_records: getData('assign_records')
+    };
+    var blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a'); 
+    a.href = URL.createObjectURL(blob);
+    a.download = 'MB_SYSTEM_BACKUP.json'; 
+    a.click();
+    showAlert('बॅकअप फाईल डाऊनलोड झाली!', 'SUCCESS');
+}
+function restoreBackup(evt) {
+    var file = evt.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var d = JSON.parse(e.target.result);
+        if(d.je_records) setData('je_records', d.je_records);
+        if(d.mb_records) setData('mb_records', d.mb_records);
+        if(d.work_records) setData('work_records', d.work_records);
+        if(d.dmbms_bills) setData('dmbms_bills', d.dmbms_bills);
+        if(d.assign_records) setData('assign_records', d.assign_records);
+        showAlert('डेटा यशस्वीरीत्या पूर्ववत झाला!', 'SUCCESS');
+    };
+    reader.readAsText(file);
+}
+function toggleSelectAll(master) { document.querySelectorAll('.del-chk').forEach(c => c.checked = master.checked); }
+function deleteSelectedData() {
+    var selected = []; 
+    document.querySelectorAll('.del-chk:checked').forEach(c => selected.push(c.value));
+    if (selected.length === 0) return showAlert('किमान एक पर्याय निवडा.', 'WARNING');
+    if (confirm('निवडलेली माहिती कायमची नष्ट करायची का?')) {
+        selected.forEach(key => localStorage.removeItem(key));
+        showAlert('निवडलेली माहिती हटवली!', 'SUCCESS');
+    }
+}
+</script>
+</body>
+</html>
