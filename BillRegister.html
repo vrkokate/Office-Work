@@ -14,7 +14,7 @@ body { background: #f0f2f5; color: #212121; min-height: 100vh; padding-bottom: 2
 .top-header h1 { font-size: 15px; font-weight: 700; margin-left: 70px; text-align: left; }
 .btn-back-hub { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: #fff; color: #000; border: none; border-radius: 6px; padding: 6px 10px; font-size: 11.5px; font-weight: 800; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
 
-.container { padding: 12px; max-width: 800px; margin: auto; }
+.container { padding: 12px; max-width: 900px; margin: auto; }
 .summary-box { background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .summary-title { font-size: 13px; font-weight: 700; text-align: center; color: #f57c00; margin-bottom: 8px; }
 .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
@@ -31,16 +31,21 @@ body { background: #f0f2f5; color: #212121; min-height: 100vh; padding-bottom: 2
 .btn-report { width: 100%; background: #f57c00; color: #fff; border: none; padding: 11px; font-size: 13.5px; font-weight: 800; border-radius: 6px; cursor: pointer; margin-top: 6px; letter-spacing: 0.5px; }
 
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 999; justify-content: center; align-items: center; padding: 10px; }
-.modal-card { background: #fff; border-radius: 8px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; padding: 16px; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.modal-card { background: #fff; border-radius: 8px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; padding: 16px; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px; }
 .btn-close { background: #e53935; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
 
 .data-table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; }
 .data-table th, .data-table td { border: 1px solid #ddd; padding: 6px; text-align: left; vertical-align: middle; }
 .data-table th { background: #f5f5f5; font-weight: 600; }
-.table-scroll-box { max-height: 280px; overflow-y: auto; overflow-x: auto; border: 1px solid #ddd; border-radius: 6px; margin-top: 8px; }
+.table-scroll-box { max-height: 300px; overflow-y: auto; overflow-x: auto; border: 1px solid #ddd; border-radius: 6px; margin-top: 8px; }
 .action-cell { white-space: nowrap; text-align: center; display: flex; gap: 4px; justify-content: center; align-items: center; }
 .btn-action { border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; cursor: pointer; color: #fff; }
+
+.wizard-step { display: none; }
+.wizard-step.active { display: block; }
+.wizard-steps-indicator { display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 11.5px; font-weight: bold; color: #666; border-bottom: 1px solid #eee; padding-bottom: 6px; }
+.wizard-step-item.active-step { color: #f57c00; text-decoration: underline; }
 
 #printableArea { display: none !important; }
 @media print {
@@ -58,6 +63,7 @@ body * { visibility: hidden !important; }
 
 <div id="customAlertModal" class="modal-overlay" style="display:none; z-index:4000;">
 <div class="modal-card" style="max-width:350px; text-align:center; padding:22px; border-radius:12px;">
+<div style="font-size:32px; margin-bottom:6px;">ℹ️</div>
 <div id="customAlertTitle" style="font-size:15px; font-weight:800; color:#f57c00; margin-bottom:6px;">माहिती व सूचना</div>
 <div id="customAlertText" style="font-size:13px; font-weight:600; line-height: 1.55; color: #37474f; margin-bottom:18px;">मेसेज</div>
 <button class="btn-report" style="background:#f57c00; margin-top:0; padding:9px 18px; width:100%;" onclick="closeCustomAlert()">समजले (OK)</button>
@@ -66,12 +72,12 @@ body * { visibility: hidden !important; }
 
 <div id="customConfirmModal" class="modal-overlay" style="display:none; z-index:4500;">
 <div class="modal-card" style="max-width:320px; text-align:center; padding:20px; border-radius:12px;">
-<div style="font-size:32px; margin-bottom:4px;">⚠️</div>
-<div style="font-size:14.5px; font-weight:800; color:#d32f2f; margin-bottom:8px;" id="confirmModalTitle">ही बिल नोंद हटवायची का?</div>
+<div style="font-size:34px; margin-bottom:4px;">⚠️</div>
+<div style="font-size:14.5px; font-weight:800; color:#d32f2f; margin-bottom:8px;" id="confirmModalTitle">ही देयक नोंद कायमची हटवायची का?</div>
 <div id="confirmSubText" style="font-size:11.5px; color:#555; margin-bottom:15px; line-height:1.4;">हा बदल पूर्ववत करता येणार नाही.</div>
 <div style="display:flex; gap:8px;">
-<button class="btn-report" style="background:#757575; margin:0; flex:1; padding:9px; font-size:12px;" onclick="closeCustomConfirm(false)">❌ CANCEL</button>
-<button id="btnConfirmOkAction" class="btn-report" style="background:#d32f2f; margin:0; flex:1; padding:9px; font-size:12px;" onclick="closeCustomConfirm(true)">✅ DELETE</button>
+<button class="btn-report" style="background:#757575; margin:0; flex:1; padding:9px; font-size:12px;" onclick="closeCustomConfirm(false)">❌ रद्द करा</button>
+<button id="btnConfirmOkAction" class="btn-report" style="background:#d32f2f; margin:0; flex:1; padding:9px; font-size:12px;" onclick="closeCustomConfirm(true)">✅ Delete</button>
 </div>
 </div>
 </div>
@@ -87,19 +93,19 @@ body * { visibility: hidden !important; }
 <div class="card-grid">
 <div class="stat-card">
     <div class="stat-num" id="statTotalBills">0</div>
-    <div class="stat-label">एकूण बिल्स</div>
+    <div class="stat-label">Total Bills</div>
 </div>
 <div class="stat-card">
     <div class="stat-num" id="statTotalAmount">₹0</div>
-    <div class="stat-label">एकूण रक्कम</div>
+    <div class="stat-label">Total Amount</div>
 </div>
 <div class="stat-card">
     <div class="stat-num" id="statTotalDeduction">₹0</div>
-    <div class="stat-label">कपात (Deduction)</div>
+    <div class="stat-label">Total Deduction</div>
 </div>
 <div class="stat-card">
     <div class="stat-num" id="statNetPayable">₹0</div>
-    <div class="stat-label">निव्वळ देय रक्कम</div>
+    <div class="stat-label">Net Payable</div>
 </div>
 </div>
 </div>
@@ -108,14 +114,14 @@ body * { visibility: hidden !important; }
 <h3 style="font-size: 13.5px; color:#f57c00; margin-bottom: 10px;">🔍 देयक शोध व नवीन नोंद</h3>
 <div class="form-row">
 <div class="form-group"><label>स्मार्ट शोध (Bill No / Contractor / JE)</label><input type="text" class="form-control" id="billSearchInput" placeholder="शोधण्यासाठी येथे टाईप करा" oninput="filterBillRegisterTable()"></div>
-<div class="form-group" style="display:flex; align-items:flex-end;"><button class="btn-report" style="margin:0; background:#2e7d32;" onclick="openNewBillModal()">➕ नवीन देयक नोंदवा</button></div>
+<div class="form-group" style="display:flex; align-items:flex-end;"><button class="btn-report" style="margin:0; background:#2e7d32;" onclick="openWizard()">➕ नवीन देयक नोंदवा</button></div>
 </div>
 </div>
 
 <div class="summary-box">
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
 <span style="font-size:13px; font-weight:700; color:#0d47a1;">📋 नोंदवलेल्या देयकांची यादी</span>
-<button class="btn-report" style="width:auto; margin:0; padding:6px 12px; font-size:11px; background:#1565c0;" onclick="printMasterBillRegister()">📄 रिपोर्ट प्रिंट (A4)</button>
+<button class="btn-report" style="width:auto; margin:0; padding:6px 12px; font-size:11px; background:#1565c0;" onclick="printMasterBillRegister()">📄 प्रिंट / पीडीएफ रिपोर्ट</button>
 </div>
 <div class="table-scroll-box">
 <table class="data-table">
@@ -141,58 +147,128 @@ body * { visibility: hidden !important; }
 </div>
 </div>
 
-<!-- नवीन / एडिट बिल मॉडेल विझार्ड -->
-<div id="billEntryModal" class="modal-overlay">
+<!-- 🌟 STEP-BY-STEP BILL ENTRY WIZARD MODAL -->
+<div id="billWizardModal" class="modal-overlay">
 <div class="modal-card">
 <div class="modal-header">
-<h3 id="billModalTitle" style="font-size: 14px; color:#f57c00;">📄 नवीन देयक नोंद (Bill Entry Wizard)</h3>
-<button class="btn-close" onclick="closeBillModal()">X</button>
+<h3 id="wizardModalTitle" style="font-size: 14px; color:#f57c00;">📄 नवीन देयक नोंद (Bill Wizard)</h3>
+<button class="btn-close" onclick="closeWizardModal()">X</button>
 </div>
 <input type="hidden" id="editBillIndex" value="-1">
 
-<div class="form-group">
-<label>कनिष्ठ अभियंता (JE) निवडा *</label>
-<select class="form-control" id="billJE" onchange="onBillJEChange()"><option value="">-- JE निवडा --</option></select>
+<div class="wizard-steps-indicator">
+    <span class="wizard-step-item active-step" id="indicatorStep1">1. तपशील</span>
+    <span class="wizard-step-item" id="indicatorStep2">2. कपात</span>
+    <span class="wizard-step-item" id="indicatorStep3">3. पुनरावलोकन</span>
 </div>
 
-<div class="form-group">
-<label>संबंधित M.B. क्रमांक निवडा *</label>
-<select class="form-control" id="billMB" onchange="onBillMBChange()"><option value="">-- आधी JE निवडा --</option></select>
+<!-- STEP 1 -->
+<div class="wizard-step active" id="wizardStep1">
+    <div class="form-group">
+        <label>कनिष्ठ अभियंता (JE) निवडा *</label>
+        <select class="form-control" id="wizJE" onchange="onWizardJEChange()"><option value="">-- JE निवडा --</option></select>
+    </div>
+    <div class="form-group">
+        <label>वाटप केलेली M.B. क्रमांक निवडा *</label>
+        <select class="form-control" id="wizMB" onchange="onWizardMBChange()"><option value="">-- आधी JE निवडा --</option></select>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>कंत्राटदार / एजन्सी *</label><input type="text" class="form-control" id="wizContractor" placeholder="कंत्राटदार नाव"></div>
+        <div class="form-group"><label>कामाचे नाव *</label><input type="text" class="form-control" id="wizWorkName" placeholder="कामाचे नाव"></div>
+    </div>
+    <div class="form-group">
+        <label>बिल प्रकार (Bill Type) *</label>
+        <select class="form-control" id="wizBillType" onchange="checkExistingBillType()">
+            <option value="">-- बिल प्रकार निवडा --</option>
+            <option value="First RA Bill">First RA Bill</option>
+            <option value="Second RA Bill">Second RA Bill</option>
+            <option value="Third RA Bill">Third RA Bill</option>
+            <option value="Fourth RA Bill">Fourth RA Bill</option>
+            <option value="Fifth RA Bill">Fifth RA Bill</option>
+            <option value="Sixth RA Bill">Sixth RA Bill</option>
+            <option value="Seventh RA Bill">Seventh RA Bill</option>
+            <option value="Eighth RA Bill">Eighth RA Bill</option>
+            <option value="Ninth RA Bill">Ninth RA Bill</option>
+            <option value="Tenth RA Bill">Tenth RA Bill</option>
+            <option value="First and Final RA Bill">First and Final RA Bill</option>
+            <option value="Second and Final RA Bill">Second and Final RA Bill</option>
+            <option value="Third and Final RA Bill">Third and Final RA Bill</option>
+            <option value="Fourth and Final RA Bill">Fourth and Final RA Bill</option>
+            <option value="Fifth and Final RA Bill">Fifth and Final RA Bill</option>
+            <option value="Sixth and Final RA Bill">Sixth and Final RA Bill</option>
+            <option value="Seventh and Final RA Bill">Seventh and Final RA Bill</option>
+            <option value="Eighth and Final RA Bill">Eighth and Final RA Bill</option>
+            <option value="Ninth and Final RA Bill">Ninth and Final RA Bill</option>
+            <option value="Tenth and Final RA Bill">Tenth and Final RA Bill</option>
+            <option value="With Held">With Held</option>
+        </select>
+        <div id="duplicateBillWarning" style="color:#d32f2f; font-size:11px; font-weight:bold; margin-top:3px; display:none;"></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>बिल क्रमांक *</label><input type="text" class="form-control" id="wizBillNo" placeholder="उदा. BILL/01"></div>
+        <div class="form-group"><label>बिल दिनांक *</label><input type="date" class="form-control" id="wizBillDate"></div>
+    </div>
+    <button class="btn-report" onclick="goToStep(2)">पुढील (Next) ➔</button>
 </div>
 
-<div class="form-row">
-<div class="form-group"><label>कामाचे नाव *</label><input type="text" class="form-control" id="billWorkName" placeholder="कामाचे नाव"></div>
-<div class="form-group"><label>कंत्राटदार / एजन्सी *</label><input type="text" class="form-control" id="billContractor" placeholder="कंत्राटदार"></div>
+<!-- STEP 2 -->
+<div class="wizard-step" id="wizardStep2">
+    <div class="form-group">
+        <label>Passed Amount (पास रक्कम) ₹ *</label>
+        <input type="number" class="form-control" id="wizPassedAmount" placeholder="0.00" oninput="autoCalculateDeductions()">
+    </div>
+    
+    <div style="font-size:12px; font-weight:700; color:#f57c00; margin:8px 0 4px 0;">कपात तपशील (Deductions):</div>
+    <div class="form-row">
+        <div class="form-group"><label>Income Tax ₹</label><input type="number" class="form-control wiz-ded" id="dedIT" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-group"><label>Security Deposit ₹</label><input type="number" class="form-control wiz-ded" id="dedSD" value="0" oninput="autoCalculateDeductions()"></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>Maintenance ₹</label><input type="number" class="form-control wiz-ded" id="dedMaint" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-group"><label>Royalty Charges ₹</label><input type="number" class="form-control wiz-ded" id="dedRoyalty" value="0" oninput="autoCalculateDeductions()"></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>Govt. Ins. Scheme ₹</label><input type="number" class="form-control wiz-ded" id="dedIns" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-group"><label>Upkar (W.C.) ₹</label><input type="number" class="form-control wiz-ded" id="dedUpkar" value="0" oninput="autoCalculateDeductions()"></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>CGST 1% ₹</label><input type="number" class="form-control wiz-ded" id="dedCGST" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-group"><label>SGST 1% ₹</label><input type="number" class="form-control wiz-ded" id="dedSGST" value="0" oninput="autoCalculateDeductions()"></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>Other-1 ₹</label><input type="number" class="form-control wiz-ded" id="dedOther" value="0" oninput="autoCalculateDeductions()"></div>
+        <div class="form-group"><label><strong>Total Deduction:</strong></label><input type="text" class="form-control" id="wizTotalDeduction" readonly style="font-weight:bold; color:#d32f2f; background:#ffebee;" value="₹0.00"></div>
+    </div>
+    <div class="form-group">
+        <label><strong>Net Payable (निव्वळ देय रक्कम):</strong></label>
+        <input type="text" class="form-control" id="wizNetPayable" readonly style="font-weight:bold; color:#2e7d32; background:#e8f5e9; font-size:14px;" value="₹0.00">
+    </div>
+
+    <div style="display:flex; gap:6px; margin-top:10px;">
+        <button class="btn-report" style="background:#757575; flex:1;" onclick="goToStep(1)">◀ मागे</button>
+        <button class="btn-report" style="flex:1; margin-top:0;" onclick="goToStep(3)">पुढील (Preview) ➔</button>
+    </div>
 </div>
 
-<div class="form-row">
-<div class="form-group"><label>बिल क्रमांक *</label><input type="text" class="form-control" id="billNo" placeholder="उदा. BILL/01"></div>
-<div class="form-group"><label>बिल दिनांक *</label><input type="date" class="form-control" id="billDate"></div>
+<!-- STEP 3 -->
+<div class="wizard-step" id="wizardStep3">
+    <div style="background:#f9f9f9; border:1px solid #ddd; border-radius:6px; padding:12px; font-size:12px; line-height:1.6; margin-bottom:12px;" id="wizardPreviewBox"></div>
+    <div style="display:flex; gap:6px;">
+        <button class="btn-report" style="background:#757575; flex:1;" onclick="goToStep(2)">◀ मागे</button>
+        <button class="btn-report" style="background:#2e7d32; flex:1; margin-top:0;" onclick="saveNewBill()">✅ जतन करा (Save)</button>
+    </div>
 </div>
 
-<div class="form-group">
-<label>बिल प्रकार (Bill Type) *</label>
-<select class="form-control" id="billType">
-<option value="Running Bill (RA)">Running Bill (RA)</option>
-<option value="Final Bill">Final Bill</option>
-<option value="Advance Bill">Advance Bill</option>
-</select>
+</div>
 </div>
 
-<div class="form-row">
-<div class="form-group"><label>एकूण बिल रक्कम (Gross Amount) ₹ *</label><input type="number" class="form-control" id="billGrossAmount" placeholder="0.00" oninput="calculateBillNetPayable()"></div>
-<div class="form-group"><label>एकूण कपात (Total Deduction) ₹ *</label><input type="number" class="form-control" id="billDeduction" placeholder="0.00" oninput="calculateBillNetPayable()"></div>
-</div>
-
-<div class="form-group">
-<label><strong>निव्वळ देय रक्कम (Net Payable):</strong></label>
-<input type="text" class="form-control" id="billNetPayableDisplay" readonly style="font-weight:bold; color:#2e7d32; background:#e8f5e9; font-size:14px;" value="₹0.00">
-</div>
-
-<div style="display:flex; gap:6px; margin-top:12px;">
-<button id="btnSaveBill" class="btn-report" style="background:#f57c00; margin:0; flex:1;" onclick="saveOrUpdateBill()">Save Bill</button>
-<button class="btn-report" style="background:#757575; margin:0; width:90px;" onclick="closeBillModal()">रद्द करा</button>
-</div>
+<!-- SUCCESS MODAL AFTER SAVE -->
+<div id="billSuccessModal" class="modal-overlay">
+<div class="modal-card" style="max-width:350px; text-align:center; padding:22px;">
+<div style="font-size:36px; margin-bottom:6px;">✅</div>
+<div style="font-size:15px; font-weight:800; color:#2e7d32; margin-bottom:6px;">देयक यशस्वीरित्या जतन झाले!</div>
+<div id="successDetailsText" style="font-size:12px; color:#555; margin-bottom:16px; line-height:1.5;"></div>
+<button class="btn-report" style="background:#f57c00; margin:0;" onclick="closeSuccessModalAndRefresh()">Bill Register वर जा</button>
 </div>
 </div>
 
@@ -206,47 +282,87 @@ window.onload = function() {
 
 function showAlert(msg, type) { alert(msg); }
 
-var pendingBillDeleteCallback = null;
-function showBillConfirm(msg, callback) {
-    document.getElementById('confirmSubText').innerText = msg;
-    pendingBillDeleteCallback = callback;
+var pendingBillDeleteIdx = -1;
+function deleteBill(idx) {
+    pendingBillDeleteIdx = idx;
     document.getElementById('customConfirmModal').style.display = 'flex';
 }
 function closeCustomConfirm(isConfirmed) {
     document.getElementById('customConfirmModal').style.display = 'none';
-    if (pendingBillDeleteCallback) {
-        pendingBillDeleteCallback(isConfirmed);
-        pendingBillDeleteCallback = null;
+    if (isConfirmed && pendingBillDeleteIdx !== -1) {
+        var bills = getData('dmbms_bills');
+        bills.splice(pendingBillDeleteIdx, 1);
+        setData('dmbms_bills', bills);
+        refreshBillRegister();
+        showAlert('देयक नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
     }
+    pendingBillDeleteIdx = -1;
 }
 
-function openNewBillModal() {
+function openWizard() {
     document.getElementById('editBillIndex').value = '-1';
-    document.getElementById('billModalTitle').innerText = '📄 नवीन देयक नोंद (Bill Entry Wizard)';
-    document.getElementById('btnSaveBill').innerText = 'Save Bill';
-    document.getElementById('billNo').value = '';
-    document.getElementById('billDate').value = new Date().toISOString().slice(0, 10);
-    document.getElementById('billWorkName').value = '';
-    document.getElementById('billContractor').value = '';
-    document.getElementById('billGrossAmount').value = '';
-    document.getElementById('billDeduction').value = '';
-    document.getElementById('billNetPayableDisplay').value = '₹0.00';
+    document.getElementById('wizardModalTitle').innerText = '📄 नवीन देयक नोंद (Bill Wizard)';
+    document.getElementById('wizBillNo').value = '';
+    document.getElementById('wizBillDate').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('wizWorkName').value = '';
+    document.getElementById('wizContractor').value = '';
+    document.getElementById('wizBillType').value = '';
+    document.getElementById('wizPassedAmount').value = '';
+    document.getElementById('dedIT').value = '0';
+    document.getElementById('dedSD').value = '0';
+    document.getElementById('dedMaint').value = '0';
+    document.getElementById('dedRoyalty').value = '0';
+    document.getElementById('dedIns').value = '0';
+    document.getElementById('dedUpkar').value = '0';
+    document.getElementById('dedCGST').value = '0';
+    document.getElementById('dedSGST').value = '0';
+    document.getElementById('dedOther').value = '0';
+    document.getElementById('duplicateBillWarning').style.display = 'none';
     
-    var jeSel = document.getElementById('billJE');
+    var jeSel = document.getElementById('wizJE');
     jeSel.innerHTML = '<option value="">-- JE निवडा --</option>';
     getData('je_records').forEach(function(j){ jeSel.add(new Option(j.name, j.name)); });
     
-    document.getElementById('billMB').innerHTML = '<option value="">-- आधी JE निवडा --</option>';
-    document.getElementById('billEntryModal').style.display = 'flex';
+    document.getElementById('wizMB').innerHTML = '<option value="">-- आधी JE निवडा --</option>';
+    goToStep(1);
+    document.getElementById('billWizardModal').style.display = 'flex';
 }
 
-function closeBillModal() {
-    document.getElementById('billEntryModal').style.display = 'none';
+function closeWizardModal() {
+    document.getElementById('billWizardModal').style.display = 'none';
 }
 
-function onBillJEChange() {
-    var je = document.getElementById('billJE').value;
-    var mbSel = document.getElementById('billMB');
+function goToStep(stepNum) {
+    if (stepNum === 2) {
+        var je = document.getElementById('wizJE').value;
+        var mb = document.getElementById('wizMB').value;
+        var bType = document.getElementById('wizBillType').value;
+        var bNo = document.getElementById('wizBillNo').value.trim();
+        if (!je || !mb || !bType || !bNo) {
+            return showAlert('कृपया स्टेप 1 मधील सर्व आवश्यक माहिती भरा.', 'WARNING');
+        }
+    }
+    if (stepNum === 3) {
+        var passed = parseFloat(document.getElementById('wizPassedAmount').value) || 0;
+        if (passed <= 0) {
+            return showAlert('कृपया वैध Passed Amount (पास रक्कम) प्रविष्ट करा.', 'WARNING');
+        }
+        renderPreview();
+    }
+
+    document.querySelectorAll('.wizard-step').forEach(function(el){ el.classList.remove('active'); });
+    document.getElementById('wizardStep' + stepNum).classList.add('active');
+
+    for(var i=1; i<=3; i++) {
+        var ind = document.getElementById('indicatorStep' + i);
+        if(i === stepNum) ind.classList.add('active-step');
+        else ind.classList.remove('active-step');
+    }
+}
+
+function onWizardJEChange() {
+    var je = document.getElementById('wizJE').value;
+    var mbSel = document.getElementById('wizMB');
     mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';
     if (!je) return;
     
@@ -258,43 +374,96 @@ function onBillJEChange() {
     heldMBs.forEach(function(m){ mbSel.add(new Option(m.mbNo + ' (' + m.size + ')', m.mbNo)); });
 }
 
-function onBillMBChange() {
-    var mbNo = document.getElementById('billMB').value;
+function onWizardMBChange() {
+    var mbNo = document.getElementById('wizMB').value;
     if (!mbNo) return;
     var works = getData('work_records').filter(function(w){ return w.mbNo === mbNo; });
     if (works.length > 0) {
         var w = works[works.length - 1];
-        document.getElementById('billWorkName').value = w.name || '';
-        document.getElementById('billContractor').value = w.contractor || '';
+        document.getElementById('wizWorkName').value = w.name || '';
+        document.getElementById('wizContractor').value = w.contractor || '';
     }
+    checkExistingBillType();
 }
 
-function calculateBillNetPayable() {
-    var gross = parseFloat(document.getElementById('billGrossAmount').value) || 0;
-    var ded = parseFloat(document.getElementById('billDeduction').value) || 0;
-    var net = gross - ded;
-    document.getElementById('billNetPayableDisplay').value = '₹' + net.toFixed(2);
-}
-
-function saveOrUpdateBill() {
-    var je = document.getElementById('billJE').value;
-    var mb = document.getElementById('billMB').value;
-    var work = document.getElementById('billWorkName').value.trim();
-    var con = document.getElementById('billContractor').value.trim();
-    var bNo = document.getElementById('billNo').value.trim();
-    var bDate = document.getElementById('billDate').value;
-    var bType = document.getElementById('billType').value;
-    var gross = parseFloat(document.getElementById('billGrossAmount').value) || 0;
-    var ded = parseFloat(document.getElementById('billDeduction').value) || 0;
-    var net = gross - ded;
-    var idx = parseInt(document.getElementById('editBillIndex').value, 10);
-
-    if (!je || !mb || !work || !con || !bNo || !bDate || gross <= 0) {
-        return showAlert('कृपया सर्व आवश्यक माहिती योग्य प्रकारे भरा.', 'WARNING');
-    }
+function checkExistingBillType() {
+    var mb = document.getElementById('wizMB').value;
+    var bType = document.getElementById('wizBillType').value;
+    var editIdx = parseInt(document.getElementById('editBillIndex').value, 10);
+    var warnEl = document.getElementById('duplicateBillWarning');
+    if (!mb || !bType) { warnEl.style.display = 'none'; return; }
 
     var bills = getData('dmbms_bills');
-    var billObj = { billNo: bNo, date: bDate, contractor: con, workName: work, je: je, mbNo: mb, billType: bType, grossAmount: gross, deduction: ded, netPay: net };
+    var found = bills.some(function(b, i) {
+        return b.mbNo === mb && b.billType === bType && i !== editIdx;
+    });
+
+    if (found) {
+        warnEl.innerText = '⚠️ हे बिल (' + bType + ') या M.B. साठी पूर्वी नोंदवलेले आहे. पुढील/दुसरा Bill Type निवडा.';
+        warnEl.style.display = 'block';
+    } else {
+        warnEl.style.display = 'none';
+    }
+}
+
+function autoCalculateDeductions() {
+    var passed = parseFloat(document.getElementById('wizPassedAmount').value) || 0;
+    var deds = document.querySelectorAll('.wiz-ded');
+    var totalDed = 0;
+    deds.forEach(function(d){ totalDed += (parseFloat(d.value) || 0); });
+    
+    var net = passed - totalDed;
+    document.getElementById('wizTotalDeduction').value = '₹' + totalDed.toFixed(2);
+    document.getElementById('wizNetPayable').value = '₹' + net.toFixed(2);
+}
+
+function renderPreview() {
+    var je = document.getElementById('wizJE').value;
+    var mb = document.getElementById('wizMB').value;
+    var con = document.getElementById('wizContractor').value;
+    var work = document.getElementById('wizWorkName').value;
+    var bType = document.getElementById('wizBillType').value;
+    var bNo = document.getElementById('wizBillNo').value;
+    var bDate = document.getElementById('wizBillDate').value;
+    var passed = parseFloat(document.getElementById('wizPassedAmount').value) || 0;
+    var totDed = document.getElementById('wizTotalDeduction').value;
+    var netPay = document.getElementById('wizNetPayable').value;
+
+    var html = `
+    <strong>JE:</strong> ${je}<br>
+    <strong>M.B. क्र.:</strong> ${mb}<br>
+    <strong>कंत्राटदार:</strong> ${con}<br>
+    <strong>काम:</strong> ${work}<br>
+    <strong>बिल प्रकार:</strong> ${bType}<br>
+    <strong>बिल क्र. व दिनांक:</strong> ${bNo} (${formatDateToDMY(bDate)})<br>
+    <hr style="margin:6px 0; border:0; border-top:1px solid #ddd;">
+    <strong>Passed Amount:</strong> ₹${passed.toFixed(2)}<br>
+    <strong>Total Deduction:</strong> ${totDed}<br>
+    <strong style="color:#2e7d32;">Net Payable:</strong> <span style="font-size:13px; color:#2e7d32; font-weight:800;">${netPay}</span>
+    `;
+    document.getElementById('wizardPreviewBox').innerHTML = html;
+}
+
+function saveNewBill() {
+    var je = document.getElementById('wizJE').value;
+    var mb = document.getElementById('wizMB').value;
+    var con = document.getElementById('wizContractor').value.trim();
+    var work = document.getElementById('wizWorkName').value.trim();
+    var bType = document.getElementById('wizBillType').value;
+    var bNo = document.getElementById('wizBillNo').value.trim();
+    var bDate = document.getElementById('wizBillDate').value;
+    var passed = parseFloat(document.getElementById('wizPassedAmount').value) || 0;
+    
+    var totalDed = 0;
+    document.querySelectorAll('.wiz-ded').forEach(function(d){ totalDed += (parseFloat(d.value) || 0); });
+    var net = passed - totalDed;
+    var idx = parseInt(document.getElementById('editBillIndex').value, 10);
+
+    var bills = getData('dmbms_bills');
+    var billObj = { 
+        billNo: bNo, date: bDate, contractor: con, workName: work, je: je, mbNo: mb, 
+        billType: bType, grossAmount: passed, deduction: totalDed, netPay: net 
+    };
 
     if (idx === -1) {
         bills.push(billObj);
@@ -303,46 +472,40 @@ function saveOrUpdateBill() {
     }
 
     setData('dmbms_bills', bills);
-    closeBillModal();
+    closeWizardModal();
     refreshBillRegister();
-    showAlert('देयक नोंद यशस्वीरीत्या जतन झाली!', 'SUCCESS');
+
+    document.getElementById('successDetailsText').innerHTML = 'बिल क्र: <strong>' + bNo + '</strong><br>निव्वळ देय रक्कम: <strong>₹' + net.toFixed(2) + '</strong>';
+    document.getElementById('billSuccessModal').style.display = 'flex';
+}
+
+function closeSuccessModalAndRefresh() {
+    document.getElementById('billSuccessModal').style.display = 'none';
 }
 
 function editBill(idx) {
     var b = getData('dmbms_bills')[idx];
     document.getElementById('editBillIndex').value = idx;
-    document.getElementById('billModalTitle').innerText = '📄 देयक नोंद संपादन (Edit Bill)';
-    document.getElementById('btnSaveBill').innerText = 'Update Bill';
+    document.getElementById('wizardModalTitle').innerText = '📄 देयक नोंद संपादन (Edit Bill)';
 
-    var jeSel = document.getElementById('billJE');
+    var jeSel = document.getElementById('wizJE');
     jeSel.innerHTML = '<option value="">-- JE निवडा --</option>';
     getData('je_records').forEach(function(j){ jeSel.add(new Option(j.name, j.name)); });
     jeSel.value = b.je;
-    onBillJEChange();
+    onWizardJEChange();
 
-    document.getElementById('billMB').value = b.mbNo;
-    document.getElementById('billWorkName').value = b.workName;
-    document.getElementById('billContractor').value = b.contractor;
-    document.getElementById('billNo').value = b.billNo;
-    document.getElementById('billDate').value = b.date;
-    document.getElementById('billType').value = b.billType || 'Running Bill (RA)';
-    document.getElementById('billGrossAmount').value = b.grossAmount;
-    document.getElementById('billDeduction').value = b.deduction;
-    calculateBillNetPayable();
-
-    document.getElementById('billEntryModal').style.display = 'flex';
-}
-
-function deleteBill(idx) {
-    showBillConfirm("ही बिल नोंद कायमची हटवायची का?", function(confirmed) {
-        if (confirmed) {
-            var bills = getData('dmbms_bills');
-            bills.splice(idx, 1);
-            setData('dmbms_bills', bills);
-            refreshBillRegister();
-            showAlert('देयक नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
-        }
-    });
+    document.getElementById('wizMB').value = b.mbNo;
+    document.getElementById('wizContractor').value = b.contractor;
+    document.getElementById('wizWorkName').value = b.workName;
+    document.getElementById('wizBillType').value = b.billType || 'First RA Bill';
+    document.getElementById('wizBillNo').value = b.billNo;
+    document.getElementById('wizBillDate').value = b.date;
+    document.getElementById('wizPassedAmount').value = b.grossAmount;
+    document.getElementById('dedIT').value = b.deduction || 0; 
+    
+    autoCalculateDeductions();
+    goToStep(1);
+    document.getElementById('billWizardModal').style.display = 'flex';
 }
 
 function refreshBillRegister() {
