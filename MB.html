@@ -223,6 +223,43 @@ body * { visibility: hidden !important; }
 </div>
 </div>
 
+<!-- ⚙️ Data Manager & Backup Modal -->
+<div id="dataManagerModal" class="modal-overlay">
+<div class="modal-card" style="max-width: 500px;">
+<div class="modal-header">
+<h3 style="font-size: 15px; color:#c2185b; font-weight: 800;">⚙️ डेटा मॅनेजर व बॅकअप (Data Manager)</h3>
+<button class="btn-close" onclick="closeModule('dataManagerModal')">X</button>
+</div>
+<div style="font-size:12px; color:#555; margin-bottom:12px;">तुमच्या प्रणालीमधील सर्व डेटा सुरक्षितपणे डाउनलोड करा, अपलोड करा किंवा आवश्यक डेटा हटवा.</div>
+
+<!-- बॅकअप व रेस्टोअर कार्ड -->
+<div style="background:#f8f9fa; border:1px solid #e0e0e0; border-radius:8px; padding:12px; margin-bottom:14px;">
+<div style="font-size:13px; font-weight:700; color:#0d47a1; margin-bottom:8px;">💾 डेटा बॅकअप व रेस्टोअर</div>
+<button class="btn-report" style="background:#1976d2; margin-bottom:8px;" onclick="exportSystemJSONData()">📥 BACKUP SAVE (डेटा डाउनलोड)</button>
+<div style="position:relative; overflow:hidden; display:block; width:100%;">
+    <button class="btn-report" style="background:#455a64; margin:0;" onclick="document.getElementById('hiddenJSONUploadInput').click()">📤 BACKUP RESTORE (डेटा अपलोड)</button>
+    <input type="file" id="hiddenJSONUploadInput" accept=".json" style="display:none;" onchange="importSystemJSONData(this)">
+</div>
+</div>
+
+<!-- डेटा हटवा कार्ड (Select & Delete) -->
+<div style="background:#fff5f5; border:1px solid #ffcdd2; border-radius:8px; padding:12px; margin-bottom:10px;">
+<div style="font-size:13px; font-weight:700; color:#c62828; margin-bottom:8px;">🗑️ डेटा हटवा (Select & Delete)</div>
+<div style="display:flex; flex-direction:column; gap:6px; font-size:12px; font-weight:600; color:#333; margin-bottom:10px;">
+    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="chkSelectAllData" onchange="toggleSelectAllDataManager(this)"> <b>सर्व डेटा निवडा</b></label>
+    <hr style="border:0; border-top:1px solid #ffccd2; margin:2px 0;">
+    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="dm-chk" value="je_records"> JE डेटा</label>
+    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="dm-chk" value="mb_records"> M.B. डेटा</label>
+    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="dm-chk" value="work_records"> कामांची यादी डेटा</label>
+    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="dm-chk" value="dmbms_bills"> देयक नोंदवही डेटा</label>
+    <label style="display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="dm-chk" value="assign_records"> M.B. वाटप डेटा</label>
+</div>
+<button class="btn-report" style="background:#d32f2f; margin:0;" onclick="executeSelectedDataDeletion()">⚠️ निवडलेली माहिती कायमची हटवा</button>
+</div>
+
+</div>
+</div>
+
 <!-- स्मार्ट शोध निकाल मॉडेल -->
 <div id="searchResultModal" class="quick-info-overlay" style="z-index: 3800;">
 <div class="quick-info-card" style="max-width: 520px;">
@@ -267,7 +304,7 @@ body * { visibility: hidden !important; }
 <button class="action-btn btn-work" onclick="openModule('workModal')"><span>📋</span>Work list</button>
 <button class="action-btn btn-bill" onclick="openModule('billModal')"><span>📄</span>Bill reg.</button>
 <button class="action-btn btn-assign" onclick="openModule('assignModal')"><span>📁</span>Assign</button>
-<a href="DataManager.html" class="action-btn btn-settings"><span>⚙</span>Data Manager</a>
+<button class="action-btn btn-settings" onclick="openModule('dataManagerModal')"><span>⚙</span>Data Manager</button>
 </div>
 
 <div class="container">
@@ -786,7 +823,7 @@ function deleteMB(idx) {
             list.splice(idx, 1);
             setData('mb_records', list);
             refreshAll();
-            showAlert('नोंद हटवली!', 'SUCCESS');
+            showAlert('M.B. नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
         }
     });
 }
@@ -1114,6 +1151,70 @@ function printHistoryFromSAC() {
     var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
     var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;"><div style="text-align:center;"><h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + title + '</h2></div><div style="text-align:right; font-size:11px;">अहवाल दिनांक: ' + todayStr + '</div></div>' + bodyHTML;
     printA4Document(html, 'MB_' + currentSacMB + '_History.pdf');
+}
+
+/* 🌟 Data Manager & Backup Functions */
+function exportSystemJSONData() {
+    var backupObj = {
+        mb_records: getData('mb_records'),
+        je_records: getData('je_records'),
+        work_records: getData('work_records'),
+        dmbms_bills: getData('dmbms_bills'),
+        assign_records: getData('assign_records'),
+        backup_date: new Date().toISOString()
+    };
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj, null, 2));
+    var downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", "MB_System_Backup_" + new Date().toISOString().slice(0, 10) + ".json");
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    showAlert("✅ डेटा बॅकअप यशस्वीरीत्या डाऊनलोड झाला आहे!", "SUCCESS");
+}
+
+function importSystemJSONData(input) {
+    var file = input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            var json = JSON.parse(e.target.result);
+            if (json.mb_records) setData('mb_records', json.mb_records);
+            if (json.je_records) setData('je_records', json.je_records);
+            if (json.work_records) setData('work_records', json.work_records);
+            if (json.dmbms_bills) setData('dmbms_bills', json.dmbms_bills);
+            if (json.assign_records) setData('assign_records', json.assign_records);
+            refreshAll();
+            showAlert("✅ डेटा बॅकअप यशस्वीरीत्या रेस्टोअर (अपलोड) झाला आहे!", "SUCCESS");
+        } catch(err) {
+            showAlert("❌ चुकीची किंवा भ्रष्ट फाईल स्वरूप!", "ERROR");
+        }
+        input.value = "";
+    };
+    reader.readAsText(file);
+}
+
+function toggleSelectAllDataManager(master) {
+    var checkboxes = document.querySelectorAll('.dm-chk');
+    checkboxes.forEach(function(chk) { chk.checked = master.checked; });
+}
+
+function executeSelectedDataDeletion() {
+    var checkboxes = document.querySelectorAll('.dm-chk:checked');
+    if (checkboxes.length === 0) return showAlert("⚠️ कृपया हटवण्यासाठी किमान एक डेटा प्रकार निवडा.", "WARNING");
+
+    showCustomConfirm("डेटा हटवा (Select & Delete)", "तुम्हाला खरोखर निवडलेला सर्व डेटा कायमस्वरूपी हटवायचा का?", null, "✅ CONFIRM DELETE", "#d32f2f", function(confirmed) {
+        if (confirmed) {
+            checkboxes.forEach(function(chk) {
+                localStorage.removeItem(chk.value);
+            });
+            document.getElementById('chkSelectAllData').checked = false;
+            checkboxes.forEach(function(chk) { chk.checked = false; });
+            refreshAll();
+            showAlert("✅ निवडलेला डेटा यशस्वीरीत्या कायमचा हटवला गेला आहे!", "SUCCESS");
+        }
+    });
 }
 
 var currentSacMB = null;
