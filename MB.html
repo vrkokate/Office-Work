@@ -126,6 +126,18 @@ body * { visibility: hidden !important; }
 </div>
 </div>
 
+<!-- 🌟 Custom Confirmation Modal for Delete -->
+<div id="customConfirmModal" class="modal-overlay" style="display:none; z-index:4500;">
+<div class="modal-card" style="max-width:320px; text-align:center; padding:20px; border-radius:12px;">
+<div style="font-size:34px; margin-bottom:6px;">❓</div>
+<div style="font-size:14.5px; font-weight:800; color:#37474f; margin-bottom:15px;" id="confirmModalText">ही नोंद हटवायची का?</div>
+<div style="display:flex; gap:8px;">
+<button class="btn-report" style="background:#757575; margin:0; flex:1; padding:9px;" onclick="closeCustomConfirm(false)">❌ CANCEL</button>
+<button class="btn-report" style="background:#d32f2f; margin:0; flex:1; padding:9px;" onclick="closeCustomConfirm(true)">✅ DELETE</button>
+</div>
+</div>
+</div>
+
 <!-- 📘 M.B. SMART ACTION CENTER MODAL -->
 <div id="smartActionCenterModal" class="quick-info-overlay" style="z-index: 3900;">
 <div class="quick-info-card" style="max-width: 480px; padding: 16px;">
@@ -355,6 +367,21 @@ function checkDatePlaceholder(input) {
 
 function showAlert(msg, type) { alert(msg); }
 
+// Custom Confirmation Modal Logic for Delete
+var pendingDeleteCallback = null;
+function showCustomConfirm(msg, callback) {
+    document.getElementById('confirmModalText').innerText = msg;
+    pendingDeleteCallback = callback;
+    document.getElementById('customConfirmModal').style.display = 'flex';
+}
+function closeCustomConfirm(isConfirmed) {
+    document.getElementById('customConfirmModal').style.display = 'none';
+    if (pendingDeleteCallback) {
+        pendingDeleteCallback(isConfirmed);
+        pendingDeleteCallback = null;
+    }
+}
+
 function openModule(id) {
     var modal = document.getElementById(id);
     if(modal) {
@@ -536,14 +563,16 @@ function openQuickInfoModal(type) {
 
 function quickPopupDelete(idx) {
     if (idx === -1) return showAlert('रेकॉर्ड सापडला नाही.', 'ERROR');
-    if (confirm('ही M.B. नोंद कायमची हटवायची का?')) {
-        var list = getData('mb_records');
-        list.splice(idx, 1);
-        setData('mb_records', list);
-        refreshAll();
-        closeQuickInfoModal();
-        showAlert('M.B. नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
-    }
+    showCustomConfirm("ही नोंद हटवायची का?", function(confirmed) {
+        if (confirmed) {
+            var list = getData('mb_records');
+            list.splice(idx, 1);
+            setData('mb_records', list);
+            refreshAll();
+            closeQuickInfoModal();
+            showAlert('M.B. नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
+        }
+    });
 }
 
 function closeQuickInfoModal() { document.getElementById('quickInfoModal').style.display = 'none'; }
@@ -648,13 +677,15 @@ function cancelMBEdit() {
 }
 
 function deleteMB(idx) {
-    if (confirm('ही नोंद हटवायची का?')) {
-        var list = getData('mb_records');
-        list.splice(idx, 1);
-        setData('mb_records', list);
-        refreshAll();
-        showAlert('नोंद हटवली!', 'SUCCESS');
-    }
+    showCustomConfirm("ही नोंद हटवायची का?", function(confirmed) {
+        if (confirmed) {
+            var list = getData('mb_records');
+            list.splice(idx, 1);
+            setData('mb_records', list);
+            refreshAll();
+            showAlert('नोंद हटवली!', 'SUCCESS');
+        }
+    });
 }
 
 function onMainCategoryChange() {
@@ -765,7 +796,7 @@ function closeSearchResultModal() {
     document.getElementById('searchResultModal').style.display = 'none';
 }
 
-/* 🌟 EXACT UPDATE: 6 Columns in History Table with Event (घटना) and Edit/Delete per row */
+/* 🌟 UPDATED: 6 Columns in History Table with Event (घटना) and Edit/Delete per row */
 function formatTransactionSentence(h) {
     if (!h) return 'अद्याप नोंद झालेली नाही.';
     var act = (h.actionType || '').trim();
@@ -816,6 +847,7 @@ function openSmartActionCenter(mbNo) {
         holderDisplay = hName ? ("JE श्री " + hName + " रावसाहेब") : "उपलब्ध";
     }
 
+    // 🌟 Status Green Badge with Soft Pulse Animation
     var statusBadgeHtml = isAvail ? '<span class="status-badge-pill badge-avail">उपलब्ध</span>' : '<span class="status-badge-pill badge-issued">दिलेली (ISSUED)</span>';
 
     var detailsHtml = `
@@ -861,7 +893,7 @@ function openSmartActionCenter(mbNo) {
             '<td>' + detailSentence + '</td>' +
             '<td class="action-cell" style="text-align:center;">' +
             '<button class="btn-action" style="background:#2e7d32; padding:2px 5px; font-size:9.5px;" onclick="closeSmartActionCenter(); openModule(\'mbModal\'); editMB(' + realIdx + ')">Edit</button> ' +
-            '<button class="btn-action" style="background:#d32f2f; padding:2px 5px; font-size:9.5px;" onclick="deleteMB(' + realIdx + '); closeSmartActionCenter();">Delete</button>' +
+            '<button class="btn-action" style="background:#d32f2f; padding:2px 5px; font-size:9.5px;" onclick="deleteMBFromSAC(' + realIdx + ')">Delete</button>' +
             '</td>' +
             '</tr>';
         });
@@ -870,6 +902,19 @@ function openSmartActionCenter(mbNo) {
     
     document.getElementById('sacHistoryTableWrapper').innerHTML = historyHtml;
     document.getElementById('smartActionCenterModal').style.display = "flex";
+}
+
+function deleteMBFromSAC(realIdx) {
+    showCustomConfirm("ही नोंद हटवायची का?", function(confirmed) {
+        if (confirmed) {
+            var list = getData('mb_records');
+            list.splice(realIdx, 1);
+            setData('mb_records', list);
+            refreshAll();
+            closeSmartActionCenter();
+            showAlert('M.B. नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
+        }
+    });
 }
 
 function closeSmartActionCenter() {
@@ -992,10 +1037,15 @@ function editJE(idx) {
 }
 
 function deleteJE(idx) {
-    var list = getData('je_records');
-    list.splice(idx, 1);
-    setData('je_records', list);
-    refreshJEList();
+    showCustomConfirm("ही नोंद हटवायची का?", function(confirmed) {
+        if (confirmed) {
+            var list = getData('je_records');
+            list.splice(idx, 1);
+            setData('je_records', list);
+            refreshJEList();
+            showAlert('JE नोंद हटवली!', 'SUCCESS');
+        }
+    });
 }
 
 function printJEReport() {
@@ -1124,13 +1174,15 @@ function cancelWorkEdit() {
 }
 
 function deleteWork(idx) {
-    if (confirm('ही कामाची नोंद कायमची हटवायची का?')) {
-        var list = getData('work_records');
-        list.splice(idx, 1);
-        setData('work_records', list);
-        refreshWorkList();
-        showAlert('काम यशस्वीरीत्या हटवले!', 'SUCCESS');
-    }
+    showCustomConfirm("ही कामाची नोंद कायमची हटवायची का?", function(confirmed) {
+        if (confirmed) {
+            var list = getData('work_records');
+            list.splice(idx, 1);
+            setData('work_records', list);
+            refreshWorkList();
+            showAlert('काम यशस्वीरीत्या हटवले!', 'SUCCESS');
+        }
+    });
 }
 
 function refreshWorkList() {
@@ -1175,23 +1227,4 @@ function printWorkReport() {
     '<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">कामांची यादी (Work Register) अहवाल</h2></div>' +
     '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>कामांची यादी</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div>' +
     '</div>' +
-    '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>कामाचे नाव</th><th>JE</th><th>कंत्राटदार</th><th>स्थिती</th><th style="text-align:center;">M.B. क्र.</th></tr></thead><tbody>';
-
-    works.forEach(function(w, i) {
-        html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + w.name + '</td><td>' + w.je + '</td><td>' + w.contractor + '</td><td>' + (w.status || 'अपूर्ण') + '</td><td style="text-align:center;">' + w.mbNo + '</td></tr>';
-    });
-
-    html += '</tbody></table>';
-    printA4Document(html, 'Work_Register_Report.pdf');
-}
-
-function printMasterBillRegister() {
-    var bills = getData('dmbms_bills');
-    var html = '<table class="print-table"><thead><tr><th>बिल क्र.</th><th>कंत्राटदार</th><th>रक्कम</th></tr></thead><tbody>';
-    bills.forEach(b => html += '<tr><td>'+b.billNo+'</td><td>'+b.contractor+'</td><td>'+b.netPay+'</td></tr>');
-    html += '</tbody></table>';
-    printA4Document(html, 'Bill_Register.pdf');
-}
-</script>
-</body>
-</html>
+    '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>कामाचे नाव</th><th>JE</th><th>क
