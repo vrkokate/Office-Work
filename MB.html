@@ -90,12 +90,7 @@ content: "दिनांक निवडा"; position: absolute; left: 10px; t
 .sac-btn-history { background: #546e7a; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .sac-btn-print { background: #1565c0; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%; margin-top: 8px; }
 
-@keyframes softPulse {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.75; transform: scale(1.02); }
-    100% { opacity: 1; transform: scale(1); }
-}
-
+/* 🌟 Magic Multi-Color Neon / Magic Button Effect for "उपलब्ध" Badge */
 .magic-neon-badge {
     position: relative;
     display: inline-flex;
@@ -185,18 +180,19 @@ body * { visibility: hidden !important; }
 </div>
 </div>
 
+<!-- 🌟 Custom Confirmation Modal for Delete & Receive -->
 <div id="customConfirmModal" class="modal-overlay" style="display:none; z-index:4500;">
 <div class="modal-card" style="max-width:340px; text-align:center; padding:20px; border-radius:12px;">
-<div style="font-size:32px; margin-bottom:4px;">⚠️</div>
-<div style="font-size:14.5px; font-weight:800; color:#d32f2f; margin-bottom:8px;">ही नोंद हटवायची का?</div>
+<div style="font-size:32px; margin-bottom:4px;" id="confirmModalIcon">⚠️</div>
+<div style="font-size:14.5px; font-weight:800; color:#333; margin-bottom:8px;" id="confirmModalTitle">ही नोंद हटवायची का?</div>
 <div id="confirmSubText" style="font-size:11.5px; color:#555; margin-bottom:12px; line-height:1.4;"></div>
 <div id="confirmInputContainer" style="margin-bottom:12px; display:none;">
     <label style="display:block; font-size:11px; font-weight:700; color:#333; margin-bottom:4px;">खात्री करण्यासाठी संबंधित M.B. क्रमांक प्रविष्ट करा:</label>
     <input type="text" class="form-control" id="confirmMBVerifyInput" placeholder="M.B. क्रमांक टाका" style="text-align:center; font-weight:bold; font-size:13px;" oninput="checkVerifyInputMatch(this)">
 </div>
 <div style="display:flex; gap:8px;">
-<button class="btn-report" style="background:#757575; margin:0; flex:1; padding:9px; font-size:12px;" onclick="closeCustomConfirm(false)">❌ CANCEL</button>
-<button id="btnConfirmDeleteAction" class="btn-report" style="background:#d32f2f; margin:0; flex:1; padding:9px; font-size:12px;" onclick="closeCustomConfirm(true)">✅ DELETE</button>
+<button id="btnConfirmCancelAction" class="btn-report" style="background:#757575; margin:0; flex:1; padding:9px; font-size:12px;" onclick="closeCustomConfirm(false)">❌ CANCEL</button>
+<button id="btnConfirmOkAction" class="btn-report" style="background:#d32f2f; margin:0; flex:1; padding:9px; font-size:12px;" onclick="closeCustomConfirm(true)">✅ DELETE</button>
 </div>
 </div>
 </div>
@@ -430,29 +426,34 @@ function checkDatePlaceholder(input) {
 
 function showAlert(msg, type) { alert(msg); }
 
-var pendingDeleteCallback = null;
+// 🌟 Advanced Custom Confirmation Modal (Supports Delete with verification & Receive)
+var pendingConfirmCallback = null;
 var expectedVerifyMB = null;
 
-function showCustomConfirm(msg, expectedMB, callback) {
+function showCustomConfirm(title, msg, expectedMB, okText, okColor, callback) {
+    document.getElementById('confirmModalTitle').innerText = title;
     document.getElementById('confirmSubText').innerText = msg;
-    pendingDeleteCallback = callback;
+    pendingConfirmCallback = callback;
     expectedVerifyMB = expectedMB ? String(expectedMB).trim() : null;
     
     var inputContainer = document.getElementById('confirmInputContainer');
     var verifyInput = document.getElementById('confirmMBVerifyInput');
-    var confirmBtn = document.getElementById('btnConfirmDeleteAction');
+    var okBtn = document.getElementById('btnConfirmOkAction');
+
+    okBtn.innerText = okText || "✅ OK";
+    okBtn.style.background = okColor || "#d32f2f";
 
     if (expectedVerifyMB) {
         inputContainer.style.display = 'block';
         verifyInput.value = '';
-        confirmBtn.disabled = true;
-        confirmBtn.style.opacity = '0.5';
-        confirmBtn.style.cursor = 'not-allowed';
+        okBtn.disabled = true;
+        okBtn.style.opacity = '0.5';
+        okBtn.style.cursor = 'not-allowed';
     } else {
         inputContainer.style.display = 'none';
-        confirmBtn.disabled = false;
-        confirmBtn.style.opacity = '1';
-        confirmBtn.style.cursor = 'pointer';
+        okBtn.disabled = false;
+        okBtn.style.opacity = '1';
+        okBtn.style.cursor = 'pointer';
     }
 
     document.getElementById('customConfirmModal').style.display = 'flex';
@@ -461,23 +462,23 @@ function showCustomConfirm(msg, expectedMB, callback) {
 
 function checkVerifyInputMatch(input) {
     var val = (input.value || '').trim();
-    var confirmBtn = document.getElementById('btnConfirmDeleteAction');
+    var okBtn = document.getElementById('btnConfirmOkAction');
     if (val === expectedVerifyMB) {
-        confirmBtn.disabled = false;
-        confirmBtn.style.opacity = '1';
-        confirmBtn.style.cursor = 'pointer';
+        okBtn.disabled = false;
+        okBtn.style.opacity = '1';
+        okBtn.style.cursor = 'pointer';
     } else {
-        confirmBtn.disabled = true;
-        confirmBtn.style.opacity = '0.5';
-        confirmBtn.style.cursor = 'not-allowed';
+        okBtn.disabled = true;
+        okBtn.style.opacity = '0.5';
+        okBtn.style.cursor = 'not-allowed';
     }
 }
 
 function closeCustomConfirm(isConfirmed) {
     document.getElementById('customConfirmModal').style.display = 'none';
-    if (pendingDeleteCallback) {
-        pendingDeleteCallback(isConfirmed);
-        pendingDeleteCallback = null;
+    if (pendingConfirmCallback) {
+        pendingConfirmCallback(isConfirmed);
+        pendingConfirmCallback = null;
     }
     expectedVerifyMB = null;
 }
@@ -665,7 +666,7 @@ function quickPopupDelete(idx) {
     if (idx === -1) return showAlert('रेकॉर्ड सापडला नाही.', 'ERROR');
     var rec = getData('mb_records')[idx];
     var mbNo = rec ? rec.mbNumber : '';
-    showCustomConfirm("ही नोंद हटवण्यासाठी कृपया M.B. क्रमांक '" + mbNo + "' खालील बॉक्समध्ये टाईप करा:", mbNo, function(confirmed) {
+    showCustomConfirm("ही नोंद हटवायची का?", "ही नोंद हटवण्यासाठी कृपया M.B. क्रमांक '" + mbNo + "' खालील बॉक्समध्ये टाईप करा:", mbNo, "✅ DELETE", "#d32f2f", function(confirmed) {
         if (confirmed) {
             var list = getData('mb_records');
             list.splice(idx, 1);
@@ -781,7 +782,7 @@ function cancelMBEdit() {
 function deleteMB(idx) {
     var rec = getData('mb_records')[idx];
     var mbNo = rec ? rec.mbNumber : '';
-    showCustomConfirm("ही नोंद हटवण्यासाठी कृपया M.B. क्रमांक '" + mbNo + "' खालील बॉक्समध्ये टाईप करा:", mbNo, function(confirmed) {
+    showCustomConfirm("ही नोंद हटवायची का?", "ही नोंद हटवण्यासाठी कृपया M.B. क्रमांक '" + mbNo + "' खालील बॉक्समध्ये टाईप करा:", mbNo, "✅ DELETE", "#d32f2f", function(confirmed) {
         if (confirmed) {
             var list = getData('mb_records');
             list.splice(idx, 1);
@@ -1008,7 +1009,7 @@ function openSmartActionCenter(mbNo) {
 function deleteMBFromSAC(realIdx) {
     var rec = getData('mb_records')[realIdx];
     var mbNo = rec ? rec.mbNumber : currentSacMB;
-    showCustomConfirm("ही नोंद हटवण्यासाठी कृपया M.B. क्रमांक '" + mbNo + "' खालील बॉक्समध्ये टाईप करा:", mbNo, function(confirmed) {
+    showCustomConfirm("ही नोंद हटवायची का?", "ही नोंद हटवण्यासाठी कृपया M.B. क्रमांक '" + mbNo + "' खालील बॉक्समध्ये टाईप करा:", mbNo, "✅ DELETE", "#d32f2f", function(confirmed) {
         if (confirmed) {
             var list = getData('mb_records');
             list.splice(realIdx, 1);
@@ -1033,11 +1034,11 @@ function sacTriggerEditRecord() {
     editMB(currentSacStatusObj.index);
 }
 
-// 🌟 UPDATED: Receive with Custom Confirmation ("ही M.B. कार्यालयात जमा करायची का?")
+// 🌟 UPDATED: Receive with Custom Confirmation Modal ("ही M.B. कार्यालयात जमा करायची का?") and no Delete confusion
 function sacTriggerReceiveMB() {
     if (!currentSacMB || !currentSacStatusObj) return;
     
-    showCustomConfirm("ही M.B. कार्यालयात जमा करायची का?", null, function(confirmed) {
+    showCustomConfirm("माहिती व सूचना", "ही M.B. कार्यालयात जमा करायची का?", null, "✅ RECEIVE", "#0277bd", function(confirmed) {
         if (confirmed) {
             var todayISO = new Date().toISOString().slice(0, 10);
             var list = getData('mb_records');
@@ -1144,7 +1145,7 @@ function editJE(idx) {
 }
 
 function deleteJE(idx) {
-    showCustomConfirm("ही JE नोंद हटवायची का?", null, function(confirmed) {
+    showCustomConfirm("ही नोंद हटवायची का?", "ही JE नोंद कायमची हटवायची का?", null, "✅ DELETE", "#d32f2f", function(confirmed) {
         if (confirmed) {
             var list = getData('je_records');
             list.splice(idx, 1);
@@ -1281,7 +1282,7 @@ function cancelWorkEdit() {
 }
 
 function deleteWork(idx) {
-    showCustomConfirm("ही कामाची नोंद कायमची हटवायची का?", null, function(confirmed) {
+    showCustomConfirm("ही नोंद हटवायची का?", "ही कामाची नोंद कायमची हटवायची का?", null, "✅ DELETE", "#d32f2f", function(confirmed) {
         if (confirmed) {
             var list = getData('work_records');
             list.splice(idx, 1);
@@ -1321,7 +1322,7 @@ function refreshWorkList() {
     if(wJE) {
         var currentJe = wJE.value;
         wJE.innerHTML = '<option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option>';
-        getData('je_records').forEach(j => wJE.add(new Option(j.name, j.name)));
+        getData('je_records').forEach(function(j){ wJE.add(new Option(j.name, j.name)); });
         if(currentJe) wJE.value = currentJe;
     }
 }
