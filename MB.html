@@ -80,12 +80,16 @@ content: "दिनांक निवडा"; position: absolute; left: 10px; t
 .action-cell { white-space: nowrap; text-align: center; display: flex; gap: 4px; justify-content: center; align-items: center; }
 .btn-action { border: none; padding: 3px 6px; border-radius: 3px; font-size: 10px; cursor: pointer; color: #fff; }
 
-.quick-info-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: 3500; justify-content: center; align-items: center; padding: 15px; }
-.quick-info-card { background: #ffffff; border-radius: 12px; width: 100%; max-width: 620px; max-height: 85vh; overflow-y: auto; padding: 18px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+.quick-info-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: 3500; justify-content: center; align-items: center; padding: 10px; }
+.quick-info-card { background: #ffffff; border-radius: 12px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 16px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
 
-.smart-action-btn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px; margin-bottom: 6px; }
-.btn-smart-act { border: none; border-radius: 6px; padding: 11px 6px; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
-.btn-act-give { background: #2e7d32; } .btn-act-receive { background: #0277bd; } .btn-act-transfer { background: #7b1fa2; } .btn-act-edit { background: #f57c00; } .btn-act-history { background: #455a64; } .btn-act-delete { background: #d32f2f; grid-column: span 2; }
+/* 🌟 पूर्वीचे Exact Smart Action Center Styles (Screenshot नुसार) */
+.sac-main-box { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; font-size: 12px; line-height: 1.6; margin-bottom: 10px; }
+.sac-btn-transfer { background: #7b1fa2; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.sac-btn-receive { background: #0277bd; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.sac-btn-edit { background: #f57c00; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.sac-btn-history { background: #546e7a; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.sac-btn-print { background: #1565c0; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%; margin-top: 8px; }
 
 .status-badge-pill { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 800; }
 .badge-avail { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
@@ -116,22 +120,33 @@ body * { visibility: hidden !important; }
 </div>
 </div>
 
-<!-- स्मार्ट ॲक्शन सेंटर मॉडेल -->
+<!-- 🌟 M.B. SMART ACTION CENTER MODAL (Exact Previous Layout & Design) -->
 <div id="smartActionCenterModal" class="quick-info-overlay" style="z-index: 3900;">
-<div class="quick-info-card" style="max-width: 470px; padding: 18px;">
-<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0d47a1; padding-bottom:8px; margin-bottom:12px;">
-<h3 style="font-size: 15px; color:#0d47a1; font-weight: 800;">📘 M.B. SMART ACTION CENTER</h3>
+<div class="quick-info-card" style="max-width: 450px; padding: 16px;">
+<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0d47a1; padding-bottom:6px; margin-bottom:10px;">
+<h3 style="font-size: 14.5px; color:#0d47a1; font-weight: 800;">📘 M.B. SMART ACTION CENTER</h3>
 <button class="btn-close" onclick="closeSmartActionCenter()">X</button>
 </div>
-<div id="sacDetailsBox" style="background:#f4f7f9; border:1px solid #cfd8dc; border-radius:8px; padding:12px; font-size:12px; line-height:1.6; margin-bottom:10px;"></div>
-<div id="sacActionButtonsGrid" class="smart-action-btn-grid"></div>
-<div id="sacSubActionContainer" style="display:none; background:#fff; border:1.5px solid #0d47a1; border-radius:8px; padding:12px; margin-top:10px;"></div>
-<div id="sacHistoryContainer" style="display:none; margin-top:10px; background:#fff; border:1.5px solid #455a64; border-radius:8px; padding:10px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:4px;">
-        <span style="font-size:12.5px; font-weight:700;">📜 संपूर्ण व्यवहार व इतिहास</span>
-        <button type="button" class="btn-action" style="background:#0d47a1; padding:5px 10px; font-weight:bold;" onclick="printHistoryFromSAC()">🖨️ PRINT</button>
-    </div>
-    <div id="sacHistoryTableWrapper" style="max-height:220px; overflow-y:auto;"></div>
+
+<!-- तपशील बॉक्स -->
+<div id="sacDetailsBox" class="sac-main-box"></div>
+
+<!-- ॲक्शन बटनांचा ग्रिड (Screenshot प्रमाणे २x२ आणि खाली प्रिंट) -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+    <button class="sac-btn-transfer" onclick="sacOpenTransferForm()">📤 TRANSFER</button>
+    <button class="sac-btn-receive" onclick="sacTriggerReceiveMB()">📥 RECEIVE</button>
+    <button class="sac-btn-edit" onclick="sacTriggerEditRecord()">✏️ EDIT</button>
+    <button class="sac-btn-history" onclick="sacToggleHistoryView()">🕒 HISTORY</button>
+</div>
+<button class="sac-btn-print" onclick="printHistoryFromSAC()">📄 REPORT / PRINT</button>
+
+<!-- सब-ॲक्शन कंटेनर (Transfer/Issue फॉर्मसाठी) -->
+<div id="sacSubActionContainer" style="display:none; background:#fff; border:1.5px solid #0d47a1; border-radius:8px; padding:10px; margin-top:8px;"></div>
+
+<!-- खालील संपूर्ण व्यवहार व इतिहास टेबल -->
+<div id="sacHistoryContainer" style="display:block; margin-top:10px; background:#fff; border:1px solid #ccc; border-radius:6px; padding:8px;">
+    <div style="font-size:12px; font-weight:700; color:#333; margin-bottom:6px; border-bottom:1px solid #eee; padding-bottom:3px;">📜 M.B. Movement History</div>
+    <div id="sacHistoryTableWrapper" style="max-height:180px; overflow-y:auto; overflow-x:auto;"></div>
 </div>
 </div>
 </div>
@@ -144,7 +159,7 @@ body * { visibility: hidden !important; }
 <button class="btn-close" onclick="closeSearchResultModal()">X</button>
 </div>
 <div style="background:#e3f2fd; color:#0d47a1; font-size:11px; padding:6px 10px; border-radius:6px; margin-bottom:8px; font-weight:600;">
-👉 <b>टीप:</b> सद्यस्थिती, धारक व ॲक्शन सेंटर पाहण्यासाठी M.B. क्रमांकावर क्लिक करा.
+👉 <b>टीप:</b> ॲक्शन सेंटर, ट्रान्सफर व हिस्ट्री पाहण्यासाठी M.B. क्रमांकावर क्लिक करा.
 </div>
 <div class="table-responsive-box" id="searchResultModalBody" style="max-height: 270px; margin-bottom: 12px;"></div>
 <button class="btn-report" style="background:#0d47a1; margin-top:4px;" onclick="printSearchResultFromPopup()">📄 REPORT / PRINT</button>
@@ -157,9 +172,6 @@ body * { visibility: hidden !important; }
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
 <h3 id="quickModalTitle" style="font-size: 14px; color:#0d47a1;">तपशील</h3>
 <button class="btn-close" onclick="closeQuickInfoModal()">X</button>
-</div>
-<div style="background:#e3f2fd; color:#0d47a1; font-size:11px; padding:6px 10px; border-radius:6px; margin-bottom:8px; font-weight:600;">
-👉 <b>टीप:</b> M.B. च्या सद्यस्थितीची सविस्तर माहिती (कुणाकडे आहे / उपलब्ध आहे) पाहण्यासाठी M.B. क्रमांकावर क्लिक करा.
 </div>
 <div class="table-responsive-box" id="quickModalBody" style="max-height:240px; overflow-y:auto; margin-bottom:10px;"></div>
 <button class="btn-report" style="margin-top:0;" onclick="printQuickModalReport()">📄 REPORT / PRINT</button>
@@ -449,7 +461,6 @@ function getUniqueReceivedMBs(excludeIndex = -1) {
     return list;
 }
 
-/* 🌟 UPDATED: प्रत्येक M.B. च्या क्लिकेबल लिंकवर सद्यस्थिती स्पष्ट दिसेल (कुणाकडे आहे किंवा उपलब्ध आहे) */
 function openQuickInfoModal(type) {
     currentQuickModalType = type;
     var title = type === 'RECEIVED' ? 'एकूण M.B.' : (type === 'GIVEN' ? 'दिलेली M.B.' : 'उपलब्ध M.B.');
@@ -483,7 +494,7 @@ function openQuickInfoModal(type) {
                 person = person.replace(/^श्री.?\s*/i, '');
                 statusText = '<span style="color:#e65100; font-weight:700;">श्री. ' + person + ' यांच्याकडे (Issued)</span>';
             } else {
-                statusText = '<span style="color:#0d47a1; font-weight:600;">उपलब्ध</span>';
+                statusText = '<span style="color:#0d47a1; font-weight:600;">कार्यालयात उपलब्ध</span>';
             }
 
             var allMBs = getData('mb_records');
@@ -654,7 +665,6 @@ function onMainCategoryChange() {
     }
 }
 
-/* 🌟 UPDATED: Smart Search without mandatory Date From/To check and utilizing original search & Action Center workflow */
 function executeSmartSearchOrReport() {
     var searchTxt = document.getElementById('smartSearchInput').value.trim();
     if (searchTxt) {
@@ -750,6 +760,31 @@ function closeSearchResultModal() {
     document.getElementById('searchResultModal').style.display = 'none';
 }
 
+/* 🌟 EXACT PREVIOUS M.B. SMART ACTION CENTER LOGIC RESTORED */
+function formatTransactionSentence(h) {
+    if (!h) return '-';
+    var act = (h.actionType || '').trim();
+    var detail = (h.receivedDetail || '').trim();
+    var from = (h.receivedFrom || '').trim();
+    var src = (h.receivedSource || '').trim();
+
+    function cleanName(n) {
+        if (!n) return '';
+        var c = n.replace(/^श्री.?\s*/i, '').replace(/रावसाहेब/g, '').trim();
+        return 'श्री ' + c + ' रावसाहेब';
+    }
+
+    if (act === 'मिळालेली M.B.' || act === 'मिळालेली एमबी') {
+        if (detail) return 'ही M.B. JE ' + cleanName(detail) + ' यांच्याकडून मिळाली.';
+        return 'ही M.B. कार्यालयात जमा झाली.';
+    }
+    if (act === 'दिलेली M.B.' || act === 'दिलेली एमबी') {
+        if (detail) return 'ही M.B. JE ' + cleanName(detail) + ' यांना दिली.';
+        return 'ही M.B. संबंधित अधिकाऱ्यांना देण्यात आली.';
+    }
+    return from || detail || '-';
+}
+
 function openSmartActionCenter(mbNo) {
     var cleanNo = (mbNo || '').trim();
     if (!cleanNo) return;
@@ -761,35 +796,114 @@ function openSmartActionCenter(mbNo) {
 
     var stock = getAvailableStock();
     var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(cleanNo); });
+    
+    var works = getData('work_records').filter(function(w){ return normalizeMB(w.mbNo) === normalizeMB(cleanNo); });
+    var currentWorkName = works.length > 0 ? works[works.length - 1].name : "काम नोंदवलेले नाही";
+
     var holderDisplay = isAvail ? "कार्यालय (Store / Office)" : (status.detail || status.source || "संबंधित व्यक्ती");
     var statusBadgeHtml = isAvail ? '<span class="status-badge-pill badge-avail">कार्यालयात उपलब्ध</span>' : '<span class="status-badge-pill badge-issued">दिलेली (ISSUED)</span>';
 
     var detailsHtml = `
-    <div><strong>M.B. क्रमांक:</strong> <span style="color:#0d47a1; font-weight:800;">${cleanNo}</span> | ${statusBadgeHtml}</div>
-    <div><strong>आकार:</strong> ${status.size || 'लहान M.B.'}</div>
-    <div><strong>सध्याचे धारक:</strong> <span style="color:#e65100; font-weight:700;">${holderDisplay}</span></div>
-    <div><strong>दिनांक:</strong> ${formatDateToDMY(status.date)}</div>
+    <div><strong>M.B. क्रमांक:</strong> <span style="color:#0d47a1; font-weight:800;">${cleanNo}</span> &nbsp; ${statusBadgeHtml}</div>
+    <div><strong>M.B. आकार:</strong> ${status.size || 'लहान M.B.'}</div>
+    <div><strong>सध्याचे धारक (Current Holder):</strong> <span style="color:#e65100; font-weight:700;">${holderDisplay}</span></div>
+    <div><strong>शेवटचा दिनांक:</strong> ${formatDateToDMY(status.date)}</div>
+    <div><strong>संबंधित काम:</strong> ${currentWorkName}</div>
     `;
 
     document.getElementById('sacDetailsBox').innerHTML = detailsHtml;
 
-    var btnGrid = document.getElementById('sacActionButtonsGrid');
-    btnGrid.innerHTML = "";
-    if (isAvail) {
-        btnGrid.innerHTML += `<button class="btn-smart-act btn-act-give" onclick="showAlert('ISSUE/GIVE')">📤 ISSUE / GIVE</button>`;
-        btnGrid.innerHTML += `<button class="btn-smart-act btn-act-edit" onclick="closeSmartActionCenter(); openModule('mbModal'); editMB(${status.index})">✏️ EDIT</button>`;
-        btnGrid.innerHTML += `<button class="btn-smart-act btn-act-delete" onclick="quickPopupDelete(${status.index}); closeSmartActionCenter();">🗑️ DELETE</button>`;
-    } else {
-        btnGrid.innerHTML += `<button class="btn-smart-act btn-act-receive" onclick="showAlert('RECEIVE')">📥 RECEIVE</button>`;
-        btnGrid.innerHTML += `<button class="btn-smart-act btn-act-edit" onclick="closeSmartActionCenter(); openModule('mbModal'); editMB(${status.index})">✏️ EDIT</button>`;
-        btnGrid.innerHTML += `<button class="btn-smart-act btn-act-delete" onclick="quickPopupDelete(${status.index}); closeSmartActionCenter();">🗑️ DELETE</button>`;
-    }
+    // हिस्ट्री टेबल लोड करणे
+    var allMBs = getData('mb_records');
+    var historyEntries = allMBs.filter(function(m){ return normalizeMB(m.mbNumber) === normalizeMB(cleanNo); });
+    var historyHtml = '<table class="data-table"><thead><tr><th>दिनांक</th><th>प्रकार</th><th>हस्तांतरण / तपशील</th></tr></thead><tbody>';
+    historyEntries.forEach(function(h) {
+        historyHtml += '<tr><td>' + formatDateToDMY(h.date) + '</td><td><strong>' + h.actionType + '</strong></td><td>' + formatTransactionSentence(h) + '</td></tr>';
+    });
+    historyHtml += '</tbody></table>';
+    document.getElementById('sacHistoryTableWrapper').innerHTML = historyHtml;
 
     document.getElementById('smartActionCenterModal').style.display = "flex";
 }
 
 function closeSmartActionCenter() {
     document.getElementById('smartActionCenterModal').style.display = "none";
+    currentSacMB = null;
+    currentSacStatusObj = null;
+}
+
+function sacTriggerEditRecord() {
+    if (!currentSacMB || !currentSacStatusObj) return;
+    closeSmartActionCenter();
+    openModule('mbModal');
+    editMB(currentSacStatusObj.index);
+}
+
+function sacTriggerReceiveMB() {
+    if (!currentSacMB || !currentSacStatusObj) return;
+    var todayISO = new Date().toISOString().slice(0, 10);
+    var list = getData('mb_records');
+    list.push({
+        actionType: "मिळालेली M.B.",
+        mbNumber: currentSacMB,
+        size: currentSacStatusObj.size || "लहान M.B.",
+        receivedSource: "कार्यालयात जमा",
+        receivedDetail: "कार्यालय",
+        receivedFrom: "कार्यालयात जमा",
+        date: todayISO
+    });
+    setData('mb_records', list);
+    refreshAll();
+    showAlert("✅ M.B. क्र. " + currentSacMB + " कार्यालयात यशस्वीरीत्या जमा (Receive) झाली आहे.", "SUCCESS");
+    openSmartActionCenter(currentSacMB);
+}
+
+function sacOpenTransferForm() {
+    var jes = getData('je_records');
+    var jeOptions = '<option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option>';
+    jes.forEach(function(j) { jeOptions += '<option value="' + j.name + '">' + j.name + '</option>'; });
+
+    var html = `
+    <div style="font-size:12px; font-weight:700; color:#7b1fa2; margin-bottom:6px;">📤 M.B. हस्तांतरण (Transfer)</div>
+    <div class="form-group" style="margin-bottom:6px;"><select class="form-control" id="sacTransferJE" style="padding:5px; font-size:11.5px;">${jeOptions}</select></div>
+    <button class="btn-report" style="background:#7b1fa2; margin:0; padding:6px; font-size:11.5px;" onclick="sacConfirmTransfer()">हस्तांतरण पूर्ण करा</button>
+    `;
+    var container = document.getElementById('sacSubActionContainer');
+    container.innerHTML = html;
+    container.style.display = "block";
+}
+
+function sacConfirmTransfer() {
+    var newJE = document.getElementById('sacTransferJE').value;
+    if (!newJE) return showAlert('कृपया कनिष्ठ अभियंता निवडा.', 'WARNING');
+    var todayISO = new Date().toISOString().slice(0, 10);
+    var list = getData('mb_records');
+    list.push({
+        actionType: "दिलेली M.B.",
+        mbNumber: currentSacMB,
+        size: currentSacStatusObj.size || "लहान M.B.",
+        receivedSource: "M.B. " + newJE + " यांना दिली",
+        receivedDetail: newJE,
+        receivedFrom: "M.B. " + newJE + " यांना दिली",
+        date: todayISO
+    });
+    setData('mb_records', list);
+    refreshAll();
+    showAlert("✅ M.B. यशस्वीरित्या " + newJE + " यांना हस्तांतरित झाली.", "SUCCESS");
+    openSmartActionCenter(currentSacMB);
+}
+
+function sacToggleHistoryView() {
+    var histEl = document.getElementById('sacHistoryContainer');
+    histEl.style.display = (histEl.style.display === "none") ? "block" : "none";
+}
+
+function printHistoryFromSAC() {
+    var title = "M.B. Smart Action Center - History Report (" + currentSacMB + ")";
+    var bodyHTML = document.getElementById('sacHistoryTableWrapper').innerHTML;
+    var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
+    var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;"><div style="text-align:center;"><h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + title + '</h2></div><div style="text-align:right; font-size:11px;">अहवाल दिनांक: ' + todayStr + '</div></div>' + bodyHTML;
+    printA4Document(html, 'MB_' + currentSacMB + '_History.pdf');
 }
 
 var currentSacMB = null;
@@ -872,7 +986,6 @@ function refreshAssignList() {
     }
 }
 
-/* 🌟 UPDATED: Work List Save, Form Reset and Table Display */
 function onWorkJEChange() {
     var je = document.getElementById('workJE').value;
     var mbSel = document.getElementById('workMB');
