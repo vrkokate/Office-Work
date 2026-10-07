@@ -6,11 +6,131 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>मोजमाप पुस्तिका नियंत्रण प्रणाली - M.B. System</title>
+<title>Digital Hub & M.B. System</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
-#mbSystemSection { background: #f0f2f5; color: #212121; min-height: 100vh; padding-bottom: 20px; display: block; }
+#digitalHubSection {
+background: radial-gradient(circle at 50% 25%, #051d3b 0%, #020b18 55%, #00050d 100%);
+color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; overflow-x: hidden; padding-bottom: 25px;
+}
+
+.hub-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; margin-top: 5px; }
+.hub-title-box { text-align: center; }
+.hub-title-box h1 { font-size: 26px; font-weight: 800; background: linear-gradient(180deg, #ffffff 40%, #00e5ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* ३D ग्लोब रोटेशनसाठी प्रोफाईल आयकॉन कंटेनर व ॲनिमेशन */
+.profile-icon { 
+font-size: 20px; 
+cursor: pointer; 
+background: rgba(0, 229, 255, 0.1); 
+border: 1.5px solid #00e5ff; 
+border-radius: 50%; 
+width: 36px; 
+height: 36px; 
+display: flex; 
+align-items: center; 
+justify-content: center; 
+perspective: 800px;
+box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+overflow: hidden;
+flex-shrink: 0;
+}
+
+.profile-icon-rotating-photo {
+width: 100%;
+height: 100%;
+border-radius: 50%;
+object-fit: cover;
+object-position: center 10%;
+display: block;
+transform-style: preserve-3d;
+animation: globeSpin 6s linear infinite;
+will-change: transform;
+}
+
+@keyframes globeSpin {
+0% {
+transform: rotateY(0deg);
+}
+100% {
+transform: rotateY(360deg);
+}
+}
+
+.breadcrumb-bar {
+background: rgba(0, 229, 255, 0.1);
+border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+padding: 4px 12px;
+font-size: 11px;
+color: #00e5ff;
+font-weight: 600;
+display: flex;
+align-items: center;
+gap: 6px;
+letter-spacing: 0.5px;
+}
+
+.breadcrumb-link { cursor: pointer; text-decoration: underline; }
+
+.tabs-wrapper { display: flex; flex-direction: column; gap: 5px; padding: 6px 8px; z-index: 5; }
+.tab-card { flex: 1; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 700; color: #ffffff; cursor: pointer; text-align: center; padding: 0 2px; }
+.btn-est { background: linear-gradient(180deg, #0051ff, #002b99); border: 1.5px solid #00d2ff; }
+.btn-mb { background: linear-gradient(180deg, #00a843, #006626); border: 1.5px solid #00ff6a; }
+.btn-form { background: linear-gradient(180deg, #ff7b00, #b34700); border: 1.5px solid #ffaa00; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+.btn-tab4 { background: linear-gradient(180deg, #7c1fa2, #4a0072); border: 1.5px solid #e040fb; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+.btn-setting { background: linear-gradient(180deg, #c2185b, #880e4f); border: 1.5px solid #ff80ab; }
+
+.center-stage { position: relative; text-align: center; padding: 5px 0; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 480px; margin: 0 auto; }
+
+/* 🌟 नवीन संस्कृत श्लोक निऑन ग्लो डिस्प्ले स्टाइल */
+.suvichar-running-box { 
+width: 100%; 
+margin: 12px 0 16px 0; 
+padding: 0 15px; 
+text-align: center;
+}
+.sanskrit-shloka-box {
+display: inline-block;
+font-size: 14.5px;
+font-weight: 800;
+color: #00e5ff;
+text-shadow: 0 0 10px rgba(0,229,255,0.7), 0 0 20px rgba(0,229,255,0.4);
+line-height: 1.8;
+letter-spacing: 0.5px;
+word-spacing: 1px;
+}
+.sanskrit-shloka-box span {
+display: block;
+}
+
+.podium-stage-box { position: relative; width: 280px; height: 280px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+.avatar-on-podium { position: relative; z-index: 3; width: 170px; height: 170px; border-radius: 50%; object-fit: cover; object-position: center 10%; border: 3px solid #00e5ff; box-shadow: 0 0 22px #00e5ff; background: #010a14; margin-bottom: -12px; }
+.podium-base-layer { position: relative; z-index: 2; width: 250px; height: 50px; background: radial-gradient(ellipse at center, #002b5c 0%, #000c1a 75%); border: 2px solid #00e5ff; border-radius: 50%; box-shadow: 0 0 20px #00e5ff; }
+
+.stage-bottom-text { text-align: center; margin-top: 8px; }
+.text-smart-strong { font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #ffffff; text-transform: uppercase; }
+.text-smart-strong span { color: #00e5ff; }
+.text-created-by { font-size: 10px; color: #8be4ff; margin-top: 4px; font-weight: 600; }
+
+.profile-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 5, 15, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
+.profile-card { background: #051d3b; border: 2px solid #00e5ff; border-radius: 18px; width: 100%; max-width: 340px; padding: 22px 18px; text-align: center; position: relative; box-shadow: 0 5px 25px rgba(0,229,255,0.4); }
+.profile-card-close { position: absolute; right: 12px; top: 12px; color: #ff3d57; font-weight: 800; cursor: pointer; border: 1.5px solid #ff3d57; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.profile-avatar-small { width: 85px; height: 85px; border-radius: 50%; object-fit: cover; object-position: center 10%; border: 2px solid #00e5ff; margin-bottom: 6px; box-shadow: 0 0 12px rgba(0,229,255,0.5); }
+.profile-name { font-size: 18px; font-weight: 800; color: #ffffff; margin-bottom: 2px; }
+.profile-title-tag { font-size: 10.5px; color: #00e5ff; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+.profile-info-box { background: rgba(0, 229, 255, 0.08); border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; font-size: 12px; color: #e0f7fa; display: flex; flex-direction: column; gap: 4px; text-align: left; }
+.profile-info-row { display: flex; justify-content: space-between; }
+.profile-info-row .label { opacity: 0.8; font-weight: 600; }
+
+.profile-social-icons-row { display: flex; justify-content: center; gap: 14px; margin-top: 6px; }
+.brand-icon-btn { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; box-shadow: 0 3px 8px rgba(0,0,0,0.3); transition: 0.2s; cursor: pointer; }
+.brand-icon-btn svg { width: 20px; height: 20px; fill: #ffffff; }
+.btn-call-brand { background: #00c853; }
+.btn-wa-brand { background: #25d366; }
+.btn-ig-brand { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+
+#mbSystemSection { display: none; background: #f0f2f5; color: #212121; min-height: 100vh; padding-bottom: 20px; }
 .top-header { background: #0d47a1; color: #fff; text-align: center; padding: 12px 15px; position: relative; }
 .top-header h1 { font-size: 15px; font-weight: 700; margin-left: 70px; text-align: left; }
 .top-header p { font-size: 11px; opacity: 0.9; margin-left: 70px; text-align: left; }
@@ -266,7 +386,7 @@ body * { visibility: hidden !important; }
 <button class="action-btn btn-je" onclick="openModule('jeModal')"><span>👷</span>JE</button>
 <button class="action-btn btn-mb-act" onclick="openModule('mbModal')"><span>📖</span>M.B.</button>
 <button class="action-btn btn-work" onclick="openModule('workModal')"><span>📋</span>Work list</button>
-<button class="action-btn btn-bill" onclick="openModule('billModal')"><span>📄</span>Bill reg.</button>
+<a href="BillRegister.html" class="action-btn btn-bill"><span>📄</span>Bill reg.</a>
 <button class="action-btn btn-assign" onclick="openModule('assignModal')"><span>📁</span>Assign</button>
 <a href="DataManager.html" class="action-btn btn-settings"><span>⚙</span>Data Manager</a>
 </div>
@@ -366,7 +486,7 @@ body * { visibility: hidden !important; }
 <div class="form-group"><label>कनिष्ठ अभियंता (JE) निवडा *</label><select class="form-control" id="workJE" onchange="onWorkJEChange()"><option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option></select></div>
 <div class="form-group"><label>वाटप केलेली M.B. निवडा *</label><select class="form-control" id="workMB" onchange="onWorkMBChange()"><option value="">-- वाटप केलेली M.B. निवडा --</option></select></div>
 <div class="form-group"><label>कामाचे नाव *</label><input type="text" class="form-control" id="workName" placeholder="कामाचे नाव"></div>
-<div class="form-group"><label>कंत्राटदार / एजन्सीचे नाव *</label><input type="text" class="form-control" id="workContractor" placeholder="कंत्राटदार / एजन्सीचे नाव"></div>
+<div class="form-group"><label>कंत्राटदार / एजन्सीचे नाव *</label><input type="text" class="form-control" id="workContractor" placeholder="कंत्राטदार / एजन्सीचे नाव"></div>
 <div style="display:flex; gap:6px;"><button id="btnSaveWork" class="btn-report" style="background:#00897b; flex:1;" onclick="saveOrUpdateWork()">Save Work</button><button class="btn-report" style="background:#0d47a1; flex:1;" onclick="printWorkReport()">📄 प्रिंट</button></div>
 <button id="btnCancelWork" class="btn-report" style="background:#757575; margin-top:6px; display:none;" onclick="cancelWorkEdit()">रद्द करा</button>
 
@@ -385,13 +505,6 @@ body * { visibility: hidden !important; }
     <tbody id="workListBody"></tbody>
 </table>
 </div>
-</div></div>
-
-<!-- 4. Bill Reg. मोडल -->
-<div id="billModal" class="modal-overlay"><div class="modal-card" style="max-width:480px;">
-<div class="modal-header"><h3 style="font-size: 14px; color:#f57c00;">📄 देयक नोंदवही (Bill Register)</h3><button class="btn-close" onclick="closeModule('billModal')">X</button></div>
-<button class="btn-report" style="background:#0d47a1; margin:0;" onclick="printMasterBillRegister()">📄 रिपोर्ट प्रिंट</button>
-<div class="bill-scroll-container" style="margin-top:10px;"><div id="billListContainer"></div></div>
 </div></div>
 
 <!-- 5. Assign मोडल -->
@@ -962,11 +1075,6 @@ function openSmartActionCenter(mbNo) {
 
     document.getElementById('sacDetailsBox').innerHTML = detailsHtml;
 
-    // 🌟 Ensure History Container is initially hidden when Action Center opens
-    var histContainer = document.getElementById('sacHistoryContainer');
-    if (histContainer) histContainer.style.display = "none";
-    document.getElementById('sacSubActionContainer').style.display = "none";
-
     var allMBs = getData('mb_records');
     var historyEntries = allMBs.filter(function(m){ return normalizeMB(m.mbNumber) === normalizeMB(cleanNo); });
     
@@ -1098,17 +1206,9 @@ function sacConfirmTransfer() {
     openSmartActionCenter(currentSacMB);
 }
 
-// 🕒 HISTORY button click action: toggles Movement History visibility inside the Action Center
 function sacToggleHistoryView() {
     var histEl = document.getElementById('sacHistoryContainer');
-    if (histEl) {
-        if (histEl.style.display === "none" || histEl.style.display === "") {
-            histEl.style.display = "block";
-            histEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        } else {
-            histEl.style.display = "none";
-        }
-    }
+    histEl.style.display = (histEl.style.display === "none") ? "block" : "none";
 }
 
 function printHistoryFromSAC() {
@@ -1354,14 +1454,6 @@ function printWorkReport() {
 
     html += '</tbody></table>';
     printA4Document(html, 'Work_Register_Report.pdf');
-}
-
-function printMasterBillRegister() {
-    var bills = getData('dmbms_bills');
-    var html = '<table class="print-table"><thead><tr><th>बिल क्र.</th><th>कंत्राटदार</th><th>रक्कम</th></tr></thead><tbody>';
-    bills.forEach(b => html += '<tr><td>'+b.billNo+'</td><td>'+b.contractor+'</td><td>'+b.netPay+'</td></tr>');
-    html += '</tbody></table>';
-    printA4Document(html, 'Bill_Register.pdf');
 }
 </script>
 </body>
