@@ -90,7 +90,7 @@ content: "दिनांक निवडा"; position: absolute; left: 10px; t
 .sac-btn-history { background: #546e7a; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .sac-btn-print { background: #1565c0; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%; margin-top: 8px; }
 
-/* 🌟 Magic Multi-Color Neon / Magic Button Effect for "उपलब्ध" Badge */
+/* 🌟 Magic Multi-Color Neon Effect for "उपलब्ध" Badge */
 .magic-neon-badge {
     position: relative;
     display: inline-flex;
@@ -216,7 +216,8 @@ body * { visibility: hidden !important; }
 
 <div id="sacSubActionContainer" style="display:none; background:#fff; border:1.5px solid #0d47a1; border-radius:8px; padding:10px; margin-top:8px;"></div>
 
-<div id="sacHistoryContainer" style="display:block; margin-top:10px; background:#fff; border:1px solid #ccc; border-radius:6px; padding:8px;">
+<!-- 🌟 History Container initially hidden until HISTORY button is clicked -->
+<div id="sacHistoryContainer" style="display:none; margin-top:10px; background:#fff; border:1px solid #ccc; border-radius:6px; padding:8px;">
     <div style="font-size:12px; font-weight:700; color:#333; margin-bottom:6px; border-bottom:1px solid #eee; padding-bottom:3px;">📜 M.B. Movement History</div>
     <div id="sacHistoryTableWrapper" style="max-height:180px; overflow-y:auto; overflow-x:auto;"></div>
 </div>
@@ -425,13 +426,13 @@ function checkDatePlaceholder(input) {
 
 function showAlert(msg, type) { alert(msg); }
 
-var pendingConfirmCallback = null;
+var pendingDeleteCallback = null;
 var expectedVerifyMB = null;
 
 function showCustomConfirm(title, msg, expectedMB, okText, okColor, callback) {
     document.getElementById('confirmModalTitle').innerText = title;
     document.getElementById('confirmSubText').innerText = msg;
-    pendingConfirmCallback = callback;
+    pendingDeleteCallback = callback;
     expectedVerifyMB = expectedMB ? String(expectedMB).trim() : null;
     
     var inputContainer = document.getElementById('confirmInputContainer');
@@ -474,9 +475,9 @@ function checkVerifyInputMatch(input) {
 
 function closeCustomConfirm(isConfirmed) {
     document.getElementById('customConfirmModal').style.display = 'none';
-    if (pendingConfirmCallback) {
-        pendingConfirmCallback(isConfirmed);
-        pendingConfirmCallback = null;
+    if (pendingDeleteCallback) {
+        pendingDeleteCallback(isConfirmed);
+        pendingDeleteCallback = null;
     }
     expectedVerifyMB = null;
 }
@@ -961,6 +962,11 @@ function openSmartActionCenter(mbNo) {
 
     document.getElementById('sacDetailsBox').innerHTML = detailsHtml;
 
+    // 🌟 Ensure History Container is initially hidden when Action Center opens
+    var histContainer = document.getElementById('sacHistoryContainer');
+    if (histContainer) histContainer.style.display = "none";
+    document.getElementById('sacSubActionContainer').style.display = "none";
+
     var allMBs = getData('mb_records');
     var historyEntries = allMBs.filter(function(m){ return normalizeMB(m.mbNumber) === normalizeMB(cleanNo); });
     
@@ -1032,7 +1038,6 @@ function sacTriggerEditRecord() {
     editMB(currentSacStatusObj.index);
 }
 
-// 🌟 UPDATED HISTORY BUTTON & RECEIVE LOGIC: 🕒 HISTORY displays history directly in SAC without extra prompts
 function sacTriggerReceiveMB() {
     if (!currentSacMB || !currentSacStatusObj) return;
     
@@ -1093,12 +1098,16 @@ function sacConfirmTransfer() {
     openSmartActionCenter(currentSacMB);
 }
 
-// 🕒 HISTORY button directly toggles/scrolls to the Movement History section inside the current Action Center
+// 🕒 HISTORY button click action: toggles Movement History visibility inside the Action Center
 function sacToggleHistoryView() {
     var histEl = document.getElementById('sacHistoryContainer');
     if (histEl) {
-        histEl.style.display = "block";
-        histEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (histEl.style.display === "none" || histEl.style.display === "") {
+            histEl.style.display = "block";
+            histEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+            histEl.style.display = "none";
+        }
     }
 }
 
