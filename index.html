@@ -4,74 +4,52 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <title>Digital Hub & M.B. System</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-
-#digitalHubSection {
-background: radial-gradient(circle at 50% 25%, #051d3b 0%, #020b18 55%, #00050d 100%);
-color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; overflow-x: hidden; padding-bottom: 25px;
-}
-
+#digitalHubSection { background: radial-gradient(circle at 50% 25%, #051d3b 0%, #020b18 55%, #00050d 100%); color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; overflow-x: hidden; padding-bottom: 25px; }
 .hub-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; margin-top: 5px; }
 .hub-title-box { text-align: center; }
 .hub-title-box h1 { font-size: 26px; font-weight: 800; background: linear-gradient(180deg, #ffffff 40%, #00e5ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-.profile-icon { 
-font-size: 20px; cursor: pointer; background: rgba(0, 229, 255, 0.1); border: 1.5px solid #00e5ff; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; perspective: 800px; box-shadow: 0 0 10px rgba(0, 229, 255, 0.4); overflow: hidden; flex-shrink: 0;
-}
-
-.profile-icon-rotating-photo { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: center 10%; display: block; transform-style: preserve-3d; animation: globeSpin 6s linear infinite; will-change: transform; }
-
-@keyframes globeSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
-
-.tabs-wrapper { display: flex; flex-direction: column; gap: 5px; padding: 6px 8px; z-index: 5; margin-top: 5px; }
+.profile-icon { font-size: 20px; cursor: pointer; background: rgba(0, 229, 255, 0.1); border: 1.5px solid #00e5ff; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+.profile-icon-rotating-photo { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.tabs-wrapper { display: flex; flex-direction: column; gap: 5px; padding: 6px 8px; z-index: 5; }
 .tab-card { flex: 1; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 700; color: #ffffff; cursor: pointer; text-align: center; padding: 0 2px; text-decoration: none; }
 .btn-est { background: linear-gradient(180deg, #0051ff, #002b99); border: 1.5px solid #00d2ff; }
 .btn-mb { background: linear-gradient(180deg, #00a843, #006626); border: 1.5px solid #00ff6a; }
-.btn-bill { background: linear-gradient(180deg, #f57c00, #b34700); border: 1.5px solid #ffaa00; }
 .btn-form { background: linear-gradient(180deg, #ff7b00, #b34700); border: 1.5px solid #ffaa00; }
 .btn-tab4 { background: linear-gradient(180deg, #7c1fa2, #4a0072); border: 1.5px solid #e040fb; }
 .btn-setting { background: linear-gradient(180deg, #c2185b, #880e4f); border: 1.5px solid #ff80ab; }
 
-.center-stage { position: relative; text-align: center; padding: 5px 0; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 480px; margin: 0 auto; }
+#mbSystemSection { display: none; background: #f0f2f5; color: #212121; min-height: 100vh; padding-bottom: 20px; }
+.top-header { background: #0d47a1; color: #fff; text-align: center; padding: 12px 15px; position: relative; }
+.top-header h1 { font-size: 15px; font-weight: 700; margin-left: 70px; text-align: left; }
+.top-header p { font-size: 11px; opacity: 0.9; margin-left: 70px; text-align: left; }
+.btn-back-hub { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: #ff9800; color: #000; border: none; border-radius: 6px; padding: 6px 10px; font-size: 11.5px; font-weight: 800; cursor: pointer; z-index: 5; }
 
-.suvichar-running-box { width: 100%; margin: 12px 0 16px 0; padding: 0 15px; text-align: center; }
-.sanskrit-shloka-box { display: inline-block; font-size: 14.5px; font-weight: 800; color: #00e5ff; text-shadow: 0 0 10px rgba(0,229,255,0.7), 0 0 20px rgba(0,229,255,0.4); line-height: 1.8; letter-spacing: 0.5px; word-spacing: 1px; }
-.sanskrit-shloka-box span { display: block; }
+.action-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 10px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.action-btn { border: none; border-radius: 8px; color: #fff; padding: 10px 4px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-decoration: none; }
+.btn-je { background: #1976d2; } .btn-mb-act { background: #2e7d32; } .btn-work { background: #00897b; } .btn-bill { background: #f57c00; } .btn-assign { background: #7b1fa2; } .btn-settings { background: #c2185b; }
 
-.podium-stage-box { position: relative; width: 280px; height: 280px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
-.avatar-on-podium { position: relative; z-index: 3; width: 170px; height: 170px; border-radius: 50%; object-fit: cover; object-position: center 10%; border: 3px solid #00e5ff; box-shadow: 0 0 22px #00e5ff; background: #010a14; margin-bottom: -12px; }
-.podium-base-layer { position: relative; z-index: 2; width: 250px; height: 50px; background: radial-gradient(ellipse at center, #002b5c 0%, #000c1a 75%); border: 2px solid #00e5ff; border-radius: 50%; box-shadow: 0 0 20px #00e5ff; }
-
-.stage-bottom-text { text-align: center; margin-top: 8px; }
-.text-smart-strong { font-size: 12px; font-weight: 800; letter-spacing: 2px; color: #ffffff; text-transform: uppercase; }
-.text-smart-strong span { color: #00e5ff; }
-.text-created-by { font-size: 10px; color: #8be4ff; margin-top: 4px; font-weight: 600; }
-
-.profile-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 5, 15, 0.85); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
-.profile-card { background: #051d3b; border: 2px solid #00e5ff; border-radius: 18px; width: 100%; max-width: 340px; padding: 22px 18px; text-align: center; position: relative; box-shadow: 0 5px 25px rgba(0,229,255,0.4); }
-.profile-card-close { position: absolute; right: 12px; top: 12px; color: #ff3d57; font-weight: 800; cursor: pointer; border: 1.5px solid #ff3d57; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
-.profile-avatar-small { width: 85px; height: 85px; border-radius: 50%; object-fit: cover; object-position: center 10%; border: 2px solid #00e5ff; margin-bottom: 6px; box-shadow: 0 0 12px rgba(0,229,255,0.5); }
-.profile-name { font-size: 18px; font-weight: 800; color: #ffffff; margin-bottom: 2px; }
-.profile-title-tag { font-size: 10.5px; color: #00e5ff; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
-.profile-info-box { background: rgba(0, 229, 255, 0.08); border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; font-size: 12px; color: #e0f7fa; display: flex; flex-direction: column; gap: 4px; text-align: left; }
-.profile-info-row { display: flex; justify-content: space-between; }
-.profile-info-row .label { opacity: 0.8; font-weight: 600; }
+.container { padding: 10px; max-width: 800px; margin: auto; }
+.summary-box { background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.summary-title { font-size: 13px; font-weight: 700; text-align: center; color: #0d47a1; margin-bottom: 8px; }
+.card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat-card { border-radius: 8px; text-align: center; padding: 11px 4px; background: #fcfdfe; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
+.stat-num { font-size: 18px; font-weight: 700; color: #0d47a1; }
+.stat-label { font-size: 11px; color: #555; margin-top: 2px; }
 </style>
 </head>
 <body>
 
+<!-- १. DIGITAL HUB मुख्य पान -->
 <div id="digitalHubSection">
 <div class="hub-header">
-<div class="header-space"></div>
 <div class="hub-title-box">
 <h1>Digital Hub</h1>
 <p>ONE PLATFORM | MANY SOLUTIONS</p>
 </div>
-<div class="profile-icon" onclick="openProfileModal()" title="माहिती व संपर्क">
+<div class="profile-icon">
 <img src="home-bg.jpg" onerror="this.onerror=null; this.src='1000320439_2.png';" class="profile-icon-rotating-photo" alt="Profile">
 </div>
 </div>
@@ -79,59 +57,51 @@ font-size: 20px; cursor: pointer; background: rgba(0, 229, 255, 0.1); border: 1.
 <div class="tabs-wrapper">
 <div style="display:flex; justify-content:center; gap:5px;">
 <div class="tab-card btn-est" onclick="alert('Est. टॅब')">Est.</div>
-<a href="MB.html" class="tab-card btn-mb">M.B.</a>
-<a href="BillRegister.html" class="tab-card btn-bill">Bill reg.</a>
+<div class="tab-card btn-mb" onclick="showMBSystem()">M.B.</div>
 <a href="form.html" class="tab-card btn-form">Form</a>
 <a href="pay-fixation.html" class="tab-card btn-tab4">Pay Fixation</a>
 </div>
-<div style="display:flex; justify-content:center; gap:5px;">
-<div class="tab-card btn-setting" onclick="alert('Set-1 टॅब')">Set-1</div>
-<div class="tab-card btn-setting" onclick="alert('Set-2 टॅब')">Set-2</div>
-<div class="tab-card btn-setting" onclick="alert('Set-3 टॅब')">Set-3</div>
-<a href="DataManager.html" class="tab-card btn-setting">Setting</a>
 </div>
 </div>
 
-<div class="center-stage">
-<div class="suvichar-running-box">
-<div class="sanskrit-shloka-box">
-<span>विद्या वितर्को विज्ञानं स्मृतिस्तत्परता क्रिया ।</span>
-<span>यस्यैते षड्गुणास्तस्य नासाध्यमतिवर्तते ॥</span>
-</div>
-</div>
-<div class="podium-stage-box">
-<img src="home-bg.jpg" onerror="this.onerror=null; this.src='1000320439_2.png';" class="avatar-on-podium" alt="User Photo">
-<div class="podium-base-layer"></div>
-</div>
-<div class="stage-bottom-text">
-<div class="text-smart-strong">SMART TOOLS <span>STRONGER</span> WORK</div>
-<div class="text-created-by">Created by Vitthal Kokate Patil</div>
-</div>
-</div>
+<!-- २. M.B. नियंत्रण प्रणाली -->
+<div id="mbSystemSection">
+<div class="top-header">
+<button class="btn-back-hub" onclick="showDigitalHub()">🏠 मुखपृष्ठ</button>
+<h1>मोजमाप पुस्तिका नियंत्रण प्रणाली</h1>
+<p>सार्वजनिक बांधकाम विभाग</p>
 </div>
 
-<!-- प्रोफाईल पॉपअप मॉडेल -->
-<div id="profileModal" class="profile-modal-overlay">
-<div class="profile-card">
-<div class="profile-card-close" onclick="closeProfileModal()">✕</div>
-<img src="home-bg.jpg" onerror="this.onerror=null; this.src='1000320439_2.png';" class="profile-avatar-small" alt="Profile Photo">
-<div class="profile-name">विठ्ठल रघुनाथ कोकाटे</div>
-<div class="profile-title-tag">सार्वजनिक बांधकाम विभाग</div>
-<div class="profile-info-box">
-<div class="profile-info-row"><span class="label">नाव:</span> <span>विठ्ठल रघुनाथ कोकाटे</span></div>
-<div class="profile-info-row"><span class="label">मोबाईल:</span> <span>8446556141</span></div>
+<div class="action-grid">
+<a href="JE.html" class="action-btn btn-je"><span>👷</span>JE</a>
+<a href="MB.html" class="action-btn btn-mb-act"><span>📖</span>M.B.</a>
+<a href="WorkList.html" class="action-btn btn-work"><span>📋</span>Work list</a>
+<!-- 🎯 येथे Bill reg. बटण थेट BillRegister.html फाईलला जोडले आहे -->
+<a href="BillRegister.html" class="action-btn btn-bill"><span>📄</span>Bill reg.</a>
+<a href="Assign.html" class="action-btn btn-assign"><span>📁</span>Assign</a>
+<a href="DataManager.html" class="action-btn btn-settings"><span>⚙</span>Data Manager</a>
+</div>
+
+<div class="container">
+<div class="summary-box">
+<div class="summary-title">📖 मोजमाप पुस्तिका (M.B.) स्थिती</div>
+<div class="card-grid">
+<div class="stat-card"><div class="stat-num">0</div><div class="stat-label">एकूण M.B.</div></div>
+<div class="stat-card"><div class="stat-num">0</div><div class="stat-label">दिलेली M.B.</div></div>
+<div class="stat-card"><div class="stat-num">0</div><div class="stat-label">उपलब्ध M.B.</div></div>
+</div>
 </div>
 </div>
 </div>
 
 <script>
-function openProfileModal() {
-    var modal = document.getElementById('profileModal');
-    if(modal) modal.style.display = 'flex';
+function showMBSystem() {
+    document.getElementById('digitalHubSection').style.display = 'none';
+    document.getElementById('mbSystemSection').style.display = 'block';
 }
-function closeProfileModal() {
-    var modal = document.getElementById('profileModal');
-    if(modal) modal.style.display = 'none';
+function showDigitalHub() {
+    document.getElementById('mbSystemSection').style.display = 'none';
+    document.getElementById('digitalHubSection').style.display = 'flex';
 }
 </script>
 </body>
