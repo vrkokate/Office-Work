@@ -90,7 +90,7 @@ content: "दिनांक निवडा"; position: absolute; left: 10px; t
 .sac-btn-history { background: #546e7a; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .sac-btn-print { background: #1565c0; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%; margin-top: 8px; }
 
-/* 🌟 Magic Multi-Color Neon / Magic Button Effect for "उपलब्ध" Badge */
+/* Magic Multi-Color Neon Effect for "उपलब्ध" Badge */
 .magic-neon-badge {
     position: relative;
     display: inline-flex;
@@ -116,14 +116,7 @@ content: "दिनांक निवडा"; position: absolute; left: 10px; t
     position: absolute;
     inset: -2px;
     border-radius: inherit;
-    background: linear-gradient(
-        90deg,
-        #8a2be2,
-        #0066ff,
-        #00e5ff,
-        #00ff88,
-        #8a2be2
-    );
+    background: linear-gradient(90deg, #8a2be2, #0066ff, #00e5ff, #00ff88, #8a2be2);
     background-size: 300% 100%;
     z-index: -2;
     animation: magicGradient 3s linear infinite;
@@ -134,14 +127,7 @@ content: "दिनांक निवडा"; position: absolute; left: 10px; t
     position: absolute;
     inset: -5px;
     border-radius: inherit;
-    background: linear-gradient(
-        90deg,
-        #8a2be2,
-        #0066ff,
-        #00e5ff,
-        #00ff88,
-        #8a2be2
-    );
+    background: linear-gradient(90deg, #8a2be2, #0066ff, #00e5ff, #00ff88, #8a2be2);
     background-size: 300% 100%;
     filter: blur(6px);
     opacity: 0.6;
@@ -156,14 +142,8 @@ content: "दिनांक निवडा"; position: absolute; left: 10px; t
 }
 
 @keyframes magicPulse {
-    0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 0 4px rgba(138, 43, 226, 0.3), 0 0 8px rgba(0, 229, 255, 0.2);
-    }
-    50% {
-        transform: scale(1.03);
-        box-shadow: 0 0 7px rgba(138, 43, 226, 0.5), 0 0 14px rgba(0, 229, 255, 0.4), 0 0 20px rgba(0, 255, 136, 0.2);
-    }
+    0%, 100% { transform: scale(1); box-shadow: 0 0 4px rgba(138, 43, 226, 0.3), 0 0 8px rgba(0, 229, 255, 0.2); }
+    50% { transform: scale(1.03); box-shadow: 0 0 7px rgba(138, 43, 226, 0.5), 0 0 14px rgba(0, 229, 255, 0.4), 0 0 20px rgba(0, 255, 136, 0.2); }
 }
 
 .status-badge-pill { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11.5px; font-weight: 800; }
@@ -194,13 +174,17 @@ body * { visibility: hidden !important; }
 </div>
 </div>
 
+<!-- Custom Confirmation Modal for Delete & Receive -->
 <div id="customConfirmModal" class="modal-overlay" style="display:none; z-index:4500;">
-<div class="modal-card" style="max-width:320px; text-align:center; padding:20px; border-radius:12px;">
+<div class="modal-card" style="max-width:340px; text-align:center; padding:20px; border-radius:12px;">
 <div style="font-size:34px; margin-bottom:6px;">❓</div>
-<div style="font-size:14.5px; font-weight:800; color:#37474f; margin-bottom:15px;" id="confirmModalText">ही नोंद हटवायची का?</div>
+<div style="font-size:14.5px; font-weight:800; color:#37474f; margin-bottom:12px;" id="confirmModalText">ही नोंद हटवायची का?</div>
+<div id="confirmInputBox" style="margin-bottom:12px; display:none;">
+    <input type="text" class="form-control" id="confirmInputMatch" placeholder="M.B. क्रमांक येथे टाका" style="text-align:center; font-weight:bold;">
+</div>
 <div style="display:flex; gap:8px;">
 <button class="btn-report" style="background:#757575; margin:0; flex:1; padding:9px;" onclick="closeCustomConfirm(false)">❌ CANCEL</button>
-<button class="btn-report" style="background:#d32f2f; margin:0; flex:1; padding:9px;" onclick="closeCustomConfirm(true)">✅ DELETE</button>
+<button id="btnConfirmAction" class="btn-report" style="background:#d32f2f; margin:0; flex:1; padding:9px;" onclick="closeCustomConfirm(true)">✅ DELETE</button>
 </div>
 </div>
 </div>
@@ -434,14 +418,44 @@ function checkDatePlaceholder(input) {
 
 function showAlert(msg, type) { alert(msg); }
 
+// 🌟 Advanced Custom Confirmation with M.B. Number Matching Requirement
 var pendingDeleteCallback = null;
-function showCustomConfirm(msg, callback) {
+function showCustomConfirmWithMatch(msg, expectedMB, callback) {
     document.getElementById('confirmModalText').innerText = msg;
+    var inputBx = document.getElementById('confirmInputBox');
+    var inputEl = document.getElementById('confirmInputMatch');
+    var btnConfirm = document.getElementById('btnConfirmAction');
+
+    if (expectedMB) {
+        inputBx.style.display = 'block';
+        inputEl.value = '';
+        inputEl.placeholder = 'खात्रीसाठी M.B. क्रमांक टाка (' + expectedMB + ')';
+        btnConfirm.disabled = true;
+        btnConfirm.style.opacity = '0.5';
+
+        inputEl.oninput = function() {
+            if (inputEl.value.trim() === expectedMB.trim()) {
+                btnConfirm.disabled = false;
+                btnConfirm.style.opacity = '1';
+            } else {
+                btnConfirm.disabled = true;
+                btnConfirm.style.opacity = '0.5';
+            }
+        };
+    } else {
+        inputBx.style.display = 'none';
+        btnConfirm.disabled = false;
+        btnConfirm.style.opacity = '1';
+    }
+
     pendingDeleteCallback = callback;
     document.getElementById('customConfirmModal').style.display = 'flex';
 }
+
 function closeCustomConfirm(isConfirmed) {
     document.getElementById('customConfirmModal').style.display = 'none';
+    var inputEl = document.getElementById('confirmInputMatch');
+    inputEl.value = '';
     if (pendingDeleteCallback) {
         pendingDeleteCallback(isConfirmed);
         pendingDeleteCallback = null;
@@ -615,7 +629,7 @@ function openQuickInfoModal(type) {
             '<td>' + dateStr + '</td>' +
             '<td class="action-cell" style="text-align:center;">' +
             '<button class="btn-action" style="background:#2e7d32; padding:3px 6px;" onclick="closeQuickInfoModal(); openModule(\'mbModal\'); editMB(' + originalIdx + ')">Edit</button>' +
-            '<button class="btn-action" style="background:#d32f2f; padding:3px 6px;" onclick="quickPopupDelete(' + originalIdx + ')">Delete</button>' +
+            '<button class="btn-action" style="background:#d32f2f; padding:3px 6px;" onclick="quickPopupDelete(' + originalIdx + ', \'' + rawNo + '\')">Delete</button>' +
             '</td>' +
             '</tr>';
         });
@@ -627,9 +641,9 @@ function openQuickInfoModal(type) {
     document.getElementById('quickInfoModal').style.display = 'flex';
 }
 
-function quickPopupDelete(idx) {
+function quickPopupDelete(idx, mbNo) {
     if (idx === -1) return showAlert('रेकॉर्ड सापडला नाही.', 'ERROR');
-    showCustomConfirm("ही नोंद हटवायची का?", function(confirmed) {
+    showCustomConfirmWithMatch("ही नोंद हटवण्यासाठी M.B. क्रमांक (" + mbNo + ") पुष्टीसाठी खाली टाईप करा:", mbNo, function(confirmed) {
         if (confirmed) {
             var list = getData('mb_records');
             list.splice(idx, 1);
@@ -743,7 +757,9 @@ function cancelMBEdit() {
 }
 
 function deleteMB(idx) {
-    showCustomConfirm("ही नोंद हटवायची का?", function(confirmed) {
+    var item = getData('mb_records')[idx];
+    var mbNo = item ? item.mbNumber : '';
+    showCustomConfirmWithMatch("ही नोंद हटवण्यासाठी M.B. क्रमांक (" + mbNo + ") पुष्टीसाठी खाली टाईप करा:", mbNo, function(confirmed) {
         if (confirmed) {
             var list = getData('mb_records');
             list.splice(idx, 1);
@@ -862,7 +878,6 @@ function closeSearchResultModal() {
     document.getElementById('searchResultModal').style.display = 'none';
 }
 
-/* 🌟 EXACT UPDATE: 6 Columns in History Table with Event (घटना) and Edit/Delete per row */
 function formatTransactionSentence(h) {
     if (!h) return 'अद्याप नोंद झालेली नाही.';
     var act = (h.actionType || '').trim();
@@ -913,7 +928,6 @@ function openSmartActionCenter(mbNo) {
         holderDisplay = hName ? ("JE श्री " + hName + " रावसाहेब") : "उपलब्ध";
     }
 
-    // 🌟 Status Green Badge with Magic Neon / Pulse Animation
     var statusBadgeHtml = isAvail ? '<span class="magic-neon-badge">उपलब्ध</span>' : '<span class="status-badge-pill badge-issued">दिलेली (ISSUED)</span>';
 
     var detailsHtml = `
@@ -958,7 +972,7 @@ function openSmartActionCenter(mbNo) {
             '<td>' + detailSentence + '</td>' +
             '<td class="action-cell" style="text-align:center;">' +
             '<button class="btn-action" style="background:#2e7d32; padding:2px 5px; font-size:9.5px;" onclick="closeSmartActionCenter(); openModule(\'mbModal\'); editMB(' + realIdx + ')">Edit</button> ' +
-            '<button class="btn-action" style="background:#d32f2f; padding:2px 5px; font-size:9.5px;" onclick="deleteMBFromSAC(' + realIdx + ')">Delete</button>' +
+            '<button class="btn-action" style="background:#d32f2f; padding:2px 5px; font-size:9.5px;" onclick="deleteMBFromSAC(' + realIdx + ', \'' + cleanNo + '\')">Delete</button>' +
             '</td>' +
             '</tr>';
         });
@@ -969,8 +983,8 @@ function openSmartActionCenter(mbNo) {
     document.getElementById('smartActionCenterModal').style.display = "flex";
 }
 
-function deleteMBFromSAC(realIdx) {
-    showCustomConfirm("ही नोंद हटवायची का?", function(confirmed) {
+function deleteMBFromSAC(realIdx, mbNo) {
+    showCustomConfirmWithMatch("ही नोंद हटवण्यासाठी M.B. क्रमांक (" + mbNo + ") पुष्टीसाठी खाली टाईप करा:", mbNo, function(confirmed) {
         if (confirmed) {
             var list = getData('mb_records');
             list.splice(realIdx, 1);
@@ -995,24 +1009,29 @@ function sacTriggerEditRecord() {
     editMB(currentSacStatusObj.index);
 }
 
+/* 🌟 UPDATED: Receive Action with Custom Confirmation first */
 function sacTriggerReceiveMB() {
     if (!currentSacMB || !currentSacStatusObj) return;
-    var todayISO = new Date().toISOString().slice(0, 10);
-    var list = getData('mb_records');
-    list.push({
-        actionType: "मिळालेली M.B.",
-        mbNumber: currentSacMB,
-        size: currentSacStatusObj.size || "लहान M.B.",
-        receivedSource: "कार्यालयात जमा",
-        receivedDetail: "उपलब्ध",
-        receivedFrom: "कार्यालयात जमा",
-        date: todayISO
+    showCustomConfirmWithMatch("ही M.B. कार्यालयात जमा करायची का?", null, function(confirmed) {
+        if (confirmed) {
+            var todayISO = new Date().toISOString().slice(0, 10);
+            var list = getData('mb_records');
+            list.push({
+                actionType: "मिळालेली M.B.",
+                mbNumber: currentSacMB,
+                size: currentSacStatusObj.size || "लहान M.B.",
+                receivedSource: "कार्यालयात जमा",
+                receivedDetail: "उपलब्ध",
+                receivedFrom: "कार्यालयात जमा",
+                date: todayISO
+            });
+            setData('mb_records', list);
+            refreshAll();
+            
+            showAlert("✅ M.B. क्र. " + currentSacMB + " कार्यालयात यशस्वीरीत्या जमा (Receive) झाली आहे.", "SUCCESS");
+            openSmartActionCenter(currentSacMB);
+        }
     });
-    setData('mb_records', list);
-    refreshAll();
-    
-    showAlert("✅ M.B. क्र. " + currentSacMB + " कार्यालयात यशस्वीरीत्या जमा (Receive) झाली आहे.", "SUCCESS");
-    openSmartActionCenter(currentSacMB);
 }
 
 function sacOpenTransferForm() {
@@ -1100,7 +1119,7 @@ function editJE(idx) {
 }
 
 function deleteJE(idx) {
-    showCustomConfirm("ही नोंद हटवायची का?", function(confirmed) {
+    showCustomConfirmWithMatch("ही JE नोंद हटवायची का?", null, function(confirmed) {
         if (confirmed) {
             var list = getData('je_records');
             list.splice(idx, 1);
@@ -1237,7 +1256,7 @@ function cancelWorkEdit() {
 }
 
 function deleteWork(idx) {
-    showCustomConfirm("ही कामाची नोंद कायमची हटवायची का?", function(confirmed) {
+    showCustomConfirmWithMatch("ही कामाची नोंद कायमची हटवायची का?", null, function(confirmed) {
         if (confirmed) {
             var list = getData('work_records');
             list.splice(idx, 1);
