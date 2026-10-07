@@ -90,7 +90,6 @@ content: "दिनांक निवडा"; position: absolute; left: 10px; t
 .sac-btn-history { background: #546e7a; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .sac-btn-print { background: #1565c0; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%; margin-top: 8px; }
 
-/* 🌟 Soft Pulse Animation for Green Badge */
 @keyframes softPulse {
     0% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.75; transform: scale(1.02); }
@@ -126,7 +125,6 @@ body * { visibility: hidden !important; }
 </div>
 </div>
 
-<!-- 🌟 Custom Confirmation Modal for Delete -->
 <div id="customConfirmModal" class="modal-overlay" style="display:none; z-index:4500;">
 <div class="modal-card" style="max-width:320px; text-align:center; padding:20px; border-radius:12px;">
 <div style="font-size:34px; margin-bottom:6px;">❓</div>
@@ -367,7 +365,6 @@ function checkDatePlaceholder(input) {
 
 function showAlert(msg, type) { alert(msg); }
 
-// Custom Confirmation Modal Logic for Delete
 var pendingDeleteCallback = null;
 function showCustomConfirm(msg, callback) {
     document.getElementById('confirmModalText').innerText = msg;
@@ -796,7 +793,6 @@ function closeSearchResultModal() {
     document.getElementById('searchResultModal').style.display = 'none';
 }
 
-/* 🌟 UPDATED: 6 Columns in History Table with Event (घटना) and Edit/Delete per row */
 function formatTransactionSentence(h) {
     if (!h) return 'अद्याप नोंद झालेली नाही.';
     var act = (h.actionType || '').trim();
@@ -847,7 +843,6 @@ function openSmartActionCenter(mbNo) {
         holderDisplay = hName ? ("JE श्री " + hName + " रावसाहेब") : "उपलब्ध";
     }
 
-    // 🌟 Status Green Badge with Soft Pulse Animation
     var statusBadgeHtml = isAvail ? '<span class="status-badge-pill badge-avail">उपलब्ध</span>' : '<span class="status-badge-pill badge-issued">दिलेली (ISSUED)</span>';
 
     var detailsHtml = `
@@ -860,7 +855,6 @@ function openSmartActionCenter(mbNo) {
 
     document.getElementById('sacDetailsBox').innerHTML = detailsHtml;
 
-    // Movement History Table with EXACT 6 Columns: अ.क्र. | दिनांक | घटना | M.B. प्रकार | हस्तांतरण / तपशील | EDIT / DELETE
     var allMBs = getData('mb_records');
     var historyEntries = allMBs.filter(function(m){ return normalizeMB(m.mbNumber) === normalizeMB(cleanNo); });
     
@@ -930,7 +924,6 @@ function sacTriggerEditRecord() {
     editMB(currentSacStatusObj.index);
 }
 
-/* 🌟 UPDATED: Direct Receive with Custom Success Message and no extra confirmation prompt */
 function sacTriggerReceiveMB() {
     if (!currentSacMB || !currentSacStatusObj) return;
     var todayISO = new Date().toISOString().slice(0, 10);
@@ -947,7 +940,6 @@ function sacTriggerReceiveMB() {
     setData('mb_records', list);
     refreshAll();
     
-    // Custom Success Message without confirmation popup
     showAlert("✅ M.B. क्र. " + currentSacMB + " कार्यालयात यशस्वीरीत्या जमा (Receive) झाली आहे.", "SUCCESS");
     openSmartActionCenter(currentSacMB);
 }
@@ -1227,4 +1219,23 @@ function printWorkReport() {
     '<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">कामांची यादी (Work Register) अहवाल</h2></div>' +
     '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>कामांची यादी</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div>' +
     '</div>' +
-    '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>कामाचे नाव</th><th>JE</th><th>क
+    '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>कामाचे नाव</th><th>JE</th><th>कंत्राटदार</th><th>स्थिती</th><th style="text-align:center;">M.B. क्र.</th></tr></thead><tbody>';
+
+    works.forEach(function(w, i) {
+        html += '<tr><td style="text-align:center;">' + (i+1) + '</td><td>' + w.name + '</td><td>' + w.je + '</td><td>' + w.contractor + '</td><td>' + (w.status || 'अपूर्ण') + '</td><td style="text-align:center;">' + w.mbNo + '</td></tr>';
+    });
+
+    html += '</tbody></table>';
+    printA4Document(html, 'Work_Register_Report.pdf');
+}
+
+function printMasterBillRegister() {
+    var bills = getData('dmbms_bills');
+    var html = '<table class="print-table"><thead><tr><th>बिल क्र.</th><th>कंत्राटदार</th><th>रक्कम</th></tr></thead><tbody>';
+    bills.forEach(b => html += '<tr><td>'+b.billNo+'</td><td>'+b.contractor+'</td><td>'+b.netPay+'</td></tr>');
+    html += '</tbody></table>';
+    printA4Document(html, 'Bill_Register.pdf');
+}
+</script>
+</body>
+</html>
