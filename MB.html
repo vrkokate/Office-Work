@@ -90,8 +90,15 @@ content: "दिनांक निवडा"; position: absolute; left: 10px; t
 .sac-btn-history { background: #546e7a; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .sac-btn-print { background: #1565c0; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%; margin-top: 8px; }
 
-.status-badge-pill { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 800; }
-.badge-avail { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+/* 🌟 Soft Pulse Animation for Green Badge */
+@keyframes softPulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.75; transform: scale(1.02); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.status-badge-pill { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11.5px; font-weight: 800; }
+.badge-avail { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; animation: softPulse 2.5s infinite ease-in-out; }
 .badge-issued { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
 
 .table-responsive-box { max-height: 300px; overflow-y: auto; overflow-x: auto; border: 1px solid #ddd; border-radius: 6px; margin-top: 8px; }
@@ -121,7 +128,7 @@ body * { visibility: hidden !important; }
 
 <!-- 📘 M.B. SMART ACTION CENTER MODAL -->
 <div id="smartActionCenterModal" class="quick-info-overlay" style="z-index: 3900;">
-<div class="quick-info-card" style="max-width: 450px; padding: 16px;">
+<div class="quick-info-card" style="max-width: 480px; padding: 16px;">
 <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0d47a1; padding-bottom:6px; margin-bottom:10px;">
 <h3 style="font-size: 14.5px; color:#0d47a1; font-weight: 800;">📘 M.B. SMART ACTION CENTER</h3>
 <button class="btn-close" onclick="closeSmartActionCenter()">X</button>
@@ -758,9 +765,9 @@ function closeSearchResultModal() {
     document.getElementById('searchResultModal').style.display = 'none';
 }
 
-/* 🌟 UPDATED: Exact Movement History Sentences & Dynamic Holder Logic */
+/* 🌟 EXACT UPDATE: 6 Columns in History Table with Event (घटना) and Edit/Delete per row */
 function formatTransactionSentence(h) {
-    if (!h) return '-';
+    if (!h) return 'अद्याप नोंद झालेली नाही.';
     var act = (h.actionType || '').trim();
     var detail = (h.receivedDetail || '').trim();
     var from = (h.receivedFrom || '').trim();
@@ -783,7 +790,7 @@ function formatTransactionSentence(h) {
         if (detail) return 'ही M.B. JE ' + cleanName(detail) + ' यांना दिली.';
         return 'ही M.B. संबंधित अधिकाऱ्यांना देण्यात आली.';
     }
-    return from || detail || '-';
+    return from || detail || 'अद्याप नोंद झालेली नाही.';
 }
 
 function openSmartActionCenter(mbNo) {
@@ -814,22 +821,54 @@ function openSmartActionCenter(mbNo) {
     var detailsHtml = `
     <div><strong>M.B. क्रमांक:</strong> <span style="color:#0d47a1; font-weight:800;">${cleanNo}</span> &nbsp; ${statusBadgeHtml}</div>
     <div><strong>M.B. आकार:</strong> ${status.size || 'लहान M.B.'}</div>
-    <div><strong>सध्याचे धारक (Current Holder):</strong> <span style="color:#e65100; font-weight:700;">${holderDisplay}</span></div>
+    <div><strong>सध्याचे धारक:</strong> <span style="color:#e65100; font-weight:700;">${holderDisplay}</span></div>
     <div><strong>शेवटचा दिनांक:</strong> ${formatDateToDMY(status.date)}</div>
     <div><strong>संबंधित काम:</strong> ${currentWorkName}</div>
     `;
 
     document.getElementById('sacDetailsBox').innerHTML = detailsHtml;
 
+    // Movement History Table with EXACT 6 Columns: अ.क्र. | दिनांक | घटना | M.B. प्रकार | हस्तांतरण / तपशील | EDIT / DELETE
     var allMBs = getData('mb_records');
     var historyEntries = allMBs.filter(function(m){ return normalizeMB(m.mbNumber) === normalizeMB(cleanNo); });
-    var historyHtml = '<table class="data-table"><thead><tr><th>दिनांक</th><th>प्रकार</th><th>हस्तांतरण / तपशील</th></tr></thead><tbody>';
-    historyEntries.forEach(function(h) {
-        historyHtml += '<tr><td>' + formatDateToDMY(h.date) + '</td><td><strong>' + h.actionType + '</strong></td><td>' + formatTransactionSentence(h) + '</td></tr>';
-    });
-    historyHtml += '</tbody></table>';
-    document.getElementById('sacHistoryTableWrapper').innerHTML = historyHtml;
+    
+    var historyHtml = '<table class="data-table"><thead><tr>' +
+    '<th style="text-align:center;">अ.क्र.</th>' +
+    '<th>दिनांक</th>' +
+    '<th>घटना</th>' +
+    '<th>M.B. प्रकार</th>' +
+    '<th>हस्तांतरण / तपशील</th>' +
+    '<th style="text-align:center;">EDIT / DELETE</th>' +
+    '</tr></thead><tbody>';
 
+    if (historyEntries.length === 0) {
+        historyHtml += '<tr><td colspan="6" style="text-align:center; color:#666;">अद्याप नोंद झालेली नाही.</td></tr>';
+    } else {
+        historyEntries.forEach(function(h, idx) {
+            var realIdx = -1;
+            for(var r=0; r<allMBs.length; r++) {
+                if(allMBs[r] === h) { realIdx = r; break; }
+            }
+            var eventName = h.actionType || 'नोंद';
+            var mbSize = h.size || status.size || 'लहान M.B.';
+            var detailSentence = formatTransactionSentence(h);
+
+            historyHtml += '<tr>' +
+            '<td style="text-align:center;">' + (idx + 1) + '</td>' +
+            '<td>' + formatDateToDMY(h.date) + '</td>' +
+            '<td><strong>' + eventName + '</strong></td>' +
+            '<td>' + mbSize + '</td>' +
+            '<td>' + detailSentence + '</td>' +
+            '<td class="action-cell" style="text-align:center;">' +
+            '<button class="btn-action" style="background:#2e7d32; padding:2px 5px; font-size:9.5px;" onclick="closeSmartActionCenter(); openModule(\'mbModal\'); editMB(' + realIdx + ')">Edit</button> ' +
+            '<button class="btn-action" style="background:#d32f2f; padding:2px 5px; font-size:9.5px;" onclick="deleteMB(' + realIdx + '); closeSmartActionCenter();">Delete</button>' +
+            '</td>' +
+            '</tr>';
+        });
+    }
+    historyHtml += '</tbody></table>';
+    
+    document.getElementById('sacHistoryTableWrapper').innerHTML = historyHtml;
     document.getElementById('smartActionCenterModal').style.display = "flex";
 }
 
