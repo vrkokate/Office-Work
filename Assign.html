@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.B. वाटप (Assign)</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.container { padding: 12px; max-width: 550px; margin: auto; background: #fff; border-radius: 8px; margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.assign-form-actions{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.assign-table-scroll{height:40vh;max-height:360px;min-height:150px;overflow:auto;margin-top:8px;border:1px solid #ddd;border-radius:6px;-webkit-overflow-scrolling:touch}
+.assign-data-table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:12px}
+.assign-data-table th,.assign-data-table td{padding:3px 5px!important;line-height:1.2;vertical-align:middle}
+.assign-action-buttons{display:flex;gap:4px;align-items:center;justify-content:center;white-space:nowrap}
+.assign-action-buttons button{border:0;border-radius:4px;color:#fff;font-size:11px;padding:4px 7px;line-height:1.15;min-height:26px;margin:0;cursor:pointer}
+@media(max-width:480px){.container{padding:10px}.assign-table-scroll{height:38vh}.assign-data-table{font-size:11px}.assign-data-table th,.assign-data-table td{padding:3px 4px!important}.assign-action-buttons button{font-size:10px;padding:4px 6px}}
+</style>
+</head>
+<body>
+<div class="top-header" style="background:#7b1fa2; color:#fff; padding:12px; position:relative; text-align:center;">
+<button class="btn-back-hub" onclick="location.href='MB.html'" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); background:#ff9800; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;">◀ मागे</button>
+<h1 style="font-size:15px; margin:0;">📁 M.B. वाटप (Assign)</h1>
+</div>
+
+<div class="breadcrumb-bar" style="background:rgba(0, 229, 255, 0.1); padding:4px 12px; font-size:11px;">
+    <span class="breadcrumb-link" onclick="location.href='index.html'" style="cursor:pointer; text-decoration:underline; color:#0d47a1;">🏠 मुख्य पृष्ठ</span> &gt; <span onclick="location.href='MB.html'" style="cursor:pointer; text-decoration:underline; color:#0d47a1;">M.B. नियंत्रण प्रणाली</span> &gt; <span>Assign</span>
+</div>
+
+<div class="container">
+<div class="form-group"><label>उपलब्ध M.B. निवडा *</label><select class="form-control" id="assignMBSelect"></select></div>
+<div class="form-group"><label>कनिष्ठ अभियंता (JE) निवडा *</label><select class="form-control" id="assignJESelect"></select></div>
+<div class="form-group"><label>वाटप दिनांक *</label><input type="date" class="form-control" id="assignDate"></div>
+<input type="hidden" id="assignEditIndex" value="-1">
+<div class="assign-form-actions"><button id="btnSaveAssign" class="btn-report" style="background:#7b1fa2;margin:0;flex:1;" onclick="saveAssign()">Assign M.B.</button><button id="btnCancelAssignEdit" class="btn-report" style="background:#757575;margin:0;width:92px;display:none;" onclick="cancelAssignEdit()">रद्द करा</button></div>
+<div class="assign-table-scroll"><table class="data-table assign-data-table"><thead><tr><th>M.B.</th><th>JE</th><th>वाटप दिनांक</th><th>Action</th></tr></thead><tbody id="assignListBody"></tbody></table></div>
+</div>
+
+<script src="common.js"></script>
+<script>
+window.onload = function() { refreshAssignList(); };
+function refreshAssignList(){var list=getData('assign_records'),tbody=document.getElementById('assignListBody');if(!tbody)return;tbody.innerHTML='';list.forEach(function(a,idx){tbody.innerHTML+='<tr><td>'+a.mbNo+'</td><td>'+a.jeName+'</td><td>'+formatDateToDMY(a.assignDate)+'</td><td><div class="assign-action-buttons"><button style="background:#2e7d32" onclick="editAssign('+idx+')">Edit</button><button style="background:#d32f2f" onclick="deleteAssign('+idx+')">Delete</button></div></td></tr>';});var mbSel=document.getElementById('assignMBSelect');if(mbSel){var old=mbSel.value;mbSel.innerHTML='<option value="">-- उपलब्ध M.B. निवडा --</option>';getAvailableStock().forEach(function(m){mbSel.add(new Option(m.mbNumber,m.mbNumber));});if(old)mbSel.value=old;}var jeSel=document.getElementById('assignJESelect');if(jeSel){var jv=jeSel.value;jeSel.innerHTML='<option value="">-- JE निवडा --</option>';getData('je_records').forEach(function(j){jeSel.add(new Option(j.name,j.name));});if(jv)jeSel.value=jv;}}
+function saveAssign(){var mb=document.getElementById('assignMBSelect').value,je=document.getElementById('assignJESelect').value,dt=document.getElementById('assignDate').value,e=document.getElementById('assignEditIndex'),editIdx=e?parseInt(e.value,10):-1;if(!mb||!je||!dt)return showAlert('कृपया M.B., JE आणि वाटप दिनांक निवडा.','WARNING');var list=getData('assign_records'),mbList=getData('mb_records');if(editIdx>=0&&list[editIdx]){var old=list[editIdx],same=String(old.mbNo)===String(mb),oldSize='लहान M.B.';if(!same&&!getAvailableStock().some(function(x){return String(x.mbNumber)===String(mb);}))return showAlert('निवडलेली M.B. सध्या उपलब्ध नाही.','WARNING');for(var k=mbList.length-1;k>=0;k--){if(mbList[k].actionType==='दिलेली M.B.'&&String(mbList[k].mbNumber)===String(old.mbNo)&&mbList[k].receivedDetail===old.jeName){oldSize=mbList[k].size||oldSize;mbList.splice(k,1);break;}}var stock=getAvailableStock().find(function(x){return String(x.mbNumber)===String(mb);});mbList.push({actionType:'दिलेली M.B.',mbNumber:mb,size:same?oldSize:(stock?stock.size:'लहान M.B.'),receivedSource:'JE',receivedDetail:je,receivedFrom:'M.B. '+je+' यांना दिली',date:dt});list[editIdx]={mbNo:mb,jeName:je,assignDate:dt};setData('mb_records',mbList);setData('assign_records',list);cancelAssignEdit();refreshAssignList();showAlert('M.B. वाटप नोंद अपडेट झाली.','SUCCESS');return;}var stockList=getAvailableStock(),stockMB=stockList.find(function(x){return String(x.mbNumber)===String(mb);});if(!stockMB)return showAlert('निवडलेली M.B. सध्या उपलब्ध नाही.','WARNING');mbList.push({actionType:'दिलेली M.B.',mbNumber:mb,size:stockMB.size||'लहान M.B.',receivedSource:'JE',receivedDetail:je,receivedFrom:'M.B. '+je+' यांना दिली',date:dt});list.push({mbNo:mb,jeName:je,assignDate:dt});setData('mb_records',mbList);setData('assign_records',list);refreshAssignList();showAlert('M.B. वाटप यशस्वी!','SUCCESS');}
+function editAssign(idx){var list=getData('assign_records'),a=list[idx];if(!a)return;var m=document.getElementById('assignMBSelect');if(!Array.from(m.options).some(function(o){return String(o.value)===String(a.mbNo);}))m.add(new Option(a.mbNo+' (सध्या वाटप केलेली)',a.mbNo));m.value=a.mbNo;document.getElementById('assignJESelect').value=a.jeName;document.getElementById('assignDate').value=a.assignDate||'';document.getElementById('assignEditIndex').value=String(idx);document.getElementById('btnSaveAssign').textContent='Update M.B.';document.getElementById('btnCancelAssignEdit').style.display='block';}
+function cancelAssignEdit(){document.getElementById('assignEditIndex').value='-1';var m=document.getElementById('assignMBSelect');m.value='';Array.from(m.options).forEach(function(o){if(o.textContent.indexOf('(सध्या वाटप केलेली)')>=0)o.remove();});document.getElementById('assignJESelect').value='';document.getElementById('assignDate').value='';document.getElementById('btnSaveAssign').textContent='Assign M.B.';document.getElementById('btnCancelAssignEdit').style.display='none';}
+function deleteAssign(idx){if(!confirm('ही M.B. वाटप नोंद Delete करायची का?'))return;var list=getData('assign_records'),removed=list.splice(idx,1)[0];setData('assign_records',list);var mbList=getData('mb_records');for(var i=mbList.length-1;i>=0;i--){if(mbList[i].actionType==='दिलेली M.B.'&&String(mbList[i].mbNumber)===String(removed.mbNo)&&mbList[i].receivedDetail===removed.jeName){mbList.splice(i,1);break;}}setData('mb_records',mbList);if(parseInt(document.getElementById('assignEditIndex').value,10)===idx)cancelAssignEdit();refreshAssignList();showAlert('वाटप नोंद Delete केली!','SUCCESS');}
+</script>
+</body>
+</html>
