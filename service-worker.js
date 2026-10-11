@@ -76,12 +76,16 @@ self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(function (keys) {
       return Promise.all(
-        keys.filter(function (key) {
-          return key.indexOf('office-work-offline-') === 0 &&
-                 key !== CACHE_NAME;
-        }).map(function (key) {
-          return caches.delete(key);
-        })
+        keys
+          .filter(function (key) {
+            return (
+              key.indexOf('office-work-offline-') === 0 &&
+              key !== CACHE_NAME
+            );
+          })
+          .map(function (key) {
+            return caches.delete(key);
+          })
       );
     }).then(function () {
       return self.clients.claim();
@@ -95,13 +99,14 @@ self.addEventListener('fetch', function (event) {
   if (request.method !== 'GET') return;
 
   var url;
+
   try {
     url = new URL(request.url);
   } catch (e) {
     return;
   }
 
-  /* For navigations/HTML, prefer the network so changes are not hidden by stale cache. */
+  // For navigations/HTML, prefer the network so changes are not hidden by stale cache.
   if (
     request.mode === 'navigate' ||
     (
@@ -110,9 +115,41 @@ self.addEventListener('fetch', function (event) {
     )
   ) {
     event.respondWith(
-      fetch(request, { cache: 'no-store' }).then(function (response) {
-        if (response && response.ok &&
-            url.origin === self.location.origin) {
+      fetch(request, { cache: 'no-store' })
+        .then(function (response) {
+          if (
+            response &&
+            response.ok &&
+            url.origin === self.location.origin
+          ) {
+            var copy = response.clone();
+
+            caches.open(CACHE_NAME).then(function (cache) {
+              cache.put(request, copy).catch(function () {});
+            });
+          }
+
+          return response;
+        })
+        .catch(function () {
+          return caches.match(request).then(function (cached) {
+            if (cached) return cached;
+            return caches.match('./index.html');
+          });
+        })
+    );
+
+    return;
+  }
+
+  // Network-first for assets prevents old cached scripts/styles; use cached copy offline.
+  event.respondWith(
+    fetch(request)
+      .then(function (response) {
+        if (
+          response &&
+          (response.ok || response.type === 'opaque')
+        ) {
           var copy = response.clone();
 
           caches.open(CACHE_NAME).then(function (cache) {
@@ -121,40 +158,17 @@ self.addEventListener('fetch', function (event) {
         }
 
         return response;
-      }).catch(function () {
+      })
+      .catch(function () {
         return caches.match(request).then(function (cached) {
           if (cached) return cached;
-          return caches.match('./index.html');
+
+          if (request.destination === 'document') {
+            return caches.match('./index.html');
+          }
+
+          return Response.error();
         });
       })
-    );
-
-    return;
-  }
-
-  /* Network-first for assets; use cached copy offline. */
-  event.respondWith(
-    fetch(request).then(function (response) {
-      if (response &&
-          (response.ok || response.type === 'opaque')) {
-        var copy = response.clone();
-
-        caches.open(CACHE_NAME).then(function (cache) {
-          cache.put(request, copy).catch(function () {});
-        });
-      }
-
-      return response;
-    }).catch(function () {
-      return caches.match(request).then(function (cached) {
-        if (cached) return cached;
-
-        if (request.destination === 'document') {
-          return caches.match('./index.html');
-        }
-
-        return Response.error();
-      });
-    })
   );
 });
