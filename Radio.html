@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#020b18"><title>FM Radio | Digital Hub</title>
+<style>
+:root{--bg:#020b18;--panel:#061b31;--cyan:#00e5ff;--pink:#ff4f9a;--text:#eefbff;--muted:#9ab7c8}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#082744 0,#020b18 52%,#00050d 100%);color:var(--text);font-family:Arial,'Noto Sans Devanagari',sans-serif;min-height:100vh}
+header{padding:14px 16px 12px;border-bottom:1px solid #00e5ff44;display:flex;align-items:center;gap:12px;background:#04152bd9;position:sticky;top:0;z-index:3;backdrop-filter:blur(10px)}
+.back{color:var(--cyan);text-decoration:none;font-size:13px;border:1px solid #00e5ff88;border-radius:10px;padding:8px 10px;white-space:nowrap}.brand{min-width:0}.brand h1{font-size:21px;margin:0;font-weight:800;background:linear-gradient(180deg,#fff,#00e5ff);-webkit-background-clip:text;background-clip:text;color:transparent}.brand p{margin:3px 0 0;color:#bdebf6;font-size:10px;letter-spacing:.7px}
+main{max-width:760px;margin:auto;padding:14px 12px 28px}.player{border:1px solid #00e5ff77;border-radius:18px;padding:17px 14px;background:linear-gradient(145deg,#092a48dd,#031021ee);box-shadow:0 0 22px #00e5ff18;text-align:center}.radio-icon{font-size:42px;line-height:1.2;filter:drop-shadow(0 0 9px #00e5ff88)}.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:1.5px;margin:8px 0}.now{font-size:19px;font-weight:800;margin:4px 0 5px}.sub{font-size:12px;color:var(--muted);margin:0 0 12px}.visualizer{height:29px;display:flex;justify-content:center;align-items:center;gap:4px;margin:10px auto 14px}.visualizer i{display:block;width:4px;height:8px;border-radius:4px;background:var(--cyan);opacity:.75}.visualizer.playing i{animation:wave .65s ease-in-out infinite alternate}.visualizer i:nth-child(3n){animation-delay:.16s}.visualizer i:nth-child(4n){animation-delay:.28s}@keyframes wave{to{height:27px;opacity:1}}
+.controls{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}.play{border:0;border-radius:12px;padding:11px 22px;background:linear-gradient(135deg,#00d7f5,#008cff);color:#001526;font-weight:800;font-size:15px;box-shadow:0 0 14px #00e5ff33}.stop{border:1px solid #ff4f9a88;border-radius:12px;padding:10px 14px;background:#8b124344;color:#fff;font-weight:700}audio{width:100%;height:34px;margin-top:13px;opacity:.92}.status{font-size:11px;color:#b5d6e2;min-height:16px;margin-top:6px}
+.tools{display:flex;gap:8px;margin:14px 0 10px}.search{flex:1;min-width:0;background:#061b31;border:1px solid #00e5ff55;border-radius:10px;color:white;padding:11px;font-size:13px;outline:none}.category{width:42%;background:#061b31;border:1px solid #00e5ff55;border-radius:10px;color:white;padding:10px;font-size:12px}
+.section-title{font-size:14px;color:#dffaff;margin:16px 2px 9px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.station{border:1px solid #00e5ff40;background:linear-gradient(145deg,#09233b,#041326);border-radius:13px;padding:12px;text-align:left;color:white;min-height:84px;cursor:pointer}.station:active{transform:scale(.99)}.station strong{display:block;font-size:13px;margin:5px 0}.station small{font-size:10px;color:#9fc8d7}.station .ico{font-size:19px}.station.active{border-color:var(--cyan);box-shadow:0 0 12px #00e5ff25}.station .tag{font-size:9px;color:#00e5ff;float:right}.note{font-size:11px;color:#9ab7c8;line-height:1.55;margin:14px 2px 0}.portal{display:inline-block;color:var(--cyan);margin-top:7px;text-decoration:none;border-bottom:1px dotted #00e5ff88}
+@media(max-width:360px){.brand h1{font-size:18px}.grid{gap:7px}.station{padding:10px}.category{width:43%}}
+</style></head><body>
+<header><a class="back" href="index.html">← मुख्य पृष्ठ</a><div class="brand"><h1>📻 FM Radio</h1><p>OFFICE WORK DIGITAL HUB</p></div></header>
+<main>
+<section class="player" aria-label="रेडिओ प्लेयर"><div class="radio-icon">📻</div><div class="eyebrow">NOW TUNING</div><div id="nowTitle" class="now">आकाशवाणी विविध भारती</div><p id="nowSub" class="sub">हिंदी संगीत • अधिकृत थेट प्रसारण स्रोत उपलब्धतेनुसार</p><div id="visualizer" class="visualizer" aria-hidden="true"></div><div class="controls"><button id="playBtn" class="play">▶ सुरू करा</button><button id="stopBtn" class="stop">■ बंद करा</button></div><audio id="audio" controls preload="none" playsinline></audio><div id="status" class="status">प्ले करण्यासाठी “सुरू करा” दाबा.</div></section>
+<div class="tools"><input id="search" class="search" type="search" placeholder="स्टेशन शोधा…" aria-label="स्टेशन शोधा"><select id="category" class="category" aria-label="स्टेशन प्रकार"><option value="all">सर्व प्रकार</option><option>आकाशवाणी</option><option>मराठी</option><option>हिंदी</option><option>बातम्या</option><option>भक्तिगीते</option><option>इतर FM</option></select></div>
+<h2 class="section-title">स्टेशन निवडा</h2><div id="stations" class="grid"></div>
+<p class="note">टीप: उपलब्ध ऑनलाइन स्टेशनचे थेट ऑडिओ URL बदलू शकतात. खात्रीशीर ऑडिओ स्ट्रीम असलेली स्टेशनच या प्लेयरमध्ये थेट चालतील. इतर आकाशवाणी स्टेशनसाठी अधिकृत थेट प्रसारण पोर्टल उघडता येईल. इंटरनेट कनेक्शन आवश्यक आहे.<br><a class="portal" href="https://akashvani.gov.in/radio/live.php?channel=265" target="_blank" rel="noopener">अधिकृत आकाशवाणी Live Portal ↗</a></p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+<script>
+(function(){
+'use strict';
+var official='https://akashvani.gov.in/radio/live.php?channel=265';
+var stations=[
+ {name:'आकाशवाणी विविध भारती',cat:'हिंदी',desc:'हिंदी चित्रपट संगीत व मनोरंजन',url:'https://air.pc.cdn.bitgravity.com/air/live/pbaudio001/playlist.m3u8',direct:true},
+ {name:'FM Gold',cat:'बातम्या',desc:'संगीत आणि बातम्या',url:official},
+ {name:'FM Rainbow',cat:'इतर FM',desc:'मनोरंजन व संगीत',url:official},
+ {name:'आकाशवाणी मराठी',cat:'मराठी',desc:'मराठी कार्यक्रम',url:official},
+ {name:'आकाशवाणी मुंबई अस्मिता',cat:'मराठी',desc:'मराठी भाषा व संस्कृती',url:official},
+ {name:'आकाशवाणी पुणे',cat:'मराठी',desc:'पुणे केंद्राचे कार्यक्रम',url:official},
+ {name:'आकाशवाणी सोलापूर',cat:'मराठी',desc:'स्थानिक आकाशवाणी केंद्र',url:official},
+ {name:'आकाशवाणी बातम्या 24x7',cat:'बातम्या',desc:'थेट बातम्यांसाठी अधिकृत पोर्टल',url:official},
+ {name:'भक्तिगीते / Raagam',cat:'भक्तिगीते',desc:'आध्यात्मिक व शास्त्रीय संगीत',url:official},
+ {name:'इतर ऑनलाइन FM स्टेशन',cat:'इतर FM',desc:'अधिकृत उपलब्ध स्टेशन शोधा',url:official}
+];
+var hls=null;
+var audio=document.getElementById('audio'), playBtn=document.getElementById('playBtn'), status=document.getElementById('status'), nowTitle=document.getElementById('nowTitle'), nowSub=document.getElementById('nowSub'), list=document.getElementById('stations'), viz=document.getElementById('visualizer'), active=0;
+for(var i=0;i<25;i++){var bar=document.createElement('i');bar.style.height=(6+(i*7%16))+'px';viz.appendChild(bar)}
+function selectStation(index){active=index;var s=stations[index];nowTitle.textContent=s.name;nowSub.textContent=s.desc;document.querySelectorAll('.station').forEach(function(el){el.classList.toggle('active',Number(el.dataset.index)===index)});
+ if(hls){try{hls.destroy()}catch(e){}hls=null;}
+ if(s.direct){
+   audio.pause(); audio.removeAttribute('src'); audio.load();
+   if(window.Hls && Hls.isSupported()){
+     hls=new Hls({enableWorker:true,lowLatencyMode:false});
+     hls.loadSource(s.url); hls.attachMedia(audio);
+     hls.on(Hls.Events.ERROR,function(_event,data){if(data && data.fatal){status.textContent='थेट स्ट्रीम उपलब्ध नाही. नेटवर्क किंवा स्टेशनचा स्रोत तपासा.';}});
+   } else if(audio.canPlayType('application/vnd.apple.mpegurl')) { audio.src=s.url; audio.load(); }
+   else { status.textContent='या ब्राउझरमध्ये HLS थेट प्लेबॅक समर्थित नाही. अधिकृत Live Portal उघडा.'; }
+   status.textContent='स्ट्रीम जोडत आहे… Play दाबा.'; playBtn.disabled=false; playBtn.textContent='▶ सुरू करा';
+ }
+ else {audio.pause();audio.removeAttribute('src');audio.load();status.textContent='या स्टेशनसाठी थेट ऑडिओ URL निश्चित नाही. अधिकृत पोर्टल उघडा.';playBtn.textContent='↗ अधिकृत Live';playBtn.disabled=false;}
+}
+function render(){var q=document.getElementById('search').value.trim().toLowerCase(),cat=document.getElementById('category').value;list.innerHTML='';var found=0;stations.forEach(function(s,i){if(cat!=='all'&&s.cat!==cat)return;if(q&&(s.name+' '+s.desc+' '+s.cat).toLowerCase().indexOf(q)<0)return;found++;var b=document.createElement('button');b.type='button';b.className='station'+(i===active?' active':'');b.dataset.index=i;b.innerHTML='<span class="tag">'+(s.direct?'LIVE STREAM':'LIVE PORTAL')+'</span><span class="ico">📻</span><strong></strong><small></small>';b.querySelector('strong').textContent=s.name;b.querySelector('small').textContent=s.desc;b.addEventListener('click',function(){selectStation(i)});list.appendChild(b)});if(!found)list.textContent='या शोधासाठी स्टेशन आढळले नाही.'}
+playBtn.addEventListener('click',function(){var s=stations[active];if(!s.direct){window.open(s.url,'_blank','noopener');return;}if(audio.paused){status.textContent='स्ट्रीम सुरू करण्याचा प्रयत्न…';audio.play().then(function(){playBtn.textContent='Ⅱ विराम';status.textContent='थेट प्रसारण सुरू आहे.'}).catch(function(){status.textContent='स्ट्रीम सुरू झाली नाही. नेटवर्क किंवा स्ट्रीम उपलब्धता तपासा.'})}else{audio.pause();playBtn.textContent='▶ सुरू करा';status.textContent='प्रसारण थांबवले आहे.'}});
+document.getElementById('stopBtn').addEventListener('click',function(){audio.pause();try{audio.currentTime=0}catch(e){}playBtn.textContent='▶ सुरू करा';status.textContent='रेडिओ बंद केला आहे.';viz.classList.remove('playing')});audio.addEventListener('playing',function(){viz.classList.add('playing');playBtn.textContent='Ⅱ विराम';status.textContent='थेट प्रसारण सुरू आहे.'});audio.addEventListener('pause',function(){viz.classList.remove('playing')});audio.addEventListener('error',function(){viz.classList.remove('playing');status.textContent='ऑडिओ स्ट्रीम उपलब्ध नाही किंवा ब्राउझरमध्ये समर्थित नाही. अधिकृत पोर्टल वापरून पाहा.';playBtn.textContent='▶ पुन्हा प्रयत्न'});document.getElementById('search').addEventListener('input',render);document.getElementById('category').addEventListener('change',render);render();selectStation(0);
+})();
+</script></body></html>
