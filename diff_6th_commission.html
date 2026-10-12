@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<script id="office-work-custom-dialogs">
+(function(){
+  if (window.__officeWorkDialogsInstalled) return;
+  window.__officeWorkDialogsInstalled = true;
+  function ensureDialog(){
+    var old=document.getElementById('ow-dialog-overlay'); if(old) return old;
+    var style=document.createElement('style'); style.id='ow-dialog-style'; style.textContent=`#ow-dialog-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;font-family:inherit}#ow-dialog-card{width:min(100%,520px);max-height:85vh;overflow:auto;background:#fff;color:#24313b;border-radius:18px;box-shadow:0 18px 55px rgba(0,0,0,.35);padding:22px;box-sizing:border-box}#ow-dialog-head{display:flex;align-items:center;gap:10px;border-bottom:3px solid #174ea6;padding-bottom:12px;margin-bottom:16px;color:#174ea6;font-weight:800;font-size:18px}#ow-dialog-message{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font-size:16px;margin:12px 0 20px}#ow-dialog-input{width:100%;box-sizing:border-box;border:1px solid #aeb8c2;border-radius:9px;padding:12px;font-size:16px;margin:0 0 18px;color:#202124;background:#fff}#ow-dialog-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}#ow-dialog-actions button{border:0;border-radius:9px;padding:12px 20px;font-size:16px;font-weight:700;cursor:pointer;min-width:100px}#ow-dialog-cancel{background:#e7edf5;color:#24313b}#ow-dialog-ok{background:#174ea6;color:#fff}#ow-dialog-ok.danger{background:#c62828}@media(max-width:420px){#ow-dialog-card{padding:17px}#ow-dialog-actions button{flex:1}}`;
+    (document.head||document.documentElement).appendChild(style);
+    var overlay=document.createElement('div'); overlay.id='ow-dialog-overlay'; overlay.innerHTML='<div id="ow-dialog-card" role="dialog" aria-modal="true" aria-labelledby="ow-dialog-title"><div id="ow-dialog-head"><span>📘</span><span id="ow-dialog-title">कार्यालयीन डिजिटल हब</span></div><div id="ow-dialog-message"></div><input id="ow-dialog-input" style="display:none" autocomplete="off"><div id="ow-dialog-actions"><button type="button" id="ow-dialog-cancel">Cancel</button><button type="button" id="ow-dialog-ok">OK</button></div></div>';
+    (document.body||document.documentElement).appendChild(overlay); return overlay;
+  }
+  function openDialog(kind,message,options){options=options||{};return new Promise(function(resolve){var overlay=ensureDialog(),msg=overlay.querySelector('#ow-dialog-message'),input=overlay.querySelector('#ow-dialog-input'),cancel=overlay.querySelector('#ow-dialog-cancel'),ok=overlay.querySelector('#ow-dialog-ok'),title=overlay.querySelector('#ow-dialog-title');title.textContent=options.title||'कार्यालयीन डिजिटल हब';msg.textContent=String(message==null?'':message);input.style.display=kind==='prompt'?'block':'none';input.value=kind==='prompt'?(options.defaultValue||''):'';input.placeholder=options.placeholder||'';cancel.style.display=kind==='alert'?'none':'inline-block';cancel.textContent=options.cancelText||'Cancel';ok.textContent=options.okText||'OK';ok.classList.toggle('danger',!!options.danger);overlay.style.display='flex';var done=false;function finish(value){if(done)return;done=true;overlay.style.display='none';cancel.onclick=null;ok.onclick=null;overlay.onclick=null;document.removeEventListener('keydown',keyHandler);resolve(value)}cancel.onclick=function(){finish(kind==='prompt'?null:false)};ok.onclick=function(){finish(kind==='prompt'?input.value:(kind==='alert'?undefined:true))};overlay.onclick=function(e){if(e.target===overlay&&kind!=='alert')finish(kind==='prompt'?null:false)};function keyHandler(e){if(e.key==='Escape'&&kind!=='alert'){e.preventDefault();finish(kind==='prompt'?null:false)}else if(e.key==='Enter'&&kind==='prompt'){e.preventDefault();finish(input.value)}else if(e.key==='Enter'&&kind==='alert'){e.preventDefault();finish(undefined)}}document.addEventListener('keydown',keyHandler);setTimeout(function(){(kind==='prompt'?input:ok).focus()},0)})}
+  window.appAlert=function(message,options){return openDialog('alert',message,options)};window.appConfirm=function(message,options){return openDialog('confirm',message,options)};window.appPrompt=function(message,options){return openDialog('prompt',message,options)};
+})();
+</script>
+
+<script src="app-shell.js?v=20261011-final2"></script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>६ वा वेतन आयोग फरक</title>
+<style>
+* { box-sizing: border-box; }
+body {
+    margin: 0; padding: 12px;
+    font-family: "Noto Sans Devanagari", Arial, sans-serif;
+    background: radial-gradient(circle at 50% 25%, #173b69 0%, #071a32 45%, #020914 100%);
+    color: white; min-height: 100vh;
+}
+.box {
+    max-width: 900px; margin: 0 auto; background: #0f1c30;
+    border-radius: 16px; border: 1px solid #0284c7; padding: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+}
+.top-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0284c7; padding-bottom: 12px; margin-bottom: 20px; }
+.back-btn { background: #0284c7; color: white; padding: 8px 16px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; }
+.title { font-size: 20px; font-weight: bold; color: #38bdf8; margin: 0; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 15px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+label { font-size: 13px; color: #cbd5e1; }
+input, select { background: #091322; border: 1px solid #0369a1; color: white; padding: 9px; border-radius: 6px; outline: none; }
+.calc-btn { background: linear-gradient(135deg, #0284c7, #2563eb); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+</style>
+</head>
+<body>
+<div class="box">
+    <div class="top-bar">
+        <a href="difference.html" class="back-btn">⬅ मागे जा</a>
+        <h2 class="title">६ वा वेतन आयोग (6th Pay Commission)</h2>
+    </div>
+
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Pay Band (वेतन बँड):</label>
+            <select>
+                <option>PB-1 (5200 - 20200)</option>
+                <option>PB-2 (9300 - 34800)</option>
+                <option>PB-3 (15600 - 39100)</option>
+                <option>PB-4 (37400 - 67000)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Band Pay (बँडमधील वेतन ₹):</label>
+            <input type="number" placeholder="उदा. 9300">
+        </div>
+        <div class="form-group">
+            <label>Grade Pay (ग्रेड पे ₹):</label>
+            <select>
+                <option>1900</option>
+                <option>2400</option>
+                <option>2800</option>
+                <option>4200</option>
+                <option>4600</option>
+                <option>5400</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>महागाई भत्ता (D.A. %):</label>
+            <input type="number" placeholder="उदा. 125">
+        </div>
+    </div>
+    <button class="calc-btn" onclick="window.appAlert('६ व्या आयोगाची गणना लवकरच जोडली जाईल!')">६ व्या आयोगाचे वेतन काढा</button>
+</div>
+</body>
+</html>

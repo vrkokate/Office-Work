@@ -1,0 +1,2392 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<script id="office-work-custom-dialogs">
+(function(){
+  if (window.__officeWorkDialogsInstalled) return;
+  window.__officeWorkDialogsInstalled = true;
+  function ensureDialog(){
+    var old=document.getElementById('ow-dialog-overlay'); if(old) return old;
+    var style=document.createElement('style'); style.id='ow-dialog-style'; style.textContent=`#ow-dialog-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;font-family:inherit}#ow-dialog-card{width:min(100%,520px);max-height:85vh;overflow:auto;background:#fff;color:#24313b;border-radius:18px;box-shadow:0 18px 55px rgba(0,0,0,.35);padding:22px;box-sizing:border-box}#ow-dialog-head{display:flex;align-items:center;gap:10px;border-bottom:3px solid #174ea6;padding-bottom:12px;margin-bottom:16px;color:#174ea6;font-weight:800;font-size:18px}#ow-dialog-message{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font-size:16px;margin:12px 0 20px}#ow-dialog-input{width:100%;box-sizing:border-box;border:1px solid #aeb8c2;border-radius:9px;padding:12px;font-size:16px;margin:0 0 18px;color:#202124;background:#fff}#ow-dialog-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}#ow-dialog-actions button{border:0;border-radius:9px;padding:12px 20px;font-size:16px;font-weight:700;cursor:pointer;min-width:100px}#ow-dialog-cancel{background:#e7edf5;color:#24313b}#ow-dialog-ok{background:#174ea6;color:#fff}#ow-dialog-ok.danger{background:#c62828}@media(max-width:420px){#ow-dialog-card{padding:17px}#ow-dialog-actions button{flex:1}}`;
+    (document.head||document.documentElement).appendChild(style);
+    var overlay=document.createElement('div'); overlay.id='ow-dialog-overlay'; overlay.innerHTML='<div id="ow-dialog-card" role="dialog" aria-modal="true" aria-labelledby="ow-dialog-title"><div id="ow-dialog-head"><span>📘</span><span id="ow-dialog-title">कार्यालयीन डिजिटल हब</span></div><div id="ow-dialog-message"></div><input id="ow-dialog-input" style="display:none" autocomplete="off"><div id="ow-dialog-actions"><button type="button" id="ow-dialog-cancel">Cancel</button><button type="button" id="ow-dialog-ok">OK</button></div></div>';
+    (document.body||document.documentElement).appendChild(overlay); return overlay;
+  }
+  function openDialog(kind,message,options){options=options||{};return new Promise(function(resolve){var overlay=ensureDialog(),msg=overlay.querySelector('#ow-dialog-message'),input=overlay.querySelector('#ow-dialog-input'),cancel=overlay.querySelector('#ow-dialog-cancel'),ok=overlay.querySelector('#ow-dialog-ok'),title=overlay.querySelector('#ow-dialog-title');title.textContent=options.title||'कार्यालयीन डिजिटल हब';msg.textContent=String(message==null?'':message);input.style.display=kind==='prompt'?'block':'none';input.value=kind==='prompt'?(options.defaultValue||''):'';input.placeholder=options.placeholder||'';cancel.style.display=kind==='alert'?'none':'inline-block';cancel.textContent=options.cancelText||'Cancel';ok.textContent=options.okText||'OK';ok.classList.toggle('danger',!!options.danger);overlay.style.display='flex';var done=false;function finish(value){if(done)return;done=true;overlay.style.display='none';cancel.onclick=null;ok.onclick=null;overlay.onclick=null;document.removeEventListener('keydown',keyHandler);resolve(value)}cancel.onclick=function(){finish(kind==='prompt'?null:false)};ok.onclick=function(){finish(kind==='prompt'?input.value:(kind==='alert'?undefined:true))};overlay.onclick=function(e){if(e.target===overlay&&kind!=='alert')finish(kind==='prompt'?null:false)};function keyHandler(e){if(e.key==='Escape'&&kind!=='alert'){e.preventDefault();finish(kind==='prompt'?null:false)}else if(e.key==='Enter'&&kind==='prompt'){e.preventDefault();finish(input.value)}else if(e.key==='Enter'&&kind==='alert'){e.preventDefault();finish(undefined)}}document.addEventListener('keydown',keyHandler);setTimeout(function(){(kind==='prompt'?input:ok).focus()},0)})}
+  window.appAlert=function(message,options){return openDialog('alert',message,options)};window.appConfirm=function(message,options){return openDialog('confirm',message,options)};window.appPrompt=function(message,options){return openDialog('prompt',message,options)};
+})();
+</script>
+
+<script src="app-shell.js?v=20261011-final2"></script>
+
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<title>४ था वेतन आयोग फरक</title>
+
+<style>
+
+/* =========================================================
+   ROOT
+========================================================= */
+
+:root{
+    --bg:#080b14;
+    --card:#111827;
+    --card2:#172033;
+    --border:#334155;
+
+    --primary:#7c3aed;
+    --primary-dark:#5b21b6;
+    --primary-light:#a855f7;
+
+    --green:#22c55e;
+    --green-dark:#15803d;
+
+    --red:#ef4444;
+    --blue:#3b82f6;
+    --yellow:#f59e0b;
+
+    --text:#f8fafc;
+    --muted:#94a3b8;
+}
+
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+*{
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    margin:0;
+    padding:8px;
+
+    min-height:100vh;
+
+    font-family:
+        "Noto Sans Devanagari",
+        "Nirmala UI",
+        Arial,
+        sans-serif;
+
+    color:var(--text);
+
+    background:
+        radial-gradient(
+            circle at top left,
+            #251052 0,
+            #080b14 45%
+        ),
+        radial-gradient(
+            circle at bottom right,
+            #082f49 0,
+            #080b14 50%
+        );
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+========================================================= */
+
+.container{
+    width:100%;
+    max-width:950px;
+    margin:0 auto;
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.navigation-buttons{
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:10px;
+
+    margin-bottom:10px;
+}
+
+.nav-btn{
+
+    min-height:46px;
+
+    border:none;
+
+    border-radius:13px;
+
+    color:#fff;
+
+    font-size:15px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 5px 15px #0008;
+
+    transition:
+        transform .15s ease,
+        opacity .15s ease;
+}
+
+.nav-btn:active{
+    transform:scale(.96);
+}
+
+.back-btn{
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
+}
+
+.home-btn{
+
+    background:
+        linear-gradient(
+            135deg,
+            #16a34a,
+            #15803d
+        );
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header{
+
+    background:
+        linear-gradient(
+            135deg,
+            #4c1d95,
+            #7c3aed,
+            #9333ea
+        );
+
+    border:
+        1px solid #a78bfa;
+
+    border-radius:18px;
+
+    padding:16px;
+
+    text-align:center;
+
+    box-shadow:
+        0 10px 30px #0008;
+
+    margin-bottom:12px;
+}
+
+.header h1{
+
+    margin:0;
+
+    font-size:23px;
+
+    line-height:1.3;
+}
+
+.header p{
+
+    margin:6px 0 0;
+
+    color:#ede9fe;
+
+    font-size:13px;
+}
+
+
+/* =========================================================
+   INFO
+========================================================= */
+
+.info{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:8px;
+
+    margin-bottom:12px;
+}
+
+.info-box{
+
+    background:#111827dd;
+
+    border:
+        1px solid var(--border);
+
+    border-radius:12px;
+
+    padding:10px;
+
+    text-align:center;
+}
+
+.info-box b{
+
+    display:block;
+
+    color:#c4b5fd;
+
+    font-size:12px;
+}
+
+.info-box span{
+
+    display:block;
+
+    margin-top:4px;
+
+    font-size:13px;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status{
+
+    display:inline-block;
+
+    padding:4px 9px;
+
+    border-radius:20px;
+
+    font-size:11px;
+
+    font-weight:bold;
+}
+
+.status.ready{
+
+    background:#064e3b;
+
+    color:#6ee7b7;
+}
+
+.status.warning{
+
+    background:#451a03;
+
+    color:#fcd34d;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card{
+
+    background:
+        linear-gradient(
+            145deg,
+            #111827f5,
+            #0f172af5
+        );
+
+    border:
+        1px solid var(--border);
+
+    border-radius:18px;
+
+    padding:14px;
+
+    margin-bottom:12px;
+
+    box-shadow:
+        0 8px 25px #0007;
+}
+
+.card-title{
+
+    font-size:17px;
+
+    font-weight:bold;
+
+    color:#ddd6fe;
+
+    padding-bottom:10px;
+
+    margin-bottom:12px;
+
+    border-bottom:
+        1px solid #334155;
+}
+
+
+/* =========================================================
+   FORM GRID
+========================================================= */
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:10px;
+}
+
+.field{
+
+    display:flex;
+
+    flex-direction:column;
+}
+
+.field.full{
+
+    grid-column:
+        1 / -1;
+}
+
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+label{
+
+    font-size:12px;
+
+    color:#cbd5e1;
+
+    margin-bottom:5px;
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+input,
+select{
+
+    width:100%;
+
+    min-height:44px;
+
+    border-radius:10px;
+
+    border:
+        1px solid #475569;
+
+    background:#020617;
+
+    color:#fff;
+
+    padding:
+        9px 10px;
+
+    outline:none;
+
+    font-size:14px;
+}
+
+input:focus,
+select:focus{
+
+    border-color:
+        #a78bfa;
+
+    box-shadow:
+        0 0 0 2px
+        #7c3aed33;
+}
+
+input[readonly]{
+
+    background:#172033;
+
+    color:#c4b5fd;
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.button-row{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:8px;
+}
+
+button{
+
+    border:none;
+
+    border-radius:11px;
+
+    min-height:45px;
+
+    padding:8px;
+
+    color:#fff;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+}
+
+button:active{
+
+    transform:
+        scale(.98);
+}
+
+.btn-calc{
+
+    background:
+        linear-gradient(
+            135deg,
+            #7c3aed,
+            #9333ea
+        );
+}
+
+.btn-reset{
+
+    background:#475569;
+}
+
+.btn-print{
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
+}
+
+.btn-save{
+
+    background:
+        linear-gradient(
+            135deg,
+            #16a34a,
+            #15803d
+        );
+}
+
+
+/* =========================================================
+   RESULT
+========================================================= */
+
+.result{
+
+    display:none;
+}
+
+.result-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:9px;
+}
+
+.result-box{
+
+    background:#020617;
+
+    border:
+        1px solid #334155;
+
+    border-radius:12px;
+
+    padding:12px;
+
+    text-align:center;
+}
+
+.result-box .caption{
+
+    color:#94a3b8;
+
+    font-size:12px;
+}
+
+.result-box .value{
+
+    margin-top:5px;
+
+    font-size:19px;
+
+    font-weight:bold;
+}
+
+.highlight{
+
+    border-color:
+        #22c55e;
+
+    background:
+        #052e16;
+}
+
+.highlight .value{
+
+    color:#4ade80;
+}
+
+.difference{
+
+    border-color:
+        #f59e0b;
+
+    background:
+        #451a03;
+}
+
+.difference .value{
+
+    color:#fbbf24;
+}
+
+
+/* =========================================================
+   DETAILS
+========================================================= */
+
+.details{
+
+    margin-top:12px;
+}
+
+.details-row{
+
+    display:flex;
+
+    justify-content:
+        space-between;
+
+    gap:10px;
+
+    border-bottom:
+        1px solid #1e293b;
+
+    padding:9px 2px;
+
+    font-size:13px;
+}
+
+.details-row span:first-child{
+
+    color:#94a3b8;
+}
+
+.details-row span:last-child{
+
+    font-weight:bold;
+
+    text-align:right;
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+.error{
+
+    display:none;
+
+    background:#450a0a;
+
+    border:
+        1px solid #ef4444;
+
+    color:#fecaca;
+
+    border-radius:12px;
+
+    padding:11px;
+
+    margin-bottom:10px;
+
+    font-size:13px;
+}
+
+.success{
+
+    display:none;
+
+    background:#052e16;
+
+    border:
+        1px solid #22c55e;
+
+    color:#bbf7d0;
+
+    border-radius:12px;
+
+    padding:11px;
+
+    margin-bottom:10px;
+
+    font-size:13px;
+}
+
+.warning-box{
+
+    background:#422006;
+
+    border:
+        1px solid #f59e0b;
+
+    color:#fde68a;
+
+    border-radius:12px;
+
+    padding:10px;
+
+    font-size:12px;
+
+    margin-top:10px;
+
+    line-height:1.5;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer{
+
+    text-align:center;
+
+    color:#64748b;
+
+    font-size:11px;
+
+    padding:12px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:650px){
+
+    body{
+        padding:6px;
+    }
+
+    .navigation-buttons{
+
+        gap:7px;
+
+        margin-bottom:8px;
+    }
+
+    .nav-btn{
+
+        min-height:43px;
+
+        font-size:14px;
+    }
+
+    .header{
+
+        padding:13px 9px;
+
+        border-radius:15px;
+    }
+
+    .header h1{
+
+        font-size:19px;
+    }
+
+    .header p{
+
+        font-size:11px;
+    }
+
+    .info{
+
+        grid-template-columns:
+            repeat(3,1fr);
+
+        gap:5px;
+    }
+
+    .info-box{
+
+        padding:7px 3px;
+    }
+
+    .info-box b{
+
+        font-size:10px;
+    }
+
+    .info-box span{
+
+        font-size:10px;
+    }
+
+    .card{
+
+        padding:11px;
+
+        border-radius:14px;
+    }
+
+    .card-title{
+
+        font-size:15px;
+    }
+
+    .grid{
+
+        grid-template-columns:
+            1fr 1fr;
+
+        gap:8px;
+    }
+
+    .field.full{
+
+        grid-column:
+            1 / -1;
+    }
+
+    input,
+    select{
+
+        min-height:42px;
+
+        font-size:13px;
+    }
+
+    .button-row{
+
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+    .result-grid{
+
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+    .result-box{
+
+        padding:10px 5px;
+    }
+
+    .result-box .value{
+
+        font-size:17px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media(max-width:380px){
+
+    .grid{
+
+        grid-template-columns:
+            1fr;
+    }
+
+    .field.full{
+
+        grid-column:auto;
+    }
+
+    .result-grid{
+
+        grid-template-columns:
+            1fr;
+    }
+
+    .info-box span{
+
+        font-size:9px;
+    }
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print{
+
+    body{
+
+        background:#fff;
+
+        color:#000;
+    }
+
+    .navigation-buttons{
+
+        display:none;
+    }
+
+    .header{
+
+        background:#fff;
+
+        color:#000;
+
+        border:
+            1px solid #000;
+
+        box-shadow:none;
+    }
+
+    .header h1,
+    .header p{
+
+        color:#000;
+    }
+
+    .card{
+
+        background:#fff;
+
+        color:#000;
+
+        border:
+            1px solid #999;
+
+        box-shadow:none;
+    }
+
+    input,
+    select{
+
+        color:#000;
+
+        background:#fff;
+
+        border:
+            1px solid #999;
+    }
+
+    .button-row,
+    .footer{
+
+        display:none;
+    }
+
+    .result{
+
+        display:block!important;
+    }
+
+    .info-box{
+
+        color:#000;
+
+        background:#fff;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+<!-- =====================================================
+     NAVIGATION
+===================================================== -->
+
+<div class="navigation-buttons">
+
+    <button
+        type="button"
+        class="nav-btn back-btn"
+        onclick="goBack()">
+
+        ⬅️ मागे
+
+    </button>
+
+
+    <button
+        type="button"
+        class="nav-btn home-btn"
+        onclick="goHome()">
+
+        🏠 मुख्यपृष्ठ
+
+    </button>
+
+</div>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<div class="header">
+
+    <h1>
+        💰 ४ था वेतन आयोग फरक
+    </h1>
+
+    <p>
+        Fourth Pay Commission —
+        Pay Fixation & Difference
+    </p>
+
+</div>
+
+
+<!-- =====================================================
+     SYSTEM INFORMATION
+===================================================== -->
+
+<div class="info">
+
+
+    <div class="info-box">
+
+        <b>
+            आयोग
+        </b>
+
+        <span>
+            ४ था वेतन आयोग
+        </span>
+
+    </div>
+
+
+    <div class="info-box">
+
+        <b>
+            नियम
+        </b>
+
+        <span>
+            1988 Rules
+        </span>
+
+    </div>
+
+
+    <div class="info-box">
+
+        <b>
+            स्थिती
+        </b>
+
+        <span
+            id="systemStatus"
+            class="status ready">
+
+            READY
+
+        </span>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     EMPLOYEE INFORMATION
+===================================================== -->
+
+<div class="card">
+
+    <div class="card-title">
+
+        👤 कर्मचारी माहिती
+
+    </div>
+
+
+    <div class="grid">
+
+
+        <div class="field">
+
+            <label>
+                Employee ID
+            </label>
+
+            <input
+                id="employeeId"
+                type="text"
+                placeholder="उदा. EMP001">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                कर्मचारी नाव
+            </label>
+
+            <input
+                id="employeeName"
+                type="text"
+                placeholder="कर्मचाऱ्याचे नाव">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                पदनाम
+            </label>
+
+            <input
+                id="designation"
+                type="text"
+                placeholder="पदनाम">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                विभाग / कार्यालय
+            </label>
+
+            <input
+                id="office"
+                type="text"
+                placeholder="कार्यालय">
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     FIXATION INFORMATION
+===================================================== -->
+
+<div class="card">
+
+    <div class="card-title">
+
+        📅 वेतन निश्चिती माहिती
+
+    </div>
+
+
+    <div class="grid">
+
+
+        <div class="field">
+
+            <label>
+                वेतन निश्चिती तारीख
+            </label>
+
+            <input
+                id="fixationDate"
+                type="date">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                लागू दिनांक
+            </label>
+
+            <input
+                id="effectiveDate"
+                type="date"
+                value="1986-01-01">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                जुनी वेतनश्रेणी / Scale Code
+            </label>
+
+            <input
+                id="oldScale"
+                type="text"
+                placeholder="Scale Code">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                जुना Stage
+            </label>
+
+            <input
+                id="oldStage"
+                type="number"
+                min="1"
+                placeholder="Stage">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                जुने मूलभूत वेतन
+            </label>
+
+            <input
+                id="oldBasic"
+                type="number"
+                min="0"
+                step="1"
+                placeholder="₹">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                जुना Increment
+            </label>
+
+            <input
+                id="oldIncrement"
+                type="number"
+                min="0"
+                step="1"
+                placeholder="₹">
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     REVISED PAY
+===================================================== -->
+
+<div class="card">
+
+    <div class="card-title">
+
+        📊 ४ था वेतन आयोग —
+        सुधारित वेतन
+
+    </div>
+
+
+    <div class="grid">
+
+
+        <div class="field">
+
+            <label>
+                Revised Scale Code
+            </label>
+
+            <input
+                id="newScale"
+                type="text"
+                placeholder="Revised Scale">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                Revised Stage
+            </label>
+
+            <input
+                id="newStage"
+                type="number"
+                min="1"
+                placeholder="Stage">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                सुधारित किमान वेतन
+            </label>
+
+            <input
+                id="newMin"
+                type="number"
+                min="0"
+                placeholder="₹">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                सुधारित कमाल वेतन
+            </label>
+
+            <input
+                id="newMax"
+                type="number"
+                min="0"
+                placeholder="₹">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                सुधारित मूलभूत वेतन
+            </label>
+
+            <input
+                id="newBasic"
+                type="number"
+                min="0"
+                step="1"
+                placeholder="₹">
+
+        </div>
+
+
+        <div class="field">
+
+            <label>
+                सुधारित Increment
+            </label>
+
+            <input
+                id="newIncrement"
+                type="number"
+                min="0"
+                step="1"
+                placeholder="₹">
+
+        </div>
+
+
+    </div>
+
+
+    <div class="warning-box">
+
+        ⚠️ सुधारित Scale / Stage /
+        Pay values अधिकृत 1988 Rules
+        मधील Master Data नुसार भराव्यात.
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MESSAGES
+===================================================== -->
+
+<div
+    id="errorBox"
+    class="error">
+</div>
+
+
+<div
+    id="successBox"
+    class="success">
+</div>
+
+
+<!-- =====================================================
+     ACTION BUTTONS
+===================================================== -->
+
+<div class="card">
+
+    <div class="button-row">
+
+
+        <button
+            type="button"
+            class="btn-calc"
+            onclick="calculateDifference()">
+
+            🧮 गणना
+
+        </button>
+
+
+        <button
+            type="button"
+            class="btn-reset"
+            onclick="resetForm()">
+
+            🔄 Reset
+
+        </button>
+
+
+        <button
+            type="button"
+            class="btn-print"
+            onclick="printReport()">
+
+            🖨️ Print
+
+        </button>
+
+
+        <button
+            type="button"
+            class="btn-save"
+            onclick="saveRecord()">
+
+            💾 Save
+
+        </button>
+
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     RESULT
+===================================================== -->
+
+<div
+    id="resultSection"
+    class="card result">
+
+
+    <div class="card-title">
+
+        📈 गणना निकाल
+
+    </div>
+
+
+    <div class="result-grid">
+
+
+        <div class="result-box">
+
+            <div class="caption">
+                जुने मूलभूत वेतन
+            </div>
+
+            <div
+                id="resultOldBasic"
+                class="value">
+
+                ₹0
+
+            </div>
+
+        </div>
+
+
+        <div class="result-box highlight">
+
+            <div class="caption">
+                सुधारित मूलभूत वेतन
+            </div>
+
+            <div
+                id="resultNewBasic"
+                class="value">
+
+                ₹0
+
+            </div>
+
+        </div>
+
+
+        <div class="result-box difference">
+
+            <div class="caption">
+                वेतन फरक
+            </div>
+
+            <div
+                id="resultDifference"
+                class="value">
+
+                ₹0
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- DETAILS -->
+
+    <div class="details">
+
+
+        <div class="details-row">
+
+            <span>
+                Employee ID
+            </span>
+
+            <span id="rEmployeeId">
+                -
+            </span>
+
+        </div>
+
+
+        <div class="details-row">
+
+            <span>
+                कर्मचारी
+            </span>
+
+            <span id="rEmployeeName">
+                -
+            </span>
+
+        </div>
+
+
+        <div class="details-row">
+
+            <span>
+                जुनी Scale
+            </span>
+
+            <span id="rOldScale">
+                -
+            </span>
+
+        </div>
+
+
+        <div class="details-row">
+
+            <span>
+                जुना Stage
+            </span>
+
+            <span id="rOldStage">
+                -
+            </span>
+
+        </div>
+
+
+        <div class="details-row">
+
+            <span>
+                नवीन Scale
+            </span>
+
+            <span id="rNewScale">
+                -
+            </span>
+
+        </div>
+
+
+        <div class="details-row">
+
+            <span>
+                नवीन Stage
+            </span>
+
+            <span id="rNewStage">
+                -
+            </span>
+
+        </div>
+
+
+        <div class="details-row">
+
+            <span>
+                वेतन फरक %
+            </span>
+
+            <span id="rDifferencePercent">
+                0%
+            </span>
+
+        </div>
+
+
+        <div class="details-row">
+
+            <span>
+                Calculation Status
+            </span>
+
+            <span id="rStatus">
+                VERIFIED
+            </span>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<div class="footer">
+
+    ४ था वेतन आयोग •
+    Pay Fixation System
+
+    <br>
+
+    Master Data आधारित
+    Calculation Engine
+
+</div>
+
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+
+/*
+   BACK BUTTON
+   मागील page वर घेऊन जाईल.
+*/
+
+function goBack(){
+
+    if(
+        window.history.length > 1
+    ){
+
+        window.history.back();
+
+    }else{
+
+        window.location.href =
+            "index.html";
+
+    }
+
+}
+
+
+/*
+   HOME BUTTON
+   मुख्यपृष्ठावर घेऊन जाईल.
+*/
+
+function goHome(){
+
+    window.location.href =
+        "index.html";
+
+}
+
+
+/* =========================================================
+   UTILITY
+========================================================= */
+
+function $(id){
+
+    return document.getElementById(id);
+
+}
+
+
+function money(value){
+
+    const n =
+        Number(value) || 0;
+
+    return "₹" +
+        n.toLocaleString(
+            "en-IN",
+            {
+                maximumFractionDigits:0
+            }
+        );
+
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+function showError(message){
+
+    const box =
+        $("errorBox");
+
+    box.textContent =
+        "❌ " + message;
+
+    box.style.display =
+        "block";
+
+    $("successBox").style.display =
+        "none";
+
+    window.scrollTo({
+
+        top:
+            box.offsetTop - 20,
+
+        behavior:
+            "smooth"
+
+    });
+
+}
+
+
+/* =========================================================
+   SUCCESS
+========================================================= */
+
+function showSuccess(message){
+
+    const box =
+        $("successBox");
+
+    box.textContent =
+        "✅ " + message;
+
+    box.style.display =
+        "block";
+
+    $("errorBox").style.display =
+        "none";
+
+}
+
+
+/* =========================================================
+   CLEAR MESSAGES
+========================================================= */
+
+function clearMessages(){
+
+    $("errorBox").style.display =
+        "none";
+
+    $("successBox").style.display =
+        "none";
+
+}
+
+
+/* =========================================================
+   VALIDATION
+========================================================= */
+
+function validateForm(){
+
+    const employeeId =
+        $("employeeId").value.trim();
+
+
+    const employeeName =
+        $("employeeName").value.trim();
+
+
+    const fixationDate =
+        $("fixationDate").value;
+
+
+    const oldBasic =
+        Number(
+            $("oldBasic").value
+        );
+
+
+    const newBasic =
+        Number(
+            $("newBasic").value
+        );
+
+
+    if(!employeeId){
+
+        showError(
+            "Employee ID भरावा."
+        );
+
+        return false;
+    }
+
+
+    if(!employeeName){
+
+        showError(
+            "कर्मचारी नाव भरावे."
+        );
+
+        return false;
+    }
+
+
+    if(!fixationDate){
+
+        showError(
+            "वेतन निश्चिती तारीख निवडा."
+        );
+
+        return false;
+    }
+
+
+    if(
+        isNaN(oldBasic) ||
+        oldBasic <= 0
+    ){
+
+        showError(
+            "जुने मूलभूत वेतन योग्यरित्या भरा."
+        );
+
+        return false;
+    }
+
+
+    if(
+        isNaN(newBasic) ||
+        newBasic <= 0
+    ){
+
+        showError(
+            "सुधारित मूलभूत वेतन योग्यरित्या भरा."
+        );
+
+        return false;
+    }
+
+
+    return true;
+
+}
+
+
+/* =========================================================
+   CALCULATION
+========================================================= */
+
+function calculateDifference(){
+
+    clearMessages();
+
+
+    if(
+        !validateForm()
+    ){
+
+        return;
+
+    }
+
+
+    const oldBasic =
+        Number(
+            $("oldBasic").value
+        );
+
+
+    const newBasic =
+        Number(
+            $("newBasic").value
+        );
+
+
+    const difference =
+        newBasic - oldBasic;
+
+
+    let percentage = 0;
+
+
+    if(oldBasic > 0){
+
+        percentage =
+            (
+                difference /
+                oldBasic
+            ) * 100;
+
+    }
+
+
+    /* RESULT */
+
+    $("resultOldBasic")
+        .textContent =
+        money(oldBasic);
+
+
+    $("resultNewBasic")
+        .textContent =
+        money(newBasic);
+
+
+    $("resultDifference")
+        .textContent =
+        money(difference);
+
+
+    /* DETAILS */
+
+    $("rEmployeeId")
+        .textContent =
+        $("employeeId").value;
+
+
+    $("rEmployeeName")
+        .textContent =
+        $("employeeName").value;
+
+
+    $("rOldScale")
+        .textContent =
+        $("oldScale").value ||
+        "-";
+
+
+    $("rOldStage")
+        .textContent =
+        $("oldStage").value ||
+        "-";
+
+
+    $("rNewScale")
+        .textContent =
+        $("newScale").value ||
+        "-";
+
+
+    $("rNewStage")
+        .textContent =
+        $("newStage").value ||
+        "-";
+
+
+    $("rDifferencePercent")
+        .textContent =
+        percentage.toFixed(2) +
+        "%";
+
+
+    /* STATUS */
+
+    if(difference >= 0){
+
+        $("rStatus")
+            .textContent =
+            "VERIFIED";
+
+        $("rStatus")
+            .style.color =
+            "#4ade80";
+
+    }else{
+
+        $("rStatus")
+            .textContent =
+            "CHECK REQUIRED";
+
+        $("rStatus")
+            .style.color =
+            "#f87171";
+
+    }
+
+
+    $("resultSection")
+        .style.display =
+        "block";
+
+
+    $("systemStatus")
+        .textContent =
+        "CALCULATED";
+
+
+    $("systemStatus")
+        .className =
+        "status ready";
+
+
+    showSuccess(
+        "गणना पूर्ण झाली. निकाल खाली पाहता येईल."
+    );
+
+
+    $("resultSection")
+        .scrollIntoView({
+
+            behavior:"smooth",
+
+            block:"start"
+
+        });
+
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+async function resetForm(){
+
+    const answer =
+        await window.appConfirm(
+            "सर्व भरलेली माहिती काढून टाकायची आहे का?"
+        );
+
+
+    if(!answer){
+
+        return;
+
+    }
+
+
+    document
+        .querySelectorAll("input")
+        .forEach(
+            function(input){
+
+                if(
+                    input.id !==
+                    "effectiveDate"
+                ){
+
+                    input.value =
+                        "";
+
+                }
+
+            }
+        );
+
+
+    $("effectiveDate")
+        .value =
+        "1986-01-01";
+
+
+    $("resultSection")
+        .style.display =
+        "none";
+
+
+    clearMessages();
+
+
+    $("systemStatus")
+        .textContent =
+        "READY";
+
+
+    $("systemStatus")
+        .className =
+        "status ready";
+
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+function printReport(){
+    if ($("resultSection").style.display !== "block") {
+        showError("Print करण्यापूर्वी प्रथम गणना करा.");
+        return;
+    }
+
+    var previousPrintTitle = document.title;
+    var reportTitle = "4th_Pay_Commission_Report_" + new Date().toISOString().slice(0, 10) + ".pdf";
+    var restored = false;
+    var restorePrintTitle = function () {
+        if (restored) return;
+        restored = true;
+        document.title = previousPrintTitle;
+        window.removeEventListener("afterprint", restorePrintTitle);
+    };
+
+    document.title = reportTitle;
+    window.addEventListener("afterprint", restorePrintTitle);
+    window.print();
+    setTimeout(restorePrintTitle, 30000);
+}
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+function addLocalHistoryEntry(moduleName, actionName, recordName, recordId, changesText) {
+    try {
+        var key = 'digital_hub_central_history';
+        var history = [];
+        try {
+            var existing = JSON.parse(localStorage.getItem(key) || '[]');
+            if (Array.isArray(existing)) history = existing;
+        } catch (e) {}
+        var now = new Date();
+        var dateText = String(now.getDate()).padStart(2, '0') + '-' +
+            String(now.getMonth() + 1).padStart(2, '0') + '-' + now.getFullYear();
+        var stamp = now.toISOString();
+        history.unshift({
+            schemaVersion: '1.0',
+            source: moduleName,
+            createdAt: stamp,
+            id: 'AUTO-' + stamp.replace(/[-:.TZ]/g, '') + '-' + Math.random().toString(36).slice(2, 7),
+            date: dateText,
+            time: now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:true}),
+            timestamp: stamp,
+            module: moduleName,
+            action: actionName,
+            recordName: recordName || moduleName + ' record',
+            recordId: recordId || '—',
+            mbNumber: '—',
+            mbSize: '—',
+            receivedFrom: '—',
+            oldData: {},
+            newData: {},
+            changes: changesText || actionName + ' action',
+            status: '—',
+            user: 'System',
+            remark: 'स्वयंचलित मॉड्यूल नोंद'
+        });
+        if (history.length > 2000) history.length = 2000;
+        localStorage.setItem(key, JSON.stringify(history));
+    } catch (e) {
+        console.warn('History entry skipped:', e);
+    }
+}
+
+function saveRecord(){
+
+    clearMessages();
+
+
+    if(
+        !validateForm()
+    ){
+
+        return;
+
+    }
+
+
+    const oldBasic =
+        Number(
+            $("oldBasic").value
+        );
+
+
+    const newBasic =
+        Number(
+            $("newBasic").value
+        );
+
+
+    const difference =
+        newBasic -
+        oldBasic;
+
+
+    const record = {
+
+        id:
+            "FIX4_" +
+            Date.now(),
+
+        commission:
+            "4TH",
+
+        employeeId:
+            $("employeeId")
+                .value
+                .trim(),
+
+        employeeName:
+            $("employeeName")
+                .value
+                .trim(),
+
+        designation:
+            $("designation")
+                .value
+                .trim(),
+
+        office:
+            $("office")
+                .value
+                .trim(),
+
+        fixationDate:
+            $("fixationDate")
+                .value,
+
+        effectiveDate:
+            $("effectiveDate")
+                .value,
+
+        oldScale:
+            $("oldScale")
+                .value
+                .trim(),
+
+        oldStage:
+            $("oldStage")
+                .value,
+
+        oldBasic:
+            oldBasic,
+
+        oldIncrement:
+            Number(
+                $("oldIncrement")
+                    .value ||
+                0
+            ),
+
+        newScale:
+            $("newScale")
+                .value
+                .trim(),
+
+        newStage:
+            $("newStage")
+                .value,
+
+        newMin:
+            Number(
+                $("newMin")
+                    .value ||
+                0
+            ),
+
+        newMax:
+            Number(
+                $("newMax")
+                    .value ||
+                0
+            ),
+
+        newBasic:
+            newBasic,
+
+        newIncrement:
+            Number(
+                $("newIncrement")
+                    .value ||
+                0
+            ),
+
+        difference:
+            difference,
+
+        createdAt:
+            new Date()
+                .toISOString()
+
+    };
+
+
+    const records =
+        JSON.parse(
+            localStorage.getItem(
+                "PAY_FIXATION_4TH"
+            ) ||
+            "[]"
+        );
+
+
+    records.push(record);
+
+
+    localStorage.setItem(
+        "PAY_FIXATION_4TH",
+        JSON.stringify(records)
+    );
+    addLocalHistoryEntry('Pay Fixation', 'ADD', record.employeeName || '4th Pay Commission record', record.id, '4था वेतन आयोग वेतन निश्चिती नोंद जतन केली');
+
+
+    $("systemStatus")
+        .textContent =
+        "SAVED";
+
+
+    $("systemStatus")
+        .className =
+        "status ready";
+
+
+    showSuccess(
+        "४ था वेतन आयोगाचा record सुरक्षितपणे Save झाला."
+    );
+
+}
+
+
+/* =========================================================
+   GET SAVED RECORDS
+========================================================= */
+
+function getSavedRecords(){
+
+    return JSON.parse(
+
+        localStorage.getItem(
+            "PAY_FIXATION_4TH"
+        ) ||
+        "[]"
+
+    );
+
+}
+
+
+/* =========================================================
+   PAGE LOAD
+========================================================= */
+
+window.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        const today =
+            new Date();
+
+
+        const yyyy =
+            today.getFullYear();
+
+
+        const mm =
+            String(
+                today.getMonth() + 1
+            )
+            .padStart(2,"0");
+
+
+        const dd =
+            String(
+                today.getDate()
+            )
+            .padStart(2,"0");
+
+
+        $("fixationDate")
+            .value =
+            yyyy +
+            "-" +
+            mm +
+            "-" +
+            dd;
+
+
+        $("effectiveDate")
+            .value =
+            "1986-01-01";
+
+    }
+);
+
+</script>
+</body>
+</html>
