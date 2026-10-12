@@ -1,7 +1,23 @@
 <!DOCTYPE html>
 <html lang="mr">
 <head>
-<script src="app-shell.js"></script>
+<script id="office-work-custom-dialogs">
+(function(){
+  if (window.__officeWorkDialogsInstalled) return;
+  window.__officeWorkDialogsInstalled = true;
+  function ensureDialog(){
+    var old=document.getElementById('ow-dialog-overlay'); if(old) return old;
+    var style=document.createElement('style'); style.id='ow-dialog-style'; style.textContent=`#ow-dialog-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;font-family:inherit}#ow-dialog-card{width:min(100%,520px);max-height:85vh;overflow:auto;background:#fff;color:#24313b;border-radius:18px;box-shadow:0 18px 55px rgba(0,0,0,.35);padding:22px;box-sizing:border-box}#ow-dialog-head{display:flex;align-items:center;gap:10px;border-bottom:3px solid #174ea6;padding-bottom:12px;margin-bottom:16px;color:#174ea6;font-weight:800;font-size:18px}#ow-dialog-message{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font-size:16px;margin:12px 0 20px}#ow-dialog-input{width:100%;box-sizing:border-box;border:1px solid #aeb8c2;border-radius:9px;padding:12px;font-size:16px;margin:0 0 18px;color:#202124;background:#fff}#ow-dialog-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}#ow-dialog-actions button{border:0;border-radius:9px;padding:12px 20px;font-size:16px;font-weight:700;cursor:pointer;min-width:100px}#ow-dialog-cancel{background:#e7edf5;color:#24313b}#ow-dialog-ok{background:#174ea6;color:#fff}#ow-dialog-ok.danger{background:#c62828}@media(max-width:420px){#ow-dialog-card{padding:17px}#ow-dialog-actions button{flex:1}}`;
+    (document.head||document.documentElement).appendChild(style);
+    var overlay=document.createElement('div'); overlay.id='ow-dialog-overlay'; overlay.innerHTML='<div id="ow-dialog-card" role="dialog" aria-modal="true" aria-labelledby="ow-dialog-title"><div id="ow-dialog-head"><span>📘</span><span id="ow-dialog-title">कार्यालयीन डिजिटल हब</span></div><div id="ow-dialog-message"></div><input id="ow-dialog-input" style="display:none" autocomplete="off"><div id="ow-dialog-actions"><button type="button" id="ow-dialog-cancel">Cancel</button><button type="button" id="ow-dialog-ok">OK</button></div></div>';
+    (document.body||document.documentElement).appendChild(overlay); return overlay;
+  }
+  function openDialog(kind,message,options){options=options||{};return new Promise(function(resolve){var overlay=ensureDialog(),msg=overlay.querySelector('#ow-dialog-message'),input=overlay.querySelector('#ow-dialog-input'),cancel=overlay.querySelector('#ow-dialog-cancel'),ok=overlay.querySelector('#ow-dialog-ok'),title=overlay.querySelector('#ow-dialog-title');title.textContent=options.title||'कार्यालयीन डिजिटल हब';msg.textContent=String(message==null?'':message);input.style.display=kind==='prompt'?'block':'none';input.value=kind==='prompt'?(options.defaultValue||''):'';input.placeholder=options.placeholder||'';cancel.style.display=kind==='alert'?'none':'inline-block';cancel.textContent=options.cancelText||'Cancel';ok.textContent=options.okText||'OK';ok.classList.toggle('danger',!!options.danger);overlay.style.display='flex';var done=false;function finish(value){if(done)return;done=true;overlay.style.display='none';cancel.onclick=null;ok.onclick=null;overlay.onclick=null;document.removeEventListener('keydown',keyHandler);resolve(value)}cancel.onclick=function(){finish(kind==='prompt'?null:false)};ok.onclick=function(){finish(kind==='prompt'?input.value:(kind==='alert'?undefined:true))};overlay.onclick=function(e){if(e.target===overlay&&kind!=='alert')finish(kind==='prompt'?null:false)};function keyHandler(e){if(e.key==='Escape'&&kind!=='alert'){e.preventDefault();finish(kind==='prompt'?null:false)}else if(e.key==='Enter'&&kind==='prompt'){e.preventDefault();finish(input.value)}else if(e.key==='Enter'&&kind==='alert'){e.preventDefault();finish(undefined)}}document.addEventListener('keydown',keyHandler);setTimeout(function(){(kind==='prompt'?input:ok).focus()},0)})}
+  window.appAlert=function(message,options){return openDialog('alert',message,options)};window.appConfirm=function(message,options){return openDialog('confirm',message,options)};window.appPrompt=function(message,options){return openDialog('prompt',message,options)};
+})();
+</script>
+
+<script src="app-shell.js?v=20261011-final2"></script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -318,6 +334,7 @@
             opacity: 0 !important;
             z-index: 5;
             cursor: pointer;
+            pointer-events: auto; /* transparent native date input receives the tap and opens Android Chrome's picker directly */
             margin: 0; padding: 0; border: none;
         }
 
@@ -1268,6 +1285,7 @@
     let selectedWithheldDates = new Set();
     let globalCalcDataList = [];
     let currentEditingRecordId = null;
+    let lastProcessedEmployeeName = '';
 
     function getGradePayFrom4thOr5th(scale, designation) {
         let desigLower = (designation || "").toLowerCase();
@@ -1334,20 +1352,41 @@
         return "रु. 4000 - 100 - 6000";
     }
 
+    function getPayFixationReportFileName(kind) {
+        const rawName = (lastProcessedEmployeeName || (document.getElementById('empName') && document.getElementById('empName').value) || '').trim();
+        const safeEmployee = rawName
+            ? rawName.replace(/[\\\\/:*?\"<>|]+/g, '_').replace(/\s+/g, '_').slice(0, 70)
+            : 'Employee';
+        const datePart = new Date().toISOString().slice(0, 10);
+        const prefix = kind === 'illustration' ? 'Pay_Fixation_Illustration' : 'Pay_Fixation_Report';
+        return prefix + '_' + safeEmployee + '_' + datePart + '.pdf';
+    }
+
     function printReportChrome() {
         document.body.classList.remove('print-illustration-mode');
+        const oldTitle = document.title;
+        document.title = getPayFixationReportFileName('report').replace(/\.pdf$/i, '');
+        const restoreTitle = () => {
+            document.title = oldTitle;
+            window.removeEventListener('afterprint', restoreTitle);
+        };
+        window.addEventListener('afterprint', restoreTitle);
         window.print();
+        setTimeout(restoreTitle, 30000);
     }
 
     function printIllustrationChrome() {
         document.body.classList.add('print-illustration-mode');
-        window.print();
+        const oldTitle = document.title;
+        document.title = getPayFixationReportFileName('illustration').replace(/\.pdf$/i, '');
         const cleanup = () => {
             document.body.classList.remove('print-illustration-mode');
+            document.title = oldTitle;
             window.removeEventListener('afterprint', cleanup);
         };
         window.addEventListener('afterprint', cleanup);
-        setTimeout(cleanup, 2000);
+        window.print();
+        setTimeout(cleanup, 30000);
     }
 
     function downloadReportPDF() {
@@ -1371,7 +1410,7 @@
 
         const opt = {
             margin: [8, 6, 8, 6],
-            filename: 'Pay_Fixation_Report.pdf',
+            filename: getPayFixationReportFileName('report'),
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true, logging: false },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -1409,7 +1448,7 @@
 
         const opt = {
             margin: [8, 8, 8, 8],
-            filename: 'Pay_Fixation_Illustration.pdf',
+            filename: getPayFixationReportFileName('illustration'),
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true, logging: false },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -1420,15 +1459,87 @@
 
     function getSavedRecordsFromStorage() {
         try {
-            return JSON.parse(localStorage.getItem('savedPayFixationsList') || '[]');
+            const parsed = JSON.parse(localStorage.getItem('savedPayFixationsList') || '[]');
+            return Array.isArray(parsed) ? parsed.filter(r => r && typeof r === 'object') : [];
         } catch(e) {
+            console.error('वेतन निश्चिती नोंदी वाचताना त्रुटी:', e);
             return [];
         }
     }
 
+    function normalizeDateForInput(value) {
+        if (value === undefined || value === null || value === '') return '';
+        if (value instanceof Date && !isNaN(value.getTime())) {
+            return `${value.getFullYear()}-${String(value.getMonth()+1).padStart(2,'0')}-${String(value.getDate()).padStart(2,'0')}`;
+        }
+        const raw = String(value).trim();
+        let m = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:$|T|\s)/);
+        if (m) return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+        m = raw.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+        if (m) return `${m[3]}-${String(m[2]).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`;
+        if (/^\d{4}-\d{2}-\d{2}T/.test(raw)) return raw.slice(0,10);
+        return '';
+    }
+
+    function getNormalizedRecordData(rec) {
+        if (!rec || typeof rec !== 'object') return null;
+        const containers = [rec, rec.formData, rec.data, rec.fields, rec.employeeData, rec.form]
+            .filter(x => x && typeof x === 'object' && !Array.isArray(x));
+        const out = Object.assign({}, ...containers);
+        const aliases = {
+            empName: ['empName', 'employeeName', 'employee_name', 'name', 'कर्मचाऱ्याचे नाव'],
+            empDesignation: ['empDesignation', 'designation', 'postName', 'post', 'employeePost', 'पदनाम'],
+            empJoinDate: ['empJoinDate', 'joiningDate', 'joining_date', 'appointmentDate', 'appointment_date', 'dateOfJoining', 'date_of_joining', 'joining_date_value', 'नियुक्ती दिनांक'],
+            payCommission: ['payCommission', 'commission', 'payCommissionType', 'commissionType', 'pay_commission', 'pay_commission_type', 'वेतन आयोग'],
+            currentPayScale: ['currentPayScale', 'payScale', 'scale', 'payBand', 'payLevel', 'pay_scale', 'वेतनश्रेणी'],
+            basicPay: ['basicPay', 'basic', 'basicSalary', 'basic_pay', 'basic_salary', 'मूळ वेतन'],
+            gradePay: ['gradePay', 'gp', 'grade_pay', 'ग्रेड पे'],
+            fixationFrom: ['fixationFrom', 'fromDate', 'reportFrom', 'fixationStartDate', 'fixation_from'],
+            fixationTo: ['fixationTo', 'toDate', 'reportTo', 'fixationEndDate', 'fixation_to']
+        };
+        Object.keys(aliases).forEach(key => {
+            if (out[key] !== undefined && out[key] !== null && out[key] !== '') return;
+            for (const alias of aliases[key]) {
+                const source = containers.find(obj => obj[alias] !== undefined && obj[alias] !== null && obj[alias] !== '');
+                if (source) { out[key] = source[alias]; break; }
+            }
+        });
+        ['empJoinDate','b1_date','b1_optDate','b2_date','b2_optDate','b3_date','b3_optDate','fixationFrom','fixationTo'].forEach(key => {
+            if (out[key] !== undefined && out[key] !== null) out[key] = normalizeDateForInput(out[key]);
+        });
+        if (out.payCommission !== undefined && out.payCommission !== null) {
+            const raw = String(out.payCommission).trim().toLowerCase();
+            const commissionMap = [
+                [/^(4th|4|४था|चौथा|fourth)/, '4th'],
+                [/^(5th|5|५वा|पाचवा|fifth)/, '5th'],
+                [/^(6th|6|६वा|सहावा|sixth)/, '6th'],
+                [/^(7th|7|७वा|सातवा|seventh)/, '7th']
+            ];
+            const found = commissionMap.find(([rx]) => rx.test(raw));
+            if (found) out.payCommission = found[1];
+        }
+        return out;
+    }
+
+    function sameRecordId(a, b) {
+        return a !== undefined && a !== null && b !== undefined && b !== null && String(a) === String(b);
+    }
+
     function saveRecordsListToStorage(list) {
-        localStorage.setItem('savedPayFixationsList', JSON.stringify(list));
-        renderSavedRecordsTable();
+        try {
+            const serialized = JSON.stringify(list);
+            localStorage.setItem('savedPayFixationsList', serialized);
+            const storedRaw = localStorage.getItem('savedPayFixationsList');
+            const storedList = JSON.parse(storedRaw || 'null');
+            if (!Array.isArray(storedList) || storedList.length !== list.length) {
+                throw new Error('Storage verification failed.');
+            }
+            renderSavedRecordsTable();
+            return true;
+        } catch (e) {
+            console.error('Storage error:', e);
+            return false;
+        }
     }
 
     function getRecordDataObject() {
@@ -1490,86 +1601,153 @@
     function saveCurrentFixationRecord(showAlert = true) {
         const empName = document.getElementById('empName').value.trim();
         if (!empName) {
-            if (showAlert) alert("कृपया कर्मचाऱ्याचे नाव भरा!");
+            if (showAlert) window.appAlert("कृपया कर्मचाऱ्याचे नाव भरा!");
             return null;
         }
 
         const recordData = getRecordDataObject();
         let list = getSavedRecordsFromStorage();
-        if (currentEditingRecordId) {
-            let idx = list.findIndex(r => r.id === currentEditingRecordId);
-            if (idx !== -1) list[idx] = recordData;
-            else list.unshift(recordData);
-            if (showAlert) alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या अद्ययावत झाली!`);
+        let wasUpdate = false;
+
+        if (currentEditingRecordId !== null && currentEditingRecordId !== undefined && currentEditingRecordId !== '') {
+            const idx = list.findIndex(r => sameRecordId(r.id, currentEditingRecordId));
+            if (idx === -1) {
+                if (showAlert) window.appAlert('ही जुनी नोंद सापडली नाही. नवीन नोंद तयार केली आहे.');
+                recordData.id = 'PF-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+                list.unshift(recordData);
+            } else {
+                recordData.id = list[idx].id;
+                list[idx] = Object.assign({}, list[idx], recordData);
+                wasUpdate = true;
+            }
         } else {
+            recordData.id = 'PF-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
             list.unshift(recordData);
-            currentEditingRecordId = recordData.id;
-            if (showAlert) alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या सेव्ह झाली!`);
         }
 
-        saveRecordsListToStorage(list);
+        const persisted = saveRecordsListToStorage(list);
+        if (!persisted) {
+            if (showAlert) window.appAlert('डेटा सेव्ह करताना त्रुटी आली. कृपया पुन्हा प्रयत्न करा.');
+            return null;
+        }
+
+        currentEditingRecordId = recordData.id;
+        if (showAlert) {
+            window.appAlert(wasUpdate
+                ? `'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या अद्ययावत झाली!`
+                : `'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या सेव्ह झाली!`);
+        }
         return recordData;
     }
 
     function renderSavedRecordsTable() {
         const tbody = document.getElementById('savedRecordsTableBody');
         const countLabel = document.getElementById('savedCountLabel');
-        let list = getSavedRecordsFromStorage();
+        const list = getSavedRecordsFromStorage();
 
         if (countLabel) countLabel.textContent = `एकूण: ${list.length} नोंदी`;
         if (!tbody) return;
 
+        tbody.innerHTML = "";
         if (list.length === 0) {
             tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#90a4ae; padding:10px;">कोणतीही नोंद जतन केलेली नाही.</td></tr>`;
             return;
         }
 
-        tbody.innerHTML = "";
         list.forEach((item, index) => {
-            let tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="font-weight:bold;">${index + 1}</td>
-                <td><b>${item.empName}</b></td>
-                <td>${item.empDesignation || '-'}</td>
-                <td style="text-align:center; white-space:nowrap;">
-                    <button type="button" class="act-btn act-btn-view" onclick="viewSavedRecord(${item.id})" title="अहवाल पहा">👁️ पहा</button>
-                    <button type="button" class="act-btn act-btn-edit" onclick="editSavedRecord(${item.id})" title="माहिती दुरुस्त करा">✏️</button>
-                    <button type="button" class="act-btn act-btn-del" onclick="deleteSavedRecord(${item.id}, '${item.empName}')" title="नोंद हटवा">🗑️</button>
-                </td>
-            `;
+            const tr = document.createElement('tr');
+
+            const numberCell = document.createElement('td');
+            numberCell.style.fontWeight = 'bold';
+            numberCell.textContent = String(index + 1);
+
+            const nameCell = document.createElement('td');
+            const nameBold = document.createElement('b');
+            nameBold.textContent = String(item.empName || '—');
+            nameCell.appendChild(nameBold);
+
+            const designationCell = document.createElement('td');
+            designationCell.textContent = String(item.empDesignation || '-');
+
+            const actionCell = document.createElement('td');
+            actionCell.style.textAlign = 'center';
+            actionCell.style.whiteSpace = 'nowrap';
+
+            const viewBtn = document.createElement('button');
+            viewBtn.type = 'button';
+            viewBtn.className = 'act-btn act-btn-view';
+            viewBtn.title = 'अहवाल पहा';
+            viewBtn.textContent = '👁️ पहा';
+            viewBtn.addEventListener('click', function () {
+                viewSavedRecord(String(item.id));
+            });
+
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'act-btn act-btn-edit';
+            editBtn.title = 'माहिती दुरुस्त करा';
+            editBtn.textContent = '✏️';
+            editBtn.addEventListener('click', function () {
+                editSavedRecord(String(item.id));
+            });
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'act-btn act-btn-del';
+            deleteBtn.title = 'नोंद हटवा';
+            deleteBtn.textContent = '🗑️';
+            deleteBtn.addEventListener('click', function () {
+                deleteSavedRecord(String(item.id), String(item.empName || 'कर्मचारी'));
+            });
+
+            actionCell.appendChild(viewBtn);
+            actionCell.appendChild(editBtn);
+            actionCell.appendChild(deleteBtn);
+            tr.appendChild(numberCell);
+            tr.appendChild(nameCell);
+            tr.appendChild(designationCell);
+            tr.appendChild(actionCell);
             tbody.appendChild(tr);
         });
     }
 
     function populateFormFromRecord(rec) {
+        const d = getNormalizedRecordData(rec);
+        if (!d) return false;
         currentEditingRecordId = rec.id;
-        const d = rec.formData;
 
-        document.getElementById('empName').value = d.empName || '';
+        document.getElementById('empName').value = d.empName || rec.empName || '';
         document.getElementById('empDesignation').value = d.empDesignation || '';
-        document.getElementById('empJoinDate').value = d.empJoinDate || '';
+        document.getElementById('empJoinDate').value = normalizeDateForInput(d.empJoinDate || '');
         handleDatePicked('empJoinDate', 'empJoinDate_disp');
 
-        document.getElementById('payCommission').value = d.payCommission || '';
-        document.getElementById('currentPayScale').value = d.currentPayScale || '';
-        document.getElementById('basicPay').value = d.basicPay || '';
-        document.getElementById('gradePay').value = d.gradePay || '0';
+        const commissionField = document.getElementById('payCommission');
+        const savedScale = d.currentPayScale === undefined || d.currentPayScale === null ? '' : String(d.currentPayScale);
+        const savedBasic = d.basicPay === undefined || d.basicPay === null ? '' : String(d.basicPay);
+        const savedGradePay = d.gradePay === undefined || d.gradePay === null || d.gradePay === '' ? '0' : String(d.gradePay);
+        
+        commissionField.value = d.payCommission || '';
+        if (typeof updateCommissionRules === 'function') updateCommissionRules();
+        commissionField.value = d.payCommission || '';
+        document.getElementById('currentPayScale').value = savedScale;
+        document.getElementById('basicPay').value = savedBasic;
+        document.getElementById('gradePay').value = savedGradePay;
 
         for (let i = 1; i <= 3; i++) {
             document.getElementById(`b${i}_type`).value = d[`b${i}_type`] || 'None';
             toggleBenefitRow(i);
-            document.getElementById(`b${i}_date`).value = d[`b${i}_date`] || '';
+            document.getElementById(`b${i}_date`).value = normalizeDateForInput(d[`b${i}_date`] || '');
             handleDatePicked(`b${i}_date`, `b${i}_date_disp`);
-            document.getElementById(`b${i}_optDate`).value = d[`b${i}_optDate`] || '';
+            document.getElementById(`b${i}_optDate`).value = normalizeDateForInput(d[`b${i}_optDate`] || '');
             handleDatePicked(`b${i}_optDate`, `b${i}_optDate_disp`);
             document.getElementById(`b${i}_comm`).value = d[`b${i}_comm`] || '';
             document.getElementById(`b${i}_post`).value = d[`b${i}_post`] || '';
             document.getElementById(`b${i}_scale`).value = d[`b${i}_scale`] || '';
         }
 
-        document.getElementById('fixationFrom').value = d.fixationFrom || '';
+        document.getElementById('fixationFrom').value = normalizeDateForInput(d.fixationFrom || '');
         handleDatePicked('fixationFrom', 'fixationFrom_disp');
-        document.getElementById('fixationTo').value = d.fixationTo || '';
+        document.getElementById('fixationTo').value = normalizeDateForInput(d.fixationTo || '');
         handleDatePicked('fixationTo', 'fixationTo_disp');
 
         document.getElementById('autoCommissionChange').value = d.autoCommissionChange || 'Yes';
@@ -1603,44 +1781,55 @@
         validateCard1();
         validateCard2();
         validateCard3();
+        return true;
     }
 
     function loadCurrentRecordIntoForm() {
-        if (!currentEditingRecordId) return;
+        if (currentEditingRecordId === null || currentEditingRecordId === undefined || currentEditingRecordId === '') return;
         let list = getSavedRecordsFromStorage();
-        let rec = list.find(r => r.id === currentEditingRecordId);
-        if (rec) {
-            populateFormFromRecord(rec);
-        }
+        let rec = list.find(r => sameRecordId(r.id, currentEditingRecordId));
+        if (rec) populateFormFromRecord(rec);
     }
 
     function viewSavedRecord(id) {
         let list = getSavedRecordsFromStorage();
-        let rec = list.find(r => r.id === id);
+        let rec = list.find(r => sameRecordId(r.id, id));
         if (!rec) return;
-
         populateFormFromRecord(rec);
-        processFixation();
+        processFixation(false);
     }
 
     function editSavedRecord(id) {
-        let list = getSavedRecordsFromStorage();
-        let rec = list.find(r => r.id === id);
-        if (!rec) return;
+        const list = getSavedRecordsFromStorage();
+        const rec = list.find(r => sameRecordId(r.id, id));
+        if (!rec) {
+            window.appAlert('निवडलेली नोंद सापडली नाही.');
+            return;
+        }
 
-        populateFormFromRecord(rec);
         closeReportView();
-        scrollToEditData();
-        alert(`'${rec.empName}' यांची माहिती फॉर्ममध्ये भरली आहे. आवश्यक ते बदल करून पुन्हा 'Submit Data' किंवा 'Save Record' करा.`);
+        openModal('employeeModal');
+        const loaded = populateFormFromRecord(rec);
+        if (!loaded) {
+            closeModal('employeeModal');
+            return;
+        }
+
+        const modal = document.getElementById('employeeModal');
+        if (modal) modal.scrollTop = 0;
+        const firstField = document.getElementById('empName');
+        if (firstField) {
+            try { firstField.focus({ preventScroll: true }); } catch (e) { firstField.focus(); }
+        }
     }
 
-    function deleteSavedRecord(id, empName) {
-        if (confirm(`तुम्हाला '${empName}' यांची जतन केलेली वेतन निश्चिती नोंद खरोखर हटवायची आहे का?`)) {
+    async function deleteSavedRecord(id, empName) {
+        if (await window.appConfirm(`तुम्हाला '${empName}' यांची जतन केलेली वेतन निश्चिती नोंद खरोखर हटवायची आहे का?`)) {
             let list = getSavedRecordsFromStorage();
-            list = list.filter(r => r.id !== id);
-            if (currentEditingRecordId === id) currentEditingRecordId = null;
+            list = list.filter(r => !sameRecordId(r.id, id));
+            if (sameRecordId(currentEditingRecordId, id)) currentEditingRecordId = null;
             saveRecordsListToStorage(list);
-            alert("नोंद यशस्वीरीत्या हटवण्यात आली आहे!");
+            window.appAlert("नोंद यशस्वीरीत्या हटवण्यात आली आहे!");
         }
     }
 
@@ -1855,7 +2044,7 @@
     function confirmWithheldSelection() {
         const chks = document.querySelectorAll('.withheld-date-chk:checked');
         if (chks.length === 0) {
-            alert("कृपया किमान एक वेतनवाढ तारीख निवडा!");
+            window.appAlert("कृपया किमान एक वेतनवाढ तारीख निवडा!");
             return;
         }
         selectedWithheldDates.clear();
@@ -1863,13 +2052,63 @@
         
         const listContainer = document.getElementById('withheldListContainer');
         if (listContainer) listContainer.classList.add('hidden');
-        alert("वेतनवाढ रोखण्याची तारीख यशस्वीरीत्या जतन केली!");
+        window.appAlert("वेतनवाढ रोखण्याची तारीख यशस्वीरीत्या जतन केली!");
+    }
+
+    function resetFormAfterSuccessfulSubmit() {
+        selectedWithheldDates.clear();
+        currentEditingRecordId = null;
+
+        const clearValue = (id, value = '') => {
+            const el = document.getElementById(id);
+            if (el) el.value = value;
+        };
+
+        [
+            'empName', 'empDesignation', 'empJoinDate', 'empJoinDate_disp',
+            'payCommission', 'currentPayScale', 'basicPay',
+            'b1_date', 'b1_date_disp', 'b1_optDate', 'b1_optDate_disp', 'b1_comm', 'b1_post', 'b1_scale',
+            'b2_date', 'b2_date_disp', 'b2_optDate', 'b2_optDate_disp', 'b2_comm', 'b2_post', 'b2_scale',
+            'b3_date', 'b3_date_disp', 'b3_optDate', 'b3_optDate_disp', 'b3_comm', 'b3_post', 'b3_scale',
+            'fixationFrom', 'fixationFrom_disp', 'fixationTo', 'fixationTo_disp'
+        ].forEach(id => clearValue(id));
+
+        clearValue('gradePay', '0');
+        clearValue('autoCommissionChange', 'Yes');
+        clearValue('incrementMonthRule7th', 'july');
+        clearValue('hasScaleRev', 'No');
+        clearValue('incrementWithheld', 'No');
+        clearValue('withheldEffect', 'non_cumulative');
+
+        for (let i = 1; i <= 3; i++) {
+            clearValue(`b${i}_type`, 'None');
+            const fields = document.getElementById(`b${i}_fields`);
+            if (fields) fields.classList.add('hidden');
+            const advisor = document.getElementById(`b${i}_advisor`);
+            if (advisor) advisor.classList.add('hidden');
+        }
+
+        const revContainer = document.getElementById('scaleRevContainer');
+        if (revContainer) revContainer.classList.add('hidden');
+        const revList = document.getElementById('scaleRevList');
+        if (revList) revList.innerHTML = '';
+        const withheldContainer = document.getElementById('withheldListContainer');
+        if (withheldContainer) withheldContainer.classList.add('hidden');
+        const effectDiv = document.getElementById('withheldEffectDiv');
+        if (effectDiv) effectDiv.classList.add('hidden');
+        document.querySelectorAll('.withheld-date-chk').forEach(chk => { chk.checked = false; });
+
+        if (typeof updateCommissionRules === 'function') updateCommissionRules();
+        if (typeof toggleScaleRevSection === 'function') toggleScaleRevSection();
+        validateCard1();
+        validateCard2();
+        validateCard3();
     }
 
     function resetAllData() {
         var ask = (typeof window.appConfirm === 'function')
             ? window.appConfirm("तुम्हाला भरलेली सर्व माहिती पुसून टाकायची आहे का?", {title: "माहिती पुसण्याची पुष्टी", okText: "होय, पुसा", cancelText: "रद्द करा", okColor: "#c62828"})
-            : Promise.resolve(window.confirm("तुम्हाला भरलेली सर्व माहिती पुसून टाकायची आहे का?"));
+            : window.appConfirm("तुम्हाला भरलेली सर्व माहिती पुसून टाकायची आहे का?");
         ask.then(function (confirmed) {
             if (!confirmed) return;
             selectedWithheldDates.clear();
@@ -1914,7 +2153,7 @@
             validateCard3();
 
             document.getElementById('outputBox').classList.add('hidden');
-            alert("सर्व माहिती यशस्वीरीत्या साफ करण्यात आली आहे!");
+            window.appAlert("सर्व माहिती यशस्वीरीत्या साफ करण्यात आली आहे!");
         });
     }
 
@@ -1946,8 +2185,20 @@
     }
 
     function saveEmployeeModal() {
-        validateCard1();
+        const isValid = validateCard1();
+        if (!isValid) {
+            window.appAlert('कृपया कर्मचारी नाव, पदनाम, नियुक्ती दिनांक, वेतन आयोग, वेतनश्रेणी आणि मूळ वेतन पूर्ण भरा.');
+            return;
+        }
+
+        const savedRecord = saveCurrentFixationRecord(false);
+        if (!savedRecord) {
+            window.appAlert('माहिती जतन/अपडेट झाली नाही. कृपया पुन्हा प्रयत्न करा.');
+            return;
+        }
+
         closeModal('employeeModal');
+        window.appAlert(`'${document.getElementById('empName').value.trim()}' यांची कर्मचारी माहिती यशस्वीरीत्या जतन/अपडेट झाली.`);
     }
 
     function validateCard2() {
@@ -2444,7 +2695,7 @@
         const input = document.getElementById(inputId);
 
         if (!comm) {
-            alert("कृपया प्रथम वेतन आयोग निवडा!");
+            window.appAlert("कृपया प्रथम वेतन आयोग निवडा!");
             document.getElementById(commSelectId).focus();
             return;
         }
@@ -2502,7 +2753,7 @@
         const basicInput = document.getElementById(basicInputId);
 
         if (!scaleStr) {
-            alert("कृपया प्रथम वेतनश्रेणी निवडा!");
+            window.appAlert("कृपया प्रथम वेतनश्रेणी निवडा!");
             document.getElementById(scaleInputId).click();
             return;
         }
@@ -2748,12 +2999,10 @@
         return { basic: cells[cells.length - 1], index: cells.length - 1, level: key };
     }
 
-    // =========================================================================
-    // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (नियम ११(१) व विकल्पानुसार अचूक फिक्सेशन)
-    // =========================================================================
-    function processFixation() {
+    function processFixation(resetAfterSuccess = true) {
         try {
             const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
+            lastProcessedEmployeeName = name;
             const initialDesignation = document.getElementById('empDesignation').value.trim() || '-';
             const joinDateInput = document.getElementById('empJoinDate').value;
             const scale = document.getElementById('currentPayScale').value;
@@ -2762,24 +3011,26 @@
             const toDateInput = document.getElementById('fixationTo').value;
 
             if (!joinDateInput || !scale || isNaN(basic) || !fromDateInput || !toDateInput) {
-                alert("कृपया तिन्ही कार्ड्स मधील आवश्यक माहिती पूर्ण भरा!");
+                window.appAlert("कृपया तिन्ही कार्ड्स मधील आवश्यक माहिती पूर्ण भरा!");
                 return;
             }
 
-            // निवडलेला अहवाल कालावधी वैध आहे का ते तपासा.
             const selectedFromDate = parseLocalDate(fromDateInput);
             const selectedToDate = parseLocalDate(toDateInput);
             if (isNaN(selectedFromDate.getTime()) || isNaN(selectedToDate.getTime())) {
-                alert("कृपया अहवालाचा सुरुवातीचा आणि शेवटचा दिनांक योग्य निवडा.");
+                window.appAlert("कृपया अहवालाचा सुरुवातीचा आणि शेवटचा दिनांक योग्य निवडा.");
                 return;
             }
             if (selectedFromDate > selectedToDate) {
-                alert("'पासून' दिनांक हा 'पर्यंत' दिनांकापेक्षा पुढील असू शकत नाही. कृपया दिनांक तपासा.");
+                window.appAlert("'पासून' दिनांक हा 'पर्यंत' दिनांकापेक्षा पुढील असू शकत नाही. कृपया दिनांक तपासा.");
                 return;
             }
 
-            // 🌟 सबमिट केल्यावर रेकॉर्ड स्वयंचलितरित्या सेव्ह / अपडेट होईल
-            saveCurrentFixationRecord(false);
+            const savedRecord = saveCurrentFixationRecord(false);
+            if (!savedRecord) {
+                window.appAlert('नोंद सेव्ह/अपडेट झाली नाही. मूळ माहिती सुरक्षित ठेवली आहे; कृपया नोंद पुन्हा निवडा आणि तपासा.');
+                return;
+            }
 
             globalCalcDataList = [];
 
@@ -3015,8 +3266,6 @@
                 }
             });
 
-            // अंतिम सुरक्षा: अहवालात फक्त निवडलेल्या 'पासून' ते 'पर्यंत' दिनांकातील नोंदी दाखवा.
-            // दोन्ही टोकांचे दिनांक समाविष्ट आहेत.
             events = events.filter(ev => {
                 if (!ev || !(ev.date instanceof Date) || isNaN(ev.date.getTime())) return false;
                 return ev.date >= startDate && ev.date <= endDate;
@@ -3151,8 +3400,6 @@
                 }
                 else if (ev.type === 'COMMISSION_7TH') {
                     currentCommission = '7th';
-                    // विवरणपत्रात ३१-१२-२०१५ चे मूळ वेतन ₹5,830, ग्रेड पे ₹1,900
-                    // आणि एकूण वेतन ₹7,730 स्वतंत्र दाखवायचे आहे.
                     let oldGP = prevGpForSheet;
                     let oldB = currentBasic - oldGP;
                     let basicForSheet7th = currentBasic;
@@ -3401,21 +3648,21 @@
 
             const outputBox = document.getElementById('outputBox');
             outputBox.classList.remove('hidden');
-            // अहवाल पुन्हा तयार करताना आडवा स्क्रोल डावीकडून सुरू करा,
-            // जेणेकरून मोबाईलवर पहिल्या स्तंभांची सुरुवात कापलेली दिसणार नाही.
             const reportTableScroller = document.querySelector('#printableReportArea .table-scroll-container');
             if (reportTableScroller) reportTableScroller.scrollLeft = 0;
             window.scrollTo({ top: 0, behavior: 'smooth' });
 
+            if (resetAfterSuccess) {
+                resetFormAfterSuccessfulSubmit();
+            }
+
         } catch (err) {
             console.error("Process Fixation Error:", err);
-            alert("वेतन निश्चिती प्रक्रिया करताना त्रुटी आली: " + err.message);
+            window.appAlert("वेतन निश्चिती प्रक्रिया करताना त्रुटी आली: " + err.message);
         }
     }
 
     function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp, evType, calcData) {
-        // ६व्या वेतन आयोगाच्या या विवरणात Pay in Band आणि Grade Pay स्वतंत्र दाखवायचे आहेत.
-        // म्हणून एकूण वेतन = मूळ वेतन + ग्रेड पे; ७व्या आयोगात GP स्वतंत्र जोडला जात नाही.
         let total = basic;
         let gpDisplay = gp > 0 ? gp : "-";
         if (comm === '६वा आयोग' || comm === '6th') {
