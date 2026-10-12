@@ -1,1 +1,0 @@
-Final Stage 20 verification package. Candidate project files are in candidate_project/. Original project is in original_project/. Syntax and mocked recovery snapshot tests passed; actual browser/APK/device testing was not performed.
