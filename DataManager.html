@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<script src="app-shell.js?v=20261011-final2"></script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚙ Data Manager</title>
+<style>
+.container { padding: 15px; max-width: 500px; margin: auto; background: #fff; border-radius: 8px; margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body>
+<div class="top-header" style="background:#c2185b; color:#fff; padding:12px; position:relative; text-align:center;">
+<button class="btn-back-hub" onclick="appGoBack()" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); background:#ff9800; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;">◀ मागे</button>
+<h1 style="font-size:15px; margin:0;">⚙ Data Manager & Backup</h1>
+</div>
+
+<div class="breadcrumb-bar" style="background:rgba(0, 229, 255, 0.1); padding:4px 12px; font-size:11px;">
+    <span class="breadcrumb-link" onclick="location.href='index.html'" style="cursor:pointer; text-decoration:underline; color:#0d47a1;">🏠 मुख्य पृष्ठ</span> &gt; <span onclick="location.href='MB.html'" style="cursor:pointer; text-decoration:underline; color:#0d47a1;">M.B. नियंत्रण प्रणाली</span> &gt; <span>Data Manager</span>
+</div>
+
+<div class="container">
+<h4 style="font-size:13px; color:#1976d2; margin-bottom:8px;">💾 डेटा बॅकअप व रेस्टोअर</h4>
+<button class="btn-report" style="background:#1976d2;" onclick="downloadBackup()">BACKUP SAVE (डेटा डाऊनलोड)</button>
+<button class="btn-report" style="background:#455a64; margin-top:8px;" onclick="document.getElementById('restoreFileInput').click()">BACKUP RESTORE (डेटा अपलोड)</button>
+<input type="file" id="restoreFileInput" style="display:none;" accept=".json" onchange="restoreBackup(event)">
+
+<hr style="margin:20px 0;">
+
+<h4 style="font-size:13px; color:#c2185b; margin-bottom:8px;">डेटा हटवा (Select & Delete)</h4>
+<div style="font-size:12px; display:flex; flex-direction:column; gap:6px;">
+<label><input type="checkbox" id="delAll" onchange="toggleSelectAll(this)"> <strong>सर्व डेटा निवडा</strong></label>
+<label><input type="checkbox" class="del-chk" value="je_records"> JE डेटा</label>
+<label><input type="checkbox" class="del-chk" value="mb_records"> M.B. डेटा</label>
+<label><input type="checkbox" class="del-chk" value="work_records"> कामांची यादी डेटा</label>
+<label><input type="checkbox" class="del-chk" value="dmbms_bills"> देयक नोंदवही डेटा</label>
+<label><input type="checkbox" class="del-chk" value="assign_records"> M.B. वाटप डेटा</label>
+</div>
+<button class="btn-report" style="background:#d32f2f; margin-top:12px;" onclick="deleteSelectedData()">निवडलेली माहिती कायमची हटवा</button>
+</div>
+
+<script src="common.js"></script>
+<script>
+function downloadBackup() {
+    try {
+        var allData = {};
+        for (var i = 0; i < localStorage.length; i++) {
+            var key = localStorage.key(i);
+            if (key === null) continue;
+            var raw = localStorage.getItem(key);
+            try { allData[key] = JSON.parse(raw); }
+            catch (parseError) { allData[key] = { __rawStringValue: raw }; }
+        }
+        var backup = { app: 'Office-Work', backupVersion: 2, createdAt: new Date().toISOString(), storageType: 'localStorage-full-snapshot', data: allData };
+        var blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a'); a.href = url;
+        // This function exports every localStorage key, so the filename must say FULL_BACKUP.
+        a.download = 'Office_Work_FULL_BACKUP_' + new Date().toISOString().slice(0,10) + '.json';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+        showAlert('सर्व उपलब्ध स्थानिक नोंदींचा बॅकअप तयार केला. ही फाईल सुरक्षित ठेवा!', 'SUCCESS');
+    } catch (err) {
+        console.error('Backup error:', err);
+        showAlert('बॅकअप तयार करता आला नाही. स्टोरेज जागा तपासा.', 'ERROR');
+    }
+}
+
+function addLocalHistoryEntry(moduleName, actionName, recordName, recordId, changesText) {
+    try {
+        var key = 'digital_hub_central_history';
+        var history = [];
+        try {
+            var existing = JSON.parse(localStorage.getItem(key) || '[]');
+            if (Array.isArray(existing)) history = existing;
+        } catch (e) {}
+        var now = new Date();
+        var dateText = String(now.getDate()).padStart(2, '0') + '-' +
+            String(now.getMonth() + 1).padStart(2, '0') + '-' + now.getFullYear();
+        var stamp = now.toISOString();
+        history.unshift({
+            schemaVersion: '1.0',
+            source: moduleName,
+            createdAt: stamp,
+            id: 'AUTO-' + stamp.replace(/[-:.TZ]/g, '') + '-' + Math.random().toString(36).slice(2, 7),
+            date: dateText,
+            time: now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:true}),
+            timestamp: stamp,
+            module: moduleName,
+            action: actionName,
+            recordName: recordName || moduleName + ' record',
+            recordId: recordId || '—',
+            mbNumber: '—',
+            mbSize: '—',
+            receivedFrom: '—',
+            oldData: {},
+            newData: {},
+            changes: changesText || actionName + ' action',
+            status: '—',
+            user: 'System',
+            remark: 'स्वयंचलित मॉड्यूल नोंद'
+        });
+        if (history.length > 2000) history.length = 2000;
+        localStorage.setItem(key, JSON.stringify(history));
+    } catch (e) {
+        console.warn('History entry skipped:', e);
+    }
+}
+
+function mergeBackupValue(currentValue, backupValue) {
+    function identityKey(item) {
+        if (!item || typeof item !== 'object' || Array.isArray(item)) return null;
+        var keys = ['id', 'uuid', 'recordId', 'recordID', 'mbId', 'mbID', 'mbNo', 'employeeId', 'employeeID', 'code'];
+        for (var i = 0; i < keys.length; i++) {
+            var k = keys[i];
+            if (Object.prototype.hasOwnProperty.call(item, k) && item[k] !== '' && item[k] !== null && item[k] !== undefined) {
+                return k + ':' + String(item[k]).trim().toLowerCase();
+            }
+        }
+        return null;
+    }
+    function stableString(value) {
+        try { return JSON.stringify(value); } catch (e) { return String(value); }
+    }
+    if (Array.isArray(currentValue) && Array.isArray(backupValue)) {
+        var result = currentValue.slice();
+        backupValue.forEach(function(incoming) {
+            var incomingId = identityKey(incoming);
+            if (incomingId) {
+                var exists = result.some(function(existing) { return identityKey(existing) === incomingId; });
+                if (!exists) result.push(incoming);
+            } else {
+                var incomingText = stableString(incoming);
+                var duplicate = result.some(function(existing) { return stableString(existing) === incomingText; });
+                if (!duplicate) result.push(incoming);
+            }
+        });
+        return result;
+    }
+    if (currentValue && backupValue && typeof currentValue === 'object' && typeof backupValue === 'object' &&
+        !Array.isArray(currentValue) && !Array.isArray(backupValue)) {
+        var merged = {};
+        Object.keys(backupValue).forEach(function(k) { merged[k] = backupValue[k]; });
+        Object.keys(currentValue).forEach(function(k) {
+            if (Object.prototype.hasOwnProperty.call(backupValue, k)) {
+                merged[k] = mergeBackupValue(currentValue[k], backupValue[k]);
+            } else {
+                merged[k] = currentValue[k];
+            }
+        });
+        return merged;
+    }
+    // Current value always wins when both versions contain the same scalar key.
+    return currentValue === undefined ? backupValue : currentValue;
+}
+
+function restoreBackup(evt) {
+    var file = evt && evt.target && evt.target.files ? evt.target.files[0] : null;
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            var parsed = JSON.parse(e.target.result);
+            var data = parsed && parsed.data && typeof parsed.data === 'object' ? parsed.data : parsed;
+            if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Invalid backup structure');
+            var knownKeys = ['je_records','mb_records','work_records','dmbms_bills','bill_records','assign_records','savedPayFixationsList','hraRecords','digital_hub_central_history'];
+            var count = parsed && parsed.data && typeof parsed.data === 'object' ? Object.keys(parsed.data).length : knownKeys.filter(function(k){ return Object.prototype.hasOwnProperty.call(data,k); }).length;
+            if (!count) throw new Error('No supported data found');
+            if (!confirm('सध्याच्या नोंदी जतन करून बॅकअपमधील नवीन नोंदी जोडल्या जातील. समान ओळख क्रमांक असल्यास सध्याची नोंद कायम राहील. बॅकअपमध्ये नसलेल्या नोंदी हटवल्या जाणार नाहीत. पुढे जायचे का?')) return;
+            var restored = 0;
+            Object.keys(data).forEach(function(key) {
+                var value = data[key];
+                var currentRaw = localStorage.getItem(key);
+                var currentValue;
+                if (currentRaw !== null) {
+                    try { currentValue = JSON.parse(currentRaw); }
+                    catch (parseError) { currentValue = { __rawStringValue: currentRaw }; }
+                }
+                if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, '__rawStringValue')) {
+                    if (currentRaw === null) localStorage.setItem(key, String(value.__rawStringValue));
+                    // Existing local value wins over a raw-string backup value.
+                    else restored--;
+                } else if (currentRaw === null) {
+                    localStorage.setItem(key, JSON.stringify(value));
+                } else {
+                    var mergedValue = mergeBackupValue(currentValue, value);
+                    localStorage.setItem(key, JSON.stringify(mergedValue));
+                }
+                restored++;
+            });
+            addLocalHistoryEntry('Data Manager', 'RESTORE', 'Backup Restore', '—', 'बॅकअपमधून '+restored+' डेटा-की merge/restore केल्या'); showAlert('बॅकअपमधील ' + restored + ' नोंदी/डेटा-की पुनर्संचयित केल्या. कृपया प्रणाली तपासा!', 'SUCCESS');
+        } catch(err) {
+            console.error('Restore error:', err);
+            showAlert('बॅकअप फाईल वैध नाही किंवा ती वाचता आली नाही. कोणताही डेटा Restore केलेला नाही.', 'ERROR');
+        } finally { if (evt && evt.target) evt.target.value = ''; }
+    };
+    reader.onerror = function(){ showAlert('फाईल वाचता आली नाही. पुन्हा प्रयत्न करा.', 'ERROR'); };
+    reader.readAsText(file);
+}
+function toggleSelectAll(master) { document.querySelectorAll('.del-chk').forEach(c => c.checked = master.checked); }
+function deleteSelectedData() {
+    var selected = []; 
+    document.querySelectorAll('.del-chk:checked').forEach(c => selected.push(c.value));
+    if (selected.length === 0) return showAlert('किमान एक पर्याय निवडा.', 'WARNING');
+    if (confirm('निवडलेली माहिती कायमची नष्ट करायची का?')) {
+        selected.forEach(key => { localStorage.removeItem(key); addLocalHistoryEntry('Data Manager', 'DELETE', key, key, 'Data Manager मधून निवडलेली डेटा-की हटवली'); });
+        showAlert('निवडलेली माहिती हटवली!', 'SUCCESS');
+    }
+}
+</script>
+</body>
+</html>
