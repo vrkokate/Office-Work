@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<script id="office-work-custom-dialogs">
+(function(){
+  if (window.__officeWorkDialogsInstalled) return;
+  window.__officeWorkDialogsInstalled = true;
+  function ensureDialog(){
+    var old=document.getElementById('ow-dialog-overlay'); if(old) return old;
+    var style=document.createElement('style'); style.id='ow-dialog-style'; style.textContent=`#ow-dialog-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;font-family:inherit}#ow-dialog-card{width:min(100%,520px);max-height:85vh;overflow:auto;background:#fff;color:#24313b;border-radius:18px;box-shadow:0 18px 55px rgba(0,0,0,.35);padding:22px;box-sizing:border-box}#ow-dialog-head{display:flex;align-items:center;gap:10px;border-bottom:3px solid #174ea6;padding-bottom:12px;margin-bottom:16px;color:#174ea6;font-weight:800;font-size:18px}#ow-dialog-message{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font-size:16px;margin:12px 0 20px}#ow-dialog-input{width:100%;box-sizing:border-box;border:1px solid #aeb8c2;border-radius:9px;padding:12px;font-size:16px;margin:0 0 18px;color:#202124;background:#fff}#ow-dialog-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}#ow-dialog-actions button{border:0;border-radius:9px;padding:12px 20px;font-size:16px;font-weight:700;cursor:pointer;min-width:100px}#ow-dialog-cancel{background:#e7edf5;color:#24313b}#ow-dialog-ok{background:#174ea6;color:#fff}#ow-dialog-ok.danger{background:#c62828}@media(max-width:420px){#ow-dialog-card{padding:17px}#ow-dialog-actions button{flex:1}}`;
+    (document.head||document.documentElement).appendChild(style);
+    var overlay=document.createElement('div'); overlay.id='ow-dialog-overlay'; overlay.innerHTML='<div id="ow-dialog-card" role="dialog" aria-modal="true" aria-labelledby="ow-dialog-title"><div id="ow-dialog-head"><span>📘</span><span id="ow-dialog-title">कार्यालयीन डिजिटल हब</span></div><div id="ow-dialog-message"></div><input id="ow-dialog-input" style="display:none" autocomplete="off"><div id="ow-dialog-actions"><button type="button" id="ow-dialog-cancel">Cancel</button><button type="button" id="ow-dialog-ok">OK</button></div></div>';
+    (document.body||document.documentElement).appendChild(overlay); return overlay;
+  }
+  function openDialog(kind,message,options){options=options||{};return new Promise(function(resolve){var overlay=ensureDialog(),msg=overlay.querySelector('#ow-dialog-message'),input=overlay.querySelector('#ow-dialog-input'),cancel=overlay.querySelector('#ow-dialog-cancel'),ok=overlay.querySelector('#ow-dialog-ok'),title=overlay.querySelector('#ow-dialog-title');title.textContent=options.title||'कार्यालयीन डिजिटल हब';msg.textContent=String(message==null?'':message);input.style.display=kind==='prompt'?'block':'none';input.value=kind==='prompt'?(options.defaultValue||''):'';input.placeholder=options.placeholder||'';cancel.style.display=kind==='alert'?'none':'inline-block';cancel.textContent=options.cancelText||'Cancel';ok.textContent=options.okText||'OK';ok.classList.toggle('danger',!!options.danger);overlay.style.display='flex';var done=false;function finish(value){if(done)return;done=true;overlay.style.display='none';cancel.onclick=null;ok.onclick=null;overlay.onclick=null;document.removeEventListener('keydown',keyHandler);resolve(value)}cancel.onclick=function(){finish(kind==='prompt'?null:false)};ok.onclick=function(){finish(kind==='prompt'?input.value:(kind==='alert'?undefined:true))};overlay.onclick=function(e){if(e.target===overlay&&kind!=='alert')finish(kind==='prompt'?null:false)};function keyHandler(e){if(e.key==='Escape'&&kind!=='alert'){e.preventDefault();finish(kind==='prompt'?null:false)}else if(e.key==='Enter'&&kind==='prompt'){e.preventDefault();finish(input.value)}else if(e.key==='Enter'&&kind==='alert'){e.preventDefault();finish(undefined)}}document.addEventListener('keydown',keyHandler);setTimeout(function(){(kind==='prompt'?input:ok).focus()},0)})}
+  window.appAlert=function(message,options){return openDialog('alert',message,options)};window.appConfirm=function(message,options){return openDialog('confirm',message,options)};window.appPrompt=function(message,options){return openDialog('prompt',message,options)};
+})();
+</script>
+
+<script src="app-shell.js?v=20261011-final2"></script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>कनिष्ठ अभियंता (JE) व्यवस्थापन</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.container { padding: 15px; max-width: 600px; margin: auto; background: #fff; border-radius: 8px; margin-top: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body>
+<div class="top-header" style="background:#1976d2; color:#fff; padding:12px; position:relative; text-align:center;">
+<button class="btn-back-hub" onclick="appGoBack()" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); background:#ff9800; border:none; padding:6px 10px; border-radius:6px; font-weight:bold; cursor:pointer;">◀ मागे</button>
+<h1 style="font-size:15px; margin:0;">कनिष्ठ अभियंता (JE) व्यवस्थापन</h1>
+</div>
+
+<div class="breadcrumb-bar" style="background:rgba(0, 229, 255, 0.1); padding:4px 12px; font-size:11px;">
+    <span class="breadcrumb-link" onclick="location.href='index.html'" style="cursor:pointer; text-decoration:underline; color:#0d47a1;">🏠 मुख्य पृष्ठ</span> &gt; <span onclick="location.href='MB.html'" style="cursor:pointer; text-decoration:underline; color:#0d47a1;">M.B. नियंत्रण प्रणाली</span> &gt; <span>JE व्यवस्थापन</span>
+</div>
+
+<div class="container">
+<input type="hidden" id="editJEIndex" value="-1">
+<div class="form-group"><label>कनिष्ठ अभियंत्याचे पूर्ण नाव *</label><input type="text" class="form-control" id="newJEName" placeholder="उदा. श्री. ए. बी. पाटील"></div>
+<div style="display:flex; gap:6px;"><button id="btnSaveJE" class="btn-report" style="background:#1976d2; flex:1;" onclick="saveOrUpdateJE()">Save JE</button><button id="btnCancelJE" class="btn-report" style="background:#757575; width:80px; display:none;" onclick="cancelJEEdit()">रद्द करा</button></div>
+
+<div style="max-height:300px; overflow-y:auto; margin-top:12px;">
+<table class="data-table" id="jeTableToPrint"><thead><tr><th>अ.क्र.</th><th>नाव</th><th style="width:25%; text-align:center;">Action</th></tr></thead><tbody id="jeListBody"></tbody></table>
+</div>
+<button class="btn-report" style="background:#0d47a1; margin-top:12px;" onclick="printJEReport()">📄 REPORT / PRINT</button>
+</div>
+
+<div id="printableArea"></div>
+<script src="common.js"></script>
+<script>
+window.onload = function() { refreshJEList(); };
+function saveOrUpdateJE() {
+    var name = document.getElementById('newJEName').value.trim();
+    var idx = parseInt(document.getElementById('editJEIndex').value, 10);
+    if (!name) return showAlert('कृपया कनिष्ठ अभियंत्याचे पूर्ण नाव भरा.', 'WARNING');
+    var list = getData('je_records');
+    if (idx === -1) list.push({ name: name }); else list[idx].name = name;
+    setData('je_records', list);
+    cancelJEEdit();
+    refreshJEList();
+    showAlert('कनिष्ठ अभियंता नोंद यशस्वीपणे सेव्ह झाली!', 'SUCCESS');
+}
+function editJE(idx) {
+    var item = getData('je_records')[idx];
+    document.getElementById('newJEName').value = item.name;
+    document.getElementById('editJEIndex').value = idx;
+    document.getElementById('btnSaveJE').textContent = 'Update JE';
+    document.getElementById('btnCancelJE').style.display = 'block';
+}
+function cancelJEEdit() {
+    document.getElementById('newJEName').value = '';
+    document.getElementById('editJEIndex').value = '-1';
+    document.getElementById('btnSaveJE').textContent = 'Save JE';
+    document.getElementById('btnCancelJE').style.display = 'none';
+}
+async function deleteJE(idx) {
+    if (await window.appConfirm('हटवायचे का?')) {
+        var list = getData('je_records');
+        list.splice(idx, 1);
+        setData('je_records', list);
+        refreshJEList();
+        showAlert('कनिष्ठ अभियंता नोंद हटवली!', 'SUCCESS');
+    }
+}
+function refreshJEList() {
+    var list = getData('je_records');
+    var tbody = document.getElementById('jeListBody');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    list.forEach(function(item, idx) {
+        tbody.innerHTML += '<tr><td>'+(idx+1)+'</td><td>'+item.name+'</td><td class="action-cell" style="text-align:center;"><button class="btn-action" style="background:#2e7d32; padding:3px 6px; color:#fff; border:none; border-radius:3px;" onclick="editJE('+idx+')">Edit</button> <button class="btn-action" style="background:#d32f2f; padding:3px 6px; color:#fff; border:none; border-radius:3px;" onclick="deleteJE('+idx+')">Delete</button></td></tr>';
+    });
+}
+function printJEReport() {
+    var list = getData('je_records');
+    if (list.length === 0) return showAlert('कोणतीही कनिष्ठ अभियंता (JE) नोंद उपलब्ध नाही.', 'WARNING');
+    var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
+    var html = '<h2 style="text-align:center;">कनिष्ठ अभियंता (JE) व्यवस्थापन अहवाल</h2><table class="print-table"><thead><tr><th>अ.क्र.</th><th>कनिष्ठ अभियंत्याचे नाव</th></tr></thead><tbody>';
+    list.forEach(function(item, i) { html += '<tr><td>'+(i+1)+'</td><td><strong>'+item.name+'</strong></td></tr>'; });
+    html += '</tbody></table>';
+    printA4Document(html, 'JE_Register_Report_' + new Date().toISOString().slice(0, 10) + '.pdf');
+}
+</script>
+</body>
+</html>

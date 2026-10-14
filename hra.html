@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<script id="office-work-custom-dialogs">
+(function(){
+  if (window.__officeWorkDialogsInstalled) return;
+  window.__officeWorkDialogsInstalled = true;
+  function ensureDialog(){
+    var old=document.getElementById('ow-dialog-overlay'); if(old) return old;
+    var style=document.createElement('style'); style.id='ow-dialog-style'; style.textContent=`#ow-dialog-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;font-family:inherit}#ow-dialog-card{width:min(100%,520px);max-height:85vh;overflow:auto;background:#fff;color:#24313b;border-radius:18px;box-shadow:0 18px 55px rgba(0,0,0,.35);padding:22px;box-sizing:border-box}#ow-dialog-head{display:flex;align-items:center;gap:10px;border-bottom:3px solid #174ea6;padding-bottom:12px;margin-bottom:16px;color:#174ea6;font-weight:800;font-size:18px}#ow-dialog-message{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font-size:16px;margin:12px 0 20px}#ow-dialog-input{width:100%;box-sizing:border-box;border:1px solid #aeb8c2;border-radius:9px;padding:12px;font-size:16px;margin:0 0 18px;color:#202124;background:#fff}#ow-dialog-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}#ow-dialog-actions button{border:0;border-radius:9px;padding:12px 20px;font-size:16px;font-weight:700;cursor:pointer;min-width:100px}#ow-dialog-cancel{background:#e7edf5;color:#24313b}#ow-dialog-ok{background:#174ea6;color:#fff}#ow-dialog-ok.danger{background:#c62828}@media(max-width:420px){#ow-dialog-card{padding:17px}#ow-dialog-actions button{flex:1}}`;
+    (document.head||document.documentElement).appendChild(style);
+    var overlay=document.createElement('div'); overlay.id='ow-dialog-overlay'; overlay.innerHTML='<div id="ow-dialog-card" role="dialog" aria-modal="true" aria-labelledby="ow-dialog-title"><div id="ow-dialog-head"><span>📘</span><span id="ow-dialog-title">कार्यालयीन डिजिटल हब</span></div><div id="ow-dialog-message"></div><input id="ow-dialog-input" style="display:none" autocomplete="off"><div id="ow-dialog-actions"><button type="button" id="ow-dialog-cancel">Cancel</button><button type="button" id="ow-dialog-ok">OK</button></div></div>';
+    (document.body||document.documentElement).appendChild(overlay); return overlay;
+  }
+  function openDialog(kind,message,options){options=options||{};return new Promise(function(resolve){var overlay=ensureDialog(),msg=overlay.querySelector('#ow-dialog-message'),input=overlay.querySelector('#ow-dialog-input'),cancel=overlay.querySelector('#ow-dialog-cancel'),ok=overlay.querySelector('#ow-dialog-ok'),title=overlay.querySelector('#ow-dialog-title');title.textContent=options.title||'कार्यालयीन डिजिटल हब';msg.textContent=String(message==null?'':message);input.style.display=kind==='prompt'?'block':'none';input.value=kind==='prompt'?(options.defaultValue||''):'';input.placeholder=options.placeholder||'';cancel.style.display=kind==='alert'?'none':'inline-block';cancel.textContent=options.cancelText||'Cancel';ok.textContent=options.okText||'OK';ok.classList.toggle('danger',!!options.danger);overlay.style.display='flex';var done=false;function finish(value){if(done)return;done=true;overlay.style.display='none';cancel.onclick=null;ok.onclick=null;overlay.onclick=null;document.removeEventListener('keydown',keyHandler);resolve(value)}cancel.onclick=function(){finish(kind==='prompt'?null:false)};ok.onclick=function(){finish(kind==='prompt'?input.value:(kind==='alert'?undefined:true))};overlay.onclick=function(e){if(e.target===overlay&&kind!=='alert')finish(kind==='prompt'?null:false)};function keyHandler(e){if(e.key==='Escape'&&kind!=='alert'){e.preventDefault();finish(kind==='prompt'?null:false)}else if(e.key==='Enter'&&kind==='prompt'){e.preventDefault();finish(input.value)}else if(e.key==='Enter'&&kind==='alert'){e.preventDefault();finish(undefined)}}document.addEventListener('keydown',keyHandler);setTimeout(function(){(kind==='prompt'?input:ok).focus()},0)})}
+  window.appAlert=function(message,options){return openDialog('alert',message,options)};window.appConfirm=function(message,options){return openDialog('confirm',message,options)};window.appPrompt=function(message,options){return openDialog('prompt',message,options)};
+})();
+</script>
+
+<script src="app-shell.js?v=20261011-final2"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>महाराष्ट्र शासन - घर भाड्या भत्ता (HRA) व्यवस्थापन</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #1b5e20;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #c8e6c9;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2e7d32;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input:focus, select:focus {
+            border-color: #4caf50;
+            outline: none;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .btn-save {
+            background-color: #2e7d32;
+            color: white;
+        }
+        .btn-save:hover {
+            background-color: #1b5e20;
+        }
+        .btn-reset {
+            background-color: #d32f2f;
+            color: white;
+        }
+        .btn-reset:hover {
+            background-color: #c62828;
+        }
+        .output-section {
+            margin-top: 40px;
+            border-top: 2px dashed #ccc;
+            padding-top: 25px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #e8f5e9;
+            color: #1b5e20;
+        }
+        .action-btns button {
+            padding: 6px 12px;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+        .btn-edit {
+            background-color: #ff9800;
+            color: white;
+        }
+        .btn-delete {
+            background-color: #e53935;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>महाराष्ट्र शासन - घर भाड्या भत्ता (HRA) व्यवस्थापन</h2>
+
+    <form id="hraForm">
+        <input type="hidden" id="recordIndex" value="">
+
+        <div class="form-group">
+            <label for="employeeName">कर्मचाऱ्याचे नाव:</label>
+            <input type="text" id="employeeName" placeholder="पूर्ण नाव प्रविष्ट करा" required>
+        </div>
+
+        <div class="form-group">
+            <label for="basicSalary">मूळ वेतन (Basic Salary):</label>
+            <input type="number" id="basicSalary" placeholder="मूळ वेतन लिहा" required>
+        </div>
+
+        <div class="form-group">
+            <label for="cityCategory">शहर प्रवर्ग (City Category):</label>
+            <select id="cityCategory" required>
+                <option value="">-- प्रवर्ग निवडा --</option>
+                <option value="X (30%)">'अ' वर्ग / X श्रेणी (30%)</option>
+                <option value="Y (20%)">'ब' वर्ग / Y श्रेणी (20%)</option>
+                <option value="Z (10%)">'क' वर्ग / Z श्रेणी (10%)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="rentPaid">प्रत्यक्षात भरलेले भाडे (मासिक):</label>
+            <input type="number" id="rentPaid" placeholder="मासिक भाडे रक्कम">
+        </div>
+
+        <div class="btn-container">
+            <button type="button" class="btn-save" onclick="saveOrUpdateRecord()">माहिती सेव्ह करा</button>
+            <button type="button" class="btn-reset" onclick="resetForm()">फॉर्म रिकामा करा</button>
+        </div>
+    </form>
+
+    <div class="output-section">
+        <h3>नोंदवलेली माहिती आणि बदल (Records & Updates)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>अ.क्र.</th>
+                    <th>नाव</th>
+                    <th>मूळ वेतन</th>
+                    <th>प्रवर्ग</th>
+                    <th>भत्ता (HRA)</th>
+                    <th>कृती (Actions)</th>
+                </tr>
+            </thead>
+            <tbody id="recordTableBody">
+                <!-- डेटा इथे जावास्क्रिप्ट द्वारे येईल -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", displayRecords);
+
+    
+function addLocalHistoryEntry(moduleName, actionName, recordName, recordId, changesText) {
+    try {
+        var key = 'digital_hub_central_history';
+        var history = [];
+        try {
+            var existing = JSON.parse(localStorage.getItem(key) || '[]');
+            if (Array.isArray(existing)) history = existing;
+        } catch (e) {}
+        var now = new Date();
+        var dateText = String(now.getDate()).padStart(2, '0') + '-' +
+            String(now.getMonth() + 1).padStart(2, '0') + '-' + now.getFullYear();
+        var stamp = now.toISOString();
+        history.unshift({
+            schemaVersion: '1.0',
+            source: moduleName,
+            createdAt: stamp,
+            id: 'AUTO-' + stamp.replace(/[-:.TZ]/g, '') + '-' + Math.random().toString(36).slice(2, 7),
+            date: dateText,
+            time: now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:true}),
+            timestamp: stamp,
+            module: moduleName,
+            action: actionName,
+            recordName: recordName || moduleName + ' record',
+            recordId: recordId || '—',
+            mbNumber: '—',
+            mbSize: '—',
+            receivedFrom: '—',
+            oldData: {},
+            newData: {},
+            changes: changesText || actionName + ' action',
+            status: '—',
+            user: 'System',
+            remark: 'स्वयंचलित मॉड्यूल नोंद'
+        });
+        if (history.length > 2000) history.length = 2000;
+        localStorage.setItem(key, JSON.stringify(history));
+    } catch (e) {
+        console.warn('History entry skipped:', e);
+    }
+}
+
+function saveOrUpdateRecord() {
+        const index = document.getElementById('recordIndex').value;
+        const name = document.getElementById('employeeName').value;
+        const basic = document.getElementById('basicSalary').value;
+        const category = document.getElementById('cityCategory').value;
+        const rent = document.getElementById('rentPaid').value;
+
+        if (!name || !basic || !category) {
+            window.appAlert('कृपया सर्व आवश्यक माहिती भरा!');
+            return;
+        }
+
+        let rate = 0.10;
+        if (category.includes('30%')) rate = 0.30;
+        else if (category.includes('20%')) rate = 0.20;
+        
+        let calculatedHRA = basic * rate;
+
+        const record = {
+            name,
+            basic,
+            category,
+            rent: rent || 0,
+            hra: calculatedHRA
+        };
+
+        let records = JSON.parse(localStorage.getItem('hraRecords')) || [];
+
+        if (index === "") {
+            records.push(record);
+        } else {
+            records[index] = record;
+            document.getElementById('recordIndex').value = "";
+        }
+
+        localStorage.setItem('hraRecords', JSON.stringify(records));
+        addLocalHistoryEntry('HRA', index === "" ? 'ADD' : 'EDIT', name, index === "" ? '—' : index, 'HRA नोंद जतन/सुधारित केली');
+        displayRecords();
+        resetForm();
+        window.appAlert('माहिती यशस्वीरित्या सेव्ह झाली!');
+    }
+
+    function displayRecords() {
+        const tbody = document.getElementById('recordTableBody');
+        tbody.innerHTML = "";
+        let records = JSON.parse(localStorage.getItem('hraRecords')) || [];
+
+        if (records.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#777;">कोणतीही माहिती उपलब्ध नाही.</td></tr>`;
+            return;
+        }
+
+        records.forEach((rec, idx) => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td>${rec.name}</td>
+                    <td>₹${rec.basic}</td>
+                    <td>${rec.category}</td>
+                    <td>₹${rec.hra}</td>
+                    <td class="action-btns">
+                        <button class="btn-edit" onclick="editRecord(${idx})">बदल करा</button>
+                        <button class="btn-delete" onclick="deleteRecord(${idx})">डिटेल काढा</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function editRecord(index) {
+        let records = JSON.parse(localStorage.getItem('hraRecords')) || [];
+        let rec = records[index];
+
+        document.getElementById('employeeName').value = rec.name;
+        document.getElementById('basicSalary').value = rec.basic;
+        document.getElementById('cityCategory').value = rec.category;
+        document.getElementById('rentPaid').value = rec.rent;
+        document.getElementById('recordIndex').value = index;
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function deleteRecord(index) {
+        if (await window.appConfirm('तुम्हाला ही नोंद डिलीट करायची आहे का?')) {
+            let records = JSON.parse(localStorage.getItem('hraRecords')) || [];
+            var removedRecord = records[index];
+            records.splice(index, 1);
+            localStorage.setItem('hraRecords', JSON.stringify(records));
+            addLocalHistoryEntry('HRA', 'DELETE', removedRecord && removedRecord.name ? removedRecord.name : 'HRA record', index, 'HRA नोंद हटवली');
+            displayRecords();
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('hraForm').reset();
+        document.getElementById('recordIndex').value = "";
+    }
+</script>
+</body>
+</html>

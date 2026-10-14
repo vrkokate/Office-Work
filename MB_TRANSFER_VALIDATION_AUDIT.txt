@@ -1,0 +1,11 @@
+M.B. transfer/assignment validation fix — updated 2026-10-11
+
+Changed file: index.html only.
+
+Root cause: transfer records save receivedSource as descriptive text such as "M.B. <JE name> यांना दिली", while getSacAssignedJEForMB previously required receivedSource === "JE". That mismatch caused a false validation alert.
+
+Fix: accept the existing literal "JE" format or the exact descriptive transfer string for the current JE; then require the JE to exist, the M.B. to remain currently held by that JE, and a matching assign_records entry. Other workflow gates (assignment required; work name required before bill) remain unchanged.
+
+Validation: inline JavaScript syntax check passed. Mock checks passed for (1) valid transfer accepted, (2) missing assignment blocked, (3) mismatched assignment blocked. Full browser/mobile APK integration was not run, so end-to-end behavior is not certified.
+
+All other project files in the prior package were kept unchanged.
