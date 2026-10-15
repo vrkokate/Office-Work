@@ -3400,4 +3400,51 @@
 
         } catch (err) {
             console.error("Process Fixation Error:", err);
-            alert("वेतन
+            alert("वेतन निश्चिती प्रक्रिया करताना त्रुटी आली: " + err.message);
+        }
+    }
+
+    function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp, evType, calcData) {
+        let total = basic;
+        let gpDisplay = gp > 0 ? gp : "-";
+        if (comm === '६वा आयोग' || comm === '6th') {
+            gpDisplay = gp > 0 ? gp : "-";
+            total = basic;
+        } else if (comm === '७वा आयोग' || comm === '7th') {
+            gpDisplay = "-";
+            total = basic;
+        }
+
+        let totalDisplay = total;
+
+        if (evType === 'COMMISSION_5TH' || evType === 'COMMISSION_6TH' || evType === 'COMMISSION_7TH') {
+            let dataIdx = globalCalcDataList.length;
+            globalCalcDataList.push(calcData);
+            totalDisplay = `<a href="javascript:void(0)" onclick="openCalculationSheet(${dataIdx})" style="color:#01579b; text-decoration:underline; font-weight:bold; cursor:pointer;" title="वेतन निश्चिती विवरणपत्र किंवा ग्रेड पे दुरुस्ती पहा">${total}</a>`;
+        }
+
+        let tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${sr}</td>
+            <td>${dateStr}</td>
+            <td>${comm}</td>
+            <td><small><b>${scaleStr}</b></small></td>
+            <td class="event-cell">${eventDesc}</td>
+            <td><b>${basic}</b></td>
+            <td>${gpDisplay}</td>
+            <td><b>${totalDisplay}</b></td>
+        `;
+        document.getElementById('tableBody').appendChild(tr);
+    }
+
+    function getCommissionLabel(comm) {
+        if(comm === '4th') return "४था आयोग";
+        if(comm === '5th') return "५वा आयोग";
+        if(comm === '6th') return "६वा आयोग";
+        if(comm === '7th') return "७वा आयोग";
+        return comm;
+    }
+</script>
+
+</body>
+</html>
