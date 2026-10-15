@@ -955,6 +955,22 @@
     </div>
 </div>
 
+<!-- ==================== पॉप-अप: ग्रेड पे निवड (Grade Pay Selection Modal) ==================== -->
+<div id="gradePayModal" class="modal-overlay hidden">
+    <div class="modal-box" style="max-width: 480px;">
+        <div class="modal-header">
+            <h3>⚙ ग्रेड पे (Grade Pay) निवड</h3>
+            <button type="button" class="modal-close-x" onclick="closeGradePayModal(false)">✕</button>
+        </div>
+        <div id="gradePayModalText" style="font-size: 12px; line-height: 1.6; color: #263238; margin-bottom: 12px;"></div>
+        <div id="gradePayRadioList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; background: #f5f5f5; padding: 10px; border-radius: 6px;"></div>
+        <div style="display: flex; gap: 8px;">
+            <button type="button" class="submit-btn" style="flex:1; padding: 10px; font-size: 13px;" onclick="confirmGradePaySelection()">पुढे जा / Confirm</button>
+            <button type="button" class="reset-btn" style="flex:1; padding: 10px; font-size: 13px;" onclick="closeGradePayModal(false)">रद्द करा / Cancel</button>
+        </div>
+    </div>
+</div>
+
 <!-- ==================== पॉप-अप १: कर्मचारी माहिती ==================== -->
 <div id="employeeModal" class="modal-overlay hidden">
     <div class="modal-box">
@@ -1252,6 +1268,67 @@
 </div>
 
 <script>
+    let pendingFixationCallback = null;
+    let resolvedGradePayOverride = null;
+
+    function getMultipleGradePays(scaleStr) {
+        if (!scaleStr) return null;
+        if (scaleStr.includes("3050") || scaleStr.includes("3050 - 75")) {
+            return {
+                pb: "PB-1 (रु. 5200 - 20200)",
+                gps: [1900, 2000]
+            };
+        }
+        return null;
+    }
+
+    function checkAndResolveGradePay(scaleStr, callback) {
+        let multi = getMultipleGradePays(scaleStr);
+        if (multi && resolvedGradePayOverride === null) {
+            pendingFixationCallback = callback;
+            let textDiv = document.getElementById('gradePayModalText');
+            let listDiv = document.getElementById('gradePayRadioList');
+            
+            textDiv.innerHTML = `आपण निवडलेल्या <b>${scaleStr}</b> या जुन्या वेतनश्रेणीसाठी सहाव्या वेतन आयोगामध्ये <b>${multi.pb}</b> अंतर्गत <b>रु. ${multi.gps[0]}</b> आणि <b>रु. ${multi.gps[1]}</b> असे दोन Grade Pay पर्याय उपलब्ध आहेत.<br><br>कृपया संबंधित पदासाठी लागू असलेला योग्य Grade Pay निवडा. योग्य पर्याय निश्चित करण्यासाठी अधिकृत शासन निर्णय, पदाची मंजूर वेतनरचना किंवा मूळ वेतननिश्चिती आदेश तपासा.`;
+            
+            listDiv.innerHTML = "";
+            multi.gps.forEach((gp, idx) => {
+                let checked = idx === 0 ? "checked" : "";
+                let label = document.createElement('label');
+                label.className = 'checkbox-item';
+                label.style.fontSize = '12px';
+                label.style.fontWeight = 'bold';
+                label.style.color = '#1b5e20';
+                label.innerHTML = `<input type="radio" name="gpOption" value="${gp}" ${checked} style="accent-color: var(--primary); width:16px; height:16px;"> Grade Pay रु. ${gp}`;
+                listDiv.appendChild(label);
+            });
+
+            openModal('gradePayModal');
+        } else {
+            callback(resolvedGradePayOverride);
+        }
+    }
+
+    function confirmGradePaySelection() {
+        let selected = document.querySelector('input[name="gpOption"]:checked');
+        if (!selected) {
+            alert("कृपया एक ग्रेड पे निवडा!");
+            return;
+        }
+        resolvedGradePayOverride = parseInt(selected.value, 10);
+        closeModal('gradePayModal');
+        if (pendingFixationCallback) {
+            let cb = pendingFixationCallback;
+            pendingFixationCallback = null;
+            cb(resolvedGradePayOverride);
+        }
+    }
+
+    function closeGradePayModal(confirmed) {
+        closeModal('gradePayModal');
+        pendingFixationCallback = null;
+    }
+
     let selectedWithheldDates = new Set();
     let globalCalcDataList = [];
     let currentEditingRecordId = null;
@@ -2770,6 +2847,13 @@
     // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (नियम ११(१) व विकल्पानुसार अचूक फिक्सेशन)
     // =========================================================================
     function processFixation() {
+        const scale = document.getElementById('currentPayScale').value;
+        checkAndResolveGradePay(scale, function(gpOverride) {
+            executeProcessFixation(gpOverride);
+        });
+    }
+
+    function executeProcessFixation(gpOverride) {
         try {
             const name = document.getElementById('empName').value.trim() || 'कर्मचारी';
             const initialDesignation = document.getElementById('empDesignation').value.trim() || '-';
@@ -2790,7 +2874,7 @@
             globalCalcDataList = [];
 
             let gpMatch = scale.match(/GP\s*(\d+)/i);
-            let gradePay = gpMatch ? parseFloat(gpMatch[1]) : (parseFloat(document.getElementById('gradePay').value) || 0);
+            let gradePay = (gpOverride !== null && gpOverride !== undefined) ? gpOverride : (gpMatch ? parseFloat(gpMatch[1]) : (parseFloat(document.getElementById('gradePay').value) || 0));
 
             const autoUpgrade = document.getElementById('autoCommissionChange').value === 'Yes';
             const rule7th = document.getElementById('incrementMonthRule7th').value;
@@ -3123,7 +3207,7 @@
                     currentCommission = '6th';
                     let preBasic = currentBasic;
                     let multB = Math.round((currentBasic * 1.86) / 10) * 10;
-                    let gp6th = getGradePayFrom4thOr5th(prevScaleForSheet, initialDesignation);
+                    let gp6th = (gradePay > 0) ? gradePay : getGradePayFrom4thOr5th(prevScaleForSheet, initialDesignation);
                     currentGP = gp6th;
                     currentBasic = multB + gp6th;
                     currentScaleLabel = (gp6th >= 4200) ? `PB-2 : 9300 - 34800 (GP ${gp6th})` : `PB-1 : 5200 - 20200 (GP ${gp6th})`;
