@@ -1310,15 +1310,19 @@
 
     function get5thScaleFrom4th(oldScale) {
         if (!oldScale) return "रु. 5000 - 150 - 8000";
-        if (oldScale.includes("3000")) return "रु. 10000 - 325 - 15200";
-        if (oldScale.includes("2200")) return "रु. 8000 - 275 - 13500";
-        if (oldScale.includes("2000")) return "रु. 6500 - 200 - 10500";
-        if (oldScale.includes("1640")) return "रु. 5500 - 175 - 9000";
-        if (oldScale.includes("1400")) return "रु. 5000 - 150 - 8000";
-        if (oldScale.includes("1200") || oldScale.includes("1350")) return "रु. 4000 - 100 - 6000";
-        if (oldScale.includes("1150") || oldScale.includes("975")) return "रु. 3200 - 85 - 4900";
-        if (oldScale.includes("950") || oldScale.includes("800")) return "रु. 3050 - 75 - 3950";
-        return "रु. 4000 - 100 - 6000";
+        if (oldScale.includes("3000")) return "रु. 12000 - 375 - 16500";
+        if (oldScale.includes("2200")) return "रु. 10000 - 325 - 15200";
+        if (oldScale.includes("2000")) return "रु. 8000 - 275 - 13500";
+        if (oldScale.includes("1640")) return "रु. 6500 - 200 - 10500";
+        if (oldScale.includes("1400") && !oldScale.includes("950")) return "रु. 5000 - 150 - 8000";
+        if (oldScale.includes("1350") || oldScale.includes("1200")) return "रु. 4000 - 100 - 6000";
+        if (oldScale.includes("1150") && !oldScale.includes("950")) return "रु. 4000 - 100 - 6000";
+        if (oldScale.includes("975")) return "रु. 3200 - 85 - 4900";
+        if (oldScale.includes("950")) return "रु. 3050 - 75 - 3950 - EB - 80 - 4590";
+        if (oldScale.includes("800")) return "रु. 2750 - 70 - 3800 - 75 - 4400";
+        if (oldScale.includes("775")) return "रु. 2610 - 60 - 2910 - 65 - 3300 - 70 - 4000";
+        if (oldScale.includes("750")) return "रु. 2550 - 55 - 2660 - 60 - 3200";
+        return "रु. 3050 - 75 - 3950 - EB - 80 - 4590";
     }
 
     function printReportChrome() {
@@ -2243,16 +2247,16 @@
                     </div>
                     ${empInfoBox}
                     <table class="ill-table">
-                        <tr><td class="col-desc">सध्याचे वेतन श्रेणी (Existing Scale)</td><td class="col-dots">...</td><td class="col-val"><input type="text" class="ill-input ill-scale-input" value="${data.existingScale}"></td></tr>
-                        <tr><td class="col-desc">सुधारित वेतन श्रेणी (Proposed Scale)</td><td class="col-dots">...</td><td class="col-val"><input type="text" class="ill-input ill-scale-input" value="${data.proposedScale}"></td></tr>
-                        <tr><td class="col-desc">31 डिसेंबर 1995 चे मूळ वेतन</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_bp" class="ill-input ill-num-input" value="${bp}" oninput="recalculate5thIllustration(${dataIndex})"></td></tr>
-                        <tr><td class="col-desc">महागाई भत्ता 148%</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_da" class="ill-input ill-num-input" value="${da}" readonly></td></tr>
-                        <tr><td class="col-desc">पहिली अंतरिम वाढ (IR-1)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_ir1" class="ill-input ill-num-input" value="${ir1}" readonly></td></tr>
-                        <tr><td class="col-desc">दुसरे अंतरिम वाढ (IR-2)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_ir2" class="ill-input ill-num-input" value="${ir2}" readonly></td></tr>
+                        <tr><td class="col-desc">Existing Scale of Pay</td><td class="col-dots">...</td><td class="col-val"><input type="text" class="ill-input ill-scale-input" value="${data.existingScale}"></td></tr>
+                        <tr><td class="col-desc">Proposed Scale of Pay</td><td class="col-dots">...</td><td class="col-val"><input type="text" class="ill-input ill-scale-input" value="${data.proposedScale}"></td></tr>
+                        <tr><td class="col-desc">31-12-1995 चे मूळ वेतन (Existing Pay)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_bp" class="ill-input ill-num-input" value="${bp}" oninput="recalculate5thIllustration(${dataIndex})"></td></tr>
+                        <tr><td class="col-desc">महागाई भत्ता - 148%</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_da" class="ill-input ill-num-input" value="${da}" readonly></td></tr>
+                        <tr><td class="col-desc">पहिली अंतरिम दिलासा (IR-1)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_ir1" class="ill-input ill-num-input" value="${ir1}" readonly></td></tr>
+                        <tr><td class="col-desc">दुसरा अंतरिम दिलासा (IR-2)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_ir2" class="ill-input ill-num-input" value="${ir2}" readonly></td></tr>
                         <tr><td class="col-desc">विद्यमान वेतन व वरील घटकांची बेरीज</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_emol" class="ill-input ill-num-input" value="${emoluments}" readonly></td></tr>
                         <tr><td class="col-desc">मूळ वेतनाच्या 40% Weightage</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_w40" class="ill-input ill-num-input" value="${add40}" readonly></td></tr>
                         <tr><td class="col-desc">एकूण गणना</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_total" class="ill-input ill-num-input" value="${total}" readonly></td></tr>
-                        <tr style="background:#e8f5e9; font-weight:bold;"><td class="col-desc">नवीन वेतन श्रेणीतील पुढील टप्पा</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_stage11" class="ill-input ill-num-input" value="${fixedPay}" style="color:#b71c1c; border-color:#2e7d32;" readonly></td></tr>
+                        <tr style="background:#e8f5e9; font-weight:bold;"><td class="col-desc">नवीन वेतनश्रेणीतील पुढील योग्य टप्पा</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_stage11" class="ill-input ill-num-input" value="${fixedPay}" style="color:#b71c1c; border-color:#2e7d32;" readonly></td></tr>
                     </table>
                 </div>
             `;
@@ -2267,8 +2271,6 @@
                     </div>
                     ${empInfoBox}
                     <table class="ill-table">
-                        <tr><td class="col-desc">सध्याचे वेतन श्रेणी (Existing Scale)</td><td class="col-dots">...</td><td class="col-val"><input type="text" class="ill-input ill-scale-input" value="${data.existingScale}"></td></tr>
-                        <tr><td class="col-desc">सुधारित वेतन श्रेणी (Proposed Scale)</td><td class="col-dots">...</td><td class="col-val"><input type="text" class="ill-input ill-scale-input" value="${data.proposedScale}"></td></tr>
                         <tr><td class="col-desc">१. ५व्या आयोगातील मूळ वेतन (Basic Pay)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_6th_bp" class="ill-input ill-num-input" value="${data.existingPay}" readonly></td></tr>
                         <tr><td class="col-desc">२. १.८६ गुणाकार (Basic × 1.86)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_6th_mult" class="ill-input ill-num-input" value="${data.multBasic}" readonly></td></tr>
                         <tr><td class="col-desc">३. ग्रेड पे (Grade Pay) <span class="ill-no-print">[बदला: 5400 / 6600]</span></td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_6th_gp" class="ill-input ill-num-input" value="${data.gp}" oninput="recalculate6thIllustration(${dataIndex})"></td></tr>
@@ -2287,8 +2289,6 @@
                     </div>
                     ${empInfoBox}
                     <table class="ill-table">
-                        <tr><td class="col-desc">सध्याचे वेतन श्रेणी (Existing Scale)</td><td class="col-dots">...</td><td class="col-val"><input type="text" class="ill-input ill-scale-input" value="${data.existingScale}"></td></tr>
-                        <tr><td class="col-desc">सुधारित वेतन श्रेणी (Proposed Scale)</td><td class="col-dots">...</td><td class="col-val"><input type="text" class="ill-input ill-scale-input" value="${data.proposedScale}"></td></tr>
                         <tr><td class="col-desc">१. ३१-१२-२०१५ रोजीचे मूळ वेतन (६वा आयोग)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_b6" class="ill-input ill-num-input" value="${data.basic6th}" oninput="recalculate7thIllustration(${dataIndex})"></td></tr>
                         <tr><td class="col-desc">२. ग्रेड पे (Grade Pay)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_gp6" class="ill-input ill-num-input" value="${data.gp6th}" oninput="recalculate7thIllustration(${dataIndex})"></td></tr>
                         <tr><td class="col-desc">३. एकूण वेतन (Basic + GP)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_total6" class="ill-input ill-num-input" value="${data.total6th}" readonly></td></tr>
@@ -3220,6 +3220,11 @@
                         currentScaleLabel = rev.scale;
                     }
 
+                    lowerLevel = currentLevel;
+                    lowerBasic = currentBasic;
+                    lowerGP = currentGP;
+                    lowerMatrixIndex = currentMatrixIndex;
+
                     let desc = `वेतनश्रेणी सुधारणा (थेट सममूल्य / पुढील टप्प्यावर निश्चिती)`;
                     addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, desc, currentBasic, currentGP, ev.type, null);
                 }
@@ -3412,7 +3417,7 @@
 
         let totalDisplay = total;
 
-        if (evType === 'COMMISSION_5TH' || evType === 'COMMISSION_6TH' || evType === 'COMMISSION_7TH') {
+        (evType === 'COMMISSION_5TH' || evType === 'COMMISSION_6TH' || evType === 'COMMISSION_7TH') {
             let dataIdx = globalCalcDataList.length;
             globalCalcDataList.push(calcData);
             totalDisplay = `<a href="javascript:void(0)" onclick="openCalculationSheet(${dataIdx})" style="color:#01579b; text-decoration:underline; font-weight:bold; cursor:pointer;" title="वेतन निश्चिती विवरणपत्र किंवा ग्रेड पे दुरुस्ती पहा">${total}</a>`;
