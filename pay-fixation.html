@@ -1349,7 +1349,7 @@
             if (scale.includes("7225") || scale.includes("6500") || scale.includes("6000")) return 4300;
             if (scale.includes("5500") || scale.includes("5000")) return 2800;
             if (scale.includes("4500") || scale.includes("4000")) return 2400;
-            if (scale.includes("3050")) return 1900; // Default lowest valid GP for 3050 scale
+            if (scale.includes("3050")) return 1900;
         }
         if (desigLower.includes("अभियांता") || desigLower.includes("engineer")) return 4200;
         return 1900;
@@ -3175,21 +3175,15 @@
                     let ir2 = Math.max(100, Math.round(bp * 0.10));
                     let emoluments = bp + da + ir1 + ir2;
                     let add40 = Math.round(bp * 0.40);
-                    let total = emoluments + add40;
 
                     let proposedStages = parsePayScaleStages(newScale, '5th');
                     if (proposedStages.length === 0) proposedStages = [2550, 2605, 2660, 2720, 2780, 2840, 2900, 2960, 3020, 3080, 3140, 3200];
                     let st9 = proposedStages[0];
                     for (let i = 0; i < proposedStages.length; i++) {
-                        if (proposedStages[i] >= total) { st9 = proposedStages[i]; break; }
+                        if (proposedStages[i] >= (emoluments + add40)) { st9 = proposedStages[i]; break; }
                     }
 
-                    let existingStages = parsePayScaleStages(oldScale, '4th');
-                    let existingIncrements = (existingStages.indexOf(bp) !== -1) ? existingStages.indexOf(bp) : Math.floor((bp - (existingStages[0] || 750)) / 12);
-                    let bunchingIncrements = Math.floor(existingIncrements / 3);
-                    let st10 = proposedStages[Math.min(bunchingIncrements, proposedStages.length - 1)];
-
-                    currentBasic = Math.max(st9, st10);
+                    currentBasic = st9;
                     currentGP = 0;
                     lowerBasic = currentBasic;
                     lowerGP = 0;
@@ -3213,7 +3207,7 @@
                     let multB = Math.round((currentBasic * 1.86) / 10) * 10;
                     let gp6th = (gradePay > 0) ? gradePay : getGradePayFrom4thOr5th(prevScaleForSheet, initialDesignation);
                     currentGP = gp6th;
-                    currentBasic = multB + gp6th;
+                    currentBasic = multB; 
                     currentScaleLabel = (gp6th >= 4200) ? `PB-2 : 9300 - 34800 (GP ${gp6th})` : `PB-1 : 5200 - 20200 (GP ${gp6th})`;
                     if (gp6th >= 5400) {
                         currentScaleLabel = `PB-3 : 15600 - 39100 (GP ${gp6th})`;
@@ -3231,17 +3225,17 @@
                         existingPay: preBasic,
                         multBasic: multB,
                         gp: gp6th,
-                        total: currentBasic
+                        total: currentBasic + currentGP
                     };
 
                     addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, calcData6th);
                 }
                 else if (ev.type === 'COMMISSION_7TH') {
                     currentCommission = '7th';
-                    let totalBefore7th = currentBasic; 
+                    let totalBefore7th = currentBasic + currentGP; 
                     currentLevel = mapGpTo7thLevel(prevGpForSheet);
                     let fitmentResult = fitInMatrix(currentLevel, totalBefore7th * 2.57);
-                    let oldB = currentBasic - prevGpForSheet;
+                    let oldB = currentBasic;
                     let oldGP = prevGpForSheet;
 
                     currentBasic = fitmentResult.basic;
@@ -3318,221 +3312,4 @@
                 }
                 else if (ev.type === 'WITHHELD_INC') {
                     restoreWithheldNext = (ev.effect === 'non_cumulative');
-                    addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
-                }
-                else if (ev.type === 'BENEFIT_PROMOTED_PROVISIONAL') {
-                    let b = ev.data;
-                    b.savedLowerBasic = currentBasic;
-                    b.savedLowerGP = currentGP;
-                    currentCommission = b.commission;
-                    currentScaleLabel = b.scale;
-                    
-                    if (currentCommission === '7th') {
-                        let lvlMatch = b.scale.match(/S-(\d+)/i);
-                        let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-                        let fitTemp = fitInMatrix(targetLvl, currentBasic);
-                        currentLevel = fitTemp.level;
-                        currentBasic = fitTemp.basic;
-                        currentMatrixIndex = fitTemp.index;
-                        currentGP = 0;
-                        currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                    } else {
-                        let promoStages = parsePayScaleStages(b.scale, b.commission);
-                        let found = promoStages.find(s => s >= currentBasic);
-                        if (found) currentBasic = found;
-                    }
-
-                    addTableRow(srNo++, ev.dateStr, getCommissionLabel(b.commission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
-                }
-                else if (ev.type === 'BENEFIT_OPTION_DNI') {
-                    let b = ev.data;
-                    currentCommission = b.commission;
-                    let lBasic = b.savedLowerBasic || currentBasic;
-
-                    currentScaleLabel = b.scale;
-                    if (currentCommission === '7th') {
-                        let lvlMatch = b.scale.match(/S-(\d+)/i);
-                        let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-                        let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
-                        let currIdx = cellsLower.indexOf(lBasic);
-                        if (currIdx === -1) currIdx = 0;
-
-                        let notionalIdx = Math.min(currIdx + 2, cellsLower.length - 1);
-                        let notionalPay = cellsLower[notionalIdx];
-
-                        let fitFinal = fitInMatrix(targetLvl, notionalPay);
-                        currentLevel = fitFinal.level;
-                        currentBasic = fitFinal.basic;
-                        currentMatrixIndex = fitFinal.index;
-                        currentGP = 0;
-                        currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                    } else if (currentCommission === '6th') {
-                        let gpMatch = b.scale.match(/GP\s*(\d+)/i);
-                        let oldGP = currentGP;
-                        currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
-                        
-                        let inc = Math.ceil((lBasic * 0.03) / 10) * 10;
-                        let gpDiff = currentGP - oldGP;
-                        currentBasic = lBasic + inc + gpDiff;
-
-                        let ep = get6thEntryPay(b.scale, currentGP);
-                        if (ep && currentBasic < (ep + currentGP)) currentBasic = ep + currentGP;
-                        currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                    } else {
-                        let step = (currentCommission === '4th') ? 25 : 100;
-                        let target = lBasic + (step * 2);
-                        let promoStages = parsePayScaleStages(b.scale, currentCommission);
-                        let found = promoStages.find(s => s >= target);
-                        currentBasic = found ? found : target;
-                        currentGP = 0;
-                        currentScaleLabel = b.scale;
-                    }
-
-                    lowerLevel = currentLevel;
-                    lowerBasic = currentBasic;
-                    lowerGP = currentGP;
-                    lowerMatrixIndex = currentMatrixIndex;
-
-                    addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
-                }
-                else if (ev.type === 'BENEFIT_SAME_DAY') {
-                    let b = ev.data;
-                    currentCommission = b.commission;
-
-                    if (currentCommission === '7th') {
-                        let lvlMatch = b.scale.match(/S-(\d+)/i);
-                        let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-                        let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
-                        let currIdx = cellsLower.indexOf(currentBasic);
-                        if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
-                        let notionalIdx = Math.min(currIdx + 1, cellsLower.length - 1);
-                        let notionalPay = cellsLower[notionalIdx];
-
-                        let fitFinal = fitInMatrix(targetLvl, notionalPay);
-                        currentLevel = fitFinal.level;
-                        currentBasic = fitFinal.basic;
-                        currentMatrixIndex = fitFinal.index;
-                        currentGP = 0;
-                        currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                    } else if (currentCommission === '6th') {
-                        let gpMatch = b.scale.match(/GP\s*(\d+)/i);
-                        let oldGP = currentGP;
-                        currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
-                        
-                        let inc = Math.ceil((currentBasic * 0.03) / 10) * 10;
-                        let gpDiff = currentGP - oldGP;
-                        currentBasic = currentBasic + inc + gpDiff;
-
-                        let ep = get6thEntryPay(b.scale, currentGP);
-                        if (ep && currentBasic < (ep + currentGP)) currentBasic = ep + currentGP;
-                        currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                    } else {
-                        let step = (currentCommission === '4th') ? 25 : 100;
-                        let target = currentBasic + step;
-                        let promoStages = parsePayScaleStages(b.scale, currentCommission);
-                        let found = promoStages.find(s => s >= target);
-                        currentBasic = found ? found : target;
-                        currentGP = 0;
-                        currentScaleLabel = b.scale;
-                    }
-
-                    lowerLevel = currentLevel;
-                    lowerBasic = currentBasic;
-                    lowerGP = currentGP;
-                    lowerMatrixIndex = currentMatrixIndex;
-
-                    addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
-                }
-                else if (ev.type === 'ANNUAL_INC') {
-                    let stagesToAdvance = restoreWithheldNext ? 2 : 1;
-                    let descText = restoreWithheldNext ? "नियमित वार्षिक वेतन वाढ (रोखलेली वाढ पूर्ववत जोडून)" : ev.desc;
-                    restoreWithheldNext = false;
-
-                    if (currentCommission === '7th') {
-                        let match = String(currentLevel).match(/S-(\d+)/i);
-                        let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
-                        currentLevel = key;
-                        const cells = fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
-
-                        if (currentMatrixIndex === -1 || currentMatrixIndex === undefined) {
-                            currentMatrixIndex = cells.indexOf(currentBasic);
-                            if (currentMatrixIndex === -1) {
-                                for (let i = 0; i < cells.length; i++) {
-                                    if (cells[i] >= currentBasic) { currentMatrixIndex = i; break; }
-                                }
-                                if (currentMatrixIndex === -1) currentMatrixIndex = 0;
-                            }
-                        }
-
-                        currentMatrixIndex = Math.min(currentMatrixIndex + stagesToAdvance, cells.length - 1);
-                        currentBasic = cells[currentMatrixIndex];
-                    } else {
-                        let cells = parsePayScaleStages(currentScaleLabel, currentCommission, currentGP);
-                        let idx = cells.indexOf(currentBasic);
-                        if (idx !== -1 && idx + stagesToAdvance < cells.length) {
-                            currentBasic = cells[idx + stagesToAdvance];
-                        } else {
-                            let stepInc = (currentCommission === '4th' ? 25 : (currentCommission === '5th' ? 55 : Math.ceil((currentBasic * 0.03) / 10) * 10));
-                            currentBasic += (stepInc * stagesToAdvance);
-                        }
-                    }
-
-                    currentScaleLabel = getCleanScaleLabel(currentScaleLabel, currentCommission, currentLevel);
-                    addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, descText, currentBasic, currentGP, ev.type, null);
-                }
-            });
-
-            const outputBox = document.getElementById('outputBox');
-            outputBox.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        } catch (err) {
-            console.error("Process Fixation Error:", err);
-            alert("वेतन निश्चिती प्रक्रिया करताना त्रुटी आली: " + err.message);
-        }
-    }
-
-    function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp, evType, calcData) {
-        let total = basic;
-        let gpDisplay = gp > 0 ? gp : "-";
-        if (comm === '६वा आयोग' || comm === '6th') {
-            gpDisplay = gp > 0 ? gp : "-";
-            total = basic;
-        } else if (comm === '७वा आयोग' || comm === '7th') {
-            gpDisplay = "-";
-            total = basic;
-        }
-
-        let totalDisplay = total;
-
-        if (evType === 'COMMISSION_5TH' || evType === 'COMMISSION_6TH' || evType === 'COMMISSION_7TH') {
-            let dataIdx = globalCalcDataList.length;
-            globalCalcDataList.push(calcData);
-            totalDisplay = `<a href="javascript:void(0)" onclick="openCalculationSheet(${dataIdx})" style="color:#01579b; text-decoration:underline; font-weight:bold; cursor:pointer;" title="वेतन निश्चिती विवरणपत्र किंवा ग्रेड पे दुरुस्ती पहा">${total}</a>`;
-        }
-
-        let tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${sr}</td>
-            <td>${dateStr}</td>
-            <td>${comm}</td>
-            <td><small><b>${scaleStr}</b></small></td>
-            <td class="event-cell">${eventDesc}</td>
-            <td><b>${basic}</b></td>
-            <td>${gpDisplay}</td>
-            <td><b>${totalDisplay}</b></td>
-        `;
-        document.getElementById('tableBody').appendChild(tr);
-    }
-
-    function getCommissionLabel(comm) {
-        if(comm === '4th') return "४था आयोग";
-        if(comm === '5th') return "५वा आयोग";
-        if(comm === '6th') return "६वा आयोग";
-        if(comm === '7th') return "७वा आयोग";
-        return comm;
-    }
-</script>
-
-</body>
-</html>
+                    addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), current
