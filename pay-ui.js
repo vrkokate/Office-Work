@@ -6,6 +6,32 @@ let selectedWithheldDates = new Set();
 let globalCalcDataList = [];
 let currentEditingRecordId = null;
 
+// 🌟 डीफॉल्ट alert() ऐवजी आकर्षक कस्टम पॉप-अप दाखवणारे फंक्शन
+function showCustomAlert(message, type = 'success') {
+    const modal = document.getElementById('customAlertModal');
+    const msgElem = document.getElementById('customAlertMessage');
+    const iconElem = document.getElementById('customAlertIcon');
+
+    if (!modal || !msgElem) {
+        alert(message);
+        return;
+    }
+
+    msgElem.textContent = message;
+    if (type === 'error') {
+        iconElem.textContent = '⚠️';
+    } else {
+        iconElem.textContent = '✅';
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function closeCustomAlert() {
+    const modal = document.getElementById('customAlertModal');
+    if (modal) modal.classList.add('hidden');
+}
+
 function printReportChrome() {
     document.body.classList.remove('print-illustration-mode');
     window.print();
@@ -22,7 +48,6 @@ function printIllustrationChrome() {
     setTimeout(cleanup, 2000);
 }
 
-// 🌟 कर्मचाऱ्याच्या अचूक नावाप्रमाणे PDF फाईलचे नाव तयार करण्याचे फंक्शन
 function getDynamicFileName(defaultPrefix) {
     let empName = '';
     const summaryCard = document.getElementById('summaryText');
@@ -181,7 +206,7 @@ function getRecordDataObject() {
 function saveCurrentFixationRecord(showAlert = true) {
     const empName = document.getElementById('empName').value.trim();
     if (!empName) {
-        if (showAlert) alert("कृपया कर्मचाऱ्याचे नाव भरा!");
+        if (showAlert) showCustomAlert("कृपया कर्मचाऱ्याचे नाव भरा!", "error");
         return null;
     }
 
@@ -191,11 +216,11 @@ function saveCurrentFixationRecord(showAlert = true) {
         let idx = list.findIndex(r => r.id === currentEditingRecordId);
         if (idx !== -1) list[idx] = recordData;
         else list.unshift(recordData);
-        if (showAlert) alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या अद्ययावत झाली!`);
+        if (showAlert) showCustomAlert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या अद्ययावत झाली!`, "success");
     } else {
         list.unshift(recordData);
         currentEditingRecordId = recordData.id;
-        if (showAlert) alert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या सेव्ह झाली!`);
+        if (showAlert) showCustomAlert(`'${empName}' यांची वेतन निश्चिती माहिती यशस्वीरीत्या सेव्ह झाली!`, "success");
     }
 
     saveRecordsListToStorage(list);
@@ -322,7 +347,7 @@ function editSavedRecord(id) {
     populateFormFromRecord(rec);
     closeReportView();
     scrollToEditData();
-    alert(`'${rec.empName}' यांची माहिती फॉर्ममध्ये भरली आहे. आवश्यक ते बदल करून पुन्हा 'Submit Data' किंवा 'Save Record' करा.`);
+    showCustomAlert(`'${rec.empName}' यांची माहिती फॉर्ममध्ये भरली आहे. आवश्यक ते बदल करून पुन्हा 'Submit Data' किंवा 'Save Record' करा.`, "success");
 }
 
 function deleteSavedRecord(id, empName) {
@@ -331,7 +356,7 @@ function deleteSavedRecord(id, empName) {
         list = list.filter(r => r.id !== id);
         if (currentEditingRecordId === id) currentEditingRecordId = null;
         saveRecordsListToStorage(list);
-        alert("नोंद यशस्वीरीत्या हटवण्यात आली आहे!");
+        showCustomAlert("नोंद यशस्वीरीत्या हटवण्यात आली आहे!", "success");
     }
 }
 
@@ -546,7 +571,7 @@ function toggleWithheldOption() {
 function confirmWithheldSelection() {
     const chks = document.querySelectorAll('.withheld-date-chk:checked');
     if (chks.length === 0) {
-        alert("कृपया किमान एक वेतनवाढ तारीख निवडा!");
+        showCustomAlert("कृपया किमान एक वेतनवाढ तारीख निवडा!", "error");
         return;
     }
     selectedWithheldDates.clear();
@@ -554,7 +579,7 @@ function confirmWithheldSelection() {
     
     const listContainer = document.getElementById('withheldListContainer');
     if (listContainer) listContainer.classList.add('hidden');
-    alert("वेतनवाढ रोखण्याची तारीख यशस्वीरीत्या जतन केली!");
+    showCustomAlert("वेतनवाढ रोखण्याची तारीख यशस्वीरीत्या जतन केली!", "success");
 }
 
 function resetAllData() {
@@ -601,7 +626,7 @@ function resetAllData() {
         validateCard3();
 
         document.getElementById('outputBox').classList.add('hidden');
-        alert("सर्व माहिती यशस्वीरीत्या साफ करण्यात आली आहे!");
+        showCustomAlert("सर्व माहिती यशस्वीरीत्या साफ करण्यात आली आहे!", "success");
     }
 }
 
@@ -725,7 +750,7 @@ function toggleScaleDropdown(inputId, dropdownId, commSelectId = 'payCommission'
     const input = document.getElementById(inputId);
 
     if (!comm) {
-        alert("कृपया प्रथम वेतन आयोग निवडा!");
+        showCustomAlert("कृपया प्रथम वेतन आयोग निवडा!", "error");
         document.getElementById(commSelectId).focus();
         return;
     }
@@ -783,7 +808,7 @@ function toggleBasicDropdown(basicInputId, dropdownId, scaleInputId, commSelectI
     const basicInput = document.getElementById(basicInputId);
 
     if (!scaleStr) {
-        alert("कृपया प्रथम वेतनश्रेणी निवडा!");
+        showCustomAlert("कृपया प्रथम वेतनश्रेणी निवडा!", "error");
         document.getElementById(scaleInputId).click();
         return;
     }
