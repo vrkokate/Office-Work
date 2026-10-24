@@ -1261,6 +1261,387 @@
     let globalCalcDataList = [];
     let currentEditingRecordId = null;
 
+    function getCleanScaleLabel(scale, comm, level) {
+        if (comm === '7th') {
+            let match = String(level || scale).match(/S-(\d+)/i);
+            let key = match ? "S-" + parseInt(match[1], 10) : "S-6";
+            let cells = fullPayMatrix7th[key] || fullPayMatrix7th["S-6"];
+            return `${key} (${cells[0]} - ${cells[cells.length - 1]})`;
+        }
+        if (comm === '6th') {
+            let match = scale.match(/(PB-?\d|-1S)\s*:\s*\d+\s*-\s*\d+\s*\(GP\s*\d+\)/i);
+            return match ? match[0] : scale;
+        }
+        return scale;
+    }
+
+    function toggleScaleDropdown(inputId, dropdownId, commSelectId = 'payCommission') {
+        const comm = document.getElementById(commSelectId).value;
+        const dropdown = document.getElementById(dropdownId);
+        const input = document.getElementById(inputId);
+
+        if (!comm) {
+            alert("कृपया प्रथम वेतन आयोग निवडा!");
+            document.getElementById(commSelectId).focus();
+            return;
+        }
+
+        if (!dropdown.classList.contains('hidden')) {
+            dropdown.classList.add('hidden');
+            return;
+        }
+
+        dropdown.innerHTML = "";
+        let scales = [];
+        if (comm === '4th') scales = payScales4th;
+        else if (comm === '5th') scales = payScales5th;
+        else if (comm === '6th') scales = payScales6th;
+        else scales = levelConfig7th.map(cfg => level7thStartPay[cfg.id].desc);
+
+        scales.forEach(scale => {
+            let div = document.createElement('div');
+            div.className = 'dropdown-item';
+            div.textContent = scale;
+            div.onclick = function(e) {
+                e.stopPropagation();
+                input.value = scale;
+                dropdown.classList.add('hidden');
+                
+                if (comm === '6th' && scale.includes('GP')) {
+                    let gpMatch = scale.match(/GP\s*(\d+)/i);
+                    if (gpMatch && gpMatch[1]) {
+                        let gpVal = parseInt(gpMatch[1], 10);
+                        document.getElementById('gradePay').value = gpVal;
+                        let ep = get6thEntryPay(scale, gpVal);
+                        if (ep && inputId === 'currentPayScale') document.getElementById('basicPay').value = ep;
+                    }
+                } else if (comm === '7th' && inputId === 'currentPayScale') {
+                    let m = scale.match(/S-(\d+)/i);
+                    if (m) {
+                        let lvl = "S-" + parseInt(m[1], 10);
+                        if (fullPayMatrix7th[lvl]) document.getElementById('basicPay').value = fullPayMatrix7th[lvl][0];
+                    }
+                }
+                
+                if (inputId === 'currentPayScale') validateCard1();
+                else if (inputId.startsWith('b')) validateCard2();
+            };
+            dropdown.appendChild(div);
+        });
+
+        dropdown.classList.remove('hidden');
+    }
+
+    function toggleBasicDropdown(basicInputId, dropdownId, scaleInputId, commSelectId) {
+        const scaleStr = document.getElementById(scaleInputId).value;
+        const comm = document.getElementById(commSelectId).value;
+        const dropdown = document.getElementById(dropdownId);
+        const basicInput = document.getElementById(basicInputId);
+
+        if (!scaleStr) {
+            alert("कृपया प्रथम वेतनश्रेणी निवडा!");
+            document.getElementById(scaleInputId).click();
+            return;
+        }
+
+        if (!dropdown.classList.contains('hidden')) {
+            dropdown.classList.add('hidden');
+            return;
+        }
+
+        let gp = 0;
+        if (comm === '6th') {
+            let gpMatch = scaleStr.match(/GP\s*(\d+)/i);
+            if (gpMatch) gp = parseInt(gpMatch[1], 10);
+            else gp = parseFloat(document.getElementById('gradePay').value) || 0;
+        }
+
+        dropdown.innerHTML = "";
+        let stages = parsePayScaleStages(scaleStr, comm, gp);
+        let entryPayVal = (comm === '6th') ? get6thEntryPay(scaleStr, gp) : 0;
+
+        if (stages.length === 0) {
+            dropdown.innerHTML = `<div class="dropdown-item" style="color:#888;">वैध वेतनश्रेणी उपलब्ध नाही</div>`;
+        } else {
+            stages.forEach((amount, idx) => {
+                let div = document.createElement('div');
+                div.className = 'dropdown-item';
+                
+                if (comm === '6th' && amount === entryPayVal) {
+                    div.innerHTML = `<b>${amount}</b> <span style="font-size:10.5px; color:#1b5e20; background:#e8f5e9; border:1px solid #a5d6a7; padding:2px 6px; border-radius:4px; font-weight:bold; margin-left:8px;">★ Annexure-III प्रथम भरती वेतन (शिफारस)</span>`;
+                    div.style.backgroundColor = "#f1f8e9";
+                } else if (comm === '7th') {
+                    div.innerHTML = `<b>${amount}</b> <small style="color:#78909c; margin-left:6px;">(टप्पा ${idx + 1})</small>`;
+                } else {
+                    div.textContent = amount;
+                }
+
+                div.onclick = function(e) {
+                    e.stopPropagation();
+                    basicInput.value = amount;
+                    dropdown.classList.add('hidden');
+                    if (basicInputId === 'basicPay') validateCard1();
+                };
+                dropdown.appendChild(div);
+            });
+        }
+
+        dropdown.classList.remove('hidden');
+    }
+
+    function updateCommissionRules() {
+        document.getElementById('currentPayScale').value = "";
+        document.getElementById('basicPay').value = "";
+        document.getElementById('gradePay').value = "0";
+    }
+
+    function toggleBenefitRow(idx) {
+        const type = document.getElementById(`b${idx}_type`).value;
+        const fields = document.getElementById(`b${idx}_fields`);
+        const postInput = document.getElementById(`b${idx}_post`);
+        const scaleInput = document.getElementById(`b${idx}_scale`);
+
+        if (type !== 'None') {
+            fields.classList.remove('hidden');
+            postInput.placeholder = (type === 'Promotion') ? "पदोन्नतीचे पद टाका" : "वरिष्ठ पद टाका";
+            scaleInput.value = "";
+        } else {
+            fields.classList.add('hidden');
+        }
+    }
+
+    function updatePromoScaleDropdown(idx) {
+        document.getElementById(`b${idx}_scale`).value = "";
+        evaluateOptionSuggestion(idx);
+    }
+
+    function getBestOptionRecommendation(benefitDateStr, comm) {
+        if (!benefitDateStr) return null;
+        let bDate = parseLocalDate(benefitDateStr);
+        let bYear = bDate.getFullYear();
+        let bMonth = bDate.getMonth();
+        let bDay = bDate.getDate();
+
+        let joinDateVal = document.getElementById('empJoinDate').value;
+        let joinMonth = joinDateVal ? parseLocalDate(joinDateVal).getMonth() : 6;
+
+        let nextIncDate = null;
+        let isWithin6MonthsBeforeInc = false;
+
+        if (comm === '4th' || comm === '5th') {
+            let incThisYear = new Date(bYear, joinMonth, 1);
+            nextIncDate = (bDate < incThisYear) ? incThisYear : new Date(bYear + 1, joinMonth, 1);
+            let diffDays = Math.round((nextIncDate - bDate) / (1000 * 60 * 60 * 24));
+            isWithin6MonthsBeforeInc = (diffDays > 0 && diffDays < 182);
+        } else if (comm === '6th') {
+            let julyThisYear = new Date(bYear, 6, 1);
+            if (bDate <= julyThisYear) {
+                nextIncDate = julyThisYear;
+                if (bMonth >= 0 && (bMonth < 6 || (bMonth === 6 && bDay === 1))) {
+                    isWithin6MonthsBeforeInc = !(bMonth === 0 && bDay === 1);
+                }
+            } else {
+                nextIncDate = new Date(bYear + 1, 6, 1);
+                isWithin6MonthsBeforeInc = false;
+            }
+        } else {
+            let rule7th = document.getElementById('incrementMonthRule7th').value;
+            if (rule7th === 'january') {
+                nextIncDate = new Date(bYear + 1, 0, 1);
+                let diffDays = Math.round((nextIncDate - bDate) / (1000 * 60 * 60 * 24));
+                isWithin6MonthsBeforeInc = (diffDays > 0 && diffDays < 182);
+            } else {
+                let julyThisYear = new Date(bYear, 6, 1);
+                if (bDate <= julyThisYear) {
+                    nextIncDate = julyThisYear;
+                    if (bMonth >= 0 && (bMonth < 6 || (bMonth === 6 && bDay === 1))) {
+                        isWithin6MonthsBeforeInc = !(bMonth === 0 && bDay === 1);
+                    }
+                } else {
+                    nextIncDate = new Date(bYear + 1, 6, 1);
+                    isWithin6MonthsBeforeInc = false;
+                }
+            }
+        }
+
+        let dNext = String(nextIncDate.getDate()).padStart(2, '0');
+        let mNext = String(nextIncDate.getMonth() + 1).padStart(2, '0');
+        let yNext = nextIncDate.getFullYear();
+        let nextIncFormatted = `${dNext}-${mNext}-${yNext}`;
+        let nextIncIso = `${yNext}-${mNext}-${dNext}`;
+
+        let bestDateStr = isWithin6MonthsBeforeInc ? nextIncIso : benefitDateStr;
+        let adviceHtml = isWithin6MonthsBeforeInc 
+            ? `💡 <b>स्मार्ट शिफारस:</b> लाभाच्या दिनांकापासून पुढील वेतनवाढीपर्यंत ६ महिने पूर्ण होत नसल्याने <b>${nextIncFormatted} (पुढील वेतनवाढ दिनांक)</b> हा विकल्प निवडणे सर्वाधिक फायदेशीर ठरेल.`
+            : `💡 <b>स्मार्ट शिफारस:</b> लाभाच्या दिनांकापासून पुढील वेतनवाढीपर्यंत ६ महिन्यांपेक्षा जास्त कालावधी मिळत असल्याने, <b>लाभाचा दिनांक (${formatDateToDDMMYYYY(benefitDateStr)})</b> हाच विकल्प निवडणे फायदेशीर आहे.`;
+
+        return {
+            bestIso: bestDateStr,
+            bestFormatted: formatDateToDDMMYYYY(bestDateStr),
+            adviceHtml: adviceHtml,
+            isWithin6Months: isWithin6MonthsBeforeInc
+        };
+    }
+
+    function evaluateOptionSuggestion(idx) {
+        const bDateVal = document.getElementById(`b${idx}_date`).value;
+        const comm = document.getElementById(`b${idx}_comm`).value;
+        const advisorBox = document.getElementById(`b${idx}_advisor`);
+        const optInput = document.getElementById(`b${idx}_optDate`);
+        const optDisp = document.getElementById(`b${idx}_optDate_disp`);
+
+        if (!bDateVal || !comm) {
+            if(advisorBox) advisorBox.classList.add('hidden');
+            return;
+        }
+
+        const rec = getBestOptionRecommendation(bDateVal, comm);
+        if (!rec || !advisorBox) return;
+
+        advisorBox.classList.remove('hidden');
+
+        if (!optInput.value) {
+            optInput.value = rec.bestIso;
+            optDisp.value = rec.bestFormatted;
+        }
+
+        checkOptionDateFeedback(idx);
+    }
+
+    function checkOptionDateFeedback(idx) {
+        const bDateVal = document.getElementById(`b${idx}_date`).value;
+        const comm = document.getElementById(`b${idx}_comm`).value;
+        const optVal = document.getElementById(`b${idx}_optDate`).value;
+        const advisorBox = document.getElementById(`b${idx}_advisor`);
+
+        if (!bDateVal || !comm || !advisorBox) return;
+        const rec = getBestOptionRecommendation(bDateVal, comm);
+        if (!rec) return;
+
+        if (optVal === rec.bestIso) {
+            advisorBox.className = "option-advisor-box advisor-good";
+            advisorBox.innerHTML = `✓ <b>उत्तम निवड!</b> आपण निवडलेला विकल्प दिनांक (${rec.bestFormatted}) आर्थिकदृष्ट्या सर्वाधिक फायदेशीर आहे.<br><small>${rec.adviceHtml}</small>`;
+        } else {
+            advisorBox.className = "option-advisor-box advisor-warn";
+            advisorBox.innerHTML = `⚠️ <b>लक्ष द्या:</b> आपण निवडलेला विकल्प दिनांक आर्थिकदृष्ट्या तोट्याचा ठरू शकतो!<br>${rec.adviceHtml}<br><button type="button" class="advisor-btn" onclick="applySuggestedOptionDate(${idx}, '${rec.bestIso}', '${rec.bestFormatted}')">👉 हा फायदेशीर दिनांक [${rec.bestFormatted}] लागू करा</button>`;
+        }
+    }
+
+    function applySuggestedOptionDate(idx, isoDate, formattedDate) {
+        const optInput = document.getElementById(`b${idx}_optDate`);
+        const optDisp = document.getElementById(`b${idx}_optDate_disp`);
+        if(optInput) optInput.value = isoDate;
+        if(optDisp) optDisp.value = formattedDate;
+        checkOptionDateFeedback(idx);
+    }
+
+    function reEvaluateAllOptionSuggestions() {
+        for (let i = 1; i <= 3; i++) {
+            let typeElem = document.getElementById(`b${i}_type`);
+            if (typeElem && typeElem.value !== 'None') evaluateOptionSuggestion(i);
+        }
+    }
+
+    function onBenefitDateChange(idx) {
+        const dVal = document.getElementById(`b${idx}_date`).value;
+        if (!dVal) return;
+
+        const dt = parseLocalDate(dVal);
+        const commSelect = document.getElementById(`b${idx}_comm`);
+
+        if (dt < new Date(1996, 0, 1)) commSelect.value = "4th";
+        else if (dt >= new Date(1996, 0, 1) && dt < new Date(2006, 0, 1)) commSelect.value = "5th";
+        else if (dt >= new Date(2006, 0, 1) && dt < new Date(2016, 0, 1)) commSelect.value = "6th";
+        else commSelect.value = "7th";
+
+        updatePromoScaleDropdown(idx);
+        evaluateOptionSuggestion(idx);
+    }
+
+    function printReportChrome() {
+        document.body.classList.remove('print-illustration-mode');
+        window.print();
+    }
+
+    function printIllustrationChrome() {
+        document.body.classList.add('print-illustration-mode');
+        window.print();
+        const cleanup = () => {
+            document.body.classList.remove('print-illustration-mode');
+            window.removeEventListener('afterprint', cleanup);
+        };
+        window.addEventListener('afterprint', cleanup);
+        setTimeout(cleanup, 2000);
+    }
+
+    function downloadReportPDF() {
+        const reportArea = document.getElementById('printableReportArea');
+        if (!reportArea) return;
+
+        if (typeof html2pdf === 'undefined') {
+            window.print();
+            return;
+        }
+
+        const scrollContainer = reportArea.querySelector('.table-scroll-container');
+        const prevMaxH = scrollContainer ? scrollContainer.style.maxHeight : '';
+        const prevOverflow = scrollContainer ? scrollContainer.style.overflow : '';
+
+        reportArea.classList.add('pdf-export-mode');
+        if (scrollContainer) {
+            scrollContainer.style.maxHeight = 'none';
+            scrollContainer.style.overflow = 'visible';
+        }
+
+        const opt = {
+            margin: [8, 6, 8, 6],
+            filename: 'Pay_Fixation_Report.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(reportArea).save().then(() => {
+            if (scrollContainer) {
+                scrollContainer.style.maxHeight = prevMaxH;
+                scrollContainer.style.overflow = prevOverflow;
+            }
+            reportArea.classList.remove('pdf-export-mode');
+        }).catch(err => {
+            console.error(err);
+            if (scrollContainer) {
+                scrollContainer.style.maxHeight = prevMaxH;
+                scrollContainer.style.overflow = prevOverflow;
+            }
+            reportArea.classList.remove('pdf-export-mode');
+            window.print();
+        });
+    }
+
+    function downloadIllustrationPDF() {
+        const illContent = document.getElementById('illustrationSheetContent');
+        if (!illContent) return;
+
+        if (typeof html2pdf === 'undefined') {
+            printIllustrationChrome();
+            return;
+        }
+
+        illContent.querySelectorAll('input').forEach(input => {
+            input.setAttribute('value', input.value);
+        });
+
+        const opt = {
+            margin: [8, 8, 8, 8],
+            filename: 'Pay_Fixation_Illustration.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(illContent).save();
+    }
+
     function getSavedRecordsFromStorage() {
         try {
             return JSON.parse(localStorage.getItem('savedPayFixationsList') || '[]');
