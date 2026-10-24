@@ -1,5 +1,5 @@
 // ==========================================
-// वेतन निश्चिती गणना, लॉजिक आणि इव्हेंट प्रोसेसिंग फाईल (pay-calc.js)
+// वेतन निश्चिती गणना आणि तक्ता निर्मिती फाईल (pay-calc.js)
 // ==========================================
 
 function getGradePayFrom4thOr5th(scale, designation) {
@@ -621,7 +621,6 @@ function processFixation() {
                     if (currentMatrixIndex === -1) currentMatrixIndex = 0;
                     currentScaleLabel = getCleanScaleLabel(rev.scale, currentCommission, currentLevel);
                 } else {
-                    currentGP = 0;
                     let cells = parsePayScaleStages(rev.scale, currentCommission);
                     let found = cells.find(s => s >= currentBasic);
                     if (found) currentBasic = found;
