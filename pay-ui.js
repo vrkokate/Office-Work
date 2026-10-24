@@ -22,6 +22,7 @@ function printIllustrationChrome() {
     setTimeout(cleanup, 2000);
 }
 
+// 🌟 कर्मचाऱ्याच्या अचूक नावाप्रमाणे PDF फाईलचे नाव तयार करण्याचे फंक्शन
 function getDynamicFileName(defaultPrefix) {
     let empName = '';
     const summaryCard = document.getElementById('summaryText');
@@ -1017,11 +1018,3 @@ window.onload = function() {
     validateCard3();
     renderSavedRecordsTable();
 };
-</script>
-
-<!-- 🌟 आवश्यक सर्व फाईल्स लिंक केल्या आहेत -->
-<script src="pay-data.js"></script>
-<script src="pay-calc.js"></script>
-
-</body>
-</html>
