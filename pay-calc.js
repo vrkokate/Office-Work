@@ -1,5 +1,5 @@
 // ==========================================
-// वेतन निश्चिती गणना आणि तक्ता निर्मिती फाईल (pay-calc.js)
+// वेतन निश्चिती गणना, लॉजिक आणि इव्हेंट प्रोसेसिंग फाईल (pay-calc.js)
 // ==========================================
 
 function getGradePayFrom4thOr5th(scale, designation) {
@@ -358,9 +358,6 @@ function processFixation() {
             }
 
             if (incDate && incDate > startDate && incDate <= endDate) {
-                let isDniOptionDate = activeBenefits.some(b => b.optDate > b.date && isSameDay(b.optDate, incDate));
-                if (isDniOptionDate) continue;
-
                 let isoStr = `${incDate.getFullYear()}-${String(incDate.getMonth() + 1).padStart(2, '0')}-${String(incDate.getDate()).padStart(2, '0')}`;
                 let isWithheld = (hasWithheld && withheldDatesSet.has(isoStr));
                 let m = String(incDate.getMonth() + 1).padStart(2, '0');
@@ -396,7 +393,7 @@ function processFixation() {
                         date: b.date,
                         dateStr: formatDateToDDMMYYYY(b.dateStr),
                         type: 'BENEFIT_SAME_DAY',
-                        desc: `${title} - वार्षिक/११(१) नुसार वेतन निश्चिती`,
+                        desc: `${title} मंजूर (नियम ११(१) नुसार वेतन निश्चिती)`,
                         data: b
                     });
                 } else if (b.optDate > b.date && b.optDate <= endDate) {
@@ -411,26 +408,14 @@ function processFixation() {
                         date: b.optDate,
                         dateStr: formatDateToDDMMYYYY(b.optDateStr),
                         type: 'BENEFIT_OPTION_DNI',
-                        desc: `${title} - वार्षिक/११(१) नुसार वेतन निश्चिती`,
+                        desc: `${title} मंजूर (नियम ११(१) नुसार वेतन निश्चिती)`,
                         data: b
                     });
                 }
             }
         });
 
-        let incrementDatesToAbsorbed = new Set();
-        activeBenefits.forEach(b => {
-            if (b.date) incrementDatesToAbsorbed.add(b.date.toDateString());
-            if (b.optDate && b.optDate > b.date) incrementDatesToAbsorbed.add(b.optDate.toDateString());
-        });
-
-        events = events.filter(ev => {
-            if (ev.type === 'ANNUAL_INC' && ev.date && incrementDatesToAbsorbed.has(ev.date.toDateString())) {
-                return false;
-            }
-            return true;
-        });
-
+        // 🌟 जुन्या अचूक पद्धतीनुसार इव्हेंट्सची क्रमवारी (वार्षिक वाढ आणि लाभ स्वतंत्र ओळीत राहतील)
         events.sort((a, b) => {
             if (a.date.getTime() !== b.date.getTime()) return a.date - b.date;
             let order = { 'INITIAL': 1, 'COMMISSION_5TH': 2, 'COMMISSION_6TH': 3, 'COMMISSION_7TH': 4, 'ANNUAL_INC': 5, 'WITHHELD_INC': 5, 'SCALE_REVISION': 6, 'BENEFIT_PROMOTED_PROVISIONAL': 7, 'BENEFIT_SAME_DAY': 7, 'BENEFIT_OPTION_DNI': 8 };
@@ -666,60 +651,10 @@ function processFixation() {
 
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(b.commission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
             }
-            else if (ev.type === 'BENEFIT_OPTION_DNI') {
+            else if (ev.type === 'BENEFIT_OPTION_DNI' || ev.type === 'BENEFIT_SAME_DAY') {
                 let b = ev.data;
                 currentCommission = b.commission;
-                let incStep = (currentCommission === '4th' ? 25 : (currentCommission === '5th' ? 55 : (currentCommission === '6th' || currentCommission === '7th' ? Math.ceil((currentBasic * 0.03) / 10) * 10 : 100)));
-                let preIncBasic = currentBasic + incStep; 
-
                 currentScaleLabel = b.scale;
-                if (currentCommission === '7th') {
-                    let lvlMatch = b.scale.match(/S-(\d+)/i);
-                    let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-                    let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
-                    let currIdx = cellsLower.indexOf(currentBasic);
-                    if (currIdx === -1) currIdx = 0;
-                    let notionalIdx = Math.min(currIdx + 1, cellsLower.length - 1);
-                    let notionalPay = cellsLower[notionalIdx];
-
-                    let fitFinal = fitInMatrix(targetLvl, notionalPay);
-                    currentLevel = fitFinal.level;
-                    currentBasic = fitFinal.basic;
-                    currentMatrixIndex = fitFinal.index;
-                    currentGP = 0;
-                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                } else if (currentCommission === '6th') {
-                    let gpMatch = b.scale.match(/GP\s*(\d+)/i);
-                    let oldGP = currentGP;
-                    currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
-                    
-                    let inc = Math.ceil((currentBasic * 0.03) / 10) * 10;
-                    let gpDiff = currentGP - oldGP;
-                    currentBasic = currentBasic + inc + gpDiff;
-
-                    let ep = get6thEntryPay(b.scale, currentGP);
-                    if (ep && currentBasic < (ep + currentGP)) currentBasic = ep + currentGP;
-                    currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
-                } else {
-                    let step = (currentCommission === '4th') ? 25 : 100;
-                    let target = preIncBasic + step;
-                    let promoStages = parsePayScaleStages(b.scale, currentCommission);
-                    let found = promoStages.find(s => s >= target);
-                    currentBasic = found ? found : target;
-                    currentGP = 0;
-                    currentScaleLabel = b.scale;
-                }
-
-                lowerLevel = currentLevel;
-                lowerBasic = currentBasic;
-                lowerGP = currentGP;
-                lowerMatrixIndex = currentMatrixIndex;
-
-                addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
-            }
-            else if (ev.type === 'BENEFIT_SAME_DAY') {
-                let b = ev.data;
-                currentCommission = b.commission;
 
                 if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
