@@ -938,6 +938,13 @@
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
+
+        <!-- 🌟 अहवालाच्या शेवटी डेव्हलपर क्रेडिट -->
+        <div style="margin-top: 15px; text-align: right; font-size: 11px; color: #444; line-height: 1.4; padding-right: 5px;">
+            system developed by<br>
+            <strong>vitthal kokate patil</strong><br>
+            Mo. 8446556141
+        </div>
     </div>
 </div>
 
@@ -1386,6 +1393,7 @@
             });
         }
 
+        dropdown.classList.add('hidden'); // Fixed closing toggle logic
         dropdown.classList.remove('hidden');
     }
 
@@ -1583,6 +1591,11 @@
             return;
         }
 
+        const empNameInput = document.getElementById('empName');
+        const empName = empNameInput ? empNameInput.value.trim() : '';
+        const safeName = empName ? empName.replace(/\s+/g, '_') : 'Pay_Fixation';
+        const filename = `${safeName}_Pay_Fixation.pdf`;
+
         const scrollContainer = reportArea.querySelector('.table-scroll-container');
         const prevMaxH = scrollContainer ? scrollContainer.style.maxHeight : '';
         const prevOverflow = scrollContainer ? scrollContainer.style.overflow : '';
@@ -1595,7 +1608,7 @@
 
         const opt = {
             margin: [8, 6, 8, 6],
-            filename: 'Pay_Fixation_Report.pdf',
+            filename: filename,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true, logging: false },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -1627,13 +1640,18 @@
             return;
         }
 
+        const empNameInput = document.getElementById('empName');
+        const empName = empNameInput ? empNameInput.value.trim() : '';
+        const safeName = empName ? empName.replace(/\s+/g, '_') : 'Illustration';
+        const filename = `${safeName}_Pay_Fixation_Illustration.pdf`;
+
         illContent.querySelectorAll('input').forEach(input => {
             input.setAttribute('value', input.value);
         });
 
         const opt = {
             margin: [8, 8, 8, 8],
-            filename: 'Pay_Fixation_Illustration.pdf',
+            filename: filename,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true, logging: false },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
