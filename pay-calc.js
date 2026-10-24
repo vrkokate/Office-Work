@@ -418,15 +418,15 @@ function processFixation() {
             }
         });
 
-        // 🌟 एकाच दिनांकावर वार्षिक वाढ आणि लाभ आल्यास स्वतंत्र वार्षिक वाढ गाळून अंतिम निश्चिती ठेवणे
-        let benefitDates = new Set();
+        // 🌟 एकाच दिनांकावर वार्षिक वाढ आणि लाभ आल्यास वार्षिक वाढ गृहीत धरून केवळ अंतिम निश्चितीची एकच ओळ ठेवणे
+        let incrementDatesToAbsorbed = new Set();
         activeBenefits.forEach(b => {
-            if (b.date) benefitDates.add(b.date.toDateString());
-            if (b.optDate && b.optDate > b.date) benefitDates.add(b.optDate.toDateString());
+            if (b.date) incrementDatesToAbsorbed.add(b.date.toDateString());
+            if (b.optDate && b.optDate > b.date) incrementDatesToAbsorbed.add(b.optDate.toDateString());
         });
 
         events = events.filter(ev => {
-            if (ev.type === 'ANNUAL_INC' && ev.date && benefitDates.has(ev.date.toDateString())) {
+            if (ev.type === 'ANNUAL_INC' && ev.date && incrementDatesToAbsorbed.has(ev.date.toDateString())) {
                 return false;
             }
             return true;
@@ -671,17 +671,20 @@ function processFixation() {
             else if (ev.type === 'BENEFIT_OPTION_DNI') {
                 let b = ev.data;
                 currentCommission = b.commission;
-                let lBasic = b.savedLowerBasic || currentBasic;
+                
+                // 🌟 नियम ११(१) विकल्पानुसार: आधी मूळ पदावर नियमित वार्षिक वाढ (1 increment) देऊन नंतर फिक्सेशन करणे
+                let incStep = (currentCommission === '4th' ? 25 : (currentCommission === '5th' ? 55 : (currentCommission === '6th' || currentCommission === '7th' ? Math.ceil((currentBasic * 0.03) / 10) * 10 : 100)));
+                let preIncBasic = currentBasic + incStep; 
 
                 currentScaleLabel = b.scale;
                 if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
+                    
                     let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
-                    let currIdx = cellsLower.indexOf(lBasic);
+                    let currIdx = cellsLower.indexOf(currentBasic);
                     if (currIdx === -1) currIdx = 0;
-
-                    let notionalIdx = Math.min(currIdx + 2, cellsLower.length - 1);
+                    let notionalIdx = Math.min(currIdx + 1, cellsLower.length - 1);
                     let notionalPay = cellsLower[notionalIdx];
 
                     let fitFinal = fitInMatrix(targetLvl, notionalPay);
@@ -695,16 +698,16 @@ function processFixation() {
                     let oldGP = currentGP;
                     currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
                     
-                    let inc = Math.ceil((lBasic * 0.03) / 10) * 10;
+                    let inc = Math.ceil((currentBasic * 0.03) / 10) * 10;
                     let gpDiff = currentGP - oldGP;
-                    currentBasic = lBasic + inc + gpDiff;
+                    currentBasic = currentBasic + inc + gpDiff;
 
                     let ep = get6thEntryPay(b.scale, currentGP);
                     if (ep && currentBasic < (ep + currentGP)) currentBasic = ep + currentGP;
                     currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
                 } else {
                     let step = (currentCommission === '4th') ? 25 : 100;
-                    let target = lBasic + (step * 2);
+                    let target = preIncBasic + step;
                     let promoStages = parsePayScaleStages(b.scale, currentCommission);
                     let found = promoStages.find(s => s >= target);
                     currentBasic = found ? found : target;
@@ -813,177 +816,5 @@ function processFixation() {
     } catch (err) {
         console.error("Process Fixation Error:", err);
         alert("वेतन निश्चिती प्रक्रिया करताना त्रुटी आली: " + err.message);
-    }
-}
-
-function addTableRow(sr, dateStr, comm, scaleStr, eventDesc, basic, gp, evType, calcData) {
-    let total = basic;
-    let gpDisplay = gp > 0 ? gp : "-";
-    if (comm === '६वा आयोग' || comm === '6th') {
-        gpDisplay = gp > 0 ? gp : "-";
-        total = basic;
-    } else if (comm === '७वा आयोग' || comm === '7th') {
-        gpDisplay = "-";
-        total = basic;
-    }
-
-    let totalDisplay = total;
-
-    if (evType === 'COMMISSION_5TH' || evType === 'COMMISSION_6TH' || evType === 'COMMISSION_7TH') {
-        let dataIdx = globalCalcDataList.length;
-        globalCalcDataList.push(calcData);
-        totalDisplay = `<a href="javascript:void(0)" onclick="openCalculationSheet(${dataIdx})" style="color:#01579b; text-decoration:underline; font-weight:bold; cursor:pointer;" title="वेतन निश्चिती विवरणपत्र किंवा ग्रेड पे दुरुस्ती पहा">${total}</a>`;
-    }
-
-    let tr = document.createElement('tr');
-    tr.innerHTML = `
-        <td>${sr}</td>
-        <td>${dateStr}</td>
-        <td>${comm}</td>
-        <td><small><b>${scaleStr}</b></small></td>
-        <td class="event-cell">${eventDesc}</td>
-        <td><b>${basic}</b></td>
-        <td>${gpDisplay}</td>
-        <td><b>${totalDisplay}</b></td>
-    `;
-    document.getElementById('tableBody').appendChild(tr);
-}
-
-function getCommissionLabel(comm) {
-    if(comm === '4th') return "४था आयोग";
-    if(comm === '5th') return "५वा आयोग";
-    if(comm === '6th') return "६वा आयोग";
-    if(comm === '7th') return "७वा आयोग";
-    return comm;
-}
-
-// ==========================================
-// 🌟 वेतन निश्चिती विवरणपत्र (Illustration Sheet Modal) फंक्शन्स
-// ==========================================
-
-function openCalculationSheet(dataIndex) {
-    let data = globalCalcDataList[dataIndex];
-    if (!data) return;
-
-    let contentDiv = document.getElementById('illustrationSheetContent');
-    let titleHeader = document.getElementById('illustrationModalTitle');
-
-    let gradePayHtml = (data.gp !== undefined && data.gp > 0) ? `<div><b>जुना ग्रेड पे:</b> रु. ${data.gp}</div>` : ((data.gp6th !== undefined && data.gp6th > 0) ? `<div><b>जुना ग्रेड पे:</b> रु. ${data.gp6th}</div>` : '');
-
-    let empInfoBox = `
-        <div style="background: #f4fbf4; border: 1px solid #a5d6a7; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; font-size: 11.5px; line-height: 1.5; color: #1b5e20; text-align: left;">
-            <div><b>कर्मचाऱ्याचे नाव:</b> ${data.empName || '-'}</div>
-            <div><b>पदनाम:</b> ${data.designation || '-'}</div>
-            <div><b>नियुक्ती दिनांक:</b> ${data.joinDate || '-'}</div>
-            <div><b>जुन्या वेतन आयोगाची वेतनश्रेणी:</b> ${data.existingScale || '-'}</div>
-            ${gradePayHtml}
-        </div>
-    `;
-
-    if (data.commission === '5th') {
-        if (titleHeader) titleHeader.textContent = "महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, १९९८ - पाचवा वेतन आयोग वेतन निश्चिती विवरणपत्र";
-        contentDiv.innerHTML = `
-            <div class="ill-print-sheet">
-                <div style="text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin-bottom: 8px;">
-                    <h2 style="font-size: 15px; color: #1b5e20; margin: 0 0 2px 0; font-weight: bold; text-align: center;">महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, १९९८</h2>
-                    <div style="font-size: 12.5px; font-weight: bold; color: #263238; text-align: center;">पाचवा वेतन आयोग वेतन निश्चिती विवरणपत्र</div>
-                </div>
-                ${empInfoBox}
-                <table class="ill-table">
-                    <tr><td class="col-desc">Existing Scale of Pay</td><td class="col-dots">...</td><td class="col-val"><input type="text" class="ill-input ill-scale-input" value="${data.existingScale}"></td></tr>
-                    <tr><td class="col-desc">Proposed Scale of Pay</td><td class="col-dots">...</td><td class="col-val"><input type="text" class="ill-input ill-scale-input" value="${data.proposedScale}"></td></tr>
-                    <tr><td class="col-desc">Existing Pay</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_bp" class="ill-input ill-num-input" value="${data.existingPay}" oninput="recalculate5thIllustration(${dataIndex})"></td></tr>
-                    <tr><td class="col-desc">Pay Fixed in Proposed Scale</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_stage11" class="ill-input ill-num-input" value="${data.stage11}" style="color:#b71c1c; border-color:#2e7d32;"></td></tr>
-                </table>
-            </div>
-        `;
-    } else if (data.commission === '6th') {
-        if (titleHeader) titleHeader.textContent = "महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, २००६ - सहावा वेतन आयोग वेतन निश्चिती विवरणपत्र";
-        contentDiv.innerHTML = `
-            <div class="ill-print-sheet">
-                <div style="text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin-bottom: 8px;">
-                    <h2 style="font-size: 15px; color: #1b5e20; margin: 0 0 2px 0; font-weight: bold; text-align: center;">महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, २००६</h2>
-                    <div style="font-size: 12.5px; font-weight: bold; color: #263238; text-align: center;">सहावा वेतन आयोग वेतन निश्चिती विवरणपत्र</div>
-                    <div style="font-size: 11px; color: #b71c1c; font-weight:bold; margin-top:3px;" class="ill-no-print">💡 खालील ग्रेड पे (Grade Pay) आवश्यकतेनुसार बदलू शकता:</div>
-                </div>
-                ${empInfoBox}
-                <table class="ill-table">
-                    <tr><td class="col-desc">१. ५व्या आयोगातील मूळ वेतन (Basic Pay)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_6th_bp" class="ill-input ill-num-input" value="${data.existingPay}" readonly></td></tr>
-                    <tr><td class="col-desc">२. १.८६ गुणाकार (Basic × 1.86)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_6th_mult" class="ill-input ill-num-input" value="${data.multBasic}" readonly></td></tr>
-                    <tr><td class="col-desc">३. ग्रेड पे (Grade Pay) <span class="ill-no-print">[बदला: 5400 / 6600]</span></td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_6th_gp" class="ill-input ill-num-input" value="${data.gp}" oninput="recalculate6thIllustration(${dataIndex})"></td></tr>
-                    <tr style="background:#e8f5e9; font-weight:bold;"><td class="col-desc">४. ६व्या आयोगात एकूण निश्चित वेतन (Pay in Band + GP)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_6th_total" class="ill-input ill-num-input" value="${data.total}" style="color:#b71c1c;" readonly></td></tr>
-                </table>
-            </div>
-        `;
-    } else if (data.commission === '7th') {
-        if (titleHeader) titleHeader.textContent = "महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, २०१९ - सातवा वेतन आयोग वेतन निश्चिती विवरणपत्र";
-        contentDiv.innerHTML = `
-            <div class="ill-print-sheet">
-                <div style="text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 6px; margin-bottom: 8px;">
-                    <h2 style="font-size: 15px; color: #1b5e20; margin: 0 0 2px 0; font-weight: bold; text-align: center;">महाराष्ट्र नागरी सेवा (सुधारित वेतन) नियम, २०१९</h2>
-                    <div style="font-size: 12.5px; font-weight: bold; color: #263238; text-align: center;">सातवा वेतन आयोग वेतन निश्चिती विवरणपत्र (०१-०१-२०१६ पे-मॅट्रिक्स)</div>
-                    <div style="font-size: 11px; color: #b71c1c; font-weight:bold; margin-top:3px;" class="ill-no-print">💡 खालील वेतनश्रेणी (स्तर) आणि ग्रेड पे आवश्यकतेनुसार बदलू शकता:</div>
-                </div>
-                ${empInfoBox}
-                <table class="ill-table">
-                    <tr><td class="col-desc">१. ३१-१२-२०१५ रोजीचे मूळ वेतन (६वा आयोग)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_b6" class="ill-input ill-num-input" value="${data.basic6th}" oninput="recalculate7thIllustration(${dataIndex})"></td></tr>
-                    <tr><td class="col-desc">२. ग्रेड पे (Grade Pay)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_gp6" class="ill-input ill-num-input" value="${data.gp6th}" oninput="recalculate7thIllustration(${dataIndex})"></td></tr>
-                    <tr><td class="col-desc">३. एकूण वेतन (Basic + GP)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_total6" class="ill-input ill-num-input" value="${data.total6th}" readonly></td></tr>
-                    <tr><td class="col-desc">४. २.५७ गुणाकार घटक (Total × 2.57)</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_fit" class="ill-input ill-num-input" value="${data.fitmentCalc}" readonly></td></tr>
-                    <tr><td class="col-desc">५. ७व्या आयोगातील समतुल्य स्तर (Pay Matrix Level) <span class="ill-no-print">[बदला: S-20 / S-23]</span></td><td class="col-dots">...</td><td class="col-val"><input type="text" id="ill_7th_lvl" class="ill-input ill-num-input" style="text-align:center;" value="${data.level}" oninput="recalculate7thIllustration(${dataIndex})"></td></tr>
-                    <tr style="background:#e8f5e9; font-weight:bold;"><td class="col-desc">६. पे-मॅट्रिक्सनुसार अंतिम निश्चित वेतन</td><td class="col-dots">...</td><td class="col-val"><span class="ill-rs-prefix">Rs.</span> <input type="number" id="ill_7th_final" class="ill-input ill-num-input" value="${data.finalBasic7th}" style="color:#b71c1c;" readonly></td></tr>
-                </table>
-            </div>
-        `;
-    }
-
-    openModal('illustrationModal');
-}
-
-function recalculate6thIllustration(dataIndex) {
-    let mult = parseFloat(document.getElementById('ill_6th_mult').value) || 0;
-    let gp = parseFloat(document.getElementById('ill_6th_gp').value) || 0;
-    let total = mult + gp;
-    document.getElementById('ill_6th_total').value = total;
-
-    globalCalcDataList[dataIndex].gp = gp;
-    globalCalcDataList[dataIndex].total = total;
-}
-
-function recalculate7thIllustration(dataIndex) {
-    let b6 = parseFloat(document.getElementById('ill_7th_b6').value) || 0;
-    let gp6 = parseFloat(document.getElementById('ill_7th_gp6').value) || 0;
-    let total6 = b6 + gp6;
-    let fit = Math.round(total6 * 2.57);
-    let lvl = document.getElementById('ill_7th_lvl').value.trim() || "S-23";
-
-    let fitRes = fitInMatrix(lvl, fit);
-
-    document.getElementById('ill_7th_total6').value = total6;
-    document.getElementById('ill_7th_fit').value = fit;
-    document.getElementById('ill_7th_final').value = fitRes.basic;
-
-    globalCalcDataList[dataIndex].basic6th = b6;
-    globalCalcDataList[dataIndex].gp6th = gp6;
-    globalCalcDataList[dataIndex].total6th = total6;
-    globalCalcDataList[dataIndex].fitmentCalc = fit;
-    globalCalcDataList[dataIndex].level = lvl;
-    globalCalcDataList[dataIndex].finalBasic7th = fitRes.basic;
-}
-
-function recalculate5thIllustration(dataIndex) {
-    let bp = parseFloat(document.getElementById('ill_bp').value) || 0;
-    let da = (bp <= 3500) ? Math.round(bp * 1.48) : ((bp <= 6000) ? Math.max(5180, Math.round(bp * 1.11)) : Math.max(6660, Math.round(bp * 0.96)));
-    let ir1 = 100;
-    let ir2 = Math.max(100, Math.round(bp * 0.10));
-    let emoluments = bp + da + ir1 + ir2;
-    let add40 = Math.round(bp * 0.40);
-    let total = emoluments + add40;
-
-    document.getElementById('ill_stage11').value = total;
-
-    if (globalCalcDataList[dataIndex]) {
-        globalCalcDataList[dataIndex].existingPay = bp;
-        globalCalcDataList[dataIndex].stage11 = total;
     }
 }
