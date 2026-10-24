@@ -1,5 +1,5 @@
 // ==========================================
-// वेतन निश्चिती गणना, लॉजिक आणि इव्हेंट प्रोसेसिंग फाईल (pay-calc.js)
+// वेतन निश्चिती गणना आणि तक्ता निर्मिती फाईल (pay-calc.js)
 // ==========================================
 
 function getGradePayFrom4thOr5th(scale, designation) {
@@ -164,6 +164,30 @@ function parsePayScaleStages(scaleStr, commission, gradePayOverride = 0) {
     return stages;
 }
 
+// 🌟 टाईमझोन विरहित अचूक तारीख पार्सिंग फंक्शन
+function parseLocalDate(dateStr) {
+    if (!dateStr) return null;
+    let parts = String(dateStr).split('-');
+    if (parts.length === 3) {
+        return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 0, 0, 0, 0);
+    }
+    return null;
+}
+
+function formatDateToDDMMYYYY(dateString) {
+    if (!dateString) return '';
+    let parts = String(dateString).split('-');
+    if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    return dateString;
+}
+
+function isSameDay(d1, d2) {
+    if (!d1 || !d2) return false;
+    return d1.getFullYear() === d2.getFullYear() &&
+           d1.getMonth() === d2.getMonth() &&
+           d1.getDate() === d2.getDate();
+}
+
 // ==========================================
 // 🚀 मुख्य वेतन निश्चिती प्रक्रिया (Process Fixation)
 // ==========================================
@@ -179,7 +203,7 @@ function processFixation() {
         const toDateInput = document.getElementById('fixationTo').value;
 
         if (!joinDateInput || !scale || isNaN(basic) || !fromDateInput || !toDateInput) {
-            alert("कृपया तिन्ही कार्ड्स मधील आवश्यक माहिती पूर्ण भरा!");
+            showCustomAlert("कृपया तिन्ही कार्ड्स मधील आवश्यक माहिती पूर्ण भरा!", "error");
             return;
         }
 
@@ -358,6 +382,10 @@ function processFixation() {
             }
 
             if (incDate && incDate > startDate && incDate <= endDate) {
+                // 🌟 विकल्प दिनांक (DNI) आणि वार्षिक वाढ एकाच दिवशी असल्यास वार्षिक वाढ गाळली जाईल
+                let isDniOptionDate = activeBenefits.some(b => b.optDate > b.date && isSameDay(b.optDate, incDate));
+                if (isDniOptionDate) continue;
+
                 let isoStr = `${incDate.getFullYear()}-${String(incDate.getMonth() + 1).padStart(2, '0')}-${String(incDate.getDate()).padStart(2, '0')}`;
                 let isWithheld = (hasWithheld && withheldDatesSet.has(isoStr));
                 let m = String(incDate.getMonth() + 1).padStart(2, '0');
@@ -415,7 +443,7 @@ function processFixation() {
             }
         });
 
-        // 🌟 जुन्या अचूक पद्धतीनुसार इव्हेंट्सची क्रमवारी (वार्षिक वाढ आणि लाभ स्वतंत्र ओळीत राहतील)
+        // 🌟 अचूक क्रमवारी
         events.sort((a, b) => {
             if (a.date.getTime() !== b.date.getTime()) return a.date - b.date;
             let order = { 'INITIAL': 1, 'COMMISSION_5TH': 2, 'COMMISSION_6TH': 3, 'COMMISSION_7TH': 4, 'ANNUAL_INC': 5, 'WITHHELD_INC': 5, 'SCALE_REVISION': 6, 'BENEFIT_PROMOTED_PROVISIONAL': 7, 'BENEFIT_SAME_DAY': 7, 'BENEFIT_OPTION_DNI': 8 };
@@ -745,7 +773,7 @@ function processFixation() {
 
     } catch (err) {
         console.error("Process Fixation Error:", err);
-        alert("वेतन निश्चिती प्रक्रिया करताना त्रुटी आली: " + err.message);
+        showCustomAlert("वेतन निश्चिती प्रक्रिया करताना त्रुटी आली: " + err.message, "error");
     }
 }
 
