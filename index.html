@@ -1,166 +1,134 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="mr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#020d1b">
-<title>SMART TOOLS STRONGER WORK — Login</title>
-
-<style>
-* {
-  box-sizing: border-box;
-}
-
-html, body {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #020d1b;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
-  position: fixed;
-  inset: 0;
-  overscroll-behavior: none;
-}
-
-#login-screen {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  height: 100dvh;
-  overflow: hidden;
-  background: #020d1b;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#design {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  position: absolute;
-  z-index: 1;
-}
-
-/* मूळ फोटोवरील इनपुट बॉक्सेस अचूक बसवण्यासाठी ओव्हरले */
-.overlay-form {
-  position: absolute;
-  z-index: 10;
-  width: 82%;
-  max-width: 320px;
-  top: 55%; 
-  left: 50%;
-  transform: translate(-50%, 0);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.input-container {
-  position: relative;
-  width: 100%;
-  background: rgba(2, 6, 23, 0.7);
-  border: 1px solid rgba(0, 243, 255, 0.4);
-  border-radius: 12px;
-}
-
-.input-container i {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #00f3ff;
-  font-size: 15px;
-}
-
-.input-box {
-  width: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #ffffff;
-  font-size: 14px;
-  padding: 12px 12px 12px 42px;
-}
-
-.login-btn {
-  width: 100%;
-  height: 46px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  border-radius: 12px;
-}
-
-.forgot-link {
-  text-align: center;
-  background: transparent;
-  border: none;
-  color: #00f3ff;
-  font-size: 12px;
-  cursor: pointer;
-  margin-top: 4px;
-}
-</style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+    <title>Smart Tools Stronger Work - Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #020617;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .glow-border {
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.4), inset 0 0 15px rgba(0, 243, 255, 0.2);
+            border: 1.5px solid rgba(0, 243, 255, 0.6);
+        }
+        .glow-avatar {
+            box-shadow: 0 0 35px rgba(0, 243, 255, 0.7);
+            border: 3px solid #00f3ff;
+        }
+        .glow-btn {
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+        }
+        .ellipse-glow {
+            width: 180px;
+            height: 20px;
+            background: rgba(0, 243, 255, 0.5);
+            border-radius: 50%;
+            filter: blur(8px);
+            margin: -10px auto 15px auto;
+        }
+    </style>
 </head>
+<body class="p-4">
 
-<body>
-  <main id="login-screen" aria-label="Login page design">
-    <!-- तुमच्या रिपॉझिटरीमधील 'home-bg.jpg' फाईल इथे जोडली आहे -->
-    <img id="design"
-         alt="Original login page design"
-         src="home-bg.jpg">
-    
-    <div class="overlay-form">
-      <form id="loginForm" onsubmit="processLogin(event)">
-        <div class="input-container" style="margin-bottom: 12px;">
-          <i class="fa-solid fa-user"></i>
-          <input type="text" id="username" class="input-box" placeholder="Username" required>
+    <div class="w-full max-w-sm flex flex-col items-center">
+        
+        <!-- Top Circular Profile with Glowing Border -->
+        <div class="relative mb-2">
+            <div class="w-32 h-32 rounded-full overflow-hidden glow-avatar bg-slate-800 flex items-center justify-center">
+                <!-- तुमच्या रिपॉझिटरीमधील फोटो फाईल (उदा. home-bg.jpg किंवा स्वतःचा फोटो) -->
+                <img src="home-bg.jpg" alt="Profile" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop'">
+            </div>
         </div>
 
-        <div class="input-container" style="margin-bottom: 14px;">
-          <i class="fa-solid fa-lock"></i>
-          <input type="password" id="password" class="input-box" placeholder="Password" required>
+        <!-- Ellipse glowing beam under avatar -->
+        <div class="ellipse-glow"></div>
+
+        <!-- Titles -->
+        <h1 class="text-base font-bold tracking-wider text-white text-center mb-1">SMART TOOLS <span class="text-cyan-400">STRONGER WORK</span></h1>
+        <p class="text-xs text-cyan-300 tracking-wide mb-6">Created by Vitthal Kokate Patil</p>
+
+        <!-- Login Card -->
+        <div class="w-full bg-slate-950/90 backdrop-blur-md rounded-3xl p-6 glow-border">
+            <div class="text-center mb-5">
+                <h2 class="text-2xl font-bold tracking-widest text-cyan-400 mb-1">LOGIN</h2>
+                <div class="w-10 h-0.5 bg-cyan-400 mx-auto"></div>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <!-- Username Field -->
+                <div class="relative flex items-center">
+                    <span class="absolute left-4 text-cyan-400 text-lg">
+                        <i class="fa-solid fa-user"></i>
+                    </span>
+                    <input type="text" id="username" required placeholder="Username" 
+                        class="w-full bg-slate-900/90 border border-cyan-500/40 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 text-sm">
+                </div>
+
+                <!-- Password Field -->
+                <div class="relative flex items-center">
+                    <span class="absolute left-4 text-cyan-400 text-lg">
+                        <i class="fa-solid fa-lock"></i>
+                    </span>
+                    <input type="password" id="password" required placeholder="Password" 
+                        class="w-full bg-slate-900/90 border border-cyan-500/40 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-400 focus:outline-none focus:border-cyan-400 text-sm">
+                </div>
+
+                <!-- Sign In Button -->
+                <button type="submit" class="w-full mt-2 bg-cyan-400 hover:bg-cyan-300 text-slate-950 font-bold py-3 rounded-xl transition duration-300 glow-btn text-base tracking-wide cursor-pointer">
+                    Sign In
+                </button>
+            </form>
+
+            <!-- Forgot Password -->
+            <div class="text-center mt-4">
+                <a href="#" onclick="alert('कृपया पासवर्ड रिसेट करण्यासाठी ऍडमिनशी संपर्क साधा.')" class="text-xs text-cyan-400 hover:underline">Forgot Password?</a>
+            </div>
         </div>
 
-        <button type="submit" class="login-btn"></button>
-      </form>
-
-      <button type="button" class="forgot-link" onclick="forgotPassword()">Forgot Password?</button>
     </div>
-  </main>
 
-  <script>
-    function processLogin(event) {
-      event.preventDefault();
-      const u = document.getElementById('username').value.trim();
-      const p = document.getElementById('password').value.trim();
+    <script>
+        function logActivity(username, action) {
+            let logs = JSON.parse(localStorage.getItem('user_activities')) || [];
+            const now = new Date().toLocaleString('en-IN');
+            logs.unshift({ username, action, time: now });
+            localStorage.setItem('user_activities', JSON.stringify(logs));
+        }
 
-      if (u === 'admin' && p === 'admin123') {
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('currentUser', u);
-        localStorage.setItem('userRole', 'admin');
-        window.location.href = 'dashboard.html';
-      } else if (u === 'user' && p === 'user123') {
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('currentUser', u);
-        localStorage.setItem('userRole', 'user');
-        window.location.href = 'dashboard.html';
-      } else {
-        alert('चुकीचा युजरनेम किंवा पासवर्ड!');
-      }
-    }
+        function handleLogin(event) {
+            event.preventDefault();
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
 
-    function forgotPassword() {
-      alert('कृपया पासवर्ड रिसेट करण्यासाठी ऍडमिनशी संपर्क साधा.');
-    }
-  </script>
+            if (user === 'admin' && pass === 'admin123') {
+                logActivity(user, 'ऍडमिन लॉगिन यशस्वी');
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('currentUser', user);
+                localStorage.setItem('userRole', 'admin');
+                window.location.href = 'dashboard.html';
+            } else if (user === 'user' && pass === 'user123') {
+                logActivity(user, 'युजर लॉगिन यशस्वी');
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('currentUser', user);
+                localStorage.setItem('userRole', 'user');
+                window.location.href = 'dashboard.html';
+            } else {
+                logActivity(user, 'चुकीच्या पासवर्डसह लॉगिन प्रयत्न');
+                alert('चुकीचा युजरनेम किंवा पासवर्ड!');
+            }
+        }
+    </script>
 </body>
 </html>
