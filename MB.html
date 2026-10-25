@@ -187,7 +187,6 @@ body * { visibility: hidden !important; }
 .print-table th, .print-table td { border: 1px solid #222; padding: 4px 5px; text-align: left; }
 .print-table th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
 }
-</style>
 
 /* ===== Smart System Doctor - lightweight UI ===== */
 .smart-doctor-btn{position:fixed;right:12px;bottom:14px;z-index:7000;border:0;border-radius:50%;width:52px;height:52px;background:#0d47a1;color:#fff;font-size:23px;box-shadow:0 4px 14px rgba(0,0,0,.28);cursor:pointer}
@@ -201,6 +200,7 @@ body * { visibility: hidden !important; }
 .smart-doctor-item{border:1px solid #ddd;border-left:5px solid #f57c00;border-radius:8px;padding:9px;margin:7px 0;font-size:12px;background:#fafafa}
 .smart-doctor-item.ok{border-left-color:#2e7d32}.smart-doctor-item.err{border-left-color:#d32f2f}.smart-doctor-item.info{border-left-color:#1976d2}
 .smart-doctor-item b{display:block;margin-bottom:3px;color:#173f7a}.smart-doctor-actions{display:flex;gap:8px;margin-top:12px}.smart-doctor-actions button{flex:1;border:0;border-radius:8px;padding:10px;font-weight:800;cursor:pointer}.sd-run{background:#0d47a1;color:#fff}.sd-recover{background:#2e7d32;color:#fff}
+</style>
 </head>
 <body>
 
@@ -622,7 +622,6 @@ function printA4Document(content, optionalFileName) {
     var printTitle = safeName + '.pdf';
 
     try {
-        // Use a native bridge only if the installed APK explicitly exposes it.
         if (window.AndroidPrintBridge && typeof window.AndroidPrintBridge.printHtml === 'function') {
             window.AndroidPrintBridge.printHtml(String(content || ''), printTitle);
             return true;
@@ -637,7 +636,6 @@ function printA4Document(content, optionalFileName) {
             printableArea.innerHTML = String(content || '');
             printableArea.style.display = 'block';
             window.print();
-            // Keep report content until the print dialog closes, then restore the page.
             var restorePrintPage = function () {
                 printableArea.innerHTML = originalContent;
                 printableArea.style.display = '';
@@ -656,7 +654,6 @@ function printA4Document(content, optionalFileName) {
             return true;
         }
 
-        // A standalone printable window is a fallback for pages without #printableArea.
         var win = window.open('', '_blank');
         if (!win) throw new Error('Print window was blocked');
         var html = '<!doctype html><html><head><meta charset="utf-8"><title>' +
@@ -1104,7 +1101,6 @@ function openSmartActionCenter(mbNo) {
 
     document.getElementById('sacDetailsBox').innerHTML = detailsHtml;
 
-    // 🌟 Ensure History Container is initially hidden when Action Center opens
     var histContainer = document.getElementById('sacHistoryContainer');
     if (histContainer) histContainer.style.display = "none";
     document.getElementById('sacSubActionContainer').style.display = "none";
@@ -1173,7 +1169,6 @@ function closeSmartActionCenter() {
     currentSacStatusObj = null;
 }
 
-// Open the related module as the active screen, not behind the Smart Action Center.
 function sacOpenWorkForCurrentMB() {
     var mbNo = currentSacMB;
     if (!mbNo) return;
@@ -1189,7 +1184,6 @@ function sacOpenWorkForCurrentMB() {
         editWork(existingIndex);
         return;
     }
-    // New work: preselect the M.B. and its current JE when available.
     var status = getLatestMBStatus(mbNo);
     var holder = status ? getMBDisplayHolder(status, false) : '';
     var jeSelect = document.getElementById('workJE');
@@ -1207,8 +1201,6 @@ function sacOpenWorkForCurrentMB() {
 }
 
 function sacOpenBillForCurrentMB() {
-    // This version's Bill Register is a register/report modal, not an entry form.
-    // Close the Action Center first so the destination is never hidden behind it.
     closeSmartActionCenter();
     openModule('billModal');
 }
@@ -1280,7 +1272,6 @@ function sacConfirmTransfer() {
     openSmartActionCenter(currentSacMB);
 }
 
-// 🕒 इतिहास button click action: toggles Movement History visibility inside the Action Center
 function sacToggleHistoryView() {
     var histEl = document.getElementById('sacHistoryContainer');
     if (histEl) {
@@ -1533,7 +1524,7 @@ function cancelWorkEdit() {
     document.getElementById('workContractor').value = '';
     document.getElementById('editWorkIndex').value = '-1';
     document.getElementById('btnSaveWork').textContent = 'Save Work';
-    document.getElementById('btnCancelWork').style.display = 'none';
+    document.getElementById('btnCancelRaw').style.display = 'none';
 }
 
 function deleteWork(idx) {
@@ -1618,7 +1609,7 @@ function printMasterBillRegister() {
   function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]});}
   function pageName(){return location.pathname.split('/').pop()||'index.html';}
   function addIssue(level,title,detail,fix){issues.push({level:level,title:title,detail:detail,fix:fix});}
-  function checkStorage(){
+  fnunction checkStorage(){
     watchedKeys.forEach(function(k){
       var raw=localStorage.getItem(k); if(raw===null) return;
       try{var v=JSON.parse(raw); if(!Array.isArray(v) && typeof v!=='object') addIssue('err','डेटा रचना तपासा',k+' मध्ये अपेक्षित डेटा रचना नाही.','हा डेटा हाताने delete करू नका. आधी Backup/Restore तपासा.');}
@@ -1656,7 +1647,7 @@ function printMasterBillRegister() {
   window.addEventListener('storage',function(){if(window.requestIdleCallback)requestIdleCallback(checkStorage);else setTimeout(checkStorage,0);});
   document.addEventListener('DOMContentLoaded',function(){
     var btn=document.createElement('button');btn.className='smart-doctor-btn';btn.title='Smart System Doctor';btn.innerHTML='🤖<span class="smart-doctor-badge"></span>';btn.onclick=open;document.body.appendChild(btn);
-    var ov=document.createElement('div');ov.id='smartDoctorOverlay';ov.className='smart-doctor-overlay';ov.innerHTML='<div class="smart-doctor-card"><div class="smart-doctor-head"><div class="smart-doctor-title">🤖 Smart System Doctor</div><button class="smart-doctor-close" onclick="document.getElementById(\'smartDoctorOverlay\').style.display=\'none\'">X</button></div><div id="smartDoctorStatus" class="smart-doctor-status">तपासणी सुरू...</div><div id="smartDoctorBody"></div><div class="smart-doctor-actions"><button class="sd-run" onclick="smartDoctorRun()">🔍 पुन्हा तपासा</button><button class="sd-recover" onclick="smartDoctorRecover()">🛠️ सुरक्षित Recovery</button></div><div style="font-size:10px;color:#666;margin-top:8px;">टीप: Smart Doctor डेटा स्वतःहून delete/बदलत नाही. तो समस्या शोधतो, जागा/कारण सांगतो आणि सुरक्षित मार्गदर्शन देतो.</div></div></div>';document.body.appendChild(ov);
+    var ov=document.createElement('div');ov.id='smartDoctorOverlay';ov.className='smart-doctor-overlay';ov.innerHTML='<div class="smart-doctor-card"><div class="smart-doctor-head"><div class="smart-doctor-title">🤖 Smart System Doctor</div><button class="smart-doctor-close" onclick="document.getElementById(\'smartDoctorOverlay\').style.display=\'none\'">X</button></div><div id="smartDoctorStatus" class="smart-doctor-status">तपासणी सुरू...शिवाय त्रुटी काढली आहे.</div><div id="smartDoctorBody"></div><div class="smart-doctor-actions"><button class="sd-run" onclick="smartDoctorRun()">🔍 पुन्हा तपासा</button><button class="sd-recover" onclick="smartDoctorRecover()">🛠️ सुरक्षित Recovery</button></div><div style="font-size:10px;color:#666;margin-top:8px;">टीप: Smart Doctor डेटा स्वतःहून delete/बदलत नाही. तो समस्या शोधतो, जागा/कारण सांगतो आणि सुरक्षित मार्गदर्शन देतो.</div></div></div>';document.body.appendChild(ov);
   });
 })();
 </script>
