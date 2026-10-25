@@ -7,10 +7,7 @@
 <title>वेतन व फरक प्रणाली - लॉगिन</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-* {
-  box-sizing: border-box;
-}
-
+* { box-sizing: border-box; }
 body {
   margin: 0;
   width: 100%;
@@ -24,12 +21,7 @@ body {
   padding: 20px;
   color: #ffffff;
 }
-
-.profile-container {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
+.profile-container { text-align: center; margin-bottom: 20px; }
 .profile-pic {
   width: 110px;
   height: 110px;
@@ -40,26 +32,9 @@ body {
   margin-bottom: 12px;
   background: #0a192f;
 }
-
-.app-title {
-  font-size: 15px;
-  font-weight: bold;
-  letter-spacing: 1px;
-  margin-bottom: 4px;
-  text-transform: uppercase;
-}
-
-.app-title span {
-  color: #00f3ff;
-}
-
-.app-subtitle {
-  font-size: 12px;
-  color: #00f3ff;
-  margin-bottom: 20px;
-  letter-spacing: 0.5px;
-}
-
+.app-title { font-size: 15px; font-weight: bold; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; }
+.app-title span { color: #00f3ff; }
+.app-subtitle { font-size: 12px; color: #00f3ff; margin-bottom: 20px; letter-spacing: 0.5px; }
 .login-card {
   width: 100%;
   max-width: 340px;
@@ -70,37 +45,10 @@ body {
   padding: 25px 20px;
   text-align: center;
 }
-
-.login-card h2 {
-  color: #00f3ff;
-  font-size: 22px;
-  margin-top: 0;
-  margin-bottom: 5px;
-  letter-spacing: 1.5px;
-}
-
-.login-divider {
-  width: 45px;
-  height: 3px;
-  background: #00f3ff;
-  margin: 0 auto 20px auto;
-  border-radius: 2px;
-}
-
-.input-group {
-  position: relative;
-  margin-bottom: 16px;
-}
-
-.input-group i {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #00f3ff;
-  font-size: 16px;
-}
-
+.login-card h2 { color: #00f3ff; font-size: 22px; margin-top: 0; margin-bottom: 5px; letter-spacing: 1.5px; }
+.login-divider { width: 45px; height: 3px; background: #00f3ff; margin: 0 auto 20px auto; border-radius: 2px; }
+.input-group { position: relative; margin-bottom: 16px; }
+.input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #00f3ff; font-size: 16px; }
 .input-box {
   width: 100%;
   background: #0a192f;
@@ -112,11 +60,6 @@ body {
   outline: none;
   box-sizing: border-box;
 }
-
-.input-box::placeholder {
-  color: #8892b0;
-}
-
 .signin-btn {
   width: 100%;
   background: #00f3ff;
@@ -132,26 +75,13 @@ body {
   box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
   transition: 0.3s;
 }
-
-.signin-btn:hover {
-  background: #00c4d1;
-}
-
-.forgot-btn {
-  background: none;
-  border: none;
-  color: #00f3ff;
-  font-size: 13px;
-  cursor: pointer;
-  text-decoration: underline;
-}
+.signin-btn:hover { background: #00c4d1; }
+.forgot-btn { background: none; border: none; color: #00f3ff; font-size: 13px; cursor: pointer; text-decoration: underline; }
 </style>
 </head>
-
 <body>
 
   <div class="profile-container">
-    <!-- तुमच्या प्रोफाईल फोटोसाठी (जर फोटो फाईल असेल तर src मध्ये नाव टाका, सध्या home-bg.jpg वापरली आहे) -->
     <img src="home-bg.jpg" alt="Profile" class="profile-pic">
     <div class="app-title">SMART TOOLS <span>STRONGER WORK</span></div>
     <div class="app-subtitle">Created by Vitthal Kokate Patil</div>
@@ -179,36 +109,22 @@ body {
   </div>
 
   <script>
-    function logActivity(username, action) {
-      let logs = JSON.parse(localStorage.getItem('user_activities')) || [];
-      const now = new Date().toLocaleString('en-IN');
-      logs.unshift({ username, action, time: now });
-      localStorage.setItem('user_activities', JSON.stringify(logs));
-    }
+    // पेज उघडताच जुनी लॉगिन माहिती काढून टाकणे जेणेकरून नेहमी लॉगिन पेज दिसेल
+    localStorage.removeItem('isLoggedIn');
 
     function processLogin(event) {
       event.preventDefault();
       const u = document.getElementById('username').value.trim();
       const p = document.getElementById('password').value.trim();
 
-      if (u === 'admin' && p === 'admin123') {
-        logActivity(u, 'ऍडमिन लॉगिन यशस्वी');
+      if ((u === 'admin' && p === 'admin123') || (u === 'user' && p === 'user123')) {
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('currentUser', u);
-        localStorage.setItem('userRole', 'admin');
-        window.location.href = 'dashboard.html';
-      } else if (u === 'user' && p === 'user123') {
-        logActivity(u, 'युजर लॉगिन यशस्वी');
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('currentUser', u);
-        localStorage.setItem('userRole', 'user');
         window.location.href = 'dashboard.html';
       } else {
-        logActivity(u, 'चुकीच्या पासवर्डसह लॉगिन प्रयत्न');
         alert('चुकीचा युजरनेम किंवा पासवर्ड!');
       }
     }
-
     function forgotPassword() {
       alert('कृपया पासवर्ड रिसेट करण्यासाठी ऍडमिनशी संपर्क साधा.');
     }
