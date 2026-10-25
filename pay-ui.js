@@ -32,6 +32,49 @@ function closeCustomAlert() {
     if (modal) modal.classList.add('hidden');
 }
 
+// 🌟 ब्राउझरच्या confirm() ऐवजी सुंदर कस्टम कन्फर्मेशन बॉक्स
+function showCustomConfirm(message, onYesCallback) {
+    let confirmModal = document.getElementById('customConfirmModal');
+    if (!confirmModal) {
+        confirmModal = document.createElement('div');
+        confirmModal.id = 'customConfirmModal';
+        confirmModal.className = 'modal-overlay';
+        confirmModal.style.zIndex = '30005';
+        confirmModal.innerHTML = `
+            <div class="modal-box" style="max-width: 360px; text-align: center; padding: 20px;">
+                <div style="font-size: 32px; margin-bottom: 8px;">❓</div>
+                <div id="customConfirmMessage" style="font-size: 13.5px; font-weight: bold; color: #263238; margin-bottom: 16px; line-height: 1.5;"></div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" id="confirmYesBtn" style="flex:1; background: var(--danger, #d32f2f); color: white; border: none; padding: 9px; font-size: 13px; font-weight: bold; border-radius: 5px; cursor: pointer;">होय (Yes)</button>
+                    <button type="button" id="confirmNoBtn" style="flex:1; background: #78909c; color: white; border: none; padding: 9px; font-size: 13px; font-weight: bold; border-radius: 5px; cursor: pointer;">नाही (No)</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(confirmModal);
+    }
+
+    document.getElementById('customConfirmMessage').textContent = message;
+    confirmModal.classList.remove('hidden');
+
+    const yesBtn = document.getElementById('confirmYesBtn');
+    const noBtn = document.getElementById('confirmNoBtn');
+
+    // जुने इव्हेंट्स काढण्यासाठी क्लोन करणे
+    const newYesBtn = yesBtn.cloneNode(true);
+    const newNoBtn = noBtn.cloneNode(true);
+    yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+    noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+
+    newYesBtn.onclick = function() {
+        confirmModal.classList.add('hidden');
+        if (typeof onYesCallback === 'function') onYesCallback();
+    };
+
+    newNoBtn.onclick = function() {
+        confirmModal.classList.add('hidden');
+    };
+}
+
 function printReportChrome() {
     document.body.classList.remove('print-illustration-mode');
     window.print();
@@ -227,7 +270,6 @@ function saveCurrentFixationRecord(showAlert = true) {
     return recordData;
 }
 
-// 🌟 इंडेक्स (Index) वर आधारित जतन केलेल्या नोंदी दर्शवणारे फंक्शन
 function renderSavedRecordsTable() {
     const tbody = document.getElementById('savedRecordsTableBody');
     const countLabel = document.getElementById('savedCountLabel');
@@ -332,7 +374,6 @@ function loadCurrentRecordIntoForm() {
     }
 }
 
-// 🌟 इंडेक्सवर आधारित पाहणे (View)
 function viewSavedRecord(index) {
     let list = getSavedRecordsFromStorage();
     let rec = list[index];
@@ -342,7 +383,6 @@ function viewSavedRecord(index) {
     processFixation();
 }
 
-// 🌟 इंडेक्सवर आधारित दुरुस्ती (Edit)
 function editSavedRecord(index) {
     let list = getSavedRecordsFromStorage();
     let rec = list[index];
@@ -354,15 +394,15 @@ function editSavedRecord(index) {
     showCustomAlert(`'${rec.empName}' यांची माहिती फॉर्ममध्ये भरली आहे. आवश्यक ते बदल करून पुन्हा 'Submit Data' किंवा 'Save Record' करा.`, "success");
 }
 
-// 🌟 इंडेक्सवर आधारित हटवणे (Delete)
+// 🌟 नोंद हटवताना डिफाल्ट confirm ऐवजी कस्टम कन्फर्म बॉक्सचा वापर
 function deleteSavedRecord(index, empName) {
-    if (confirm(`तुम्हाला '${empName}' यांची जतन केलेली वेतन निश्चिती नोंद खरोखर हटवायची आहे का?`)) {
+    showCustomConfirm(`तुम्हाला '${empName}' यांची जतन केलेली वेतन निश्चिती नोंद खरोखर हटवायची आहे का?`, function() {
         let list = getSavedRecordsFromStorage();
         list.splice(index, 1);
         currentEditingRecordId = null;
         saveRecordsListToStorage(list);
         showCustomAlert("नोंद यशस्वीरीत्या हटवण्यात आली आहे!", "success");
-    }
+    });
 }
 
 function onWithheldChkChange(chk) {
@@ -587,8 +627,9 @@ function confirmWithheldSelection() {
     showCustomAlert("वेतनवाढ रोखण्याची तारीख यशस्वीरीत्या जतन केली!", "success");
 }
 
+// 🌟 'Reset Data' मधील डिफाल्ट confirm ऐवजी कस्टम कन्फर्म बॉक्सचा वापर
 function resetAllData() {
-    if (confirm("तुम्हाला भरलेली सर्व माहिती पुसून टाकायची आहे का?")) {
+    showCustomConfirm("तुम्हाला भरलेली सर्व माहिती पुसून टाकायची आहे का?", function() {
         selectedWithheldDates.clear();
         globalCalcDataList = [];
         currentEditingRecordId = null;
@@ -632,7 +673,7 @@ function resetAllData() {
 
         document.getElementById('outputBox').classList.add('hidden');
         showCustomAlert("सर्व माहिती यशस्वीरीत्या साफ करण्यात आली आहे!", "success");
-    }
+    });
 }
 
 function validateCard1() {
