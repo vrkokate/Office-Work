@@ -26,7 +26,8 @@ body {
   overscroll-behavior: none;
 }
 
-#screen {
+/* १. लॉगिन स्क्रीन (ही सुरुवातीला पूर्ण स्क्रीनवर दिसेल) */
+#login-screen {
   position: fixed;
   inset: 0;
   width: 100%;
@@ -37,6 +38,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1000;
 }
 
 #design {
@@ -108,13 +110,13 @@ body {
   margin-top: 4px;
 }
 
-/* डॅशबोर्ड आणि ऍडमिन लॉगसाठी पॅनल स्क्रीन */
+/* २. डॅशबोर्ड स्क्रीन (ही सुरुवातीला लपलेली असेल - display: none) */
 #dashboard-screen {
   position: fixed;
   inset: 0;
   background: #020617;
-  z-index: 100;
-  display: none;
+  z-index: 500;
+  display: none; 
   color: #ffffff;
   padding: 20px;
   overflow-y: auto;
@@ -124,39 +126,15 @@ body {
 </head>
 
 <body>
-  <!-- लॉगिन स्क्रीन (मूळ फोटो आणि ओव्हरले) -->
-  <main id="screen" aria-label="Login page design">
-    <!-- तुमच्या मूळ फोटोचा पूर्ण Base64 कोड येथे समाविष्ट केला आहे -->
+  <!-- लॉगिन स्क्रीन (सुरुवातीला फक्त हीच स्क्रीन दिसेल) -->
+  <main id="login-screen" aria-label="Login page design">
     <img id="design"
          alt="Original login page design"
-         src="data:image/jpeg;base64,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">
-
-    <!-- पारदर्शक इनपुट कंट्रोल्स जे फोटोच्या बॉक्सवर तंतोतंत बसतील -->
-    <div class="overlay-form">
-      <form id="loginForm" onsubmit="processLogin(event)">
-        <!-- Username -->
-        <div class="input-container" style="margin-bottom: 12px;">
-          <i class="fa-solid fa-user"></i>
-          <input type="text" id="username" class="input-box" placeholder="Username" required>
-        </div>
-
-        <!-- Password -->
-        <div class="input-container" style="margin-bottom: 14px;">
-          <i class="fa-solid fa-lock"></i>
-          <input type="password" id="password" class="input-box" placeholder="Password" required>
-        </div>
-
-        <!-- Sign In Button (फोटोमधील निळ्या बटणावर क्लिक होईल) -->
-        <button type="submit" class="login-btn"></button>
-      </form>
-
-      <!-- Forgot Password -->
-      <button type="button" class="forgot-link" onclick="forgotPassword()">Forgot Password?</button>
-    </div>
+         src="data:image/jpeg;base64,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">
   </main>
 
-  <!-- ऍडमिन व युजर डॅशबोर्ड व ऍक्टिव्हिटी लॉग पॅनल -->
-  <div id="dashboard-screen">
+  <!-- डॅशबोर्ड स्क्रीन (सुरुवातीला पूर्णपणे लपलेली असेल) -->
+  <main id="dashboard-screen">
     <div style="max-width: 800px; margin: 0 auto; padding-top: 20px;">
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,243,255,0.3); padding-bottom: 15px; margin-bottom: 20px;">
         <h2 id="welcomeTitle" style="color: #00f3ff; margin: 0;">Dashboard</h2>
@@ -193,7 +171,7 @@ body {
         </div>
       </div>
     </div>
-  </div>
+  </main>
 
   <script>
     // ऍक्टिव्हिटी लॉग सेव्ह करण्याची पद्धत
@@ -209,7 +187,7 @@ body {
       const u = document.getElementById('username').value.trim();
       const p = document.getElementById('password').value.trim();
 
-      // ऍडमिन व युजर लॉगिन तपासणी
+      // ऍडमिन व युजर लॉगिन तपासणी (सध्याचे डीफॉल्ट क्रेडेंशियल्स)
       if (u === 'admin' && p === 'admin123') {
         logActivity(u, 'ऍडमिन लॉगिन यशस्वी');
         openDashboard('admin', u);
@@ -223,7 +201,8 @@ body {
     }
 
     function openDashboard(role, username) {
-      document.getElementById('screen').style.display = 'none';
+      // लॉगिन स्क्रीन लपवा आणि डॅशबोर्ड स्क्रीन दाखवा
+      document.getElementById('login-screen').style.display = 'none';
       document.getElementById('dashboard-screen').style.display = 'block';
 
       if (role === 'admin') {
@@ -260,11 +239,11 @@ body {
     }
 
     function logout() {
+      // डॅशबोर्ड बंद करा आणि पुन्हा लॉगिन स्क्रीन दाखवा
       document.getElementById('dashboard-screen').style.display = 'none';
-      document.getElementById('screen').style.display = 'flex';
+      document.getElementById('login-screen').style.display = 'flex';
       document.getElementById('loginForm').reset();
     }
   </script>
 </body>
-  </html>
-  
+</html>
