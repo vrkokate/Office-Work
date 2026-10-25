@@ -271,6 +271,17 @@ html, body {
 .btn-next { background: var(--primary); color: #fff; border: none; padding: 10px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; flex: 2; }
 
 .hidden { display: none !important; }
+
+#printableArea { display: none !important; }
+@media print {
+body * { visibility: hidden !important; }
+#printableArea, #printableArea * { visibility: visible !important; }
+#printableArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 4mm; display: block !important; }
+@page { size: A4 portrait; margin: 4mm; }
+.print-table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+.print-table th, .print-table td { border: 1px solid #222; padding: 4px 5px; text-align: left; }
+.print-table th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+}
 </style>
 </head>
 <body>
@@ -278,7 +289,7 @@ html, body {
 <div class="container">
     <div class="header">
         <h2>📄 देयक नोंदवही (Bill Register)</h2>
-        <!-- 🌟 लाल 'X' बटन दाबल्यावर थेट dashboard.html वर जाईल -->
+        <!-- 🌟 डॅशबोर्डवर जाणारे लाल 'X' बटन -->
         <a href="dashboard.html" class="close-btn">X</a>
     </div>
 
@@ -351,37 +362,37 @@ html, body {
         <!-- पायरी १: मूळ माहिती -->
         <div id="wizardStep1">
             <div style="font-size: 12.5px; font-weight: bold; color: var(--primary-dark); margin-bottom: 8px;">
-                संबंधित माहिती व तपशील
+                संबंधित माहिती व तपशील[span_3](start_span)[span_3](end_span)
             </div>
             <div class="field-group">
-                <label>संबंधित कनिष्ठ अभियंता (JE) *</label>
+                <label>संबंधित कनिष्ठ अभियंता (JE) *[span_4](start_span)[span_4](end_span)</label>
                 <select id="wizJeName" class="form-control">
-                    <option value="">-- JE निवडा --</option>
+                    <option value="">-- JE निवडा --[span_5](start_span)[span_5](end_span)</option>
                 </select>
             </div>
             <div class="field-group">
-                <label>वाटप केलेली M.B. क्रमांक *</label>
+                <label>वाटप केलेली M.B. क्रमांक *[span_6](start_span)[span_6](end_span)</label>
                 <input type="text" id="wizMbNo" placeholder="M.B. क्रमांक टाका">
             </div>
             <div class="field-group">
-                <label>कंत्राटदार / एजन्सीचे नाव *</label>
+                <label>कंत्राटदार / एजन्सीचे नाव *[span_7](start_span)[span_7](end_span)</label>
                 <input type="text" id="wizContractor" placeholder="कंत्राटदार नाव टाका">
             </div>
             <div class="field-group">
-                <label>संबंधित कामाचे नाव *</label>
+                <label>संबंधित कामाचे नाव *[span_8](start_span)[span_8](end_span)</label>
                 <input type="text" id="wizWorkName" placeholder="कामाचे नाव टाका">
             </div>
             <div class="field-group">
-                <label>बिलाचा प्रकार निवडा *</label>
+                <label>बिलाचा प्रकार निवडा *[span_9](start_span)[span_9](end_span)</label>
                 <select id="wizBillType">
-                    <option value="">-- बिलाचा प्रकार --</option>
-                    <option value="First RA Bill">First RA Bill[span_0](start_span)[span_0](end_span)</option>
+                    <option value="">-- बिलाचा प्रकार निवडा --[span_10](start_span)[span_10](end_span)</option>
+                    <option value="First RA Bill">First RA Bill[span_11](start_span)[span_11](end_span)</option>
                     <option value="Running Bill">Running Bill</option>
                     <option value="Final Bill">Final Bill</option>
                 </select>
             </div>
             <div class="field-group">
-                <label>बिलाचा दिनांक *</label>
+                <label>बिलाचा दिनांक *[span_12](start_span)[span_12](end_span)</label>
                 <input type="date" id="wizBillDate">
             </div>
             <div class="step-btns-row">
@@ -392,22 +403,22 @@ html, body {
         <!-- पायरी २: कपात तपशील (Deduction) -->
         <div id="wizardStep2" class="hidden">
             <div style="font-size: 12.5px; font-weight: bold; color: var(--primary-dark); margin-bottom: 8px;">
-                Deduction (कपात तपशील)
+                Deduction (कपात तपशील)[span_13](start_span)[span_13](end_span)
             </div>
             <div class="field-group">
-                <label>Passed Amount (पास रक्कम) ₹ *</label>
+                <label>Passed Amount (पास रक्कम) ₹ *[span_14](start_span)[span_14](end_span)</label>
                 <input type="number" id="wizPassedAmount" placeholder="उदा. 500000" oninput="calculateDeductions()">
             </div>
-            <div class="field-group"><label>Maintenance</label><input type="number" id="wizDedMaint" value="0" oninput="calculateDeductions()"></div>
-            <div class="field-group"><label>Royalty Charges</label><input type="number" id="wizDedRoyalty" value="0" oninput="calculateDeductions()"></div>
-            <div class="field-group"><label>Govt. Ins. Scheme</label><input type="number" id="wizDedIns" value="0" oninput="calculateDeductions()"></div>
-            <div class="field-group"><label>Upkar (W.C.)</label><input type="number" id="wizDedUpkar" value="0" oninput="calculateDeductions()"></div>
-            <div class="field-group"><label>CGST 1%</label><input type="number" id="wizDedCgst" value="0" oninput="calculateDeductions()"></div>
-            <div class="field-group"><label>SGST 1%</label><input type="number" id="wizDedSgst" value="0" oninput="calculateDeductions()"></div>
+            <div class="field-group"><label>Maintenance[span_15](start_span)[span_15](end_span)</label><input type="number" id="wizDedMaint" value="0" oninput="calculateDeductions()"></div>
+            <div class="field-group"><label>Royalty Charges[span_16](start_span)[span_16](end_span)</label><input type="number" id="wizDedRoyalty" value="0" oninput="calculateDeductions()"></div>
+            <div class="field-group"><label>Govt. Ins. Scheme[span_17](start_span)[span_17](end_span)</label><input type="number" id="wizDedIns" value="0" oninput="calculateDeductions()"></div>
+            <div class="field-group"><label>Upkar (W.C.)[span_18](start_span)[span_18](end_span)</label><input type="number" id="wizDedUpkar" value="0" oninput="calculateDeductions()"></div>
+            <div class="field-group"><label>CGST 1%[span_19](start_span)[span_19](end_span)</label><input type="number" id="wizDedCgst" value="0" oninput="calculateDeductions()"></div>
+            <div class="field-group"><label>SGST 1%[span_20](start_span)[span_20](end_span)</label><input type="number" id="wizDedSgst" value="0" oninput="calculateDeductions()"></div>
             
             <div style="background: #fff3e0; border: 1px solid #ffb74d; border-radius: 6px; padding: 8px; font-size: 12px; margin: 8px 0; font-weight: bold;">
-                <div>एकूण कपात (Total Deduction): ₹ <span id="wizDisplayTotalDed">0</span></div>
-                <div style="color: #16a34a; margin-top: 2px;">प्रत्यक्षात देय रक्कम (Net Payable): ₹ <span id="wizDisplayNetPay">0</span></div>
+                <div>एकूण कपात (Total Deduction): ₹ <span id="wizDisplayTotalDed">0</span>[span_21](start_span)[span_21](end_span)</div>
+                <div style="color: #16a34a; margin-top: 2px;">प्रत्यक्षात देय रक्कम (Net Payable): ₹ <span id="wizDisplayNetPay">0</span>[span_22](start_span)[span_22](end_span)</div>
             </div>
 
             <div class="step-btns-row">
@@ -432,6 +443,8 @@ html, body {
     </div>
 </div>
 
+<div id="printableArea"></div>
+
 <script src="common.js"></script>
 <script>
 window.onload = function() {
@@ -442,7 +455,7 @@ window.onload = function() {
 function loadJeDropdown() {
     var jeSel = document.getElementById('wizJeName');
     if(!jeSel) return;
-    jeSel.innerHTML = '<option value="">-- JE निवडा --</option>';
+    jeSel.innerHTML = '<option value="">-- JE निवडा --</option>[span_23](start_span)[span_23](end_span)';
     var jes = getData('je_records');
     jes.forEach(function(j) {
         jeSel.add(new Option(j.name, j.name));
@@ -575,8 +588,13 @@ function saveNewBill() {
     var netPay = passedAmount - totalDed;
 
     var bills = getData('dmbms_bills');
+    var currentYear = new Date().getFullYear();
+    var serialNo = String(bills.length + 1).padStart(2, '0');
+    var autoBillNo = currentYear + '/' + serialNo;
+
     bills.push({
-        billNo: mb,
+        billNo: autoBillNo,
+        mbNo: mb,
         je: je,
         contractor: contractor,
         workName: work,
@@ -622,7 +640,7 @@ function refreshBillTable() {
 
         html += `<tr>
             <td style="text-align:center;">${idx + 1}</td>
-            <td><b>${b.billNo || '-'}</b></td>
+            <td><b>${b.billNo || '-'}</b> (${b.mbNo || '-'})</td>
             <td>${b.contractor || '-'}</td>
             <td>₹ ${passed.toLocaleString('en-IN')}</td>
             <td style="color:#16a34a; font-weight:bold;">₹ ${net.toLocaleString('en-IN')}</td>
@@ -664,7 +682,8 @@ function printMasterBillReport() {
         <thead>
             <tr style="background:#eee;">
                 <th>अ.क्र.</th>
-                <th>बिल क्र. / M.B.</th>
+                <th>बिल क्र.</th>
+                <th>M.B. क्र.</th>
                 <th>कंत्राटदार</th>
                 <th>कामाचे नाव</th>
                 <th>बिलाचा प्रकार</th>
@@ -678,6 +697,7 @@ function printMasterBillReport() {
         html += `<tr>
             <td style="text-align:center;">${i+1}</td>
             <td><b>${b.billNo || '-'}</b></td>
+            <td>${b.mbNo || '-'}</td>
             <td>${b.contractor || '-'}</td>
             <td>${b.workName || '-'}</td>
             <td>${b.billType || '-'}</td>
@@ -687,10 +707,7 @@ function printMasterBillReport() {
     });
     html += `</tbody></table>`;
     
-    var win = window.open('', '_blank');
-    win.document.write('<html><head><title>Bill Register Report</title></head><body>' + html + '</body></html>');
-    win.document.close();
-    win.onload = function() { win.print(); };
+    printA4Document(html, 'Bill_Register_Report_' + todayStr + '.pdf');
 }
 </script>
 </body>
