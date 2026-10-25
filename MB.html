@@ -28,9 +28,29 @@
 .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 
 .stat-card { 
-border: none !important; border-radius: 8px; text-align: center; padding: 11px 4px; cursor: pointer; background: #fcfdfe; transition: 0.2s; position: relative; z-index: 10; box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+border-radius: 8px; text-align: center; padding: 11px 4px; cursor: pointer; background: #fcfdfe; transition: 0.2s; position: relative; z-index: 10; box-shadow: 0 3px 10px rgba(0,0,0,0.08);
 }
 .stat-card:hover { transform: scale(1.02); }
+
+/* 🌟 समरी कार्ड्ससाठी सुंदर नियॉन कलरफुल ग्रॅडिअंट बॉर्डर */
+.stat-card:nth-child(1) {
+background: linear-gradient(#fcfdfe, #fcfdfe) padding-box, linear-gradient(90deg, #00c853, #00e5ff, #76ff03, #00c853) border-box;
+border: 2.5px solid transparent !important; background-size: 100% 100%, 300% 300%; animation: borderLightFlow 3s linear infinite;
+}
+.stat-card:nth-child(2) {
+background: linear-gradient(#fcfdfe, #fcfdfe) padding-box, linear-gradient(90deg, #2979ff, #aa00ff, #ff4081, #2979ff) border-box;
+border: 2.5px solid transparent !important; background-size: 100% 100%, 300% 300%; animation: borderLightFlow 3s linear infinite;
+}
+.stat-card:nth-child(3) {
+background: linear-gradient(#fcfdfe, #fcfdfe) padding-box, linear-gradient(90deg, #ff9100, #ffea00, #ff1744, #ff9100) border-box;
+border: 2.5px solid transparent !important; background-size: 100% 100%, 300% 300%; animation: borderLightFlow 3s linear infinite;
+}
+
+@keyframes borderLightFlow {
+0% { background-position: 0% 0%, 0% 50%; }
+50% { background-position: 0% 0%, 100% 50%; }
+100% { background-position: 0% 0%, 0% 50%; }
+}
 
 .stat-num { font-size: 18px; font-weight: 700; color: #0d47a1; pointer-events: none; }
 .stat-label { font-size: 11px; color: #555; margin-top: 2px; pointer-events: none; }
@@ -43,23 +63,23 @@ border: none !important; border-radius: 8px; text-align: center; padding: 11px 4
 
 .btn-report { width: 100%; background: #0d47a1; color: #fff; border: none; padding: 11px; font-size: 13.5px; font-weight: 800; border-radius: 6px; cursor: pointer; margin-top: 6px; letter-spacing: 0.5px; }
 
-/* 🌟 बॉक्स-रहित, बॉर्डर-रहित थेट निळ्या रंगाचे स्क्रोल होणारे M.B. अंक */
+/* 🌟 बॉक्स-रहित, पारदर्शक आणि सर्च बारच्या वरच्या बाजूला (Upwards) ओपन होणारी स्क्रोलिंग ब्लू नंबर्स यादी */
 #smartSearchSuggestions {
     display: none;
     position: absolute;
     left: 0;
     right: 0;
-    top: calc(100% + 2px);
+    bottom: calc(100% + 4px);
     background: transparent;
     border: none;
-    max-height: 180px;
+    max-height: 160px;
     overflow-y: auto;
     z-index: 1000;
     box-shadow: none;
 }
 .suggestion-item {
-    padding: 6px 10px;
-    font-size: 15px;
+    padding: 5px 8px;
+    font-size: 16px;
     cursor: pointer;
     color: #0d47a1;
     font-weight: 800;
@@ -291,7 +311,7 @@ body * { visibility: hidden !important; }
 <div class="form-group" style="position: relative;">
 <label>स्मार्ट शोध (M.B. क्र., नाव किंवा तपशील)</label>
 <input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका" oninput="handleSmartSearchInput(this)">
-<!-- 🌟 जुन्या स्क्रीनशॉटप्रमाणे बॉक्स-रहित, थेट ओळीत दिसणारी स्क्रोलिंग ब्लू नंबर्स यादी -->
+<!-- 🌟 सर्च बारच्या वरच्या कोपऱ्यापासून वरच्या दिशेने ओपन होणारी बॉक्स-रहित स्क्रोलिंग ब्लू नंबर्स यादी -->
 <div id="smartSearchSuggestions"></div>
 </div>
 
@@ -598,7 +618,7 @@ function closeCustomConfirm(isConfirmed) {
     expectedVerifyMB = null;
 }
 
-// 🌟 जुन्या स्क्रीनशॉटनुसार थेट ओळीत दिसणारे, बॉक्स-रहित आणि स्क्रोलिंग असलेले ब्लू नंबर्स
+// 🌟 जुन्या डिझाईननुसार सर्च बारच्या वरच्या दिशेने ओपन होणारी बॉक्स-रहित स्क्रोलिंग ब्लू नंबर्स यादी
 function handleSmartSearchInput(input) {
     var query = (input.value || '').trim().toLowerCase();
     var box = document.getElementById('smartSearchSuggestions');
