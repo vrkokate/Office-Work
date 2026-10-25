@@ -454,6 +454,8 @@ function processFixation() {
         let currentLevel = initialLevel;
         let currentMatrixIndex = -1;
         let restoreWithheldNext = false;
+        let savedPrePromotionBasic = basic; // 🌟 जुने मूळ वेतन जतन करण्यासाठी व्हेरिएबल
+        let savedPrePromotionLevel = initialLevel;
 
         if (currentCommission === '7th') {
             let match = String(initialLevel).match(/S-(\d+)/i);
@@ -492,6 +494,8 @@ function processFixation() {
             let prevGpForSheet = currentGP;
 
             if (ev.type === 'INITIAL') {
+                savedPrePromotionBasic = currentBasic;
+                savedPrePromotionLevel = currentLevel;
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
             }
             else if (ev.type === 'COMMISSION_5TH') {
@@ -525,6 +529,7 @@ function processFixation() {
                 currentGP = 0;
                 lowerBasic = currentBasic;
                 lowerGP = 0;
+                savedPrePromotionBasic = currentBasic;
 
                 let calcData5th = {
                     commission: '5th',
@@ -552,6 +557,7 @@ function processFixation() {
                 }
                 lowerBasic = currentBasic;
                 lowerGP = currentGP;
+                savedPrePromotionBasic = currentBasic;
 
                 let calcData6th = {
                     commission: '6th',
@@ -570,7 +576,7 @@ function processFixation() {
             }
             else if (ev.type === 'COMMISSION_7TH') {
                 currentCommission = '7th';
-                let totalBefore7th = currentBasic + currentGP; // 🌟 दुरुस्ती: मूळ वेतन + ग्रेड पे एकत्र करून २.५७ ने फिफ्मेंट केली
+                let totalBefore7th = currentBasic + currentGP;
                 currentLevel = mapGpTo7thLevel(prevGpForSheet);
                 let fitmentResult = fitInMatrix(currentLevel, totalBefore7th * 2.57);
                 let oldB = currentBasic;
@@ -585,6 +591,8 @@ function processFixation() {
                 lowerBasic = currentBasic;
                 lowerGP = 0;
                 lowerMatrixIndex = currentMatrixIndex;
+                savedPrePromotionBasic = currentBasic;
+                savedPrePromotionLevel = currentLevel;
 
                 let newScale7th = getCleanScaleLabel(scale, currentCommission, currentLevel);
                 currentScaleLabel = newScale7th;
@@ -644,6 +652,7 @@ function processFixation() {
                 lowerBasic = currentBasic;
                 lowerGP = currentGP;
                 lowerMatrixIndex = currentMatrixIndex;
+                savedPrePromotionBasic = currentBasic;
 
                 let desc = `वेतनश्रेणी सुधारणा (थेट सममूल्य / पुढील टप्प्यावर निश्चिती)`;
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, desc, currentBasic, currentGP, ev.type, null);
@@ -654,8 +663,8 @@ function processFixation() {
             }
             else if (ev.type === 'BENEFIT_PROMOTED_PROVISIONAL') {
                 let b = ev.data;
-                b.savedLowerBasic = currentBasic;
-                b.savedLowerGP = currentGP;
+                savedPrePromotionBasic = currentBasic; // 🌟 लाभाच्या आधीचे मूळ वेतन जतन करा (उदा. 26800)
+                savedPrePromotionLevel = currentLevel;
                 currentCommission = b.commission;
                 currentScaleLabel = b.scale;
                 
@@ -684,10 +693,13 @@ function processFixation() {
                 if (currentCommission === '7th') {
                     let lvlMatch = b.scale.match(/S-(\d+)/i);
                     let targetLvl = lvlMatch ? "S-" + parseInt(lvlMatch[1], 10) : "S-8";
-                    let cellsLower = fullPayMatrix7th[currentLevel] || fullPayMatrix7th["S-6"];
-                    let currIdx = cellsLower.indexOf(currentBasic);
-                    if (currIdx === -1) currIdx = Math.max(0, currentMatrixIndex);
-                    let notionalIdx = Math.min(currIdx + 1, cellsLower.length - 1);
+                    
+                    // 🌟 नियम काय सांगतो: जुन्या स्तरावरून (savedPrePromotionLevel) 2 टप्पे पुढे (वार्षिक वाढ + 11(1) वाढ)
+                    const cellsLower = fullPayMatrix7th[savedPrePromotionLevel] || fullPayMatrix7th["S-6"];
+                    let baseIdx = cellsLower.indexOf(savedPrePromotionBasic);
+                    if (baseIdx === -1) baseIdx = 0;
+                    
+                    let notionalIdx = Math.min(baseIdx + 2, cellsLower.length - 1); // +2 steps (26800 -> 27600 -> 28400)
                     let notionalPay = cellsLower[notionalIdx];
 
                     let fitFinal = fitInMatrix(targetLvl, notionalPay);
@@ -701,16 +713,16 @@ function processFixation() {
                     let oldGP = currentGP;
                     currentGP = gpMatch ? parseInt(gpMatch[1], 10) : currentGP;
                     
-                    let inc = Math.ceil((currentBasic * 0.03) / 10) * 10;
+                    let inc = Math.ceil((savedPrePromotionBasic * 0.03) / 10) * 10;
                     let gpDiff = currentGP - oldGP;
-                    currentBasic = currentBasic + inc + gpDiff;
+                    currentBasic = savedPrePromotionBasic + inc + inc + gpDiff; // 2 increments for option DNI
 
                     let ep = get6thEntryPay(b.scale, currentGP);
                     if (ep && currentBasic < (ep + currentGP)) currentBasic = ep + currentGP;
                     currentScaleLabel = getCleanScaleLabel(b.scale, currentCommission, currentLevel);
                 } else {
                     let step = (currentCommission === '4th') ? 25 : 100;
-                    let target = currentBasic + step;
+                    let target = savedPrePromotionBasic + step + step;
                     let promoStages = parsePayScaleStages(b.scale, currentCommission);
                     let found = promoStages.find(s => s >= target);
                     currentBasic = found ? found : target;
@@ -721,7 +733,8 @@ function processFixation() {
                 lowerLevel = currentLevel;
                 lowerBasic = currentBasic;
                 lowerGP = currentGP;
-                lowerMatrixIndex = currentMatrixIndex;
+                savedPrePromotionBasic = currentBasic;
+                savedPrePromotionLevel = currentLevel;
 
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, ev.desc, currentBasic, currentGP, ev.type, null);
             }
@@ -760,6 +773,7 @@ function processFixation() {
                 }
 
                 currentScaleLabel = getCleanScaleLabel(currentScaleLabel, currentCommission, currentLevel);
+                savedPrePromotionBasic = currentBasic;
                 addTableRow(srNo++, ev.dateStr, getCommissionLabel(currentCommission), currentScaleLabel, descText, currentBasic, currentGP, ev.type, null);
             }
         });
