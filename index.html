@@ -39,41 +39,33 @@ body {
   justify-content: center;
 }
 
-/* डिझाईन किंवा बॅकग्राउंडसाठी डिव्ह */
-.bg-design {
+#design {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
   position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   z-index: 1;
 }
 
-/* ओव्हरले फॉर्म जो अचूक डिझाईन दिसेल */
+/* मूळ फोटोवरील इनपुट बॉक्सेस अचूक बसवण्यासाठी ओव्हरले */
 .overlay-form {
   position: absolute;
   z-index: 10;
-  width: 85%;
+  width: 82%;
   max-width: 320px;
-  top: 52%; 
+  top: 55%; 
   left: 50%;
   transform: translate(-50%, 0);
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: rgba(2, 6, 23, 0.85);
-  padding: 20px;
-  border-radius: 20px;
-  border: 1px solid rgba(0, 243, 255, 0.4);
-  box-shadow: 0 0 25px rgba(0, 243, 255, 0.3);
 }
 
 .input-container {
   position: relative;
   width: 100%;
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(2, 6, 23, 0.7);
   border: 1px solid rgba(0, 243, 255, 0.4);
   border-radius: 12px;
 }
@@ -100,19 +92,10 @@ body {
 .login-btn {
   width: 100%;
   height: 46px;
-  background: #00f3ff;
-  color: #020617;
-  font-weight: bold;
+  background: transparent;
   border: none;
   cursor: pointer;
   border-radius: 12px;
-  font-size: 15px;
-  box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
-  transition: 0.3s;
-}
-
-.login-btn:hover {
-  background: #38bdf8;
 }
 
 .forgot-link {
@@ -124,60 +107,33 @@ body {
   cursor: pointer;
   margin-top: 4px;
 }
-
-.brand-title {
-  position: absolute;
-  top: 15%;
-  text-align: center;
-  z-index: 5;
-}
-
-.brand-title h1 {
-  font-size: 18px;
-  color: #ffffff;
-  letter-spacing: 1px;
-  margin: 0;
-}
-
-.brand-title p {
-  font-size: 11px;
-  color: #38bdf8;
-  margin: 4px 0 0 0;
-}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
-  <main id="login-screen" aria-label="Login page">
-    <div class="bg-design">
-      <div class="brand-title">
-        <h1>SMART TOOLS <span style="color: #00f3ff;">STRONGER WORK</span></h1>
-        <p>Created by Vitthal Kokate Patil</p>
-      </div>
-
-      <div class="overlay-form">
-        <div style="text-align: center; margin-bottom: 5px;">
-          <h2 style="color: #00f3ff; font-size: 20px; margin: 0; letter-spacing: 2px;">LOGIN</h2>
-          <div style="width: 30px; height: 2px; background: #00f3ff; margin: 5px auto 0 auto;"></div>
+  <main id="login-screen" aria-label="Login page design">
+    <!-- तुमच्या रिपॉझिटरीमधील 'home-bg.jpg' फाईल इथे जोडली आहे -->
+    <img id="design"
+         alt="Original login page design"
+         src="home-bg.jpg">
+    
+    <div class="overlay-form">
+      <form id="loginForm" onsubmit="processLogin(event)">
+        <div class="input-container" style="margin-bottom: 12px;">
+          <i class="fa-solid fa-user"></i>
+          <input type="text" id="username" class="input-box" placeholder="Username" required>
         </div>
 
-        <form id="loginForm" onsubmit="processLogin(event)">
-          <div class="input-container" style="margin-bottom: 12px;">
-            <i class="fa-solid fa-user"></i>
-            <input type="text" id="username" class="input-box" placeholder="Username" required>
-          </div>
+        <div class="input-container" style="margin-bottom: 14px;">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="password" class="input-box" placeholder="Password" required>
+        </div>
 
-          <div class="input-container" style="margin-bottom: 14px;">
-            <i class="fa-solid fa-lock"></i>
-            <input type="password" id="password" class="input-box" placeholder="Password" required>
-          </div>
+        <button type="submit" class="login-btn"></button>
+      </form>
 
-          <button type="submit" class="login-btn">Sign In</button>
-        </form>
-
-        <button type="button" class="forgot-link" onclick="forgotPassword()">Forgot Password?</button>
-      </div>
+      <button type="button" class="forgot-link" onclick="forgotPassword()">Forgot Password?</button>
     </div>
   </main>
 
