@@ -292,7 +292,7 @@ body * { visibility: hidden !important; }
 <!-- M.B. नियंत्रण प्रणाली मुख्य डॅशबोर्ड -->
 <div id="mbSystemSection">
 <div class="top-header">
-<a href="dashboard.html" class="btn-back-hub">🏠 मुखपृष्ठ</a>
+<a href="index.html" class="btn-back-hub">🏠 मुखपृष्ठ</a>
 <h1>मोजमाप पुस्तिका नियंत्रण प्रणाली</h1>
 <p>सार्वजनिक बांधकाम विभाग</p>
 </div>
@@ -422,11 +422,15 @@ body * { visibility: hidden !important; }
 </div>
 </div></div>
 
-<!-- 4. Bill Reg. मोडल -->
+<!-- 4. Bill Reg. मोडल (दुरुस्त केलेला भाग) -->
 <div id="billModal" class="modal-overlay"><div class="modal-card" style="max-width:480px;">
 <div class="modal-header"><h3 style="font-size: 14px; color:#f57c00;">📄 देयक नोंदवही (Bill Register)</h3><button class="btn-close" onclick="closeModule('billModal')">X</button></div>
 <button class="btn-report" style="background:#0d47a1; margin:0;" onclick="printMasterBillRegister()">📄 रिपोर्ट प्रिंट</button>
-<div class="bill-scroll-container" style="margin-top:10px;"><div id="billListContainer"></div></div>
+<div class="bill-scroll-container" style="margin-top:10px; max-height:260px; overflow-y:auto;">
+    <div id="billListContainer">
+        <!-- येथे बिलांची यादी आपोआप लोड होईल -->
+    </div>
+</div>
 </div></div>
 
 <!-- 5. Assign मोडल -->
@@ -549,12 +553,45 @@ function closeCustomConfirm(isConfirmed) {
     expectedVerifyMB = null;
 }
 
+// 🌟 बिल रजिस्टर डेटा लोड करणारे नवीन फंक्शन
+function refreshBillRegister() {
+    var container = document.getElementById('billListContainer');
+    if (!container) return;
+    var bills = getData('dmbms_bills');
+    if (!bills || bills.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:15px; color:#666; font-size:12px;">कोणतीही देयक (Bill) नोंद उपलब्ध नाही.</div>';
+        return;
+    }
+    var html = '<table class="data-table"><thead><tr>' +
+    '<th style="text-align:center;">अ.क्र.</th>' +
+    '<th>बिल क्र.</th>' +
+    '<th>कंत्राटदार / एजन्सी</th>' +
+    '<th>रक्कम</th>' +
+    '</tr></thead><tbody>';
+    
+    bills.forEach(function(b, idx) {
+        var bNo = b.billNo || b.no || '-';
+        var contractor = b.contractor || b.agency || '-';
+        var amount = b.netPay || b.amount || b.total || '0';
+        html += '<tr>' +
+        '<td style="text-align:center;">' + (idx + 1) + '</td>' +
+        '<td>' + escapeHtml(bNo) + '</td>' +
+        '<td>' + escapeHtml(contractor) + '</td>' +
+        '<td>' + escapeHtml(amount) + '</td>' +
+        '</tr>';
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
 function openModule(id) {
     var modal = document.getElementById(id);
     if(modal) {
         modal.style.display = 'flex';
         if(id === 'workModal') {
             refreshWorkList();
+        } else if(id === 'billModal') {
+            refreshBillRegister(); // 🌟 बिल रजिस्टर मॉडेल उघडताच डेटा लोड होईल
         }
     }
 }
@@ -570,6 +607,7 @@ function refreshAll() {
     refreshMBDashboard();
     refreshWorkList();
     refreshAssignList();
+    refreshBillRegister();
 }
 
 function animateNumberCount(elementId, finalVal) {
@@ -1558,7 +1596,7 @@ function refreshWorkList() {
             '<td>' + mbDisplay + '</td>' +
             '<td class="action-cell" style="text-align:center;">' +
             '<button class="btn-action" style="background:#2e7d32; padding:3px 6px;" onclick="editWork(' + idx + ')">Edit</button> ' +
-            '<button class="btn-action" style="background:#d32f2f; padding:3px 6px;" onclick="deleteWork(' + idx + ')">Delete is done</button>' +
+            '<button class="btn-action" style="background:#d32f2f; padding:3px 6px;" onclick="deleteWork(' + idx + ')">Delete</button>' +
             '</td>' +
             '</tr>';
         });
@@ -1614,13 +1652,13 @@ function printMasterBillRegister() {
     watchedKeys.forEach(function(k){
       var raw=localStorage.getItem(k); if(raw===null) return;
       try{var v=JSON.parse(raw); if(!Array.isArray(v) && typeof v!=='object') addIssue('err','डेटा रचना तपासा',k+' मध्ये अपेक्षित डेटा रचना नाही.','हा डेटा हाताने delete करू नका. आधी Backup/Restore तपासा.');}
-      catch(e){addIssue('err','Local data format error',k+' मध्ये JSON डेटा खराब/अपूर्ण आहे.','jsdelivr डेटा delete न करता Backup/Restore मधून सुरक्षित प्रत तपासा.');}
+      catch(e){addIssue('err','Local data format error',k+' मध्ये JSON डेटा खराब/अपूर्ण आहे.','डेटा delete न करता Backup/Restore मधून सुरक्षित प्रत तपासा.');}
     });
   }
   function checkDom(){
     var required=['mbSystemSection','mbListBody'];
     if(pageName()==='index.html') required=['mbSystemSection'];
-    required.forEach(function(id){if(!document.getElementById(id)) addIssue('err','Screen component missing','#'+id+' सापडले नाही.','हा भाग या पेजवर अपेक्षित आहे; कोड बदलण्यापूर्वी मूळ Final file तपासा.');} );
+    required.forEach(function(id){if(!document.getElementById(id)) addIssue('err','Screen component missing','#'+id+' सापडले नाही.','हा भाग या पेजवर अपेक्षित आहे; कोड बदलण्यापूर्वी मूळ Final file तपासा.');});
   }
   function checkErrors(){if(lastError)addIssue('err','JavaScript error',lastError.message,'Error location: '+lastError.location+'. त्या ठिकाणीच तपासणी करा; बाकी code बदलू नका.');}
   function checkPerformance(){var ms=Math.round(performance.now()-loadStart);if(ms>3000)addIssue('info','Page load slow',ms+' ms मध्ये पेज तयार झाले.','अनावश्यक refresh/animation टाळा. Smart Doctor data बदलत नाही.');else addIssue('ok','Speed check','Page ready time '+ms+' ms.','सध्या कोणतीही मोठी speed warning नाही.');}
