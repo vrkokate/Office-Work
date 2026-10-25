@@ -55,7 +55,7 @@ border: 2.5px solid transparent !important; background-size: 100% 100%, 300% 300
 .stat-num { font-size: 18px; font-weight: 700; color: #0d47a1; pointer-events: none; }
 .stat-label { font-size: 11px; color: #555; margin-top: 2px; pointer-events: none; }
 
-.filter-card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.filter-card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); position: relative; }
 .form-group { margin-bottom: 10px; text-align: left; }
 .form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 4px; }
 .form-control { width: 100%; padding: 8px 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 5px; outline: none; background: #fff; display: block; }
@@ -63,28 +63,27 @@ border: 2.5px solid transparent !important; background-size: 100% 100%, 300% 300
 
 .btn-report { width: 100%; background: #0d47a1; color: #fff; border: none; padding: 11px; font-size: 13.5px; font-weight: 800; border-radius: 6px; cursor: pointer; margin-top: 6px; letter-spacing: 0.5px; }
 
-/* 🌟 सर्च बारच्या बरोबर वरच्या कोपऱ्यापासून वरच्या दिशेने (Upwards) ओपन होणारी बॉक्स-रहित स्क्रोलिंग ब्लू नंबर्स यादी */
+/* 🌟 जुन्या स्क्रीनशॉटप्रमाणे फिल्टर कार्डच्या उजव्या बाजूला वरती असणारी स्क्रोलिंग ब्लू नंबर्स यादी[span_1](start_span)[span_1](end_span) */
 #smartSearchSuggestions {
     display: none;
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 100%;
-    margin-bottom: 4px;
+    top: 10px;
+    right: 14px;
     background: transparent;
     border: none;
-    max-height: 160px;
+    max-height: 180px;
     overflow-y: auto;
     z-index: 1000;
     box-shadow: none;
+    text-align: right;
 }
 .suggestion-item {
-    padding: 5px 8px;
+    padding: 4px 8px;
     font-size: 16px;
     cursor: pointer;
     color: #0d47a1;
     font-weight: 800;
-    text-align: left;
+    text-align: right;
     letter-spacing: 0.5px;
     background: transparent;
 }
@@ -289,6 +288,9 @@ body * { visibility: hidden !important; }
 </div>
 
 <div class="filter-card">
+<!-- 🌟 जुन्या स्क्रीनशॉटप्रमाणे फिल्टर कार्डच्या उजव्या बाजूला वरती असणारी स्क्रोलिंग ब्लू नंबर्स यादी[span_2](start_span)[span_2](end_span) -->
+<div id="smartSearchSuggestions"></div>
+
 <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
 <div class="form-row">
 <div class="form-group"><label>दिनांक पासून *</label><input type="date" class="form-control date-placeholder-input empty-date" id="repFromDate" onchange="checkDatePlaceholder(this)"></div>
@@ -311,11 +313,7 @@ body * { visibility: hidden !important; }
 
 <div class="form-group">
 <label>स्मार्ट शोध (M.B. क्र., नाव किंवा तपशील)</label>
-<!-- 🌟 स्वतंत्र रॅपपर (Wrapper Div) जो अचूकपणे सर्च बारच्या शेवटी आणि वरच्या दिशेने यादी दर्शवेल -->
-<div style="position: relative;">
-    <input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका" oninput="handleSmartSearchInput(this)">
-    <div id="smartSearchSuggestions"></div>
-</div>
+<input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका" oninput="handleSmartSearchInput(this)">
 </div>
 
 <div style="display:flex; gap:8px; width:100%; margin-top:6px;">
@@ -621,7 +619,7 @@ function closeCustomConfirm(isConfirmed) {
     expectedVerifyMB = null;
 }
 
-// 🌟 सर्च बारच्या बरोबर वरच्या दिशेने ओपन होणारी बॉक्स-रहित स्क्रोलिंग ब्लू नंबर्स यादी
+// 🌟 जुन्या स्क्रीनशॉटप्रमाणे फिल्टर कार्डच्या उजव्या बाजूला वरती असणारी स्क्रोलिंग ब्लू नंबर्स यादी[span_3](start_span)[span_3](end_span)
 function handleSmartSearchInput(input) {
     var query = (input.value || '').trim().toLowerCase();
     var box = document.getElementById('smartSearchSuggestions');
@@ -1489,7 +1487,7 @@ function deleteMB(idx) {
             list.splice(idx, 1);
             setData('mb_records', list);
             refreshAll();
-            showAlert('M.B. नोंद हटवली!', 'SUCCESS');
+            showAlert('M.B. नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
         }
     });
 }
@@ -2134,7 +2132,7 @@ function printWorkReport() {
     watchedKeys.forEach(function(k){
       var raw=localStorage.getItem(k); if(raw===null) return;
       try{var v=JSON.parse(raw); if(!Array.isArray(v) && typeof v!=='object') addIssue('err','डेटा रचना तपासा',k+' मध्ये अपेक्षित डेटा रचना नाही.','हा डेटा हाताने delete करू नका. आधी Backup/Restore तपासा.');}
-      catch(e){addIssue('err','Local data format error',k+' मध्ये JSON डेटा खराब/अपूर्ण आहे.','डेटा delete न करता Backup/Restore मधून सुरक्षित प्रत तपासा.');}
+      catch(e){addIssue('err','Local data format error',k+' मध्ये JSON डेटा खराब/अपूर्ण आहे.','jsdelivr delete न करता Backup/Restore मधून सुरक्षित प्रत तपासा.');}
     });
   }
   function checkDom(){
