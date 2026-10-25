@@ -251,7 +251,6 @@ body * { visibility: hidden !important; }
 
 <div id="sacSubActionContainer" style="display:none; background:#fff; border:1.5px solid #0d47a1; border-radius:8px; padding:10px; margin-top:8px;"></div>
 
-<!-- 🌟 History Container initially hidden until इतिहास button is clicked -->
 <div id="sacHistoryContainer" style="display:none; margin-top:10px; background:#fff; border:1px solid #ccc; border-radius:6px; padding:8px;">
     <div style="font-size:12px; font-weight:700; color:#333; margin-bottom:6px; border-bottom:1px solid #eee; padding-bottom:3px;">📜 M.B. Movement History</div>
     <div id="sacHistoryTableWrapper" style="max-height:180px; overflow-y:auto; overflow-x:auto;"></div>
@@ -292,7 +291,7 @@ body * { visibility: hidden !important; }
 <!-- M.B. नियंत्रण प्रणाली मुख्य डॅशबोर्ड -->
 <div id="mbSystemSection">
 <div class="top-header">
-<a href="index.html" class="btn-back-hub">🏠 मुखपृष्ठ</a>
+<a href="dashboard.html" class="btn-back-hub">🏠 मुखपृष्ठ</a>
 <h1>मोजमाप पुस्तिका नियंत्रण प्रणाली</h1>
 <p>सार्वजनिक बांधकाम विभाग</p>
 </div>
@@ -422,14 +421,29 @@ body * { visibility: hidden !important; }
 </div>
 </div></div>
 
-<!-- 4. Bill Reg. मोडल (दुरुस्त केलेला भाग) -->
+<!-- 4. Bill Reg. मोडल (सुधारित आणि पूर्ण बिल नोंदणी आणि यादीसह) -->
 <div id="billModal" class="modal-overlay"><div class="modal-card" style="max-width:480px;">
 <div class="modal-header"><h3 style="font-size: 14px; color:#f57c00;">📄 देयक नोंदवही (Bill Register)</h3><button class="btn-close" onclick="closeModule('billModal')">X</button></div>
-<button class="btn-report" style="background:#0d47a1; margin:0;" onclick="printMasterBillRegister()">📄 रिपोर्ट प्रिंट</button>
-<div class="bill-scroll-container" style="margin-top:10px; max-height:260px; overflow-y:auto;">
-    <div id="billListContainer">
-        <!-- येथे बिलांची यादी आपोआप लोड होईल -->
+
+<!-- 🌟 नवीन बिल नोंदणीसाठी बटण -->
+<button class="btn-report" style="background:#2e7d32; margin-top:0; margin-bottom:6px;" onclick="toggleBillForm()">➕ नवीन बिल नोंदवा</button>
+
+<!-- बिल नोंदणी फॉर्म (नवीन बिल जोडण्यासाठी) -->
+<div id="billFormContainer" style="display:none; background:#f8f9fa; border:1px solid #ddd; border-radius:6px; padding:10px; margin-bottom:10px;">
+    <input type="hidden" id="editBillIndex" value="-1">
+    <div class="form-group" style="margin-bottom:6px;"><label>बिल क्रमांक *</label><input type="text" class="form-control" id="billNoInput" placeholder="उदा. 2026/01"></div>
+    <div class="form-group" style="margin-bottom:6px;"><label>कंत्राटदार / एजन्सीचे नाव *</label><input type="text" class="form-control" id="billContractorInput" placeholder="कंत्राटदार नाव"></div>
+    <div class="form-group" style="margin-bottom:8px;"><label>रक्कम (₹) *</label><input type="number" class="form-control" id="billAmountInput" placeholder="रक्कम टाका"></div>
+    <div style="display:flex; gap:6px;">
+        <button class="btn-report" style="background:#2e7d32; margin:0; flex:1; padding:8px;" onclick="saveBillRecord()">Save Bill</button>
+        <button class="btn-report" style="background:#757575; margin:0; width:80px; padding:8px;" onclick="toggleBillForm()">रद्द करा</button>
     </div>
+</div>
+
+<button class="btn-report" style="background:#0d47a1; margin:0 0 8px 0;" onclick="printMasterBillRegister()">📄 रिपोर्ट प्रिंट</button>
+
+<div class="bill-scroll-container" style="max-height:220px; overflow-y:auto;">
+    <div id="billListContainer"></div>
 </div>
 </div></div>
 
@@ -553,7 +567,66 @@ function closeCustomConfirm(isConfirmed) {
     expectedVerifyMB = null;
 }
 
-// 🌟 बिल रजिस्टर डेटा लोड करणारे नवीन फंक्शन
+// 🌟 बिल रजिस्टर फॉर्म टॉगल आणि सेव्ह फंक्शन्स
+function toggleBillForm() {
+    var box = document.getElementById('billFormContainer');
+    if(!box) return;
+    if(box.style.display === 'none' || box.style.display === '') {
+        box.style.display = 'block';
+        document.getElementById('editBillIndex').value = '-1';
+        document.getElementById('billNoInput').value = '';
+        document.getElementById('billContractorInput').value = '';
+        document.getElementById('billAmountInput').value = '';
+    } else {
+        box.style.display = 'none';
+    }
+}
+
+function saveBillRecord() {
+    var bNo = document.getElementById('billNoInput').value.trim();
+    var contractor = document.getElementById('billContractorInput').value.trim();
+    var netPay = document.getElementById('billAmountInput').value.trim();
+    var idx = parseInt(document.getElementById('editBillIndex').value, 10);
+
+    if(!bNo || !contractor || !netPay) {
+        return showAlert('कृपया बिल क्रमांक, कंत्राटदार आणि रक्कम भरा.', 'WARNING');
+    }
+
+    var bills = getData('dmbms_bills');
+    if(idx === -1) {
+        bills.push({ billNo: bNo, contractor: contractor, netPay: netPay });
+    } else {
+        bills[idx] = { billNo: bNo, contractor: contractor, netPay: netPay };
+    }
+    setData('dmbms_bills', bills);
+    toggleBillForm();
+    refreshBillRegister();
+    showAlert('बिल यशस्वीरीत्या जतन झाले!', 'SUCCESS');
+}
+
+function deleteBillRecord(idx) {
+    showCustomConfirm("ही नोंद हटवायची का?", "हे बिल कायमचे डिलीट करायचे का?", null, "✅ DELETE", "#d32f2f", function(confirmed) {
+        if(confirmed) {
+            var bills = getData('dmbms_bills');
+            bills.splice(idx, 1);
+            setData('dmbms_bills', bills);
+            refreshBillRegister();
+            showAlert('बिल नोंद हटवली!', 'SUCCESS');
+        }
+    });
+}
+
+function editBillRecord(idx) {
+    var bills = getData('dmbms_bills');
+    var b = bills[idx];
+    if(!b) return;
+    document.getElementById('editBillIndex').value = idx;
+    document.getElementById('billNoInput').value = b.billNo || '';
+    document.getElementById('billContractorInput').value = b.contractor || '';
+    document.getElementById('billAmountInput').value = b.netPay || '';
+    document.getElementById('billFormContainer').style.display = 'block';
+}
+
 function refreshBillRegister() {
     var container = document.getElementById('billListContainer');
     if (!container) return;
@@ -567,6 +640,7 @@ function refreshBillRegister() {
     '<th>बिल क्र.</th>' +
     '<th>कंत्राटदार / एजन्सी</th>' +
     '<th>रक्कम</th>' +
+    '<th style="text-align:center;">कृती</th>' +
     '</tr></thead><tbody>';
     
     bills.forEach(function(b, idx) {
@@ -578,6 +652,10 @@ function refreshBillRegister() {
         '<td>' + escapeHtml(bNo) + '</td>' +
         '<td>' + escapeHtml(contractor) + '</td>' +
         '<td>' + escapeHtml(amount) + '</td>' +
+        '<td class="action-cell" style="text-align:center;">' +
+        '<button class="btn-action" style="background:#2e7d32; padding:2px 5px;" onclick="editBillRecord(' + idx + ')">Edit</button> ' +
+        '<button class="btn-action" style="background:#d32f2f; padding:2px 5px;" onclick="deleteBillRecord(' + idx + ')">Delete</button>' +
+        '</td>' +
         '</tr>';
     });
     html += '</tbody></table>';
@@ -591,7 +669,7 @@ function openModule(id) {
         if(id === 'workModal') {
             refreshWorkList();
         } else if(id === 'billModal') {
-            refreshBillRegister(); // 🌟 बिल रजिस्टर मॉडेल उघडताच डेटा लोड होईल
+            refreshBillRegister();
         }
     }
 }
