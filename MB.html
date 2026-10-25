@@ -288,9 +288,6 @@ body * { visibility: hidden !important; }
 </div>
 
 <div class="filter-card">
-<!-- 🌟 जुन्या स्क्रीनशॉटप्रमाणे फिल्टर कार्डच्या उजव्या बाजूला वरती असणारी स्क्रोलिंग ब्लू नंबर्स यादी[span_2](start_span)[span_2](end_span) -->
-<div id="smartSearchSuggestions"></div>
-
 <h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
 <div class="form-row">
 <div class="form-group"><label>दिनांक पासून *</label><input type="date" class="form-control date-placeholder-input empty-date" id="repFromDate" onchange="checkDatePlaceholder(this)"></div>
@@ -619,7 +616,15 @@ function closeCustomConfirm(isConfirmed) {
     expectedVerifyMB = null;
 }
 
-// 🌟 जुन्या स्क्रीनशॉटप्रमाणे फिल्टर कार्डच्या उजव्या बाजूला वरती असणारी स्क्रोलिंग ब्लू नंबर्स यादी[span_3](start_span)[span_3](end_span)
+function getMBDisplayHolder(status, isAvail) {
+    if (isAvail) return 'कार्यालय';
+    if (status && (status.detail || status.source)) {
+        return status.detail || status.source;
+    }
+    return '-';
+}
+
+// 🌟 जुन्या स्क्रीनशॉटप्रमाणे फिल्टर कार्डच्या उजव्या बाजूला वरती असणारी स्क्रोलिंग ब्लू नंबर्स यादी[span_2](start_span)[span_2](end_span)
 function handleSmartSearchInput(input) {
     var query = (input.value || '').trim().toLowerCase();
     var box = document.getElementById('smartSearchSuggestions');
@@ -2132,7 +2137,7 @@ function printWorkReport() {
     watchedKeys.forEach(function(k){
       var raw=localStorage.getItem(k); if(raw===null) return;
       try{var v=JSON.parse(raw); if(!Array.isArray(v) && typeof v!=='object') addIssue('err','डेटा रचना तपासा',k+' मध्ये अपेक्षित डेटा रचना नाही.','हा डेटा हाताने delete करू नका. आधी Backup/Restore तपासा.');}
-      catch(e){addIssue('err','Local data format error',k+' मध्ये JSON डेटा खराब/अपूर्ण आहे.','jsdelivr delete न करता Backup/Restore मधून सुरक्षित प्रत तपासा.');}
+      catch(e){addIssue('err','Local data format error',k+' मध्ये JSON डेटा खराब/अपूर्ण आहे.','डेटा delete न करता Backup/Restore मधून सुरक्षित प्रत तपासा.');}
     });
   }
   function checkDom(){
