@@ -43,7 +43,7 @@ border: none !important; border-radius: 8px; text-align: center; padding: 11px 4
 
 .btn-report { width: 100%; background: #0d47a1; color: #fff; border: none; padding: 11px; font-size: 13.5px; font-weight: 800; border-radius: 6px; cursor: pointer; margin-top: 6px; letter-spacing: 0.5px; }
 
-/* 🌟 ब्लू बॉर्डर स्क्रोल करण्यायोग्य स्मार्ट शोध यादीसाठी डिझाईन */
+/* 🌟 जुन्या स्क्रीनशॉटप्रमाणे फक्त ब्लू रंगाचे M.B. क्रमांक आणि स्क्रोलिंग यादी */
 #smartSearchSuggestions {
     display: none;
     position: absolute;
@@ -53,18 +53,19 @@ border: none !important; border-radius: 8px; text-align: center; padding: 11px 4
     background: #fff;
     border: 2px solid #0d47a1;
     border-radius: 6px;
-    max-height: 180px;
+    max-height: 160px;
     overflow-y: auto;
     z-index: 1000;
     box-shadow: 0 4px 12px rgba(13, 71, 161, 0.2);
 }
 .suggestion-item {
     padding: 8px 12px;
-    font-size: 12.5px;
-    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    border-bottom: 1px solid #f0f0f0;
     cursor: pointer;
     color: #0d47a1;
-    font-weight: 600;
+    font-weight: 800;
+    text-align: center;
 }
 .suggestion-item:hover {
     background: #e3f2fd;
@@ -290,7 +291,7 @@ body * { visibility: hidden !important; }
 <div class="form-group" style="position: relative;">
 <label>स्मार्ट शोध (M.B. क्र., नाव किंवा तपशील)</label>
 <input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका" oninput="handleSmartSearchInput(this)">
-<!-- 🌟 रिअल-टाइम स्क्रोल करण्यायोग्य ब्लू बॉर्डर यादी कन्टेनर -->
+<!-- 🌟 जुन्या डिझाईनप्रमाणे फक्त ब्लू रंगाचे M.B. क्रमांक आणि स्क्रोलिंग यादी -->
 <div id="smartSearchSuggestions"></div>
 </div>
 
@@ -591,7 +592,7 @@ function closeCustomConfirm(isConfirmed) {
     expectedVerifyMB = null;
 }
 
-// 🌟 स्मार्ट शोध रिअल-टाइम ऑटो-सजेस्ट फंक्शन (ब्लू बॉर्डर स्क्रोल यादी)
+// 🌟 जुन्या डिझाईनप्रमाणे फक्त ब्लू रंगाचे M.B. क्रमांक दाखवणारे रिअल-टाइम फंक्शन
 function handleSmartSearchInput(input) {
     var query = (input.value || '').trim().toLowerCase();
     var box = document.getElementById('smartSearchSuggestions');
@@ -609,11 +610,9 @@ function handleSmartSearchInput(input) {
 
     allMBs.forEach(function(m) {
         var no = (m.mbNumber || '').trim();
-        var det = (m.receivedDetail || '').trim();
-        var src = (m.receivedSource || '').trim();
-        if ((no.toLowerCase().includes(query) || det.toLowerCase().includes(query) || src.toLowerCase().includes(query)) && !seen[no]) {
+        if (no.toLowerCase().includes(query) && !seen[no]) {
             seen[no] = true;
-            matches.push(m);
+            matches.push(no);
         }
     });
 
@@ -624,9 +623,8 @@ function handleSmartSearchInput(input) {
     }
 
     var html = '';
-    matches.forEach(function(m) {
-        var displayTxt = 'M.B. क्र: <strong>' + m.mbNumber + '</strong> (' + (m.size || 'लहान') + ') - ' + (m.receivedDetail || m.receivedSource || '');
-        html += '<div class="suggestion-item" onclick="selectSuggestionItem(\'' + m.mbNumber + '\')">' + displayTxt + '</div>';
+    matches.forEach(function(mbNo) {
+        html += '<div class="suggestion-item" onclick="selectSuggestionItem(\'' + mbNo + '\')">' + mbNo + '</div>';
     });
 
     box.innerHTML = html;
@@ -1573,46 +1571,6 @@ function showSmartSearchResultModal(query) {
 
 function closeSearchResultModal() {
     document.getElementById('searchResultModal').style.display = 'none';
-}
-
-function formatTransactionSentence(h) {
-    if (!h) return 'अद्याप नोंद झालेली नाही.';
-    var act = (h.actionType || '').trim();
-    var detail = (h.receivedDetail || '').trim();
-    var from = (h.receivedFrom || '').trim();
-    var src = (h.receivedSource || '').trim();
-
-    function cleanName(n) {
-        if (!n) return '';
-        var c = n.replace(/^श्री.?\s*/i, '').replace(/रावसाहेब/g, '').trim();
-        return 'श्री ' + c + ' रावसाहेब';
-    }
-
-    if (act === 'मिळालेली M.B.' || act === 'मिळालेली एमबी') {
-        if (src.includes('कार्यालयात जमा') || from.includes('कार्यालयात जमा')) {
-            return 'ही M.B. उपलब्ध आहे.';
-        }
-        if (detail) return 'ही M.B. JE ' + cleanName(detail) + ' यांच्याकडून मिळाली.';
-        return 'ही M.B. कार्यालयात जमा झाली.';
-    }
-    if (act === 'दिलेली M.B.' || act === 'दिलेली एमबी') {
-        if (detail) return 'ही M.B. JE ' + cleanName(detail) + ' यांना दिली.';
-        return 'ही M.B. संबंधित अधिकाऱ्यांना देण्यात आली.';
-    }
-    return from || detail || 'अद्याप नोंद झालेली नाही.';
-}
-
-function getMBDisplayHolder(statusObj, isAvailable) {
-    if (isAvailable) return 'उपलब्ध';
-    var raw = (statusObj && (statusObj.detail || statusObj.source || statusObj.receivedFrom) || '').toString().trim();
-    raw = raw.replace(/^श्री\.?\s*/i, '').trim();
-    raw = raw.replace(/^JE\s*\(?/i, '').replace(/\)?$/,'').trim();
-    raw = raw.replace(/^कनिष्ठ अभियंता\s*[:：-]?\s*/,'').trim();
-    raw = raw.replace(/^विभागीय कार्यालय\s*[:：-]?\s*/,'').trim();
-    raw = raw.replace(/^कार्यालय\s*[:：-]?\s*/,'').trim();
-    raw = raw.replace(/^Store\s*[:：-]?\s*/i,'').replace(/^Office\s*[:：-]?\s*/i,'').trim();
-    if (!raw || raw === 'संबंधित') return 'संबंधित धारक';
-    return raw;
 }
 
 function openSmartActionCenter(mbNo) {
