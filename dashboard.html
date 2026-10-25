@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#020617">
+<title>Dashboard — वेतन व फरक प्रणाली</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background: #020617;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #ffffff;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0,243,255,0.3);
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.logout-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.panel {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(0,243,255,0.2);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  background: rgba(0, 243, 255, 0.1);
+  color: #00f3ff;
+  border-bottom: 1px solid rgba(0,243,255,0.2);
+  padding: 12px;
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h2 id="welcomeTitle" style="color: #00f3ff; margin: 0;">Dashboard</h2>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <!-- ऍडमिनसाठी स्वतंत्र ऍक्टिव्हिटी लॉग टॅब -->
+    <div id="adminPanel" style="display: none;" class="panel">
+      <h3 style="color: #38bdf8; margin-bottom: 10px;"><i class="fa-solid fa-list-check"></i> युजर ऍक्टिव्हिटी लॉग (User Activity Logs)</h3>
+      <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">इथे सर्व युजरच्या हालचाली आणि लॉगिन रेकॉर्ड्स दिसतील:</p>
+      
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>अ.क्र.</th>
+              <th>युजरनेम</th>
+              <th>केलेली कृती (Action)</th>
+              <th>वेळ व तारीख</th>
+            </tr>
+          </thead>
+          <tbody id="logTableBody">
+            <!-- JavaScript द्वारे रेकॉर्ड्स येथे लोड होतील -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- साधारण युजर डॅशबोर्ड -->
+    <div id="userPanel" style="display: none;" class="panel">
+      <h3 style="color: #00f3ff;">वेतन व फरक प्रणाली</h3>
+      <p>स्वागत आहे! तुम्ही यशस्वीरित्या युजर लॉगिन केले आहे. येथून तुम्ही तुमचे वेतन आणि फरक कॅल्क्युलेट करू शकता.</p>
+    </div>
+  </div>
+
+  <script>
+    // पेज उघडताच सिक्युरिटी चेक (लॉगिन केल्याशिवाय डॅशबोर्ड पाहता येणार नाही)
+    window.onload = function() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const role = localStorage.getItem('userRole');
+      const username = localStorage.getItem('currentUser');
+
+      if (isLoggedIn !== 'true') {
+        // जर लॉगिन नसेल तर थेट लॉगिन पेजवर पाठवा
+        window.location.href = 'loginpage.html';
+        return;
+      }
+
+      // रोलनुसार पॅनल दाखवणे
+      if (role === 'admin') {
+        document.getElementById('welcomeTitle').innerText = 'Welcome Admin: ' + username;
+        document.getElementById('adminPanel').style.display = 'block';
+        loadActivityLogs();
+      } else {
+        document.getElementById('welcomeTitle').innerText = 'Welcome User: ' + username;
+        document.getElementById('userPanel').style.display = 'block';
+      }
+    };
+
+    function loadActivityLogs() {
+      const tbody = document.getElementById('logTableBody');
+      const logs = JSON.parse(localStorage.getItem('user_activities')) || [];
+      
+      if (logs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8;">कोणतेही रेकॉर्ड उपलब्ध नाही.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = logs.map((log, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td style="color: #38bdf8; font-weight: bold;">${log.username}</td>
+          <td>${log.action}</td>
+          <td style="color: #94a3b8; font-size: 13px;">${log.time}</td>
+        </tr>
+      `).join('');
+    }
+
+    function logout() {
+      // सर्व सेशन डेटा साफ करून लॉगिन पेजवर पाठवा
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('userRole');
+      window.location.href = 'loginpage.html';
+    }
+  </script>
+</body>
+</html>
