@@ -25,6 +25,8 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>Digital Hub & M.B. System</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
@@ -169,7 +171,6 @@ body * { visibility: hidden !important; }
 </div>
 </div>
 
-<!-- M.B. नियंत्रण प्रणाली मुख्य डॅशबोर्ड -->
 <div id="mbSystemSection">
 <div class="top-header">
 <a href="dashboard.html" class="btn-back-hub">🏠 मुखपृष्ठ</a>
@@ -186,36 +187,25 @@ body * { visibility: hidden !important; }
 <a href="DataManager.html" class="action-btn btn-settings"><span>⚙</span>Data Manager</a>
 </div>
 
-<div class="container">
-<div class="summary-box">
-<div class="summary-title">📖 मोजमाप पुस्तिका (M.B.) स्थिती</div>
-<div class="card-grid">
-<div class="stat-card"><div class="stat-num" id="countReceivedMB">0</div><div class="stat-label">एकूण M.B.</div></div>
-<div class="stat-card"><div class="stat-num" id="countGivenMB">0</div><div class="stat-label">दिलेली M.B.</div></div>
-<div class="stat-card"><div class="stat-num" id="countAvailableMB">0</div><div class="stat-label">उपलब्ध M.B.</div></div>
-</div>
-</div>
-</div>
-
-<!-- 4. Bill Reg. मोडल (स्क्रीनशॉट्सनुसार 4-Cards + 3-Step Wizard) -->
+<!-- 4. Bill Reg. मोडल (स्क्रीनशॉट 1000394872.jpg नुसार अचूक ४ समरी कार्ड्स, नारिंगी व निळे बटण) -->
 <div id="billModal" class="modal-overlay" style="display:flex;"><div class="modal-card" style="max-width:480px;">
 <div class="modal-header">
     <h3 style="font-size: 15px; color:#f57c00; font-weight:800;">📄 देयक नोंदवही (Bill Register)</h3>
     <a href="dashboard.html" class="btn-close" style="background:#e53935; color:#fff; text-decoration:none; padding:4px 10px; border-radius:4px; font-weight:bold;">X</a>
 </div>
 
-<!-- ४ समरी कार्ड्स (Screenshots 1000394872.jpg नुसार) -->
-<div class="summary-grid" style="margin-bottom:10px;">
-    <div class="sum-card-clickable" onclick="openDetailPopup('TOTAL_BILLS')"><div class="label">Total Bills</div><div class="val" id="sumTotalBills">0</div></div>
-    <div class="sum-card-clickable" onclick="openDetailPopup('TOTAL_AMOUNT')"><div class="label">Total Amount</div><div class="val" id="sumTotalAmount">₹ 0</div></div>
-    <div class="sum-card-clickable" onclick="openDetailPopup('TOTAL_DEDUCTION')"><div class="label">Total Deduction</div><div class="val" id="sumTotalDed" style="color:#d32f2f;">₹ 0</div></div>
-    <div class="summary-card net sum-card-clickable" onclick="openDetailPopup('NET_PAYABLE')"><div class="label">Net Payable</div><div class="val" id="sumNetPay" style="color:#16a34a;">₹ 0</div></div>
+<!-- ४ समरी कार्ड्स -->
+<div class="summary-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom:10px;">
+    <div class="sum-card-clickable" onclick="openDetailPopup('TOTAL_BILLS')"><div class="label" style="font-size:11px; color:#666;">Total Bills</div><div class="val" style="font-size:16px; font-weight:700; color:#0d47a1;" id="sumTotalBills">0</div></div>
+    <div class="sum-card-clickable" onclick="openDetailPopup('TOTAL_AMOUNT')"><div class="label" style="font-size:11px; color:#666;">Total Amount</div><div class="val" style="font-size:16px; font-weight:700; color:#0d47a1;" id="sumTotalAmount">₹ 0</div></div>
+    <div class="sum-card-clickable" onclick="openDetailPopup('TOTAL_DEDUCTION')"><div class="label" style="font-size:11px; color:#666;">Total Deduction</div><div class="val" style="font-size:16px; font-weight:700; color:#d32f2f;" id="sumTotalDed">₹ 0</div></div>
+    <div class="sum-card-clickable net" onclick="openDetailPopup('NET_PAYABLE')"><div class="label" style="font-size:11px; color:#666;">Net Payable</div><div class="val" style="font-size:16px; font-weight:700; color:#16a34a;" id="sumNetPay">₹ 0</div></div>
 </div>
 
-<!-- २ मुख्य बटन्स -->
+<!-- २ मुख्य बटन्स (नारिंगी व निळे) -->
 <div style="display: flex; gap: 8px; margin-bottom: 12px;">
     <button type="button" class="btn-report" style="background:#f97316; margin:0; flex:1;" onclick="openWizard(1)"><i class="fa-solid fa-plus"></i> नवीन देयक नोंदवा</button>
-    <button type="button" class="btn-report" style="background:#1d4ed8; margin:0; flex:1;" onclick="printMasterBillRegister()">🖨️ प्रिंट / पीडीएफ रिपोर्ट</button>
+    <button type="button" class="btn-report" style="background:#1d4ed8; margin:0; flex:1;" onclick="printMasterBillReport()">🖨️ प्रिंट / पीडीएफ रिपोर्ट</button>
 </div>
 
 <div class="bill-scroll-container">
@@ -227,7 +217,7 @@ body * { visibility: hidden !important; }
 
 </div>
 
-<!-- ==================== ३-स्टेप्स विझार्ड मॉडेल ==================== -->
+<!-- ==================== ३-स्टेप्स विझार्ड मॉडेल (Screenshots 1000408535, 36, 37 नुसार) ==================== -->
 <div id="wizardModal" class="wizard-overlay">
     <div class="wizard-card">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f97316; padding-bottom:8px; margin-bottom:12px;">
@@ -237,40 +227,42 @@ body * { visibility: hidden !important; }
 
         <input type="hidden" id="editBillIndex" value="-1">
 
-        <!-- स्टेप्स इंडिकेटर (1, 2, 3 वर्तुळे) -->
+        <!-- स्टेप्स इंडिकेटर (1, 2, 3) -->
         <div class="steps-indicator">
             <div class="step-circle active" id="dot1">1</div>
             <div class="step-circle" id="dot2">2</div>
             <div class="step-circle" id="dot3">3</div>
         </div>
 
-        <!-- स्टेप १: मुख्य माहिती (Screen 1000408535.jpg नुसार) -->
+        <!-- स्टेप १: मुख्य माहिती -->
         <div class="wizard-step" id="step1">
-            <div class="form-group"><label>संबंधित कनिष्ठ अभियंता (JE) *[span_5](start_span)[span_5](end_span)</label><select class="form-control" id="wJeSelect" onchange="onWizardJEChange()"><option value="">-- JE निवडा --[span_6](start_span)[span_6](end_span)</option></select></div>
-            <div class="form-group"><label>वाटप केलेली M.B. क्रमांक *[span_7](start_span)[span_7](end_span)</label><select class="form-control" id="wMbSelect" onchange="onWizardMBChange()"><option value="">-- आधी JE निवडा --[span_8](start_span)[span_8](end_span)</option></select></div>
+            <div class="form-group"><label>संबंधित कनिष्ठ अभियंता (JE) *[span_2](start_span)[span_2](end_span)</label><select class="form-control" id="wJeSelect" onchange="onWizardJEChange()"><option value="">-- JE निवडा --[span_3](start_span)[span_3](end_span)</option></select></div>
+            <div class="form-group"><label>वाटप केलेली M.B. क्रमांक *[span_4](start_span)[span_4](end_span)</label><select class="form-control" id="wMbSelect" onchange="onWizardMBChange()"><option value="">-- आधी JE निवडा --[span_5](start_span)[span_5](end_span)</option></select></div>
             <div class="form-group"><label>कंत्राटदार / एजन्सी चे नाव</label><input type="text" class="form-control" id="wContractor" placeholder="कंत्राटदार नाव" readonly style="background:#f2f2f2;"></div>
             <div class="form-group"><label>संबंधित कामाचे नाव</label><input type="text" class="form-control" id="wWorkName" placeholder="कामाचे नाव" readonly style="background:#f2f2f2;"></div>
-            <div class="form-group"><label>बिलाचा प्रकार निवडा *[span_9](start_span)[span_9](end_span)</label><select class="form-control" id="wBillType"><option value="">-- बिलाचा प्रकार निवडा --[span_10](start_span)[span_10](end_span)</option><option value="First RA Bill">First RA Bill[span_11](start_span)[span_11](end_span)</option><option value="Running Bill">Running Bill</option><option value="Final Bill">Final Bill</option></select></div>
-            <div class="form-group"><label>बिलाचा दिनांक *[span_12](start_span)[span_12](end_span)</label><input type="date" class="form-control" id="wBillDate"></div>
+            <div class="form-group"><label>बिलाचा प्रकार निवडा *[span_6](start_span)[span_6](end_span)</label><select class="form-control" id="wBillType"><option value="">-- बिलाचा प्रकार निवडा --[span_7](start_span)[span_7](end_span)</option><option value="First RA Bill">First RA Bill[span_8](start_span)[span_8](end_span)</option><option value="Running Bill">Running Bill</option><option value="Final Bill">Final Bill</option></select></div>
+            <div class="form-group"><label>बिलाचा दिनांक *[span_9](start_span)[span_9](end_span)</label><input type="date" class="form-control" id="wBillDate"></div>
             <div class="wizard-buttons">
                 <button class="btn-wizard btn-next" onclick="goToStep(2)">पुढील ➔</button>
             </div>
         </div>
 
-        <!-- स्टेप २: कपात व हिशोब (Screen 1000408536.jpg नुसार) -->
+        <!-- स्टेप २: कपात व हिशोब -->
         <div class="wizard-step hidden" id="step2">
-            <h4 style="font-size:13px; color:#c2410c; margin-bottom:8px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">Deduction (कपात तपशील)[span_13](start_span)[span_13](end_span)</h4>
-            <div class="form-group"><label>Passed Amount (पास रक्कम) ₹ *[span_14](start_span)[span_14](end_span)</label><input type="number" class="form-control" id="wPassedAmt" placeholder="उदा. 1000000" oninput="autoCalculateDeductions()"></div>
-            <div class="form-group"><label>Maintenance[span_15](start_span)[span_15](end_span)</label><input type="number" class="form-control calc-ded" id="dedMaint" value="0" oninput="updateDeductionTotals()"></div>
-            <div class="form-group"><label>Royalty Charges[span_16](start_span)[span_16](end_span)</label><input type="number" class="form-control calc-ded" id="dedRoyalty" value="0" oninput="updateDeductionTotals()"></div>
-            <div class="form-group"><label>Govt. Ins. Scheme[span_17](start_span)[span_17](end_span)</label><input type="number" class="form-control calc-ded" id="dedGovt" value="0" oninput="updateDeductionTotals()"></div>
-            <div class="form-group"><label>Upkar (W.C.)[span_18](start_span)[span_18](end_span)</label><input type="number" class="form-control calc-ded" id="dedUpkar" value="0" oninput="updateDeductionTotals()"></div>
-            <div class="form-group"><label>CGST 1%[span_19](start_span)[span_19](end_span)</label><input type="number" class="form-control calc-ded" id="dedCGST" value="0" oninput="updateDeductionTotals()"></div>
-            <div class="form-group"><label>SGST 1%[span_20](start_span)[span_20](end_span)</label><input type="number" class="form-control calc-ded" id="dedSGST" value="0" oninput="updateDeductionTotals()"></div>
+            <h4 style="font-size:13px; color:#c2410c; margin-bottom:8px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">Deduction (कपात तपशील)[span_10](start_span)[span_10](end_span)</h4>
+            <div class="form-group"><label>Passed Amount (पास रक्कम) ₹ *[span_11](start_span)[span_11](end_span)</label><input type="number" class="form-control" id="wPassedAmt" placeholder="उदा. 1000000" oninput="autoCalculateDeductions()"></div>
+            <div class="form-group"><label>Income Tax 2%[span_12](start_span)[span_12](end_span)</label><input type="number" class="form-control calc-ded" id="dedIT" value="0" oninput="updateDeductionTotals()"></div>
+            <div class="form-group"><label>Security Deposit 0.5%[span_13](start_span)[span_13](end_span)</label><input type="number" class="form-control calc-ded" id="dedSD" value="0" oninput="updateDeductionTotals()"></div>
+            <div class="form-group"><label>Maintenance 0.5%[span_14](start_span)[span_14](end_span)</label><input type="number" class="form-control calc-ded" id="dedMaint" value="0" oninput="updateDeductionTotals()"></div>
+            <div class="form-group"><label>Royalty Charges 1%[span_15](start_span)[span_15](end_span)</label><input type="number" class="form-control calc-ded" id="dedRoyalty" value="0" oninput="updateDeductionTotals()"></div>
+            <div class="form-group"><label>Govt. Ins. Scheme 1%[span_16](start_span)[span_16](end_span)</label><input type="number" class="form-control calc-ded" id="dedGovt" value="0" oninput="updateDeductionTotals()"></div>
+            <div class="form-group"><label>Upkar (W.C.) 1%[span_17](start_span)[span_17](end_span)</label><input type="number" class="form-control calc-ded" id="dedUpkar" value="0" oninput="updateDeductionTotals()"></div>
+            <div class="form-group"><label>CGST 1%[span_18](start_span)[span_18](end_span)</label><input type="number" class="form-control calc-ded" id="dedCGST" value="0" oninput="updateDeductionTotals()"></div>
+            <div class="form-group"><label>SGST 1%[span_19](start_span)[span_19](end_span)</label><input type="number" class="form-control calc-ded" id="dedSGST" value="0" oninput="updateDeductionTotals()"></div>
 
             <div style="background:#fff3e0; border:1px solid #ffb74d; border-radius:6px; padding:8px; font-size:12px; margin:8px 0; font-weight:bold;">
-                <div>एकूण कपात (Total Deduction): ₹ <span id="wLblTotalDed" style="color:#d32f2f;">0</span>[span_21](start_span)[span_21](end_span)</div>
-                <div style="color:#16a34a; margin-top:2px;">प्रत्यक्षात देय रक्कम (Net Payable): ₹ <span id="wLblNetPay">0</span>[span_22](start_span)[span_22](end_span)</div>
+                <div>एकूण कपात (Total Deduction): ₹ <span id="wLblTotalDed" style="color:#d32f2f;">0</span>[span_20](start_span)[span_20](end_span)</div>
+                <div style="color:#16a34a; margin-top:2px;">प्रत्यक्षात देय रक्कम (Net Payable): ₹ <span id="wLblNetPay">0</span>[span_21](start_span)[span_21](end_span)</div>
             </div>
             <div class="wizard-buttons">
                 <button class="btn-wizard btn-back" onclick="goToStep(1)">⬅ मागे</button>
@@ -278,7 +270,7 @@ body * { visibility: hidden !important; }
             </div>
         </div>
 
-        <!-- स्टेप ३: पूर्वावलोकन (Screen 1000408537.jpg नुसार) -->
+        <!-- स्टेप ३: पूर्वावलोकन -->
         <div class="wizard-step hidden" id="step3">
             <h4 style="font-size:13px; color:#c2410c; margin-bottom:8px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">नोंद तपासा आणि जतन करा</h4>
             <div class="preview-box" id="previewContent"></div>
@@ -289,18 +281,6 @@ body * { visibility: hidden !important; }
         </div>
     </div>
 </div>
-
-<!-- तपशील पॉप-अप -->
-<div id="detailModal" class="modal-overlay"><div class="modal-box" style="max-width:95vw; width:450px;">
-<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:6px; margin-bottom:10px;">
-<h3 id="detailModalTitle" style="font-size:14px; color:#0d47a1;">तपशील</h3>
-<button class="btn-close" onclick="closeDetailPopup()">X</button>
-</div>
-<div class="table-scroll" id="detailModalBody" style="max-height:260px;"></div>
-<button type="button" class="btn-report" style="background:#0d47a1; margin-top:12px;" onclick="printDetailModalReport()">📄 REPORT / PRINT</button>
-</div></div>
-
-<div id="printableArea"></div>
 
 <script src="common.js"></script>
 <script>
@@ -335,7 +315,7 @@ function refreshBillDashboard() {
     } else {
         listHTML = '<table class="data-table"><thead><tr>' +
         '<th>अ.क्र.</th><th>बिल क्र.</th><th>कंत्राटदार</th><th>कामाचे नाव</th><th>JE</th><th>M.B.</th><th>बिल प्रकार</th><th>दिनांक</th>' +
-        '<th style="text-align:right;">पास रक्कम (₹)</th><th style="text-align:right;">कपात (₹)</th><th style="text-align:right;">नेट रक्कम (₹)</th>' +
+        '<th style="text-align:right;">पास रक्कम</th><th style="text-align:right;">कपात</th><th style="text-align:right;">निव्वळ रक्कम</th>' +
         '<th style="text-align:center;">Action</th>' +
         '</tr></thead><tbody>';
 
@@ -355,7 +335,7 @@ function refreshBillDashboard() {
             '<td>' + (b.billType || '-') + '</td>' +
             '<td>' + (b.date ? formatDateToDMY(b.date) : '-') + '</td>' +
             '<td style="text-align:right;">₹ ' + passedAmt.toLocaleString('en-IN') + '</td>' +
-            '<td style="text-align:right; color:#d32f2f; font-weight:700; cursor:pointer;" onclick="openBillDeductionDetail(' + actualIdx + ')">₹ ' + totalDed.toLocaleString('en-IN') + '</td>' +
+            '<td style="text-align:right; color:#d32f2f; font-weight:700;">₹ ' + totalDed.toLocaleString('en-IN') + '</td>' +
             '<td style="text-align:right; color:#16a34a; font-weight:700;">₹ ' + netPay.toLocaleString('en-IN') + '</td>' +
             '<td class="action-cell" style="text-align:center; white-space:nowrap;">' +
             '<button type="button" class="btn-action" style="background:#2e7d32; padding:3px 6px;" onclick="editBill(' + actualIdx + ')">Edit</button> ' +
@@ -369,120 +349,14 @@ function refreshBillDashboard() {
     if(container) container.innerHTML = listHTML;
 }
 
-function openBillDeductionDetail(idx) {
-    var b = getData('dmbms_bills')[idx];
-    if(!b) return;
-    var d = b.deductions || {};
-
-    var title = "कपात तपशील (बिल क्र: " + (b.billNo || '-') + " | कंत्राटदार: " + (b.contractor || '-') + ")";
-    var tableHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>कपात बाब (Deduction Item)</th><th style="text-align:right;">रक्कम (₹)</th></tr></thead><tbody>';
-
-    var items = [
-        {name: "Maintenance[span_23](start_span)[span_23](end_span)", val: parseFloat(d.Maint) || 0},
-        {name: "Royalty Charges[span_24](start_span)[span_24](end_span)", val: parseFloat(d.Royalty) || 0},
-        {name: "Govt. Ins. Scheme[span_25](start_span)[span_25](end_span)", val: parseFloat(d.Govt) || 0},
-        {name: "Upkar (W.C.)[span_26](start_span)[span_26](end_span)", val: parseFloat(d.Upkar) || 0},
-        {name: "CGST 1%[span_27](start_span)[span_27](end_span)", val: parseFloat(d.CGST) || 0},
-        {name: "SGST 1%[span_28](start_span)[span_28](end_span)", val: parseFloat(d.SGST) || 0}
-    ];
-
-    var sum = 0, count = 1;
-    items.forEach(function(item) {
-        sum += item.val;
-        tableHTML += '<tr><td style="text-align:center;">' + count++ + '</td><td>' + item.name + '</td><td style="text-align:right;">₹ ' + item.val.toLocaleString('en-IN') + '</td></tr>';
-    });
-
-    tableHTML += '<tr style="font-weight:750; background:#f5f5f5;"><td colspan="2" style="text-align:right;">एकूण कपात (Total Deduction)[span_29](start_span)[span_29](end_span):</td><td style="text-align:right; color:#d32f2f;">₹ ' + sum.toLocaleString('en-IN') + '</td></tr></tbody></table>';
-
-    document.getElementById('detailModalTitle').innerText = title;
-    document.getElementById('detailModalBody').innerHTML = tableHTML;
-    document.getElementById('detailModal').style.display = 'flex';
-}
-
-function openDetailPopup(type) {
-    var bills = getData('dmbms_bills');
-    var title = "";
-    var tableHTML = "";
-
-    if (bills.length === 0) {
-        title = "तपशील";
-        tableHTML = '<p style="text-align:center; padding:15px; color:#666;">कोणतीही देयक नोंद उपलब्ध नाही.</p>';
-    } else {
-        if (type === 'TOTAL_BILLS') {
-            title = "एकूण बिले तपशील (Total Bills)";
-            tableHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>बिल क्र.</th><th>कंत्राटदार</th><th>कामाचे नाव</th><th>बिल प्रकार</th><th style="text-align:right;">रक्कम (₹)</th></tr></thead><tbody>';
-            var sumAmt = 0;
-            bills.forEach(function(b, i) {
-                var amt = parseFloat(b.passedAmt) || 0;
-                sumAmt += amt;
-                tableHTML += '<tr><td>' + (i+1) + '</td><td>' + (b.billNo || '-') + '</td><td>' + (b.contractor || '-') + '</td><td>' + (b.workName || '-') + '</td><td>' + (b.billType || '-') + '</td><td style="text-align:right;">₹ ' + amt.toLocaleString('en-IN') + '</td></tr>';
-            });
-            tableHTML += '<tr style="font-weight:700; background:#f5f5f5;"><td colspan="5" style="text-align:right;">एकूण बिले: ' + bills.length + '</td><td style="text-align:right;">₹ ' + sumAmt.toLocaleString('en-IN') + '</td></tr></tbody></table>';
-        } else if (type === 'TOTAL_AMOUNT') {
-            title = "एकूण रक्कम तपशील (Total Amount)";
-            tableHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>बिल क्र.</th><th>कंत्राटदार</th><th>कामाचे नाव</th><th style="text-align:right;">पास रक्कम (₹)</th></tr></thead><tbody>';
-            var sumAmt = 0;
-            bills.forEach(function(b, i) {
-                var amt = parseFloat(b.passedAmt) || 0;
-                sumAmt += amt;
-                tableHTML += '<tr><td>' + (i+1) + '</td><td>' + (b.billNo || '-') + '</td><td>' + (b.contractor || '-') + '</td><td>' + (b.workName || '-') + '</td><td style="text-align:right;">₹ ' + amt.toLocaleString('en-IN') + '</td></tr>';
-            });
-            tableHTML += '<tr style="font-weight:700; background:#f5f5f5;"><td colspan="4" style="text-align:right;">एकूण रक्कम (Total):</td><td style="text-align:right; color:#0d47a1;">₹ ' + sumAmt.toLocaleString('en-IN') + '</td></tr></tbody></table>';
-        } else if (type === 'TOTAL_DEDUCTION') {
-            title = "एकूण कपात तपशील (Total Deduction)[span_30](start_span)[span_30](end_span)";
-            tableHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>बिल क्र.</th><th>कंत्राटदार</th><th>Maintenance[span_31](start_span)[span_31](end_span)</th><th>Royalty[span_32](start_span)[span_32](end_span)</th><th>Govt. Ins.[span_33](start_span)[span_33](end_span)</th><th>Upkar[span_34](start_span)[span_34](end_span)</th><th>CGST[span_35](start_span)[span_35](end_span)</th><th>SGST[span_36](start_span)[span_36](end_span)</th><th style="text-align:right;">एकूण कपात (₹)[span_37](start_span)[span_37](end_span)</th></tr></thead><tbody>';
-            var tMaint=0, tRoy=0, tGovt=0, tUpk=0, tCGST=0, tSGST=0, tTotalDed=0;
-            bills.forEach(function(b, i) {
-                var d = b.deductions || {};
-                var maint = parseFloat(d.Maint) || 0; tMaint += maint;
-                var roy = parseFloat(d.Royalty) || 0; tRoy += roy;
-                var govt = parseFloat(d.Govt) || 0; tGovt += govt;
-                var upkar = parseFloat(d.Upkar) || 0; tUpk += upkar;
-                var cgst = parseFloat(d.CGST) || 0; tCGST += cgst;
-                var sgst = parseFloat(d.SGST) || 0; tSGST += sgst;
-                var tot = parseFloat(b.totalDed) || 0; tTotalDed += tot;
-
-                tableHTML += '<tr><td>' + (i+1) + '</td><td>' + (b.billNo || '-') + '</td><td>' + (b.contractor || '-') + '</td><td>' + maint + '</td><td>' + roy + '</td><td>' + govt + '</td><td>' + upkar + '</td><td>' + cgst + '</td><td>' + sgst + '</td><td style="text-align:right; color:#d32f2f; font-weight:700;">₹ ' + tot.toLocaleString('en-IN') + '</td></tr>';
-            });
-            tableHTML += '<tr style="font-weight:750; background:#f5f5f5;"><td colspan="3" style="text-align:right;">एकूण (Total):</td><td>' + tMaint + '</td><td>' + tRoy + '</td><td>' + tGovt + '</td><td>' + tUpk + '</td><td>' + tCGST + '</td><td>' + tSGST + '</td><td style="text-align:right; color:#d32f2f;">₹ ' + tTotalDed.toLocaleString('en-IN') + '</td></tr></tbody></table>';
-        } else if (type === 'NET_PAYABLE') {
-            title = "प्रत्यक्षात देय रक्कम तपशील (Net Payable)[span_38](start_span)[span_38](end_span)";
-            tableHTML = '<table class="data-table"><thead><tr><th>अ.क्र.</th><th>बिल क्र.</th><th>कंत्राटदार</th><th>कामाचे नाव</th><th style="text-align:right;">निव्वळ रक्कम (₹)</th></tr></thead><tbody>';
-            var sumNet = 0;
-            bills.forEach(function(b, i) {
-                var net = parseFloat(b.netPay) || 0;
-                sumNet += net;
-                tableHTML += '<tr><td>' + (i+1) + '</td><td>' + (b.billNo || '-') + '</td><td>' + (b.contractor || '-') + '</td><td>' + (b.workName || '-') + '</td><td style="text-align:right; color:#2e7d32;">₹ ' + net.toLocaleString('en-IN') + '</td></tr>';
-            });
-            tableHTML += '<tr style="font-weight:700; background:#f5f5f5;"><td colspan="4" style="text-align:right;">एकूण देय रक्कम (Total):</td><td style="text-align:right; color:#2e7d32;">₹ ' + sumNet.toLocaleString('en-IN') + '</td></tr></tbody></table>';
-        }
-    }
-
-    document.getElementById('detailModalTitle').innerText = title;
-    document.getElementById('detailModalBody').innerHTML = tableHTML;
-    document.getElementById('detailModal').style.display = 'flex';
-}
-
-function closeDetailPopup() {
-    document.getElementById('detailModal').style.display = 'none';
-}
-
-function printDetailModalReport() {
-    var title = document.getElementById('detailModalTitle').innerText;
-    var bodyHTML = document.getElementById('detailModalBody').innerHTML;
-    var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
-    var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + title + '</h2></div><div style="text-align:right; font-size:11px;">अहवाल दिनांक: ' + todayStr + '</div></div>' + bodyHTML;
-    printA4Document(html, 'Detail_Report_' + todayStr.replace(/\//g, '-') + '.pdf');
-}
-
 function openWizard(step) {
     document.getElementById('editBillIndex').value = '-1';
     var jeSel = document.getElementById('wJeSelect');
     if(jeSel) {
-        jeSel.innerHTML = '<option value="">-- JE निवडा --</option>';[span_39](start_span)[span_39](end_span)
+        jeSel.innerHTML = '<option value="">-- JE निवडा --</option>';[span_22](start_span)[span_22](end_span)
         getData('je_records').forEach(function(j){ jeSel.add(new Option(j.name, j.name)); });
     }
-    document.getElementById('wMbSelect').innerHTML = '<option value="">-- आधी JE निवडा --</option>';[span_40](start_span)[span_40](end_span)
+    document.getElementById('wMbSelect').innerHTML = '<option value="">-- आधी JE निवडा --</option>';[span_23](start_span)[span_23](end_span)
     document.getElementById('wContractor').value = '';
     document.getElementById('wWorkName').value = '';
     document.getElementById('wBillType').value = '';
@@ -519,7 +393,7 @@ function onWizardJEChange() {
     var jeName = document.getElementById('wJeSelect').value;
     var mbSel = document.getElementById('wMbSelect');
     if(!mbSel) return;
-    mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';[span_41](start_span)[span_41](end_span)
+    mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';[span_24](start_span)[span_24](end_span)
     document.getElementById('wContractor').value = '';
     document.getElementById('wWorkName').value = '';
     if(!jeName) return;
@@ -551,6 +425,8 @@ function onWizardMBChange() {
 
 function autoCalculateDeductions() {
     var passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
+    document.getElementById('dedIT').value = Math.round(passed * 0.02 * 100) / 100;
+    document.getElementById('dedSD').value = Math.round(passed * 0.005 * 100) / 100;
     document.getElementById('dedMaint').value = Math.round(passed * 0.005 * 100) / 100;
     document.getElementById('dedRoyalty').value = Math.round(passed * 0.01 * 100) / 100;
     document.getElementById('dedGovt').value = Math.round(passed * 0.01 * 100) / 100;
@@ -588,7 +464,7 @@ function renderPreview() {
     '<div class="preview-row"><span>बिलाचा प्रकार:</span> <strong>' + type + '</strong></div>' +
     '<div class="preview-row"><span>Passed Amount:</span> <strong>₹ ' + passed.toLocaleString('en-IN') + '</strong></div>' +
     '<div class="preview-row" style="color:#d32f2f;"><span>Total Deduction:</span> <strong>₹ ' + totalDed.toLocaleString('en-IN') + '</strong></div>' +
-    '<div class="preview-row" style="color:#2e7d32; font-size:13px;"><span>Net Payable:</span> <strong>₹ ' + netPay.toLocaleString('en-IN') + '</strong></div>';
+    '<div class="preview-row" style="color:#16a34a; font-size:13px;"><span>Net Payable:</span> <strong>₹ ' + netPay.toLocaleString('en-IN') + '</strong></div>';
     document.getElementById('previewContent').innerHTML = html;
 }
 
@@ -604,11 +480,18 @@ function saveNewBill() {
     var netPay = passed - totalDed;
     var idx = parseInt(document.getElementById('editBillIndex').value, 10);
 
+    if(!je || !mb || !billType) {
+        alert('कृपया JE, M.B. आणि बिलाचा प्रकार भरा.');
+        return;
+    }
+
     var bills = getData('dmbms_bills');
     var currentYear = new Date().getFullYear();
     var autoBillNo = currentYear + '/' + String(bills.length + 1).padStart(2, '0');
 
     var dedObj = {
+        IT: parseFloat(document.getElementById('dedIT').value) || 0,
+        SD: parseFloat(document.getElementById('dedSD').value) || 0,
         Maint: parseFloat(document.getElementById('dedMaint').value) || 0,
         Royalty: parseFloat(document.getElementById('dedRoyalty').value) || 0,
         Govt: parseFloat(document.getElementById('dedGovt').value) || 0,
@@ -655,6 +538,8 @@ function editBill(idx) {
     document.getElementById('wPassedAmt').value = b.passedAmt || '';
 
     var d = b.deductions || {};
+    document.getElementById('dedIT').value = d.IT || 0;
+    document.getElementById('dedSD').value = d.SD || 0;
     document.getElementById('dedMaint').value = d.Maint || 0;
     document.getElementById('dedRoyalty').value = d.Royalty || 0;
     document.getElementById('dedGovt').value = d.Govt || 0;
@@ -665,7 +550,7 @@ function editBill(idx) {
 }
 
 function deleteBill(idx) {
-    if(confirm('ही देयक नोंद हटवायची का?')) {
+    if(confirm('ही देयक नोंद डिलीट करायची का?')) {
         var bills = getData('dmbms_bills');
         bills.splice(idx, 1);
         setData('dmbms_bills', bills);
@@ -722,14 +607,14 @@ function printMasterBillReport() {
             <td>${b.date ? formatDateToDMY(b.date) : '-'}</td>
             <td style="text-align:right;">₹ ${p.toLocaleString('en-IN')}</td>
             <td style="text-align:right; color:#d32f2f;">₹ ${ded.toLocaleString('en-IN')}</td>
-            <td style="text-align:right; color:#2e7d32; font-weight:bold;">₹ ${net.toLocaleString('en-IN')}</td>
+            <td style="text-align:right; color:#16a34a; font-weight:bold;">₹ ${net.toLocaleString('en-IN')}</td>
         </tr>`;
     });
     html += `<tr style="font-weight:bold; background:#eee;">
         <td colspan="8" style="text-align:right;">एकूण (Total):</td>
         <td style="text-align:right;">₹ ${totAmt.toLocaleString('en-IN')}</td>
         <td style="text-align:right; color:#d32f2f;">₹ ${totDed.toLocaleString('en-IN')}</td>
-        <td style="text-align:right; color:#2e7d32;">₹ ${totNet.toLocaleString('en-IN')}</td>
+        <td style="text-align:right; color:#16a34a;">₹ ${totNet.toLocaleString('en-IN')}</td>
     </tr></tbody></table>`;
     
     printA4Document(html, 'Bill_Register_Report_' + todayStr + '.pdf');
