@@ -227,6 +227,7 @@ function saveCurrentFixationRecord(showAlert = true) {
     return recordData;
 }
 
+// 🌟 इंडेक्स (Index) वर आधारित जतन केलेल्या नोंदी दर्शवणारे फंक्शन
 function renderSavedRecordsTable() {
     const tbody = document.getElementById('savedRecordsTableBody');
     const countLabel = document.getElementById('savedCountLabel');
@@ -249,9 +250,9 @@ function renderSavedRecordsTable() {
             <td><b>${item.empName}</b></td>
             <td>${item.empDesignation || '-'}</td>
             <td style="text-align:center; white-space:nowrap;">
-                <button type="button" class="act-btn act-btn-view" onclick="viewSavedRecord(${item.id})" title="अहवाल पहा">👁️ पहा</button>
-                <button type="button" class="act-btn act-btn-edit" onclick="editSavedRecord(${item.id})" title="माहिती दुरुस्त करा">✏️</button>
-                <button type="button" class="act-btn act-btn-del" onclick="deleteSavedRecord(${item.id}, '${safeName}')" title="नोंद हटवा">🗑️</button>
+                <button type="button" class="act-btn act-btn-view" onclick="viewSavedRecord(${index})" title="अहवाल पहा">👁️ पहा</button>
+                <button type="button" class="act-btn act-btn-edit" onclick="editSavedRecord(${index})" title="माहिती दुरुस्त करा">✏️</button>
+                <button type="button" class="act-btn act-btn-del" onclick="deleteSavedRecord(${index}, '${safeName}')" title="नोंद हटवा">🗑️</button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -259,7 +260,7 @@ function renderSavedRecordsTable() {
 }
 
 function populateFormFromRecord(rec) {
-    currentEditingRecordId = rec.id;
+    currentEditingRecordId = rec.id || Date.now();
     const d = rec.formData;
 
     document.getElementById('empName').value = d.empName || '';
@@ -331,18 +332,20 @@ function loadCurrentRecordIntoForm() {
     }
 }
 
-function viewSavedRecord(id) {
+// 🌟 इंडेक्सवर आधारित पाहणे (View)
+function viewSavedRecord(index) {
     let list = getSavedRecordsFromStorage();
-    let rec = list.find(r => r.id === id);
+    let rec = list[index];
     if (!rec) return;
 
     populateFormFromRecord(rec);
     processFixation();
 }
 
-function editSavedRecord(id) {
+// 🌟 इंडेक्सवर आधारित दुरुस्ती (Edit)
+function editSavedRecord(index) {
     let list = getSavedRecordsFromStorage();
-    let rec = list.find(r => r.id === id);
+    let rec = list[index];
     if (!rec) return;
 
     populateFormFromRecord(rec);
@@ -351,11 +354,12 @@ function editSavedRecord(id) {
     showCustomAlert(`'${rec.empName}' यांची माहिती फॉर्ममध्ये भरली आहे. आवश्यक ते बदल करून पुन्हा 'Submit Data' किंवा 'Save Record' करा.`, "success");
 }
 
-function deleteSavedRecord(id, empName) {
+// 🌟 इंडेक्सवर आधारित हटवणे (Delete)
+function deleteSavedRecord(index, empName) {
     if (confirm(`तुम्हाला '${empName}' यांची जतन केलेली वेतन निश्चिती नोंद खरोखर हटवायची आहे का?`)) {
         let list = getSavedRecordsFromStorage();
-        list = list.filter(r => r.id !== id);
-        if (currentEditingRecordId === id) currentEditingRecordId = null;
+        list.splice(index, 1);
+        currentEditingRecordId = null;
         saveRecordsListToStorage(list);
         showCustomAlert("नोंद यशस्वीरीत्या हटवण्यात आली आहे!", "success");
     }
@@ -368,14 +372,14 @@ function onWithheldChkChange(chk) {
 
 function formatDateToDDMMYYYY(dateString) {
     if (!dateString) return '';
-    let parts = dateString.split('-');
+    let parts = String(dateString).split('-');
     if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
     return dateString;
 }
 
 function parseLocalDate(dateStr) {
     if (!dateStr) return null;
-    let parts = dateStr.split('-');
+    let parts = String(dateStr).split('-');
     if (parts.length === 3) {
         return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 0, 0, 0, 0);
     }
