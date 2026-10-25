@@ -292,7 +292,7 @@ body * { visibility: hidden !important; }
 <!-- M.B. नियंत्रण प्रणाली मुख्य डॅशबोर्ड -->
 <div id="mbSystemSection">
 <div class="top-header">
-<a href="index.html" class="btn-back-hub">🏠 मुखपृष्ठ</a>
+<a href="dashboard.html" class="btn-back-hub">🏠 मुखपृष्ठ</a>
 <h1>मोजमाप पुस्तिका नियंत्रण प्रणाली</h1>
 <p>सार्वजनिक बांधकाम विभाग</p>
 </div>
@@ -1524,7 +1524,7 @@ function cancelWorkEdit() {
     document.getElementById('workContractor').value = '';
     document.getElementById('editWorkIndex').value = '-1';
     document.getElementById('btnSaveWork').textContent = 'Save Work';
-    document.getElementById('btnCancelRaw').style.display = 'none';
+    document.getElementById('btnCancelWork').style.display = 'none';
 }
 
 function deleteWork(idx) {
@@ -1558,7 +1558,7 @@ function refreshWorkList() {
             '<td>' + mbDisplay + '</td>' +
             '<td class="action-cell" style="text-align:center;">' +
             '<button class="btn-action" style="background:#2e7d32; padding:3px 6px;" onclick="editWork(' + idx + ')">Edit</button> ' +
-            '<button class="btn-action" style="background:#d32f2f; padding:3px 6px;" onclick="deleteWork(' + idx + ')">Delete</button>' +
+            '<button class="btn-action" style="background:#d32f2f; padding:3px 6px;" onclick="deleteWork(' + idx + ')">Delete is done</button>' +
             '</td>' +
             '</tr>';
         });
@@ -1576,10 +1576,11 @@ function refreshWorkList() {
 function printWorkReport() {
     var works = getData('work_records');
     if (works.length === 0) return showAlert('कोणतीही कामाची नोंद उपलब्ध नाही.', 'WARNING');
+    var totalWorks = works.length;
     var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
     var html = '<div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px;">' +
     '<div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">कामांची यादी (Work Register) अहवाल</h2></div>' +
-    '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>कामांची यादी</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div>' +
+    '<div style="display:flex; justify-content:space-between; align-items:flex-end; font-size:11px; margin-top:4px;"><div><strong>एकूण कामे: ' + totalWorks + '</strong><br>अहवाल दिनांक: ' + todayStr + '</div></div>' +
     '</div>' +
     '<table class="print-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>कामाचे नाव</th><th>JE</th><th>कंत्राटदार</th><th>स्थिती</th><th style="text-align:center;">M.B. क्र.</th></tr></thead><tbody>';
 
@@ -1609,17 +1610,17 @@ function printMasterBillRegister() {
   function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]});}
   function pageName(){return location.pathname.split('/').pop()||'index.html';}
   function addIssue(level,title,detail,fix){issues.push({level:level,title:title,detail:detail,fix:fix});}
-  fnunction checkStorage(){
+  function checkStorage(){
     watchedKeys.forEach(function(k){
       var raw=localStorage.getItem(k); if(raw===null) return;
       try{var v=JSON.parse(raw); if(!Array.isArray(v) && typeof v!=='object') addIssue('err','डेटा रचना तपासा',k+' मध्ये अपेक्षित डेटा रचना नाही.','हा डेटा हाताने delete करू नका. आधी Backup/Restore तपासा.');}
-      catch(e){addIssue('err','Local data format error',k+' मध्ये JSON डेटा खराब/अपूर्ण आहे.','डेटा delete न करता Backup/Restore मधून सुरक्षित प्रत तपासा.');}
+      catch(e){addIssue('err','Local data format error',k+' मध्ये JSON डेटा खराब/अपूर्ण आहे.','jsdelivr डेटा delete न करता Backup/Restore मधून सुरक्षित प्रत तपासा.');}
     });
   }
   function checkDom(){
     var required=['mbSystemSection','mbListBody'];
     if(pageName()==='index.html') required=['mbSystemSection'];
-    required.forEach(function(id){if(!document.getElementById(id)) addIssue('err','Screen component missing','#'+id+' सापडले नाही.','हा भाग या पेजवर अपेक्षित आहे; कोड बदलण्यापूर्वी मूळ Final file तपासा.');});
+    required.forEach(function(id){if(!document.getElementById(id)) addIssue('err','Screen component missing','#'+id+' सापडले नाही.','हा भाग या पेजवर अपेक्षित आहे; कोड बदलण्यापूर्वी मूळ Final file तपासा.');} );
   }
   function checkErrors(){if(lastError)addIssue('err','JavaScript error',lastError.message,'Error location: '+lastError.location+'. त्या ठिकाणीच तपासणी करा; बाकी code बदलू नका.');}
   function checkPerformance(){var ms=Math.round(performance.now()-loadStart);if(ms>3000)addIssue('info','Page load slow',ms+' ms मध्ये पेज तयार झाले.','अनावश्यक refresh/animation टाळा. Smart Doctor data बदलत नाही.');else addIssue('ok','Speed check','Page ready time '+ms+' ms.','सध्या कोणतीही मोठी speed warning नाही.');}
@@ -1647,7 +1648,7 @@ function printMasterBillRegister() {
   window.addEventListener('storage',function(){if(window.requestIdleCallback)requestIdleCallback(checkStorage);else setTimeout(checkStorage,0);});
   document.addEventListener('DOMContentLoaded',function(){
     var btn=document.createElement('button');btn.className='smart-doctor-btn';btn.title='Smart System Doctor';btn.innerHTML='🤖<span class="smart-doctor-badge"></span>';btn.onclick=open;document.body.appendChild(btn);
-    var ov=document.createElement('div');ov.id='smartDoctorOverlay';ov.className='smart-doctor-overlay';ov.innerHTML='<div class="smart-doctor-card"><div class="smart-doctor-head"><div class="smart-doctor-title">🤖 Smart System Doctor</div><button class="smart-doctor-close" onclick="document.getElementById(\'smartDoctorOverlay\').style.display=\'none\'">X</button></div><div id="smartDoctorStatus" class="smart-doctor-status">तपासणी सुरू...शिवाय त्रुटी काढली आहे.</div><div id="smartDoctorBody"></div><div class="smart-doctor-actions"><button class="sd-run" onclick="smartDoctorRun()">🔍 पुन्हा तपासा</button><button class="sd-recover" onclick="smartDoctorRecover()">🛠️ सुरक्षित Recovery</button></div><div style="font-size:10px;color:#666;margin-top:8px;">टीप: Smart Doctor डेटा स्वतःहून delete/बदलत नाही. तो समस्या शोधतो, जागा/कारण सांगतो आणि सुरक्षित मार्गदर्शन देतो.</div></div></div>';document.body.appendChild(ov);
+    var ov=document.createElement('div');ov.id='smartDoctorOverlay';ov.className='smart-doctor-overlay';ov.innerHTML='<div class="smart-doctor-card"><div class="smart-doctor-head"><div class="smart-doctor-title">🤖 Smart System Doctor</div><button class="smart-doctor-close" onclick="document.getElementById(\'smartDoctorOverlay\').style.display=\'none\'">X</button></div><div id="smartDoctorStatus" class="smart-doctor-status">तपासणी सुरू...</div><div id="smartDoctorBody"></div><div class="smart-doctor-actions"><button class="sd-run" onclick="smartDoctorRun()">🔍 पुन्हा तपासा</button><button class="sd-recover" onclick="smartDoctorRecover()">🛠️ सुरक्षित Recovery</button></div><div style="font-size:10px;color:#666;margin-top:8px;">टीप: Smart Doctor डेटा स्वतःहून delete/बदलत नाही. तो समस्या शोधतो, जागा/कारण सांगतो आणि सुरक्षित मार्गदर्शन देतो.</div></div></div>';document.body.appendChild(ov);
   });
 })();
 </script>
