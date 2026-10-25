@@ -1,141 +1,182 @@
 <!doctype html>
-<html lang="en">
+<html lang="mr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#020d1b">
-<title>SMART TOOLS STRONGER WORK — Login</title>
-
+<title>वेतन व फरक प्रणाली - लॉगिन</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 * {
   box-sizing: border-box;
 }
 
-html, body {
+body {
   margin: 0;
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  min-height: 100vh;
   background: #020d1b;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
-  position: fixed;
-  inset: 0;
-  overscroll-behavior: none;
-}
-
-#login-screen {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  height: 100dvh;
-  overflow: hidden;
-  background: #020d1b;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#design {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  position: absolute;
-  z-index: 1;
-}
-
-/* मूळ फोटोवरील इनपुट बॉक्सेस अचूक बसवण्यासाठी ओव्हरले */
-.overlay-form {
-  position: absolute;
-  z-index: 10;
-  width: 82%;
-  max-width: 320px;
-  top: 55%; 
-  left: 50%;
-  transform: translate(-50%, 0);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #ffffff;
 }
 
-.input-container {
-  position: relative;
+.profile-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-pic {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 3px solid #00f3ff;
+  box-shadow: 0 0 20px #00f3ff;
+  object-fit: cover;
+  margin-bottom: 12px;
+  background: #0a192f;
+}
+
+.app-title {
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.app-title span {
+  color: #00f3ff;
+}
+
+.app-subtitle {
+  font-size: 12px;
+  color: #00f3ff;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+}
+
+.login-card {
   width: 100%;
-  background: rgba(2, 6, 23, 0.7);
-  border: 1px solid rgba(0, 243, 255, 0.4);
-  border-radius: 12px;
+  max-width: 340px;
+  background: rgba(2, 6, 23, 0.9);
+  border: 2px solid #00f3ff;
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(0, 243, 255, 0.3);
+  padding: 25px 20px;
+  text-align: center;
 }
 
-.input-container i {
+.login-card h2 {
+  color: #00f3ff;
+  font-size: 22px;
+  margin-top: 0;
+  margin-bottom: 5px;
+  letter-spacing: 1.5px;
+}
+
+.login-divider {
+  width: 45px;
+  height: 3px;
+  background: #00f3ff;
+  margin: 0 auto 20px auto;
+  border-radius: 2px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.input-group i {
   position: absolute;
-  left: 14px;
+  left: 15px;
   top: 50%;
   transform: translateY(-50%);
   color: #00f3ff;
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .input-box {
   width: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
+  background: #0a192f;
+  border: 1px solid rgba(0, 243, 255, 0.4);
+  border-radius: 30px;
+  padding: 12px 15px 12px 45px;
   color: #ffffff;
   font-size: 14px;
-  padding: 12px 12px 12px 42px;
+  outline: none;
+  box-sizing: border-box;
 }
 
-.login-btn {
+.input-box::placeholder {
+  color: #8892b0;
+}
+
+.signin-btn {
   width: 100%;
-  height: 46px;
-  background: transparent;
+  background: #00f3ff;
+  color: #020d1b;
   border: none;
+  border-radius: 30px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
   cursor: pointer;
-  border-radius: 12px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+  transition: 0.3s;
 }
 
-.forgot-link {
-  text-align: center;
-  background: transparent;
+.signin-btn:hover {
+  background: #00c4d1;
+}
+
+.forgot-btn {
+  background: none;
   border: none;
   color: #00f3ff;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
-  margin-top: 4px;
+  text-decoration: underline;
 }
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
-  <main id="login-screen" aria-label="Login page design">
-    <!-- तुमच्या प्रोजेक्टमधील home-bg.jpg फाईलचा वापर केला आहे -->
-    <img id="design"
-         alt="Original login page design"
-         src="home-bg.jpg">
+
+  <div class="profile-container">
+    <!-- तुमच्या प्रोफाईल फोटोसाठी (जर फोटो फाईल असेल तर src मध्ये नाव टाका, सध्या home-bg.jpg वापरली आहे) -->
+    <img src="home-bg.jpg" alt="Profile" class="profile-pic">
+    <div class="app-title">SMART TOOLS <span>STRONGER WORK</span></div>
+    <div class="app-subtitle">Created by Vitthal Kokate Patil</div>
+  </div>
+
+  <div class="login-card">
+    <h2>LOGIN</h2>
+    <div class="login-divider"></div>
     
-    <div class="overlay-form">
-      <form id="loginForm" onsubmit="processLogin(event)">
-        <div class="input-container" style="margin-bottom: 12px;">
-          <i class="fa-solid fa-user"></i>
-          <input type="text" id="username" class="input-box" placeholder="Username" required>
-        </div>
+    <form id="loginForm" onsubmit="processLogin(event)">
+      <div class="input-group">
+        <i class="fa-solid fa-user"></i>
+        <input type="text" id="username" class="input-box" placeholder="Username" required>
+      </div>
 
-        <div class="input-container" style="margin-bottom: 14px;">
-          <i class="fa-solid fa-lock"></i>
-          <input type="password" id="password" class="input-box" placeholder="Password" required>
-        </div>
+      <div class="input-group">
+        <i class="fa-solid fa-lock"></i>
+        <input type="password" id="password" class="input-box" placeholder="Password" required>
+      </div>
 
-        <button type="submit" class="login-btn"></button>
-      </form>
+      <button type="submit" class="signin-btn">Sign In</button>
+    </form>
 
-      <button type="button" class="forgot-link" onclick="forgotPassword()">Forgot Password?</button>
-    </div>
-  </main>
+    <button type="button" class="forgot-btn" onclick="forgotPassword()">Forgot Password?</button>
+  </div>
 
   <script>
     function logActivity(username, action) {
