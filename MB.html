@@ -426,14 +426,12 @@ body * { visibility: hidden !important; }
 
         <input type="hidden" id="editBillIndex" value="-1">
 
-        <!-- स्टेप्स इंडिकेटर (फक्त वर्तुळे राहतील, बाहेर कोणतेही अंक दिसणार नाहीत) -->
         <div class="steps-indicator">
             <div class="step-circle active" id="dot1">1</div>
             <div class="step-circle" id="dot2">2</div>
             <div class="step-circle" id="dot3">3</div>
         </div>
 
-        <!-- स्टेप १: मुख्य माहिती -->
         <div class="wizard-step" id="step1">
             <div class="form-group"><label>संबंधित कनिष्ठ अभियंता (JE) *</label><select class="form-control" id="wJeSelect" onchange="onWizardJEChange()"><option value="">-- JE निवडा --</option></select></div>
             <div class="form-group"><label>वाटप केलेली M.B. क्रमांक *</label><select class="form-control" id="wMbSelect" onchange="onWizardMBChange()"><option value="">-- आधी JE निवडा --</option></select></div>
@@ -446,7 +444,6 @@ body * { visibility: hidden !important; }
             </div>
         </div>
 
-        <!-- स्टेप २: कपात व हिशोब -->
         <div class="wizard-step hidden" id="step2">
             <h4 style="font-size:13px; color:#c2410c; margin-bottom:8px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">Deduction (कपात तपशील)</h4>
             <div class="form-group"><label>Passed Amount (पास रक्कम) ₹ *</label><input type="number" class="form-control" id="wPassedAmt" placeholder="उदा. 1000000" oninput="autoCalculateDeductions()"></div>
@@ -469,7 +466,6 @@ body * { visibility: hidden !important; }
             </div>
         </div>
 
-        <!-- स्टेप ३: पूर्वावलोकन -->
         <div class="wizard-step hidden" id="step3">
             <h4 style="font-size:13px; color:#c2410c; margin-bottom:8px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">नोंद तपासा आणि जतन करा</h4>
             <div class="preview-box" id="previewContent"></div>
@@ -500,7 +496,10 @@ window.onload = function() {
     var tDate = document.getElementById('repToDate');
     if (fDate) checkDatePlaceholder(fDate);
     if (tDate) checkDatePlaceholder(tDate);
+    
+    // डॅशबोर्ड डेटा आणि समरी कार्ड्स लोड करण्यासाठी हे कॉल्स आवश्यक आहेत
     refreshAll();
+    refreshMBDashboard();
     onMainCategoryChange();
     refreshBillDashboard();
 };
@@ -2113,7 +2112,7 @@ function printWorkReport() {
   window.addEventListener('storage',function(){if(window.requestIdleCallback)requestIdleCallback(checkStorage);else setTimeout(checkStorage,0);});
   document.addEventListener('DOMContentLoaded',function(){
     var btn=document.createElement('button');btn.className='smart-doctor-btn';btn.title='Smart System Doctor';btn.innerHTML='🤖<span class="smart-doctor-badge"></span>';btn.onclick=open;document.body.appendChild(btn);
-    var ov=document.createElement('div');ov.id='smartDoctorOverlay';ov.className='smart-doctor-overlay';ov.innerHTML='<div class="smart-doctor-card"><div class="smart-doctor-head"><div class="smart-doctor-title">🤖 Smart System Doctor</div><button class="smart-doctor-close" onclick="document.getElementById(\'smartDoctorOverlay\').style.display=\'none\'">X</button></div><div id="smartDoctorStatus" class="smart-doctor-status">तपासणी सुरू...</div><div id="smartDoctorBody"></div><div class="smart-doctor-actions"><button class="sd-run" onclick="smartDoctorRun()">🔍 पुन्हा तपासा</button><button class="sd-recover" onclick="smartDoctorRecover()">🛠️ सुरक्षित Recovery</button></div><div style="font-size:10px;color:#666;margin-top:8px;">टीप: Smart Doctor डेटा स्वतःहून delete/बदलत नाही. तो समस्या शोधतो, जागा/कारण सांगतो आणि सुरक्षित मार्गदर्शन देतो.</div></div></div>';document.body.appendChild(ov);
+    var ov=document.getElementById('smartDoctorOverlay');ov.className='smart-doctor-overlay';ov.innerHTML='<div class="smart-doctor-card"><div class="smart-doctor-head"><div class="smart-doctor-title">🤖 Smart System Doctor</div><button class="smart-doctor-close" onclick="document.getElementById(\'smartDoctorOverlay\').style.display=\'none\'">X</button></div><div id="smartDoctorStatus" class="smart-doctor-status">तपासणी सुरू...</div><div id="smartDoctorBody"></div><div class="smart-doctor-actions"><button class="sd-run" onclick="smartDoctorRun()">🔍 पुन्हा तपासा</button><button class="sd-recover" onclick="smartDoctorRecover()">🛠️ सुरक्षित Recovery</button></div><div style="font-size:10px;color:#666;margin-top:8px;">टीप: Smart Doctor डेटा स्वतःहून delete/बदलत नाही. तो समस्या शोधतो, जागा/कारण सांगतो आणि सुरक्षित मार्गदर्शन देतो.</div></div></div>';document.body.appendChild(ov);
   });
 })();
 </script>
