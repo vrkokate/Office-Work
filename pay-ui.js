@@ -6,7 +6,7 @@ let selectedWithheldDates = new Set();
 let globalCalcDataList = [];
 let currentEditingRecordId = null;
 
-// 🌟 डीफॉल्ट alert() ऐवजी आकर्षक कस्टम पॉप-अप दाखवणारे फंक्शन
+// 🌟 आकर्षक कस्टम पॉप-अप दाखवणारे फंक्शन
 function showCustomAlert(message, type = 'success') {
     const modal = document.getElementById('customAlertModal');
     const msgElem = document.getElementById('customAlertMessage');
@@ -242,6 +242,7 @@ function renderSavedRecordsTable() {
 
     tbody.innerHTML = "";
     list.forEach((item, index) => {
+        let safeName = (item.empName || '').replace(/'/g, "\\'");
         let tr = document.createElement('tr');
         tr.innerHTML = `
             <td style="font-weight:bold;">${index + 1}</td>
@@ -250,7 +251,7 @@ function renderSavedRecordsTable() {
             <td style="text-align:center; white-space:nowrap;">
                 <button type="button" class="act-btn act-btn-view" onclick="viewSavedRecord(${item.id})" title="अहवाल पहा">👁️ पहा</button>
                 <button type="button" class="act-btn act-btn-edit" onclick="editSavedRecord(${item.id})" title="माहिती दुरुस्त करा">✏️</button>
-                <button type="button" class="act-btn act-btn-del" onclick="deleteSavedRecord(${item.id}, '${item.empName}')" title="नोंद हटवा">🗑️</button>
+                <button type="button" class="act-btn act-btn-del" onclick="deleteSavedRecord(${item.id}, '${safeName}')" title="नोंद हटवा">🗑️</button>
             </td>
         `;
         tbody.appendChild(tr);
