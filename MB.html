@@ -55,7 +55,7 @@ border: 2.5px solid transparent !important; background-size: 100% 100%, 300% 300
 .stat-num { font-size: 18px; font-weight: 700; color: #0d47a1; pointer-events: none; }
 .stat-label { font-size: 11px; color: #555; margin-top: 2px; pointer-events: none; }
 
-.filter-card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); position: relative; }
+.filter-card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .form-group { margin-bottom: 10px; text-align: left; }
 .form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 4px; }
 .form-control { width: 100%; padding: 8px 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 5px; outline: none; background: #fff; display: block; }
@@ -63,13 +63,14 @@ border: 2.5px solid transparent !important; background-size: 100% 100%, 300% 300
 
 .btn-report { width: 100%; background: #0d47a1; color: #fff; border: none; padding: 11px; font-size: 13.5px; font-weight: 800; border-radius: 6px; cursor: pointer; margin-top: 6px; letter-spacing: 0.5px; }
 
-/* 🌟 बॉक्स-रहित, पारदर्शक आणि सर्च बारच्या वरच्या बाजूला (Upwards) ओपन होणारी स्क्रोलिंग ब्लू नंबर्स यादी */
+/* 🌟 सर्च बारच्या बरोबर वरच्या कोपऱ्यापासून वरच्या दिशेने (Upwards) ओपन होणारी बॉक्स-रहित स्क्रोलिंग ब्लू नंबर्स यादी */
 #smartSearchSuggestions {
     display: none;
     position: absolute;
     left: 0;
     right: 0;
-    bottom: calc(100% + 4px);
+    bottom: 100%;
+    margin-bottom: 4px;
     background: transparent;
     border: none;
     max-height: 160px;
@@ -308,11 +309,13 @@ body * { visibility: hidden !important; }
 
 <div class="form-group" id="dynamicOptionGroup1" style="display:none;"><label id="lblDynamic1">पुढील पर्याय</label><select class="form-control" id="repDynamicSelect1" onchange="onDynamicSelect1Change()"></select></div>
 
-<div class="form-group" style="position: relative;">
+<div class="form-group">
 <label>स्मार्ट शोध (M.B. क्र., नाव किंवा तपशील)</label>
-<input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका" oninput="handleSmartSearchInput(this)">
-<!-- 🌟 सर्च बारच्या वरच्या कोपऱ्यापासून वरच्या दिशेने ओपन होणारी बॉक्स-रहित स्क्रोलिंग ब्लू नंबर्स यादी -->
-<div id="smartSearchSuggestions"></div>
+<!-- 🌟 स्वतंत्र रॅपपर (Wrapper Div) जो अचूकपणे सर्च बारच्या शेवटी आणि वरच्या दिशेने यादी दर्शवेल -->
+<div style="position: relative;">
+    <input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका" oninput="handleSmartSearchInput(this)">
+    <div id="smartSearchSuggestions"></div>
+</div>
 </div>
 
 <div style="display:flex; gap:8px; width:100%; margin-top:6px;">
@@ -618,7 +621,7 @@ function closeCustomConfirm(isConfirmed) {
     expectedVerifyMB = null;
 }
 
-// 🌟 जुन्या डिझाईननुसार सर्च बारच्या वरच्या दिशेने ओपन होणारी बॉक्स-रहित स्क्रोलिंग ब्लू नंबर्स यादी
+// 🌟 सर्च बारच्या बरोबर वरच्या दिशेने ओपन होणारी बॉक्स-रहित स्क्रोलिंग ब्लू नंबर्स यादी
 function handleSmartSearchInput(input) {
     var query = (input.value || '').trim().toLowerCase();
     var box = document.getElementById('smartSearchSuggestions');
@@ -1486,7 +1489,7 @@ function deleteMB(idx) {
             list.splice(idx, 1);
             setData('mb_records', list);
             refreshAll();
-            showAlert('M.B. नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
+            showAlert('M.B. नोंद हटवली!', 'SUCCESS');
         }
     });
 }
