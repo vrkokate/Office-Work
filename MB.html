@@ -32,35 +32,43 @@ border: none !important; border-radius: 8px; text-align: center; padding: 11px 4
 }
 .stat-card:hover { transform: scale(1.02); }
 
-.stat-card:nth-child(1) {
-background: linear-gradient(#fcfdfe, #fcfdfe) padding-box, linear-gradient(90deg, #00c853, #00e5ff, #76ff03, #00c853) border-box;
-border: 2.5px solid transparent !important; background-size: 100% 100%, 300% 300%; animation: borderLightFlow 3s linear infinite;
-}
-.stat-card:nth-child(2) {
-background: linear-gradient(#fcfdfe, #fcfdfe) padding-box, linear-gradient(90deg, #2979ff, #aa00ff, #ff4081, #2979ff) border-box;
-border: 2.5px solid transparent !important; background-size: 100% 100%, 300% 300%; animation: borderLightFlow 3s linear infinite;
-}
-.stat-card:nth-child(3) {
-background: linear-gradient(#fcfdfe, #fcfdfe) padding-box, linear-gradient(90deg, #ff9100, #ffea00, #ff1744, #ff9100) border-box;
-border: 2.5px solid transparent !important; background-size: 100% 100%, 300% 300%; animation: borderLightFlow 3s linear infinite;
-}
-
-@keyframes borderLightFlow {
-0% { background-position: 0% 0%, 0% 50%; }
-50% { background-position: 0% 0%, 100% 50%; }
-100% { background-position: 0% 0%, 0% 50%; }
-}
-
 .stat-num { font-size: 18px; font-weight: 700; color: #0d47a1; pointer-events: none; }
 .stat-label { font-size: 11px; color: #555; margin-top: 2px; pointer-events: none; }
 
-.filter-card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.filter-card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); position: relative; }
 .form-group { margin-bottom: 10px; text-align: left; }
 .form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 4px; }
 .form-control { width: 100%; padding: 8px 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 5px; outline: none; background: #fff; display: block; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 8px; }
 
 .btn-report { width: 100%; background: #0d47a1; color: #fff; border: none; padding: 11px; font-size: 13.5px; font-weight: 800; border-radius: 6px; cursor: pointer; margin-top: 6px; letter-spacing: 0.5px; }
+
+/* 🌟 ब्लू बॉर्डर स्क्रोल करण्यायोग्य स्मार्ट शोध यादीसाठी डिझाईन */
+#smartSearchSuggestions {
+    display: none;
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    top: calc(100% - 15px);
+    background: #fff;
+    border: 2px solid #0d47a1;
+    border-radius: 6px;
+    max-height: 180px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(13, 71, 161, 0.2);
+}
+.suggestion-item {
+    padding: 8px 12px;
+    font-size: 12.5px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    color: #0d47a1;
+    font-weight: 600;
+}
+.suggestion-item:hover {
+    background: #e3f2fd;
+}
 
 .date-placeholder-input { position: relative; color: #212121; }
 .date-placeholder-input.empty-date { color: transparent !important; }
@@ -96,7 +104,6 @@ content: "दिनांक निवडा"; position: absolute; left: 10px; t
 
 .table-responsive-box { max-height: 300px; overflow-y: auto; overflow-x: auto; border: 1px solid #ddd; border-radius: 6px; margin-top: 8px; }
 
-/* ===== Bill Register Summary & Wizard Styles ===== */
 .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
 .sum-card-clickable { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
 .sum-card-clickable:hover { background: #f8fafc; }
@@ -280,9 +287,11 @@ body * { visibility: hidden !important; }
 
 <div class="form-group" id="dynamicOptionGroup1" style="display:none;"><label id="lblDynamic1">पुढील पर्याय</label><select class="form-control" id="repDynamicSelect1" onchange="onDynamicSelect1Change()"></select></div>
 
-<div class="form-group">
+<div class="form-group" style="position: relative;">
 <label>स्मार्ट शोध (M.B. क्र., नाव किंवा तपशील)</label>
-<input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका">
+<input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका" oninput="handleSmartSearchInput(this)">
+<!-- 🌟 रिअल-टाइम स्क्रोल करण्यायोग्य ब्लू बॉर्डर यादी कन्टेनर -->
+<div id="smartSearchSuggestions"></div>
 </div>
 
 <div style="display:flex; gap:8px; width:100%; margin-top:6px;">
@@ -497,7 +506,6 @@ window.onload = function() {
     if (fDate) checkDatePlaceholder(fDate);
     if (tDate) checkDatePlaceholder(tDate);
     
-    // डॅशबोर्ड डेटा आणि समरी कार्ड्स लोड करण्यासाठी हे कॉल्स आवश्यक आहेत
     refreshAll();
     refreshMBDashboard();
     onMainCategoryChange();
@@ -582,6 +590,67 @@ function closeCustomConfirm(isConfirmed) {
     }
     expectedVerifyMB = null;
 }
+
+// 🌟 स्मार्ट शोध रिअल-टाइम ऑटो-सजेस्ट फंक्शन (ब्लू बॉर्डर स्क्रोल यादी)
+function handleSmartSearchInput(input) {
+    var query = (input.value || '').trim().toLowerCase();
+    var box = document.getElementById('smartSearchSuggestions');
+    if (!box) return;
+
+    if (!query) {
+        box.style.display = 'none';
+        box.innerHTML = '';
+        return;
+    }
+
+    var allMBs = getData('mb_records');
+    var matches = [];
+    var seen = {};
+
+    allMBs.forEach(function(m) {
+        var no = (m.mbNumber || '').trim();
+        var det = (m.receivedDetail || '').trim();
+        var src = (m.receivedSource || '').trim();
+        if ((no.toLowerCase().includes(query) || det.toLowerCase().includes(query) || src.toLowerCase().includes(query)) && !seen[no]) {
+            seen[no] = true;
+            matches.push(m);
+        }
+    });
+
+    if (matches.length === 0) {
+        box.style.display = 'none';
+        box.innerHTML = '';
+        return;
+    }
+
+    var html = '';
+    matches.forEach(function(m) {
+        var displayTxt = 'M.B. क्र: <strong>' + m.mbNumber + '</strong> (' + (m.size || 'लहान') + ') - ' + (m.receivedDetail || m.receivedSource || '');
+        html += '<div class="suggestion-item" onclick="selectSuggestionItem(\'' + m.mbNumber + '\')">' + displayTxt + '</div>';
+    });
+
+    box.innerHTML = html;
+    box.style.display = 'block';
+}
+
+function selectSuggestionItem(mbNo) {
+    document.getElementById('smartSearchInput').value = mbNo;
+    var box = document.getElementById('smartSearchSuggestions');
+    if (box) {
+        box.style.display = 'none';
+        box.innerHTML = '';
+    }
+    openSmartActionCenter(mbNo);
+}
+
+// बाहेर क्लिक केल्यास सजेस्ट बॉक्स बंद करणे
+document.addEventListener('click', function(e) {
+    var searchInput = document.getElementById('smartSearchInput');
+    var box = document.getElementById('smartSearchSuggestions');
+    if (searchInput && box && !searchInput.contains(e.target) && !box.contains(e.target)) {
+        box.style.display = 'none';
+    }
+});
 
 function refreshBillDashboard() {
     var bills = getData('dmbms_bills');
@@ -2112,7 +2181,7 @@ function printWorkReport() {
   window.addEventListener('storage',function(){if(window.requestIdleCallback)requestIdleCallback(checkStorage);else setTimeout(checkStorage,0);});
   document.addEventListener('DOMContentLoaded',function(){
     var btn=document.createElement('button');btn.className='smart-doctor-btn';btn.title='Smart System Doctor';btn.innerHTML='🤖<span class="smart-doctor-badge"></span>';btn.onclick=open;document.body.appendChild(btn);
-    var ov=document.getElementById('smartDoctorOverlay');ov.className='smart-doctor-overlay';ov.innerHTML='<div class="smart-doctor-card"><div class="smart-doctor-head"><div class="smart-doctor-title">🤖 Smart System Doctor</div><button class="smart-doctor-close" onclick="document.getElementById(\'smartDoctorOverlay\').style.display=\'none\'">X</button></div><div id="smartDoctorStatus" class="smart-doctor-status">तपासणी सुरू...</div><div id="smartDoctorBody"></div><div class="smart-doctor-actions"><button class="sd-run" onclick="smartDoctorRun()">🔍 पुन्हा तपासा</button><button class="sd-recover" onclick="smartDoctorRecover()">🛠️ सुरक्षित Recovery</button></div><div style="font-size:10px;color:#666;margin-top:8px;">टीप: Smart Doctor डेटा स्वतःहून delete/बदलत नाही. तो समस्या शोधतो, जागा/कारण सांगतो आणि सुरक्षित मार्गदर्शन देतो.</div></div></div>';document.body.appendChild(ov);
+    var ov=document.createElement('div');ov.id='smartDoctorOverlay';ov.className='smart-doctor-overlay';ov.innerHTML='<div class="smart-doctor-card"><div class="smart-doctor-head"><div class="smart-doctor-title">🤖 Smart System Doctor</div><button class="smart-doctor-close" onclick="document.getElementById(\'smartDoctorOverlay\').style.display=\'none\'">X</button></div><div id="smartDoctorStatus" class="smart-doctor-status">तपासणी सुरू...</div><div id="smartDoctorBody"></div><div class="smart-doctor-actions"><button class="sd-run" onclick="smartDoctorRun()">🔍 पुन्हा तपासा</button><button class="sd-recover" onclick="smartDoctorRecover()">🛠️ सुरक्षित Recovery</button></div><div style="font-size:10px;color:#666;margin-top:8px;">टीप: Smart Doctor डेटा स्वतःहून delete/बदलत नाही. तो समस्या शोधतो, जागा/कारण सांगतो आणि सुरक्षित मार्गदर्शन देतो.</div></div></div>';document.body.appendChild(ov);
   });
 })();
 </script>
