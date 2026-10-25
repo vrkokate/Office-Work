@@ -43,33 +43,31 @@ border: none !important; border-radius: 8px; text-align: center; padding: 11px 4
 
 .btn-report { width: 100%; background: #0d47a1; color: #fff; border: none; padding: 11px; font-size: 13.5px; font-weight: 800; border-radius: 6px; cursor: pointer; margin-top: 6px; letter-spacing: 0.5px; }
 
-/* 🌟 जुन्या डिझाईनप्रमाणे हुबेहूब ब्लू रंगाचे M.B. क्रमांक आणि स्क्रोलिंग यादी */
+/* 🌟 बॉक्स-रहित, बॉर्डर-रहित केवल नीले रंग के स्क्रॉल होने वाले M.B. नंबर */
 #smartSearchSuggestions {
     display: none;
     position: absolute;
     left: 0;
     right: 0;
     top: calc(100% + 2px);
-    background: #fff;
-    border: 2px solid #0d47a1;
-    border-radius: 6px;
+    background: transparent;
+    border: none;
     max-height: 150px;
     overflow-y: auto;
     z-index: 1000;
-    box-shadow: 0 4px 12px rgba(13, 71, 161, 0.2);
+    box-shadow: none;
 }
 .suggestion-item {
-    padding: 8px 10px;
-    font-size: 15px;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 6px 10px;
+    font-size: 16px;
     cursor: pointer;
     color: #0d47a1;
     font-weight: 800;
-    text-align: center;
+    text-align: left;
     letter-spacing: 0.5px;
 }
 .suggestion-item:hover {
-    background: #e3f2fd;
+    background: rgba(13, 71, 161, 0.08);
 }
 
 .date-placeholder-input { position: relative; color: #212121; }
@@ -292,7 +290,7 @@ body * { visibility: hidden !important; }
 <div class="form-group" style="position: relative;">
 <label>स्मार्ट शोध (M.B. क्र., नाव किंवा तपशील)</label>
 <input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका" oninput="handleSmartSearchInput(this)">
-<!-- 🌟 जुन्या डिझाईनप्रमाणे फक्त ब्लू रंगाचे M.B. क्रमांक आणि स्क्रोलिंग यादी -->
+<!-- 🌟 जुन्या स्क्रीनशॉटप्रमाणे बॉक्स-रहित, थेट ओळीत दिसणारी स्क्रोलिंग ब्लू नंबर्स यादी -->
 <div id="smartSearchSuggestions"></div>
 </div>
 
@@ -593,7 +591,7 @@ function closeCustomConfirm(isConfirmed) {
     expectedVerifyMB = null;
 }
 
-// 🌟 जुन्या डिझाईनप्रमाणे फक्त ब्लू रंगाचे M.B. क्रमांक आणि स्क्रोलिंग यादी दाखवणारे अचूक फंक्शन
+// 🌟 जुन्या डिझाईनप्रमाणे बॉक्स-रहित फक्त ब्लू नंबर्स स्क्रोलिंग लिस्ट
 function handleSmartSearchInput(input) {
     var query = (input.value || '').trim().toLowerCase();
     var box = document.getElementById('smartSearchSuggestions');
@@ -1461,7 +1459,7 @@ function deleteMB(idx) {
             list.splice(idx, 1);
             setData('mb_records', list);
             refreshAll();
-            showAlert('नोंद हटवली!', 'SUCCESS');
+            showAlert('M.B. नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
         }
     });
 }
@@ -2136,7 +2134,7 @@ function printWorkReport() {
   window.smartDoctorRun=run;window.smartDoctorRecover=safeRecover;
   window.addEventListener('error',function(e){lastError={message:e.message||'Unknown error',location:(e.filename||pageName())+':'+(e.lineno||'?')+':'+(e.colno||'?')};var b=document.querySelector('.smart-doctor-badge');if(b)b.style.background='#d32f2f';});
   window.addEventListener('unhandledrejection',function(e){lastError={message:'Unhandled promise rejection: '+(e.reason&&e.reason.message||e.reason||'Unknown'),location:pageName()};var b=document.querySelector('.smart-doctor-badge');if(b)b.style.background='#d32f2f';});
-  window.addEventListener('load',function(){setTimeout(function(){checkPerformance();},0);});
+  window.addEventListener('load',function(-){setTimeout(function(){checkPerformance();},0);});
   window.addEventListener('storage',function(){if(window.requestIdleCallback)requestIdleCallback(checkStorage);else setTimeout(checkStorage,0);});
   document.addEventListener('DOMContentLoaded',function(){
     var btn=document.createElement('button');btn.className='smart-doctor-btn';btn.title='Smart System Doctor';btn.innerHTML='🤖<span class="smart-doctor-badge"></span>';btn.onclick=open;document.body.appendChild(btn);
