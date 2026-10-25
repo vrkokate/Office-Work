@@ -43,7 +43,7 @@ border: none !important; border-radius: 8px; text-align: center; padding: 11px 4
 
 .btn-report { width: 100%; background: #0d47a1; color: #fff; border: none; padding: 11px; font-size: 13.5px; font-weight: 800; border-radius: 6px; cursor: pointer; margin-top: 6px; letter-spacing: 0.5px; }
 
-/* 🌟 बॉक्स-रहित, बॉर्डर-रहित केवल नीले रंग के स्क्रॉल होने वाले M.B. नंबर */
+/* 🌟 बॉक्स-रहित, बॉर्डर-रहित थेट निळ्या रंगाचे स्क्रोल होणारे M.B. अंक */
 #smartSearchSuggestions {
     display: none;
     position: absolute;
@@ -52,19 +52,20 @@ border: none !important; border-radius: 8px; text-align: center; padding: 11px 4
     top: calc(100% + 2px);
     background: transparent;
     border: none;
-    max-height: 150px;
+    max-height: 180px;
     overflow-y: auto;
     z-index: 1000;
     box-shadow: none;
 }
 .suggestion-item {
     padding: 6px 10px;
-    font-size: 16px;
+    font-size: 15px;
     cursor: pointer;
     color: #0d47a1;
     font-weight: 800;
     text-align: left;
     letter-spacing: 0.5px;
+    background: transparent;
 }
 .suggestion-item:hover {
     background: rgba(13, 71, 161, 0.08);
@@ -506,6 +507,12 @@ window.onload = function() {
     if (fDate) checkDatePlaceholder(fDate);
     if (tDate) checkDatePlaceholder(tDate);
     
+    // टॅब बदलून परत आल्यावर किंवा पेज लोडवर सर्च बॉक्स कोरा ठेवणे
+    var searchInput = document.getElementById('smartSearchInput');
+    if(searchInput) searchInput.value = '';
+    var box = document.getElementById('smartSearchSuggestions');
+    if(box) box.style.display = 'none';
+
     refreshAll();
     refreshMBDashboard();
     onMainCategoryChange();
@@ -591,7 +598,7 @@ function closeCustomConfirm(isConfirmed) {
     expectedVerifyMB = null;
 }
 
-// 🌟 जुन्या डिझाईनप्रमाणे बॉक्स-रहित फक्त ब्लू नंबर्स स्क्रोलिंग लिस्ट
+// 🌟 जुन्या स्क्रीनशॉटनुसार थेट ओळीत दिसणारे, बॉक्स-रहित आणि स्क्रोलिंग असलेले ब्लू नंबर्स
 function handleSmartSearchInput(input) {
     var query = (input.value || '').trim().toLowerCase();
     var box = document.getElementById('smartSearchSuggestions');
@@ -2134,7 +2141,7 @@ function printWorkReport() {
   window.smartDoctorRun=run;window.smartDoctorRecover=safeRecover;
   window.addEventListener('error',function(e){lastError={message:e.message||'Unknown error',location:(e.filename||pageName())+':'+(e.lineno||'?')+':'+(e.colno||'?')};var b=document.querySelector('.smart-doctor-badge');if(b)b.style.background='#d32f2f';});
   window.addEventListener('unhandledrejection',function(e){lastError={message:'Unhandled promise rejection: '+(e.reason&&e.reason.message||e.reason||'Unknown'),location:pageName()};var b=document.querySelector('.smart-doctor-badge');if(b)b.style.background='#d32f2f';});
-  window.addEventListener('load',function(-){setTimeout(function(){checkPerformance();},0);});
+  window.addEventListener('load',function(){setTimeout(function(){checkPerformance();},0);});
   window.addEventListener('storage',function(){if(window.requestIdleCallback)requestIdleCallback(checkStorage);else setTimeout(checkStorage,0);});
   document.addEventListener('DOMContentLoaded',function(){
     var btn=document.createElement('button');btn.className='smart-doctor-btn';btn.title='Smart System Doctor';btn.innerHTML='🤖<span class="smart-doctor-badge"></span>';btn.onclick=open;document.body.appendChild(btn);
