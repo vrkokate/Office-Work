@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#020d1b">
+<title>SMART TOOLS STRONGER WORK — Login</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #020d1b;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  position: fixed;
+  inset: 0;
+  overscroll-behavior: none;
+}
+
+#screen {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: #020d1b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#design {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  position: absolute;
+  z-index: 1;
+}
+
+/* मूळ फोटोवरील इनपुट बॉक्सेस अचूक बसवण्यासाठी ओव्हरले */
+.overlay-form {
+  position: absolute;
+  z-index: 10;
+  width: 82%;
+  max-width: 320px;
+  top: 55%; 
+  left: 50%;
+  transform: translate(-50%, 0);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-container {
+  position: relative;
+  width: 100%;
+  background: rgba(2, 6, 23, 0.7);
+  border: 1px solid rgba(0, 243, 255, 0.4);
+  border-radius: 12px;
+}
+
+.input-container i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #00f3ff;
+  font-size: 15px;
+}
+
+.input-box {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 14px;
+  padding: 12px 12px 12px 42px;
+}
+
+.login-btn {
+  width: 100%;
+  height: 46px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+.forgot-link {
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: #00f3ff;
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+/* डॅशबोर्ड आणि ऍडमिन लॉगसाठी पॅनल स्क्रीन */
+#dashboard-screen {
+  position: fixed;
+  inset: 0;
+  background: #020617;
+  z-index: 100;
+  display: none;
+  color: #ffffff;
+  padding: 20px;
+  overflow-y: auto;
+}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+  <!-- लॉगिन स्क्रीन (मूळ फोटो आणि ओव्हरले) -->
+  <main id="screen" aria-label="Login page design">
+    <!-- तुमच्या मूळ फोटोचा Base64 कोड येथे टाका -->
+    <img id="design"
+         alt="Original login page design"
+         src="data:image/png;base64,येथे-मूळ-फोटोचा-संपूर्ण-डेटा">
+
+    <!-- पारदर्शक इनपुट कंट्रोल्स जे फोटोच्या बॉक्सवर तंतोतंत बसतील -->
+    <div class="overlay-form">
+      <form id="loginForm" onsubmit="processLogin(event)">
+        <!-- Username -->
+        <div class="input-container" style="margin-bottom: 12px;">
+          <i class="fa-solid fa-user"></i>
+          <input type="text" id="username" class="input-box" placeholder="Username" required>
+        </div>
+
+        <!-- Password -->
+        <div class="input-container" style="margin-bottom: 14px;">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="password" class="input-box" placeholder="Password" required>
+        </div>
+
+        <!-- Sign In Button (फोटोमधील निळ्या बटणावर क्लिक होईल) -->
+        <button type="submit" class="login-btn"></button>
+      </form>
+
+      <!-- Forgot Password -->
+      <button type="button" class="forgot-link" onclick="forgotPassword()">Forgot Password?</button>
+    </div>
+  </main>
+
+  <!-- ऍडमिन व युजर डॅशबोर्ड व ऍक्टिव्हिटी लॉग पॅनल -->
+  <div id="dashboard-screen">
+    <div style="max-width: 800px; margin: 0 auto; padding-top: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,243,255,0.3); padding-bottom: 15px; margin-bottom: 20px;">
+        <h2 id="welcomeTitle" style="color: #00f3ff; margin: 0;">Dashboard</h2>
+        <button onclick="logout()" style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer;">Logout</button>
+      </div>
+
+      <!-- ऍडमिनसाठी स्वतंत्र ऍक्टिव्हिटी लॉग टॅब -->
+      <div id="adminPanel" style="display: none;">
+        <h3 style="color: #38bdf8; margin-bottom: 10px;"><i class="fa-solid fa-list-check"></i> युजर ऍक्टिव्हिटी लॉग (User Activity Logs)</h3>
+        <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">इथे सर्व युजरच्या हालचाली आणि लॉगिन रेकॉर्ड्स दिसतील:</p>
+        
+        <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(0,243,255,0.2); border-radius: 12px; overflow: hidden;">
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+            <thead>
+              <tr style="background: rgba(0, 243, 255, 0.1); color: #00f3ff; border-bottom: 1px solid rgba(0,243,255,0.2);">
+                <th style="padding: 12px;">अ.क्र.</th>
+                <th style="padding: 12px;">युजरनेम</th>
+                <th style="padding: 12px;">केलेली कृती (Action)</th>
+                <th style="padding: 12px;">वेळ व तारीख</th>
+              </tr>
+            </thead>
+            <tbody id="logTableBody">
+              <!-- JavaScript द्वारे रेकॉर्ड्स येथे लोड होतील -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- साधारण युजर डॅशबोर्ड -->
+      <div id="userPanel" style="display: none;">
+        <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(0,243,255,0.2); padding: 20px; border-radius: 12px;">
+          <h3 style="color: #00f3ff;">वेतन व फरक प्रणाली</h3>
+          <p>स्वागत आहे! तुम्ही यशस्वीरित्या युजर लॉगिन केले आहे.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ऍक्टिव्हिटी लॉग सेव्ह करण्याची पद्धत
+    function logActivity(username, action) {
+      let logs = JSON.parse(localStorage.getItem('user_activities')) || [];
+      const now = new Date().toLocaleString('en-IN');
+      logs.unshift({ username, action, time: now });
+      localStorage.setItem('user_activities', JSON.stringify(logs));
+    }
+
+    function processLogin(event) {
+      event.preventDefault();
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value.trim();
+
+      // ऍडमिन व युजर लॉगिन तपासणी
+      if (u === 'admin' && p === 'admin123') {
+        logActivity(u, 'ऍडमिन लॉगिन यशस्वी');
+        openDashboard('admin', u);
+      } else if (u === 'user' && p === 'user123') {
+        logActivity(u, 'युजर लॉगिन यशस्वी');
+        openDashboard('user', u);
+      } else {
+        logActivity(u, 'चुकीच्या पासवर्डसह लॉगिन प्रयत्न');
+        alert('चुकीचा युजरनेम किंवा पासवर्ड!');
+      }
+    }
+
+    function openDashboard(role, username) {
+      document.getElementById('screen').style.display = 'none';
+      document.getElementById('dashboard-screen').style.display = 'block';
+
+      if (role === 'admin') {
+        document.getElementById('welcomeTitle').innerText = 'Welcome Admin: ' + username;
+        document.getElementById('adminPanel').style.display = 'block';
+        loadActivityLogs();
+      } else {
+        document.getElementById('welcomeTitle').innerText = 'Welcome User: ' + username;
+        document.getElementById('userPanel').style.display = 'block';
+      }
+    }
+
+    function loadActivityLogs() {
+      const tbody = document.getElementById('logTableBody');
+      const logs = JSON.parse(localStorage.getItem('user_activities')) || [];
+      
+      if (logs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="padding: 15px; text-align: center; color: #94a3b8;">कोणतेही रेकॉर्ड उपलब्ध नाही.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = logs.map((log, index) => `
+        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+          <td style="padding: 12px;">${index + 1}</td>
+          <td style="padding: 12px; color: #38bdf8; font-weight: bold;">${log.username}</td>
+          <td style="padding: 12px;">${log.action}</td>
+          <td style="padding: 12px; color: #94a3b8; font-size: 13px;">${log.time}</td>
+        </tr>
+      `).join('');
+    }
+
+    function forgotPassword() {
+      alert('कृपया पासवर्ड रिसेट करण्यासाठी ऍडमिनशी संपर्क साधा.');
+    }
+
+    function logout() {
+      document.getElementById('dashboard-screen').style.display = 'none';
+      document.getElementById('screen').style.display = 'flex';
+      document.getElementById('loginForm').reset();
+    }
+  </script>
+</body>
+</html>
