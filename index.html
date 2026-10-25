@@ -131,7 +131,7 @@ padding: 4px 12px; font-size: 11px; color: #00e5ff; font-weight: 600; display: f
 .data-table th, .data-table td { border: 1px solid #ddd; padding: 5px 6px; text-align: left; vertical-align: middle; }
 .data-table th { background: #f5f5f5; font-weight: 600; }
 
-/* Bill Register Wizard & Summary Styles (Screenshots Match) */
+/* Bill Register Summary & Wizard Styles */
 .summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 10px; }
 .sum-card-clickable { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
 .sum-card-clickable:hover { background: #f8fafc; }
@@ -139,9 +139,9 @@ padding: 4px 12px; font-size: 11px; color: #00e5ff; font-weight: 600; display: f
 .wizard-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3500; justify-content: center; align-items: center; padding: 10px; }
 .wizard-card { background: #fff; border-radius: 12px; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; padding: 18px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
 .steps-indicator { display: flex; justify-content: space-between; margin-bottom: 14px; padding: 0 20px; }
-.step-dot { width: 30px; height: 30px; border-radius: 50%; background: #cbd5e1; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
-.step-dot.active { background: #f97316; }
-.step-dot.completed { background: #16a34a; }
+.step-circle { width: 32px; height: 32px; border-radius: 50%; background: #94a3b8; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px; }
+.step-circle.active { background: #f97316; }
+.step-circle.done { background: #16a34a; }
 .wizard-buttons { display: flex; gap: 8px; margin-top: 14px; }
 .btn-wizard { flex: 1; padding: 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; color: #fff; }
 .btn-back { background: #64748b; } .btn-next { background: #f97316; } .btn-submit { background: #16a34a; }
@@ -187,22 +187,22 @@ body * { visibility: hidden !important; }
 <a href="DataManager.html" class="action-btn btn-settings"><span>⚙</span>Data Manager</a>
 </div>
 
-<!-- 4. Bill Reg. मोडल (स्क्रीनशॉट 1000394872.jpg नुसार अचूक ४ समरी कार्ड्स, नारिंगी व निळे बटण) -->
+<!-- 4. Bill Reg. मोडल (Screenshots 1000394872.jpg नुसार अचूक ४ समरी कार्ड्स, नारिंगी व निळे बटण) -->
 <div id="billModal" class="modal-overlay" style="display:flex;"><div class="modal-card" style="max-width:480px;">
 <div class="modal-header">
     <h3 style="font-size: 15px; color:#f57c00; font-weight:800;">📄 देयक नोंदवही (Bill Register)</h3>
     <a href="dashboard.html" class="btn-close" style="background:#e53935; color:#fff; text-decoration:none; padding:4px 10px; border-radius:4px; font-weight:bold;">X</a>
 </div>
 
-<!-- ४ समरी कार्ड्स -->
-<div class="summary-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom:10px;">
+<!-- ४ समरी कार्ड्स (Total Bills, Total Amount, Total Deduction, Net Payable) -->
+<div class="summary-grid" style="margin-bottom:10px;">
     <div class="sum-card-clickable" onclick="openDetailPopup('TOTAL_BILLS')"><div class="label" style="font-size:11px; color:#666;">Total Bills</div><div class="val" style="font-size:16px; font-weight:700; color:#0d47a1;" id="sumTotalBills">0</div></div>
     <div class="sum-card-clickable" onclick="openDetailPopup('TOTAL_AMOUNT')"><div class="label" style="font-size:11px; color:#666;">Total Amount</div><div class="val" style="font-size:16px; font-weight:700; color:#0d47a1;" id="sumTotalAmount">₹ 0</div></div>
     <div class="sum-card-clickable" onclick="openDetailPopup('TOTAL_DEDUCTION')"><div class="label" style="font-size:11px; color:#666;">Total Deduction</div><div class="val" style="font-size:16px; font-weight:700; color:#d32f2f;" id="sumTotalDed">₹ 0</div></div>
     <div class="sum-card-clickable net" onclick="openDetailPopup('NET_PAYABLE')"><div class="label" style="font-size:11px; color:#666;">Net Payable</div><div class="val" style="font-size:16px; font-weight:700; color:#16a34a;" id="sumNetPay">₹ 0</div></div>
 </div>
 
-<!-- २ मुख्य बटन्स (नारिंगी व निळे) -->
+<!-- २ मुख्य बटन्स: नारिंगी 'नवीन देयक नोंदवा' आणि निळे 'प्रिंट / पीडीएफ रिपोर्ट' -->
 <div style="display: flex; gap: 8px; margin-bottom: 12px;">
     <button type="button" class="btn-report" style="background:#f97316; margin:0; flex:1;" onclick="openWizard(1)"><i class="fa-solid fa-plus"></i> नवीन देयक नोंदवा</button>
     <button type="button" class="btn-report" style="background:#1d4ed8; margin:0; flex:1;" onclick="printMasterBillReport()">🖨️ प्रिंट / पीडीएफ रिपोर्ट</button>
@@ -217,7 +217,7 @@ body * { visibility: hidden !important; }
 
 </div>
 
-<!-- ==================== ३-स्टेप्स विझार्ड मॉडेल (Screenshots 1000408535, 36, 37 नुसार) ==================== -->
+<!-- ==================== ३-स्टेप्स विझार्ड मॉडेल ==================== -->
 <div id="wizardModal" class="wizard-overlay">
     <div class="wizard-card">
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f97316; padding-bottom:8px; margin-bottom:12px;">
@@ -227,21 +227,21 @@ body * { visibility: hidden !important; }
 
         <input type="hidden" id="editBillIndex" value="-1">
 
-        <!-- स्टेप्स इंडिकेटर (1, 2, 3) -->
+        <!-- स्टेप्स इंडिकेटर (1, 2, 3 वर्तुळे) -->
         <div class="steps-indicator">
             <div class="step-circle active" id="dot1">1</div>
             <div class="step-circle" id="dot2">2</div>
             <div class="step-circle" id="dot3">3</div>
         </div>
 
-        <!-- स्टेप १: मुख्य माहिती -->
+        <!-- स्टेप १: मुख्य माहिती (Screen 1000408535_2.jpg नुसार) -->
         <div class="wizard-step" id="step1">
-            <div class="form-group"><label>संबंधित कनिष्ठ अभियंता (JE) *[span_2](start_span)[span_2](end_span)</label><select class="form-control" id="wJeSelect" onchange="onWizardJEChange()"><option value="">-- JE निवडा --[span_3](start_span)[span_3](end_span)</option></select></div>
-            <div class="form-group"><label>वाटप केलेली M.B. क्रमांक *[span_4](start_span)[span_4](end_span)</label><select class="form-control" id="wMbSelect" onchange="onWizardMBChange()"><option value="">-- आधी JE निवडा --[span_5](start_span)[span_5](end_span)</option></select></div>
+            <div class="form-group"><label>संबंधित कनिष्ठ अभियंता (JE) *[span_3](start_span)[span_3](end_span)</label><select class="form-control" id="wJeSelect" onchange="onWizardJEChange()"><option value="">-- JE निवडा --[span_4](start_span)[span_4](end_span)</option></select></div>
+            <div class="form-group"><label>वाटप केलेली M.B. क्रमांक *[span_5](start_span)[span_5](end_span)</label><select class="form-control" id="wMbSelect" onchange="onWizardMBChange()"><option value="">-- आधी JE निवडा --[span_6](start_span)[span_6](end_span)</option></select></div>
             <div class="form-group"><label>कंत्राटदार / एजन्सी चे नाव</label><input type="text" class="form-control" id="wContractor" placeholder="कंत्राटदार नाव" readonly style="background:#f2f2f2;"></div>
             <div class="form-group"><label>संबंधित कामाचे नाव</label><input type="text" class="form-control" id="wWorkName" placeholder="कामाचे नाव" readonly style="background:#f2f2f2;"></div>
-            <div class="form-group"><label>बिलाचा प्रकार निवडा *[span_6](start_span)[span_6](end_span)</label><select class="form-control" id="wBillType"><option value="">-- बिलाचा प्रकार निवडा --[span_7](start_span)[span_7](end_span)</option><option value="First RA Bill">First RA Bill[span_8](start_span)[span_8](end_span)</option><option value="Running Bill">Running Bill</option><option value="Final Bill">Final Bill</option></select></div>
-            <div class="form-group"><label>बिलाचा दिनांक *[span_9](start_span)[span_9](end_span)</label><input type="date" class="form-control" id="wBillDate"></div>
+            <div class="form-group"><label>बिलाचा प्रकार निवडा *[span_7](start_span)[span_7](end_span)</label><select class="form-control" id="wBillType"><option value="">-- बिलाचा प्रकार निवडा --[span_8](start_span)[span_8](end_span)</option><option value="First RA Bill">First RA Bill[span_9](start_span)[span_9](end_span)</option><option value="Running Bill">Running Bill</option><option value="Final Bill">Final Bill</option></select></div>
+            <div class="form-group"><label>बिलाचा दिनांक *[span_10](start_span)[span_10](end_span)</label><input type="date" class="form-control" id="wBillDate"></div>
             <div class="wizard-buttons">
                 <button class="btn-wizard btn-next" onclick="goToStep(2)">पुढील ➔</button>
             </div>
@@ -249,20 +249,20 @@ body * { visibility: hidden !important; }
 
         <!-- स्टेप २: कपात व हिशोब -->
         <div class="wizard-step hidden" id="step2">
-            <h4 style="font-size:13px; color:#c2410c; margin-bottom:8px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">Deduction (कपात तपशील)[span_10](start_span)[span_10](end_span)</h4>
-            <div class="form-group"><label>Passed Amount (पास रक्कम) ₹ *[span_11](start_span)[span_11](end_span)</label><input type="number" class="form-control" id="wPassedAmt" placeholder="उदा. 1000000" oninput="autoCalculateDeductions()"></div>
-            <div class="form-group"><label>Income Tax 2%[span_12](start_span)[span_12](end_span)</label><input type="number" class="form-control calc-ded" id="dedIT" value="0" oninput="updateDeductionTotals()"></div>
-            <div class="form-group"><label>Security Deposit 0.5%[span_13](start_span)[span_13](end_span)</label><input type="number" class="form-control calc-ded" id="dedSD" value="0" oninput="updateDeductionTotals()"></div>
-            <div class="form-group"><label>Maintenance 0.5%[span_14](start_span)[span_14](end_span)</label><input type="number" class="form-control calc-ded" id="dedMaint" value="0" oninput="updateDeductionTotals()"></div>
-            <div class="form-group"><label>Royalty Charges 1%[span_15](start_span)[span_15](end_span)</label><input type="number" class="form-control calc-ded" id="dedRoyalty" value="0" oninput="updateDeductionTotals()"></div>
-            <div class="form-group"><label>Govt. Ins. Scheme 1%[span_16](start_span)[span_16](end_span)</label><input type="number" class="form-control calc-ded" id="dedGovt" value="0" oninput="updateDeductionTotals()"></div>
-            <div class="form-group"><label>Upkar (W.C.) 1%[span_17](start_span)[span_17](end_span)</label><input type="number" class="form-control calc-ded" id="dedUpkar" value="0" oninput="updateDeductionTotals()"></div>
-            <div class="form-group"><label>CGST 1%[span_18](start_span)[span_18](end_span)</label><input type="number" class="form-control calc-ded" id="dedCGST" value="0" oninput="updateDeductionTotals()"></div>
-            <div class="form-group"><label>SGST 1%[span_19](start_span)[span_19](end_span)</label><input type="number" class="form-control calc-ded" id="dedSGST" value="0" oninput="updateDeductionTotals()"></div>
+            <h4 style="font-size:13px; color:#c2410c; margin-bottom:8px; border-bottom:1px solid #cbd5e1; padding-bottom:4px;">Deduction (कपात तपशील)[span_11](start_span)[span_11](end_span)</h4>
+            <div class="form-group"><label>Passed Amount (पास रक्कम) ₹ *[span_12](start_span)[span_12](end_span)</label><input type="number" class="form-control" id="wPassedAmt" placeholder="उदा. 1000000" oninput="autoCalculateDeductions()"></div>
+            <div class="form-group"><label>Income Tax 2%[span_13](start_span)[span_13](end_span)</label><input type="number" class="form-control calc-ded" id="dedIT" value="0" oninput="updateDeductionTotals()"></div>
+            <div class="form-group"><label>Security Deposit 0.5%[span_14](start_span)[span_14](end_span)</label><input type="number" class="form-control calc-ded" id="dedSD" value="0" oninput="updateDeductionTotals()"></div>
+            <div class="form-group"><label>Maintenance 0.5%[span_15](start_span)[span_15](end_span)</label><input type="number" class="form-control calc-ded" id="dedMaint" value="0" oninput="updateDeductionTotals()"></div>
+            <div class="form-group"><label>Royalty Charges 1%[span_16](start_span)[span_16](end_span)</label><input type="number" class="form-control calc-ded" id="dedRoyalty" value="0" oninput="updateDeductionTotals()"></div>
+            <div class="form-group"><label>Govt. Ins. Scheme 1%[span_17](start_span)[span_17](end_span)</label><input type="number" class="form-control calc-ded" id="dedGovt" value="0" oninput="updateDeductionTotals()"></div>
+            <div class="form-group"><label>Upkar (W.C.) 1%[span_18](start_span)[span_18](end_span)</label><input type="number" class="form-control calc-ded" id="dedUpkar" value="0" oninput="updateDeductionTotals()"></div>
+            <div class="form-group"><label>CGST 1%[span_19](start_span)[span_19](end_span)</label><input type="number" class="form-control calc-ded" id="dedCGST" value="0" oninput="updateDeductionTotals()"></div>
+            <div class="form-group"><label>SGST 1%[span_20](start_span)[span_20](end_span)</label><input type="number" class="form-control calc-ded" id="dedSGST" value="0" oninput="updateDeductionTotals()"></div>
 
             <div style="background:#fff3e0; border:1px solid #ffb74d; border-radius:6px; padding:8px; font-size:12px; margin:8px 0; font-weight:bold;">
-                <div>एकूण कपात (Total Deduction): ₹ <span id="wLblTotalDed" style="color:#d32f2f;">0</span>[span_20](start_span)[span_20](end_span)</div>
-                <div style="color:#16a34a; margin-top:2px;">प्रत्यक्षात देय रक्कम (Net Payable): ₹ <span id="wLblNetPay">0</span>[span_21](start_span)[span_21](end_span)</div>
+                <div>एकूण कपात (Total Deduction): ₹ <span id="wLblTotalDed" style="color:#d32f2f;">0</span>[span_21](start_span)[span_21](end_span)</div>
+                <div style="color:#16a34a; margin-top:2px;">प्रत्यक्षात देय रक्कम (Net Payable): ₹ <span id="wLblNetPay">0</span>[span_22](start_span)[span_22](end_span)</div>
             </div>
             <div class="wizard-buttons">
                 <button class="btn-wizard btn-back" onclick="goToStep(1)">⬅ मागे</button>
@@ -282,16 +282,13 @@ body * { visibility: hidden !important; }
     </div>
 </div>
 
+<div id="printableArea"></div>
+
 <script src="common.js"></script>
 <script>
 window.onload = function() {
     refreshBillDashboard();
 };
-
-function closeCustomAlert() {
-    var modal = document.getElementById('customAlertModal');
-    if(modal) modal.style.display = 'none';
-}
 
 function refreshBillDashboard() {
     var bills = getData('dmbms_bills');
@@ -353,10 +350,10 @@ function openWizard(step) {
     document.getElementById('editBillIndex').value = '-1';
     var jeSel = document.getElementById('wJeSelect');
     if(jeSel) {
-        jeSel.innerHTML = '<option value="">-- JE निवडा --</option>';[span_22](start_span)[span_22](end_span)
+        jeSel.innerHTML = '<option value="">-- JE निवडा --</option>';[span_23](start_span)[span_23](end_span)
         getData('je_records').forEach(function(j){ jeSel.add(new Option(j.name, j.name)); });
     }
-    document.getElementById('wMbSelect').innerHTML = '<option value="">-- आधी JE निवडा --</option>';[span_23](start_span)[span_23](end_span)
+    document.getElementById('wMbSelect').innerHTML = '<option value="">-- आधी JE निवडा --</option>';[span_24](start_span)[span_24](end_span)
     document.getElementById('wContractor').value = '';
     document.getElementById('wWorkName').value = '';
     document.getElementById('wBillType').value = '';
@@ -381,7 +378,7 @@ function goToStep(step) {
     for(var i=1; i<=3; i++) {
         var dot = document.getElementById('dot' + i);
         if(dot) {
-            dot.className = 'step-dot';
+            dot.className = 'step-circle';
             if(i < step) dot.classList.add('completed');
             else if(i === step) dot.classList.add('active');
         }
@@ -393,7 +390,7 @@ function onWizardJEChange() {
     var jeName = document.getElementById('wJeSelect').value;
     var mbSel = document.getElementById('wMbSelect');
     if(!mbSel) return;
-    mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';[span_24](start_span)[span_24](end_span)
+    mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';[span_25](start_span)[span_25](end_span)
     document.getElementById('wContractor').value = '';
     document.getElementById('wWorkName').value = '';
     if(!jeName) return;
