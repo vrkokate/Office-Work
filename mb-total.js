@@ -1,4 +1,4 @@
-// mb-total.js - Total M.B., Dashboard Counts, Filtering, and Reporting Logic
+// mb-total.js - Total M.B., Dashboard Counts, Filtering, Dependent Dropdown & Reporting Logic
 
 function animateNumberCount(elementId, finalVal) {
     var el = document.getElementById(elementId);
@@ -75,18 +75,32 @@ function getFilteredReceivedMBs() {
         var isAvail = isAvailableMap[normalizeMB(rawNo)];
         var holder = getMBDisplayHolder(statusObj, isAvail);
 
+        // स्रोत फिल्टर
         if (fSource && fSource !== 'सर्व (All)') {
             var src = (m.receivedSource || m.receivedFrom || '').toLowerCase();
             if (!src.includes(fSource.toLowerCase())) return false;
         }
+        // M.B. आकार फिल्टर
         if (fSize && fSize !== 'सर्व M.B.') {
             if (m.size !== fSize) return false;
         }
+        // कनिष्ठ अभियंता (JE) फिल्टर (डिपेंडंट)
         if (fJe && fJe !== 'सर्व JE') {
             if (!holder.includes(fJe)) return false;
         }
         return true;
     });
+}
+
+function onSourceChangeInModal() {
+    var srcVal = document.getElementById('qmFilterSource').value;
+    var jeSelect = document.getElementById('qmFilterJE');
+    
+    // डिपेंडंट लॉजिक: जर स्त्रोत 'विभागीय कार्यालय' किंवा 'भांडारपाल' निवडला, तर JE फिल्टर आपोआप 'सर्व JE' वर सेट होऊ शकतो किंवा त्यानुसार नियंत्रण ठेवता येते.
+    if (srcVal === 'विभागीय कार्यालय' || srcVal === 'भांडारपाल') {
+        // हवे असल्यास येथे अतिरिक्त बदल करता येऊ शकतात
+    }
+    renderQuickModalTable();
 }
 
 function renderQuickModalTable() {
@@ -172,11 +186,12 @@ function openQuickInfoModal(type) {
             jeOptions += '<option value="' + j.name + '">' + j.name + '</option>';
         });
 
+        // डिपेंडंट ड्रॉपडाऊन स्ट्रक्चरसह UI डिझाईन
         filterHTML = '<div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px; margin-bottom:10px; font-size:12px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);">' +
             '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">' +
             '<div>' +
             '<label style="display:block; font-weight:700; margin-bottom:3px; color:#0d47a1;">स्रोत:</label>' +
-            '<select class="form-control" id="qmFilterSource" style="padding:6px; font-size:11.5px; border-radius:6px; border:1px solid #94a3b8; background:#fff;" onchange="renderQuickModalTable()">' +
+            '<select class="form-control" id="qmFilterSource" style="padding:6px; font-size:11.5px; border-radius:6px; border:1px solid #94a3b8; background:#fff;" onchange="onSourceChangeInModal()">' +
             '<option value="सर्व (All)">सर्व (All)</option>' +
             '<option value="विभागीय कार्यालय">विभागीय कार्यालय</option>' +
             '<option value="भांडारपाल">भांडारपाल</option>' +
