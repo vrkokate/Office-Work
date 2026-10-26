@@ -1,4 +1,4 @@
-// mb-total.js - Total M.B., Dashboard Counts, Filtering, and Grouped Reporting Logic
+// mb-total.js - Total M.B., Dashboard Counts, and Reporting Logic
 
 function animateNumberCount(elementId, finalVal) {
     var el = document.getElementById(elementId);
@@ -59,44 +59,8 @@ function getUniqueReceivedMBs(excludeIndex = -1) {
     return list;
 }
 
-function getFilteredReceivedMBs() {
-    var list = getUniqueReceivedMBs();
-    var fJe = document.getElementById('qmFilterJE') ? document.getElementById('qmFilterJE').value : '';
-    var fSize = document.getElementById('qmFilterSize') ? document.getElementById('qmFilterSize').value : '';
-    var fSource = document.getElementById('qmFilterSource') ? document.getElementById('qmFilterSource').value : '';
-    var fFrom = document.getElementById('qmFromDate') ? document.getElementById('qmFromDate').value : '';
-    var fTo = document.getElementById('qmToDate') ? document.getElementById('qmToDate').value : '';
-
-    return list.filter(function(m) {
-        var rawNo = (m.mbNumber || '').trim();
-        var statusObj = getLatestMBStatus(rawNo);
-        var stock = getAvailableStock();
-        var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(rawNo); });
-        var holder = getMBDisplayHolder(statusObj, isAvail);
-
-        // JE Filter
-        if (fJe) {
-            if (!holder.includes(fJe)) return false;
-        }
-        // Size Filter
-        if (fSize) {
-            if (m.size !== fSize) return false;
-        }
-        // Source Filter
-        if (fSource) {
-            var src = (m.receivedSource || m.receivedFrom || '').toLowerCase();
-            if (!src.includes(fSource.toLowerCase())) return false;
-        }
-        // Date Range Filter (दिनांक पासून - दिनांक पर्यंत)
-        if (fFrom && m.date && m.date < fFrom) return false;
-        if (fTo && m.date && m.date > fTo) return false;
-
-        return true;
-    });
-}
-
 function renderQuickModalTable() {
-    var list = getFilteredReceivedMBs();
+    var list = getUniqueReceivedMBs();
     var stock = getAvailableStock();
     var isAvailableMap = {};
     stock.forEach(function(s) { isAvailableMap[normalizeMB(s.mbNumber)] = true; });
@@ -164,25 +128,8 @@ function openQuickInfoModal(type) {
     currentQuickModalType = type;
     var title = type === 'घेणेD' ? 'एकूण M.B.' : (type === 'GIVEN' ? 'दिलेली M.B.' : 'उपलब्ध M.B.');
     
-    var filterHTML = '';
-    if (type === 'घेणेD') {
-        var jeOptions = '<option value="">-- सर्व JE --</option>';
-        getData('je_records').forEach(function(j) { jeOptions += '<option value="' + j.name + '">' + j.name + '</option>'; });
-        
-        filterHTML = '<div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:8px; margin-bottom:10px; font-size:11.5px;">' +
-            '<div style="font-weight:700; color:#0d47a1; margin-bottom:6px;">📊 एकूण M.B. रिपोर्ट फिल्टर व कालावधी</div>' +
-            '<div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px;">' +
-            '<div><label style="display:block; font-weight:600; margin-bottom:2px;">दिनांक पासून</label><input type="date" class="form-control" id="qmFromDate" style="padding:4px; font-size:11px;" onchange="renderQuickModalTable()"></div>' +
-            '<div><label style="display:block; font-weight:600; margin-bottom:2px;">दिनांक पर्यंत</label><input type="date" class="form-control" id="qmToDate" style="padding:4px; font-size:11px;" onchange="renderQuickModalTable()"></div>' +
-            '</div>' +
-            '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:6px;">' +
-            '<div><label style="display:block; font-weight:600; margin-bottom:2px;">JE निवडा</label><select class="form-control" id="qmFilterJE" style="padding:4px; font-size:11px;" onchange="renderQuickModalTable()">' + jeOptions + '</select></div>' +
-            '<div><label style="display:block; font-weight:600; margin-bottom:2px;">M.B. प्रकार</label><select class="form-control" id="qmFilterSize" style="padding:4px; font-size:11px;" onchange="renderQuickModalTable()"><option value="">-- सर्व M.B. --</option><option value="लहान M.B.">लहान M.B.</option><option value="मोठी M.B.">मोठी M.B.</option></select></div>' +
-            '<div><label style="display:block; font-weight:600; margin-bottom:2px;">नोंद स्रोत</label><select class="form-control" id="qmFilterSource" style="padding:4px; font-size:11px;" onchange="renderQuickModalTable()"><option value="">-- सर्व स्रोत --</option><option value="विभागीय कार्यालय">विभागीय कार्यालय</option><option value="भांडारपाल">भांडारपाल</option></select></div>' +
-            '</div></div>';
-    }
-
-    var fullHTML = filterHTML + '<div id="qmTableContainer"></div>';
+    // फिल्टरचा भाग पूर्णपणे काढून टाकला आहे
+    var fullHTML = '<div id="qmTableContainer"></div>';
 
     document.getElementById('quickModalTitle').innerText = title;
     document.getElementById('quickModalBody').innerHTML = fullHTML;
@@ -283,9 +230,7 @@ function printQuickModalReport() {
     }
 
     // एकूण M.B. (घेणेD) साठी मुख्य स्त्रोत आणि दुसरा स्त्रोत गटानुसार (Grouped Report) प्रिंट जनरेट करणे
-    var list = getFilteredReceivedMBs();
-    var fFrom = document.getElementById('qmFromDate') ? document.getElementById('qmFromDate').value : '';
-    var fTo = document.getElementById('qmToDate') ? document.getElementById('qmToDate').value : '';
+    var list = getUniqueReceivedMBs();
     var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 
     var groups = {};
@@ -296,13 +241,11 @@ function printQuickModalReport() {
         var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(rawNo); });
         var holder = getMBDisplayHolder(statusObj, isAvail);
 
-        // मुख्य स्त्रोत (Main Source) ठरवणे
         var mainSrc = m.receivedSource || m.receivedFrom || 'इतर स्त्रोत';
         if (mainSrc.includes('भांडारपाल')) mainSrc = 'भांडारपाल (Bhandarpal)';
         else if (mainSrc.includes('कार्यालय') || mainSrc.includes('जमा')) mainSrc = 'विभागीय कार्यालय (Office)';
         else mainSrc = 'इतर स्त्रोत (Other)';
 
-        // दुसरा स्त्रोत / धारक (Secondary Source / Holder)
         var secSrc = holder || 'कार्यालय';
 
         if (!groups[mainSrc]) groups[mainSrc] = {};
@@ -315,10 +258,7 @@ function printQuickModalReport() {
         '<h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1>' +
         '<h2 style="font-size:13px; font-weight:700; margin:3px 0;">एकूण मोजमाप पुस्तिका (M.B.) सविस्तर अहवाल (मुख्य व दुसरा स्त्रोत गटानुसार)</h2>' +
         '</div>' +
-        '<div style="display:flex; justify-content:space-between; font-size:11px; margin-top:5px;">' +
-        '<div><strong>कालावधी:</strong> ' + (fFrom ? formatDateToDMY(fFrom) : 'सर्व') + ' ते ' + (fTo ? formatDateToDMY(fTo) : 'सर्व') + '</div>' +
-        '<div><strong>अहवाल दिनांक:</strong> ' + todayStr + '</div>' +
-        '</div>' +
+        '<div style="text-align:right; font-size:11px; margin-top:5px;"><strong>अहवाल दिनांक:</strong> ' + todayStr + '</div>' +
         '</div>';
 
     var globalIndex = 1;
