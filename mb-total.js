@@ -1,4 +1,4 @@
-// mb-total.js - Total, Given, and Available M.B. Dashboards, Filters, and Reporting Logic
+// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters & Scrollable Table Logic
 
 function animateNumberCount(elementId, finalVal) {
     var el = document.getElementById(elementId);
@@ -232,8 +232,8 @@ function openQuickInfoModal(type) {
         jeOptions += '<option value="' + jeName + '">' + jeName + '</option>';
     }
 
-    // तिन्ही मॉडेल्ससाठी समान फिल्टर पट्टी
-    var filterHTML = '<div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px; margin-bottom:10px; font-size:12px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);">' +
+    // स्थिर फिल्टर बॉक्स
+    var filterHTML = '<div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px; margin-bottom:8px; font-size:12px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); flex-shrink:0;">' +
         '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">' +
         '<div>' +
         '<label style="display:block; font-weight:700; margin-bottom:3px; color:#0d47a1;">स्रोत:</label>' +
@@ -258,7 +258,8 @@ function openQuickInfoModal(type) {
         '</div>' +
         '</div>';
 
-    var fullHTML = filterHTML + '<div id="qmTableContainer"></div>';
+    // केवळ टेबलचा भाग स्क्रोल होईल असा कंटेनर
+    var fullHTML = filterHTML + '<div id="qmTableContainer" style="max-height:220px; overflow-y:auto; overflow-x:auto; border:1px solid #e2e8f0; border-radius:6px;"></div>';
 
     document.getElementById('quickModalTitle').innerText = title;
     document.getElementById('quickModalBody').innerHTML = fullHTML;
