@@ -1,4 +1,4 @@
-// mb-total.js - Total M.B., Dashboard Counts, and Filtering Logic
+// mb-total.js - Total M.B., Dashboard Counts, Filtering, and Grouped Reporting Logic
 
 function animateNumberCount(elementId, finalVal) {
     var el = document.getElementById(elementId);
@@ -252,4 +252,110 @@ function openQuickInfoModal(type) {
         html += '</tbody></table>';
         document.getElementById('qmTableContainer').innerHTML = html;
     }
+}
+
+function quickPopupDelete(idx) {
+    if (idx === -1) return showAlert('रेकॉर्ड सापडला नाही.', 'ERROR');
+    var rec = getData('mb_records')[idx];
+    var mbNo = rec ? rec.mbNumber : '';
+    showCustomConfirm("ही नोंद हटवायची का?", "ही नोंद हटवण्यासाठी कृपया M.B. क्रमांक '" + mbNo + "' खालील बॉक्समध्ये टाईप करा:", mbNo, "✅ DELETE", "#d32f2f", function(confirmed) {
+        if (confirmed) {
+            var list = getData('mb_records');
+            list.splice(idx, 1);
+            setData('mb_records', list);
+            refreshAll();
+            closeQuickInfoModal();
+            showAlert('M.B. नोंद यशस्वीरीत्या हटवली!', 'SUCCESS');
+        }
+    });
+}
+
+function closeQuickInfoModal() { document.getElementById('quickInfoModal').style.display = 'none'; }
+
+function printQuickModalReport() {
+    if (currentQuickModalType !== 'घेणेD') {
+        var title = document.getElementById('quickModalTitle').innerText;
+        var tableHTML = document.getElementById('qmTableContainer').innerHTML;
+        var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
+        var html = '<div style="margin-bottom:12px; border-bottom:2px solid #333; padding-bottom:6px;"><div style="text-align:center; margin-bottom:4px;"><h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1><h2 style="font-size:12px; font-weight:700; margin:2px 0;">' + title + '</h2></div><div style="text-align:right; font-size:11.5px;">अहवाल दिनांक: ' + todayStr + '</div></div>' + tableHTML;
+        printA4Document(html, 'MB_Quick_Report_' + todayStr.replace(/\//g, '-') + '.pdf');
+        return;
+    }
+
+    // एकूण M.B. (घेणेD) साठी मुख्य स्त्रोत आणि दुसरा स्त्रोत गटानुसार (Grouped Report) प्रिंट जनरेट करणे
+    var list = getFilteredReceivedMBs();
+    var fFrom = document.getElementById('qmFromDate') ? document.getElementById('qmFromDate').value : '';
+    var fTo = document.getElementById('qmToDate') ? document.getElementById('qmToDate').value : '';
+    var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
+
+    var groups = {};
+    list.forEach(function(m) {
+        var rawNo = (m.mbNumber || '').trim();
+        var statusObj = getLatestMBStatus(rawNo);
+        var stock = getAvailableStock();
+        var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(rawNo); });
+        var holder = getMBDisplayHolder(statusObj, isAvail);
+
+        // मुख्य स्त्रोत (Main Source) ठरवणे
+        var mainSrc = m.receivedSource || m.receivedFrom || 'इतर स्त्रोत';
+        if (mainSrc.includes('भांडारपाल')) mainSrc = 'भांडारपाल (Bhandarpal)';
+        else if (mainSrc.includes('कार्यालय') || mainSrc.includes('जमा')) mainSrc = 'विभागीय कार्यालय (Office)';
+        else mainSrc = 'इतर स्त्रोत (Other)';
+
+        // दुसरा स्त्रोत / धारक (Secondary Source / Holder)
+        var secSrc = holder || 'कार्यालय';
+
+        if (!groups[mainSrc]) groups[mainSrc] = {};
+        if (!groups[mainSrc][secSrc]) groups[mainSrc][secSrc] = [];
+        groups[mainSrc][secSrc].push(m);
+    });
+
+    var html = '<div style="margin-bottom:15px; border-bottom:2px solid #333; padding-bottom:8px;">' +
+        '<div style="text-align:center; margin-bottom:4px;">' +
+        '<h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1>' +
+        '<h2 style="font-size:13px; font-weight:700; margin:3px 0;">एकूण मोजमाप पुस्तिका (M.B.) सविस्तर अहवाल (मुख्य व दुसरा स्त्रोत गटानुसार)</h2>' +
+        '</div>' +
+        '<div style="display:flex; justify-content:space-between; font-size:11px; margin-top:5px;">' +
+        '<div><strong>कालावधी:</strong> ' + (fFrom ? formatDateToDMY(fFrom) : 'सर्व') + ' ते ' + (fTo ? formatDateToDMY(fTo) : 'सर्व') + '</div>' +
+        '<div><strong>अहवाल दिनांक:</strong> ' + todayStr + '</div>' +
+        '</div>' +
+        '</div>';
+
+    var globalIndex = 1;
+    for (var mainKey in groups) {
+        html += '<div style="margin-top:12px; margin-bottom:6px; font-size:11pt; font-weight:800; color:#0d47a1; background:#e3f2fd; padding:5px 8px; border-radius:4px;">📂 मुख्य स्त्रोत: ' + mainKey + '</div>';
+        
+        for (var secKey in groups[mainKey]) {
+            html += '<div style="margin:6px 0 4px 10px; font-size:10pt; font-weight:700; color:#333;">👉 दुसरा स्त्रोत / धारक: ' + secKey + '</div>';
+            html += '<table class="print-table" style="margin-bottom:8px; width:100%; border-collapse:collapse; font-size:9.5pt;">' +
+                '<thead><tr style="background:#f5f5f5;">' +
+                '<th style="width:40px; text-align:center;">अ.क्र.</th>' +
+                '<th>M.B. क्रमांक</th>' +
+                '<th>साईज</th>' +
+                '<th>नोंद दिनांक</th>' +
+                '<th>सद्यस्थिती व तपशील</th>' +
+                '</tr></thead><tbody>';
+
+            groups[mainKey][secKey].forEach(function(item) {
+                var rawNo = (item.mbNumber || '').trim();
+                var statusObj = getLatestMBStatus(rawNo);
+                var stock = getAvailableStock();
+                var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(rawNo); });
+                var holder = getMBDisplayHolder(statusObj, isAvail);
+                var dateStr = formatDateToDMY(item.date);
+                var sizeStr = item.size || 'लहान M.B.';
+
+                html += '<tr>' +
+                    '<td style="text-align:center;">' + (globalIndex++) + '</td>' +
+                    '<td><strong>' + rawNo + '</strong></td>' +
+                    '<td>' + sizeStr + '</td>' +
+                    '<td>' + dateStr + '</td>' +
+                    '<td>' + holder + '</td>' +
+                    '</tr>';
+            });
+            html += '</tbody></table>';
+        }
+    }
+
+    printA4Document(html, 'Total_MB_Grouped_Report_' + todayStr.replace(/\//g, '-') + '.pdf');
 }
