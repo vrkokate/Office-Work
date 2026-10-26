@@ -141,7 +141,6 @@ function openQuickInfoModal(type) {
     currentQuickModalType = type;
     var list = getUniqueReceivedMBs();
     
-    // लहान व मोठ्या M.B. ची मोजणी
     var totalCount = list.length;
     var smallCount = 0;
     var bigCount = 0;
