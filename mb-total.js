@@ -64,6 +64,8 @@ function getFilteredReceivedMBs() {
     var fJe = document.getElementById('qmFilterJE') ? document.getElementById('qmFilterJE').value : '';
     var fSize = document.getElementById('qmFilterSize') ? document.getElementById('qmFilterSize').value : '';
     var fSource = document.getElementById('qmFilterSource') ? document.getElementById('qmFilterSource').value : '';
+    var fFrom = document.getElementById('qmFromDate') ? document.getElementById('qmFromDate').value : '';
+    var fTo = document.getElementById('qmToDate') ? document.getElementById('qmToDate').value : '';
 
     return list.filter(function(m) {
         var rawNo = (m.mbNumber || '').trim();
@@ -72,16 +74,23 @@ function getFilteredReceivedMBs() {
         var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(rawNo); });
         var holder = getMBDisplayHolder(statusObj, isAvail);
 
+        // JE Filter
         if (fJe) {
             if (!holder.includes(fJe)) return false;
         }
+        // Size Filter
         if (fSize) {
             if (m.size !== fSize) return false;
         }
+        // Source Filter
         if (fSource) {
             var src = (m.receivedSource || m.receivedFrom || '').toLowerCase();
             if (!src.includes(fSource.toLowerCase())) return false;
         }
+        // Date Range Filter (दिनांक पासून - दिनांक पर्यंत)
+        if (fFrom && m.date && m.date < fFrom) return false;
+        if (fTo && m.date && m.date > fTo) return false;
+
         return true;
     });
 }
@@ -161,7 +170,11 @@ function openQuickInfoModal(type) {
         getData('je_records').forEach(function(j) { jeOptions += '<option value="' + j.name + '">' + j.name + '</option>'; });
         
         filterHTML = '<div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:8px; margin-bottom:10px; font-size:11.5px;">' +
-            '<div style="font-weight:700; color:#0d47a1; margin-bottom:6px;">📊 एकूण M.B. रिपोर्ट फिल्टर</div>' +
+            '<div style="font-weight:700; color:#0d47a1; margin-bottom:6px;">📊 एकूण M.B. रिपोर्ट फिल्टर व कालावधी</div>' +
+            '<div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px;">' +
+            '<div><label style="display:block; font-weight:600; margin-bottom:2px;">दिनांक पासून</label><input type="date" class="form-control" id="qmFromDate" style="padding:4px; font-size:11px;" onchange="renderQuickModalTable()"></div>' +
+            '<div><label style="display:block; font-weight:600; margin-bottom:2px;">दिनांक पर्यंत</label><input type="date" class="form-control" id="qmToDate" style="padding:4px; font-size:11px;" onchange="renderQuickModalTable()"></div>' +
+            '</div>' +
             '<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:6px;">' +
             '<div><label style="display:block; font-weight:600; margin-bottom:2px;">JE निवडा</label><select class="form-control" id="qmFilterJE" style="padding:4px; font-size:11px;" onchange="renderQuickModalTable()">' + jeOptions + '</select></div>' +
             '<div><label style="display:block; font-weight:600; margin-bottom:2px;">M.B. प्रकार</label><select class="form-control" id="qmFilterSize" style="padding:4px; font-size:11px;" onchange="renderQuickModalTable()"><option value="">-- सर्व M.B. --</option><option value="लहान M.B.">लहान M.B.</option><option value="मोठी M.B.">मोठी M.B.</option></select></div>' +
