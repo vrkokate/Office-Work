@@ -63,14 +63,27 @@ function getFilteredReceivedMBs() {
     var list = getUniqueReceivedMBs();
     var fSource = document.getElementById('qmFilterSource') ? document.getElementById('qmFilterSource').value : '';
     var fSize = document.getElementById('qmFilterSize') ? document.getElementById('qmFilterSize').value : '';
+    var fJe = document.getElementById('qmFilterJE') ? document.getElementById('qmFilterJE').value : '';
+
+    var stock = getAvailableStock();
+    var isAvailableMap = {};
+    stock.forEach(function(s) { isAvailableMap[normalizeMB(s.mbNumber)] = true; });
 
     return list.filter(function(m) {
+        var rawNo = (m.mbNumber || '').trim();
+        var statusObj = getLatestMBStatus(rawNo);
+        var isAvail = isAvailableMap[normalizeMB(rawNo)];
+        var holder = getMBDisplayHolder(statusObj, isAvail);
+
         if (fSource && fSource !== 'सर्व (All)') {
             var src = (m.receivedSource || m.receivedFrom || '').toLowerCase();
             if (!src.includes(fSource.toLowerCase())) return false;
         }
         if (fSize && fSize !== 'सर्व M.B.') {
             if (m.size !== fSize) return false;
+        }
+        if (fJe && fJe !== 'सर्व JE') {
+            if (!holder.includes(fJe)) return false;
         }
         return true;
     });
@@ -153,19 +166,35 @@ function openQuickInfoModal(type) {
     
     var filterHTML = '';
     if (type === 'घेणेD') {
-        filterHTML = '<div style="margin-bottom:10px; font-size:12px;">' +
-            '<div style="font-weight:600; margin-bottom:3px; color:#333;">स्रोत / कोणाकडून मिळाली:</div>' +
-            '<select class="form-control" id="qmFilterSource" style="margin-bottom:8px;" onchange="renderQuickModalTable()">' +
+        var jeOptions = '<option value="सर्व JE">सर्व JE</option>';
+        var jeList = getData('je_records') || [];
+        jeList.forEach(function(j) {
+            jeOptions += '<option value="' + j.name + '">' + j.name + '</option>';
+        });
+
+        filterHTML = '<div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px; margin-bottom:10px; font-size:12px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);">' +
+            '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">' +
+            '<div>' +
+            '<label style="display:block; font-weight:700; margin-bottom:3px; color:#0d47a1;">स्रोत:</label>' +
+            '<select class="form-control" id="qmFilterSource" style="padding:6px; font-size:11.5px; border-radius:6px; border:1px solid #94a3b8; background:#fff;" onchange="renderQuickModalTable()">' +
             '<option value="सर्व (All)">सर्व (All)</option>' +
             '<option value="विभागीय कार्यालय">विभागीय कार्यालय</option>' +
             '<option value="भांडारपाल">भांडारपाल</option>' +
             '</select>' +
-            '<div style="font-weight:600; margin-bottom:3px; color:#333;">M.B. आकारानुसार फिल्टर:</div>' +
-            '<select class="form-control" id="qmFilterSize" onchange="renderQuickModalTable()">' +
+            '</div>' +
+            '<div>' +
+            '<label style="display:block; font-weight:700; margin-bottom:3px; color:#0d47a1;">M.B. आकार:</label>' +
+            '<select class="form-control" id="qmFilterSize" style="padding:6px; font-size:11.5px; border-radius:6px; border:1px solid #94a3b8; background:#fff;" onchange="renderQuickModalTable()">' +
             '<option value="सर्व M.B.">सर्व M.B.</option>' +
             '<option value="लहान M.B.">लहान M.B.</option>' +
             '<option value="मोठी M.B.">मोठी M.B.</option>' +
             '</select>' +
+            '</div>' +
+            '</div>' +
+            '<div>' +
+            '<label style="display:block; font-weight:700; margin-bottom:3px; color:#0d47a1;">कनिष्ठ अभियंता (JE):</label>' +
+            '<select class="form-control" id="qmFilterJE" style="padding:6px; font-size:11.5px; border-radius:6px; border:1px solid #94a3b8; background:#fff;" onchange="renderQuickModalTable()">' + jeOptions + '</select>' +
+            '</div>' +
             '</div>';
     }
 
