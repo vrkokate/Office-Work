@@ -117,10 +117,19 @@ function getFilteredGivenMBs() {
 function getFilteredAvailableMBs() {
     var list = getAvailableStock();
     var fSize = document.getElementById('qmFilterSize') ? document.getElementById('qmFilterSize').value : '';
+    var fSource = document.getElementById('qmFilterSource') ? document.getElementById('qmFilterSource').value : '';
+    var fJe = document.getElementById('qmFilterJE') ? document.getElementById('qmFilterJE').value : '';
 
     return list.filter(function(m) {
         if (fSize && fSize !== 'सर्व M.B.') {
             if (m.size !== fSize) return false;
+        }
+        if (fSource && fSource !== 'सर्व (All)') {
+            var src = (m.receivedSource || m.receivedFrom || '').toLowerCase();
+            if (!src.includes(fSource.toLowerCase())) return false;
+        }
+        if (fJe && fJe !== 'सर्व JE') {
+            return false;
         }
         return true;
     });
@@ -156,7 +165,7 @@ function renderQuickModalTable() {
             if (isAvailableMap[normNo]) {
                 statusText = '<span style="color:#2e7d32; font-weight:700;">कार्यालयात उपलब्ध</span>';
             } else if (statusObj && (statusObj.lastAction === 'दिलेली M.B.' || statusObj.lastAction === 'दिलेली एमबी')) {
-                var person = statusObj.detail || statusObj.source || 'संबंधित कुटुंबाशी';
+                var person = statusObj.detail || statusObj.source || 'संबंधित';
                 statusText = '<span style="color:#e65100; font-weight:700;">श्री. ' + person + ' यांच्याकडे</span>';
             } else {
                 statusText = '<span style="color:#0d47a1; font-weight:600;">कार्यालयात उपलब्ध</span>';
@@ -209,7 +218,6 @@ function openQuickInfoModal(type) {
     else if (type === 'GIVEN') title = 'दिलेली M.B. (एकूण: ' + givenList.length + ')';
     else title = 'उपलब्ध M.B. (एकूण: ' + availList.length + ')';
 
-    var filterHTML = '';
     var jeMap = {};
     var jeRecords = getData('je_records') || [];
     jeRecords.forEach(function(j) { if(j.name) jeMap[j.name.trim()] = true; });
@@ -224,7 +232,8 @@ function openQuickInfoModal(type) {
         jeOptions += '<option value="' + jeName + '">' + jeName + '</option>';
     }
 
-    filterHTML = '<div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px; margin-bottom:10px; font-size:12px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);">' +
+    // तिन्ही मॉडेल्ससाठी समान फिल्टर पट्टी
+    var filterHTML = '<div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px; margin-bottom:10px; font-size:12px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);">' +
         '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">' +
         '<div>' +
         '<label style="display:block; font-weight:700; margin-bottom:3px; color:#0d47a1;">स्रोत:</label>' +
