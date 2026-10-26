@@ -312,7 +312,7 @@ body * { visibility: hidden !important; }
 <div class="form-group" style="position: relative;">
 <label>स्मार्ट शोध (M.B. क्र., नाव किंवा तपशील)</label>
 <input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका" oninput="handleSmartSearchInput(this)">
-<!-- 🌟 अचूकपणे सर्च बारच्या शेवटी (उजव्या बाजूला) वरच्या दिशेने ओपन होणारी स्क्रोलिंग ब्लू नंबर्स यादी -->
+<!-- 🌟 सर्च बारच्या अगदी वरच्या उजव्या कोपऱ्यापासून वरच्या दिशेने ओपन होणारी स्क्रोलिंग ब्लू नंबर्स यादी -->
 <div id="smartSearchSuggestions"></div>
 </div>
 
@@ -619,12 +619,18 @@ function closeCustomConfirm(isConfirmed) {
     expectedVerifyMB = null;
 }
 
+// 🌟 सविस्तर धारक ओळखण्यासाठी सुधारित फंक्शन
 function getMBDisplayHolder(status, isAvail) {
-    if (isAvail) return 'कार्यालय';
-    if (status && (status.detail || status.source)) {
-        return status.detail || status.source;
-    }
-    return '-';
+    if (isAvail) return 'कार्यालयात उपलब्ध';
+    if (!status) return 'कार्यालय / उपलब्ध';
+    var detail = status.detail || status.receivedDetail || '';
+    var source = status.source || status.receivedSource || status.receivedFrom || '';
+    var action = status.lastAction || status.actionType || '';
+    
+    if (detail) return detail;
+    if (source) return source;
+    if (action.includes('JE')) return action;
+    return action || 'कार्यालय';
 }
 
 function formatTransactionSentence(h) {
