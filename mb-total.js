@@ -1,4 +1,4 @@
-// mb-total.js - Total M.B., Dashboard Counts, and Reporting Logic
+// mb-total.js - Total M.B., Dashboard Counts, Filtering, and Reporting Logic
 
 function animateNumberCount(elementId, finalVal) {
     var el = document.getElementById(elementId);
@@ -59,8 +59,25 @@ function getUniqueReceivedMBs(excludeIndex = -1) {
     return list;
 }
 
-function renderQuickModalTable() {
+function getFilteredReceivedMBs() {
     var list = getUniqueReceivedMBs();
+    var fSource = document.getElementById('qmFilterSource') ? document.getElementById('qmFilterSource').value : '';
+    var fSize = document.getElementById('qmFilterSize') ? document.getElementById('qmFilterSize').value : '';
+
+    return list.filter(function(m) {
+        if (fSource && fSource !== 'सर्व (All)') {
+            var src = (m.receivedSource || m.receivedFrom || '').toLowerCase();
+            if (!src.includes(fSource.toLowerCase())) return false;
+        }
+        if (fSize && fSize !== 'सर्व M.B.') {
+            if (m.size !== fSize) return false;
+        }
+        return true;
+    });
+}
+
+function renderQuickModalTable() {
+    var list = getFilteredReceivedMBs();
     var stock = getAvailableStock();
     var isAvailableMap = {};
     stock.forEach(function(s) { isAvailableMap[normalizeMB(s.mbNumber)] = true; });
@@ -69,13 +86,12 @@ function renderQuickModalTable() {
     '<th style="text-align:center;">अ.क्र.</th>' +
     '<th>M.B. क्र.</th>' +
     '<th>साईज</th>' +
-    '<th>सद्यस्थिती व धारक</th>' +
-    '<th>दिनांक</th>' +
+    '<th>सद्यस्थिती</th>' +
     '<th style="text-align:center;">Action</th>' +
     '</tr></thead><tbody>';
 
     if (list.length === 0) {
-        html += '<tr><td colspan="6" style="text-align:center; padding:10px; color:#666;">कोणतीही नोंद उपलब्ध नाही.</td></tr>';
+        html += '<tr><td colspan="5" style="text-align:center; padding:10px; color:#666;">कोणतीही नोंद उपलब्ध नाही.</td></tr>';
     } else {
         list.forEach(function(m, i) {
             var rawNo = (m.mbNumber || m.mbNo || '').trim();
@@ -84,13 +100,12 @@ function renderQuickModalTable() {
             var statusText = "";
 
             if (isAvailableMap[normNo]) {
-                statusText = '<span style="color:#2e7d32; font-weight:700;">उपलब्ध</span>';
+                statusText = '<span style="color:#2e7d32; font-weight:700;">कार्यालयात उपलब्ध</span>';
             } else if (statusObj && (statusObj.lastAction === 'दिलेली M.B.' || statusObj.lastAction === 'दिलेली एमबी')) {
                 var person = statusObj.detail || statusObj.source || 'संबंधित';
-                person = person.replace(/^श्री.?\s*/i, '');
-                statusText = '<span style="color:#e65100; font-weight:700;">JE श्री. ' + person + '</span>';
+                statusText = '<span style="color:#e65100; font-weight:700;">श्री. ' + person + ' यांच्याकडे</span>';
             } else {
-                statusText = '<span style="color:#0d47a1; font-weight:600;">उपलब्ध</span>';
+                statusText = '<span style="color:#0d47a1; font-weight:600;">कार्यालयात उपलब्ध</span>';
             }
 
             var allMBs = getData('mb_records');
@@ -102,7 +117,6 @@ function renderQuickModalTable() {
                 }
             }
 
-            var dateStr = formatDateToDMY(m.date);
             var sizeStr = m.size || 'लहान M.B.';
 
             html += '<tr>' +
@@ -110,7 +124,6 @@ function renderQuickModalTable() {
             '<td><a href="javascript:void(0)" onclick="closeQuickInfoModal(); openSmartActionCenter(\'' + rawNo + '\')" style="color:#0d47a1; font-weight:800; text-decoration:underline;">' + rawNo + '</a></td>' +
             '<td>' + sizeStr + '</td>' +
             '<td>' + statusText + '</td>' +
-            '<td>' + dateStr + '</td>' +
             '<td class="action-cell" style="text-align:center;">' +
             '<button class="btn-action" style="background:#2e7d32; padding:3px 6px;" onclick="closeQuickInfoModal(); openModule(\'mbModal\'); editMB(' + originalIdx + ')">Edit</button>' +
             '<button class="btn-action" style="background:#d32f2f; padding:3px 6px;" onclick="quickPopupDelete(' + originalIdx + ')">Delete</button>' +
@@ -126,10 +139,38 @@ function renderQuickModalTable() {
 
 function openQuickInfoModal(type) {
     currentQuickModalType = type;
-    var title = type === 'घेणेD' ? 'एकूण M.B.' : (type === 'GIVEN' ? 'दिलेली M.B.' : 'उपलब्ध M.B.');
+    var list = getUniqueReceivedMBs();
     
-    // फिल्टरचा भाग पूर्णपणे काढून टाकला आहे
-    var fullHTML = '<div id="qmTableContainer"></div>';
+    // लहान व मोठ्या M.B. ची मोजणी
+    var totalCount = list.length;
+    var smallCount = 0;
+    var bigCount = 0;
+    list.forEach(function(m) {
+        if (m.size === 'मोठी M.B.') bigCount++;
+        else smallCount++;
+    });
+
+    var title = type === 'घेणेD' ? ('एकूण M.B. (एकूण: ' + totalCount + ' | लहान: ' + smallCount + ', मोठी: ' + bigCount + ')') : (type === 'GIVEN' ? 'दिलेली M.B.' : 'उपलब्ध M.B.');
+    
+    var filterHTML = '';
+    if (type === 'घेणेD') {
+        filterHTML = '<div style="margin-bottom:10px; font-size:12px;">' +
+            '<div style="font-weight:600; margin-bottom:3px; color:#333;">स्रोत / कोणाकडून मिळाली:</div>' +
+            '<select class="form-control" id="qmFilterSource" style="margin-bottom:8px;" onchange="renderQuickModalTable()">' +
+            '<option value="सर्व (All)">सर्व (All)</option>' +
+            '<option value="विभागीय कार्यालय">विभागीय कार्यालय</option>' +
+            '<option value="भांडारपाल">भांडारपाल</option>' +
+            '</select>' +
+            '<div style="font-weight:600; margin-bottom:3px; color:#333;">M.B. आकारानुसार फिल्टर:</div>' +
+            '<select class="form-control" id="qmFilterSize" onchange="renderQuickModalTable()">' +
+            '<option value="सर्व M.B.">सर्व M.B.</option>' +
+            '<option value="लहान M.B.">लहान M.B.</option>' +
+            '<option value="मोठी M.B.">मोठी M.B.</option>' +
+            '</select>' +
+            '</div>';
+    }
+
+    var fullHTML = filterHTML + '<div id="qmTableContainer"></div>';
 
     document.getElementById('quickModalTitle').innerText = title;
     document.getElementById('quickModalBody').innerHTML = fullHTML;
@@ -138,7 +179,7 @@ function openQuickInfoModal(type) {
     if (type === 'घेणेD') {
         renderQuickModalTable();
     } else {
-        var list = type === 'GIVEN' ? getCurrentlyActiveGivenMBs() : getAvailableStock();
+        var subList = type === 'GIVEN' ? getCurrentlyActiveGivenMBs() : getAvailableStock();
         var stock = getAvailableStock();
         var isAvailableMap = {};
         stock.forEach(function(s) { isAvailableMap[normalizeMB(s.mbNumber)] = true; });
@@ -147,28 +188,26 @@ function openQuickInfoModal(type) {
         '<th style="text-align:center;">अ.क्र.</th>' +
         '<th>M.B. क्र.</th>' +
         '<th>साईज</th>' +
-        '<th>सद्यस्थिती व धारक</th>' +
-        '<th>दिनांक</th>' +
+        '<th>सद्यस्थिती</th>' +
         '<th style="text-align:center;">Action</th>' +
         '</tr></thead><tbody>';
 
-        if (list.length === 0) {
-            html += '<tr><td colspan="6" style="text-align:center; padding:10px; color:#666;">कोणतीही नोंद उपलब्ध नाही.</td></tr>';
+        if (subList.length === 0) {
+            html += '<tr><td colspan="5" style="text-align:center; padding:10px; color:#666;">कोणतीही नोंद उपलब्ध नाही.</td></tr>';
         } else {
-            list.forEach(function(m, i) {
+            subList.forEach(function(m, i) {
                 var rawNo = (m.mbNumber || m.mbNo || '').trim();
                 var normNo = normalizeMB(rawNo);
                 var statusObj = getLatestMBStatus(rawNo);
                 var statusText = "";
 
                 if (isAvailableMap[normNo]) {
-                    statusText = '<span style="color:#2e7d32; font-weight:700;">उपलब्ध</span>';
+                    statusText = '<span style="color:#2e7d32; font-weight:700;">कार्यालयात उपलब्ध</span>';
                 } else if (statusObj && (statusObj.lastAction === 'दिलेली M.B.' || statusObj.lastAction === 'दिलेली एमबी')) {
                     var person = statusObj.detail || statusObj.source || 'संबंधित';
-                    person = person.replace(/^श्री.?\s*/i, '');
-                    statusText = '<span style="color:#e65100; font-weight:700;">JE श्री. ' + person + '</span>';
+                    statusText = '<span style="color:#e65100; font-weight:700;">श्री. ' + person + ' यांच्याकडे</span>';
                 } else {
-                    statusText = '<span style="color:#0d47a1; font-weight:600;">उपलब्ध</span>';
+                    statusText = '<span style="color:#0d47a1; font-weight:600;">कार्यालयात उपलब्ध</span>';
                 }
 
                 var allMBs = getData('mb_records');
@@ -180,7 +219,6 @@ function openQuickInfoModal(type) {
                     }
                 }
 
-                var dateStr = formatDateToDMY(m.date);
                 var sizeStr = m.size || 'लहान M.B.';
 
                 html += '<tr>' +
@@ -188,7 +226,6 @@ function openQuickInfoModal(type) {
                 '<td><a href="javascript:void(0)" onclick="closeQuickInfoModal(); openSmartActionCenter(\'' + rawNo + '\')" style="color:#0d47a1; font-weight:800; text-decoration:underline;">' + rawNo + '</a></td>' +
                 '<td>' + sizeStr + '</td>' +
                 '<td>' + statusText + '</td>' +
-                '<td>' + dateStr + '</td>' +
                 '<td class="action-cell" style="text-align:center;">' +
                 '<button class="btn-action" style="background:#2e7d32; padding:3px 6px;" onclick="closeQuickInfoModal(); openModule(\'mbModal\'); editMB(' + originalIdx + ')">Edit</button>' +
                 '<button class="btn-action" style="background:#d32f2f; padding:3px 6px;" onclick="quickPopupDelete(' + originalIdx + ')">Delete</button>' +
@@ -229,8 +266,7 @@ function printQuickModalReport() {
         return;
     }
 
-    // एकूण M.B. (घेणेD) साठी मुख्य स्त्रोत आणि दुसरा स्त्रोत गटानुसार (Grouped Report) प्रिंट जनरेट करणे
-    var list = getUniqueReceivedMBs();
+    var list = getFilteredReceivedMBs();
     var todayStr = formatDateToDMY(new Date().toISOString().slice(0, 10));
 
     var groups = {};
@@ -253,10 +289,14 @@ function printQuickModalReport() {
         groups[mainSrc][secSrc].push(m);
     });
 
+    var totalCount = list.length;
+    var smallCount = 0, bigCount = 0;
+    list.forEach(function(m){ if(m.size === 'मोठी M.B.') bigCount++; else smallCount++; });
+
     var html = '<div style="margin-bottom:15px; border-bottom:2px solid #333; padding-bottom:8px;">' +
         '<div style="text-align:center; margin-bottom:4px;">' +
         '<h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1>' +
-        '<h2 style="font-size:13px; font-weight:700; margin:3px 0;">एकूण मोजमाप पुस्तिका (M.B.) सविस्तर अहवाल (मुख्य व दुसरा स्त्रोत गटानुसार)</h2>' +
+        '<h2 style="font-size:13px; font-weight:700; margin:3px 0;">एकूण मोजमाप पुस्तिका (M.B.) सविस्तर अहवाल (एकूण: ' + totalCount + ' | लहान: ' + smallCount + ', मोठी: ' + bigCount + ')</h2>' +
         '</div>' +
         '<div style="text-align:right; font-size:11px; margin-top:5px;"><strong>अहवाल दिनांक:</strong> ' + todayStr + '</div>' +
         '</div>';
@@ -266,7 +306,7 @@ function printQuickModalReport() {
         html += '<div style="margin-top:12px; margin-bottom:6px; font-size:11pt; font-weight:800; color:#0d47a1; background:#e3f2fd; padding:5px 8px; border-radius:4px;">📂 मुख्य स्त्रोत: ' + mainKey + '</div>';
         
         for (var secKey in groups[mainKey]) {
-            html += '<div style="margin:6px 0 4px 10px; font-size:10pt; font-weight:700; color:#333;">👉 दुसरा स्त्रोत / धारक: ' + secKey + '</div>';
+            html += '<div style="margin:6px 0 4px 10px; font-size:10pt; font-weight:700; color:#333;">👉 सद्यस्थिती व धारक: ' + secKey + '</div>';
             html += '<table class="print-table" style="margin-bottom:8px; width:100%; border-collapse:collapse; font-size:9.5pt;">' +
                 '<thead><tr style="background:#f5f5f5;">' +
                 '<th style="width:40px; text-align:center;">अ.क्र.</th>' +
