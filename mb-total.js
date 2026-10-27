@@ -74,6 +74,7 @@ function getFilteredReceivedMBs() {
         var statusObj = getLatestMBStatus(rawNo);
         var isAvail = isAvailableMap[normalizeMB(rawNo)];
         var holder = getMBDisplayHolder(statusObj, isAvail);
+        if(holder) holder = holder.replace(/^(श्री\.?\s*)+/gi, 'श्री. ').trim();
 
         if (fSource && fSource !== 'सर्व (All)') {
             var src = (m.receivedSource || m.receivedFrom || '').toLowerCase();
@@ -99,6 +100,7 @@ function getFilteredGivenMBs() {
         var rawNo = (m.mbNumber || m.mbNo || '').trim();
         var statusObj = getLatestMBStatus(rawNo);
         var holder = getMBDisplayHolder(statusObj, false);
+        if(holder) holder = holder.replace(/^(श्री\.?\s*)+/gi, 'श्री. ').trim();
 
         if (fSource && fSource !== 'सर्व (All)') {
             var src = (m.receivedSource || m.receivedFrom || '').toLowerCase();
@@ -166,6 +168,8 @@ function renderQuickModalTable() {
                 statusText = '<span style="color:#2e7d32; font-weight:700;">कार्यालयात उपलब्ध</span>';
             } else if (statusObj && (statusObj.lastAction === 'दिलेली M.B.' || statusObj.lastAction === 'दिलेली एमबी')) {
                 var person = statusObj.detail || statusObj.source || 'संबंधित';
+                // अतिरिक्त 'श्री' किंवा 'श्री.' काढून टाकणे आणि एकदाच 'श्री.' जोडणे
+                person = person.replace(/^(श्री\.?\s*)+/gi, '').trim();
                 statusText = '<span style="color:#e65100; font-weight:700;">श्री. ' + person + ' यांच्याकडे</span>';
             } else {
                 statusText = '<span style="color:#0d47a1; font-weight:600;">कार्यालयात उपलब्ध</span>';
@@ -220,19 +224,20 @@ function openQuickInfoModal(type) {
 
     var jeMap = {};
     var jeRecords = getData('je_records') || [];
-    jeRecords.forEach(function(j) { if(j.name) jeMap[j.name.trim()] = true; });
+    jeRecords.forEach(function(j) { if(j.name) jeMap[j.name.replace(/^(श्री\.?\s*)+/gi, '').trim()] = true; });
     var allMBs = getData('mb_records') || [];
     allMBs.forEach(function(m) {
-        if(m.detail) jeMap[m.detail.trim()] = true;
-        if(m.source) jeMap[m.source.trim()] = true;
+        if(m.detail) jeMap[m.detail.replace(/^(श्री\.?\s*)+/gi, '').trim()] = true;
+        if(m.source) jeMap[m.source.replace(/^(श्री\.?\s*)+/gi, '').trim()] = true;
     });
 
     var jeOptions = '<option value="सर्व JE">सर्व JE</option>';
     for (var jeName in jeMap) {
-        jeOptions += '<option value="' + jeName + '">' + jeName + '</option>';
+        if(jeName) {
+            jeOptions += '<option value="' + jeName + '">श्री. ' + jeName + '</option>';
+        }
     }
 
-    // स्थिर फिल्टर बॉक्स
     var filterHTML = '<div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px; margin-bottom:8px; font-size:12px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); flex-shrink:0;">' +
         '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">' +
         '<div>' +
@@ -258,7 +263,6 @@ function openQuickInfoModal(type) {
         '</div>' +
         '</div>';
 
-    // केवळ टेबलचा भाग स्क्रोल होईल असा कंटेनर
     var fullHTML = filterHTML + '<div id="qmTableContainer" style="max-height:220px; overflow-y:auto; overflow-x:auto; border:1px solid #e2e8f0; border-radius:6px;"></div>';
 
     document.getElementById('quickModalTitle').innerText = title;
@@ -308,6 +312,7 @@ function printQuickModalReport() {
         var stock = getAvailableStock();
         var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(rawNo); });
         var holder = getMBDisplayHolder(statusObj, isAvail);
+        if(holder) holder = holder.replace(/^(श्री\.?\s*)+/gi, 'श्री. ').trim();
 
         var mainSrc = m.receivedSource || m.receivedFrom || 'इतर स्त्रोत';
         if (mainSrc.includes('भांडारपाल')) mainSrc = 'भांडारपाल (Bhandarpal)';
@@ -354,6 +359,7 @@ function printQuickModalReport() {
                 var stock = getAvailableStock();
                 var isAvail = stock.some(function(s){ return normalizeMB(s.mbNumber) === normalizeMB(rawNo); });
                 var holder = getMBDisplayHolder(statusObj, isAvail);
+                if(holder) holder = holder.replace(/^(श्री\.?\s*)+/gi, 'श्री. ').trim();
                 var dateStr = formatDateToDMY(item.date);
                 var sizeStr = item.size || 'लहान M.B.';
 
