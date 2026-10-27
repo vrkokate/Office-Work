@@ -1,4 +1,4 @@
-// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters & Scrollable Table Logic
+// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters, Scrollable Table & Global Click Fix
 
 function animateNumberCount(elementId, finalVal) {
     var el = document.getElementById(elementId);
@@ -172,7 +172,6 @@ function renderQuickModalTable() {
 
             var sizeStr = m.size || 'लहान M.B.';
 
-            // सुरक्षित क्लिक ट्रान्झिशनसाठी setTimeout जोडले आहे
             html += '<tr>' +
             '<td style="text-align:center;">' + (i + 1) + '</td>' +
             '<td><a href="javascript:void(0)" onclick="closeQuickInfoModal(); setTimeout(function() { openSmartActionCenter(\'' + rawNo + '\'); }, 50);" style="color:#0d47a1; font-weight:800; text-decoration:underline;">' + rawNo + '</a></td>' +
@@ -364,3 +363,27 @@ function printQuickModalReport() {
 
     printA4Document(html, currentQuickModalType + '_Report_' + todayStr.replace(/\//g, '-') + '.pdf');
 }
+
+// 🌟 ग्लोबल क्लिक लिसनर: कोणत्याही मोडलमधील (स्मार्ट शोध किंवा इतर) M.B. लिंकवर क्लिक केल्यावर कृती केंद्र सुरळीत उघडेल
+document.addEventListener('click', function(e) {
+    var target = e.target;
+    if (target && target.tagName === 'A' && target.getAttribute('onclick')) {
+        var onclickVal = target.getAttribute('onclick');
+        if (onclickVal.indexOf('openSmartActionCenter') !== -1) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof closeSearchResultModal === 'function') closeSearchResultModal();
+            if (typeof closeQuickInfoModal === 'function') closeQuickInfoModal();
+            if (typeof closeSmartActionCenter === 'function') closeSmartActionCenter();
+            var match = onclickVal.match(/openSmartActionCenter\(['"]([^'"]+)['"]\)/);
+            if (match && match[1]) {
+                var mbNum = match[1];
+                setTimeout(function() {
+                    if (typeof openSmartActionCenter === 'function') {
+                        openSmartActionCenter(mbNum);
+                    }
+                }, 60);
+            }
+        }
+    }
+});
