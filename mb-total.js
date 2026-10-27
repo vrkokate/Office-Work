@@ -1,4 +1,4 @@
-// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters, Scrollable Table & Variable Fix
+// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters, Scrollable Table & Action Center Wrapper Fix
 
 var currentQuickModalType = '';
 
@@ -176,7 +176,7 @@ function renderQuickModalTable() {
 
             html += '<tr>' +
             '<td style="text-align:center;">' + (i + 1) + '</td>' +
-            '<td><a href="javascript:void(0)" onclick="closeQuickInfoModal(); if(typeof closeSearchResultModal===\'function\') closeSearchResultModal(); openSmartActionCenter(\'' + rawNo + '\');" style="color:#0d47a1; font-weight:800; text-decoration:underline;">' + rawNo + '</a></td>' +
+            '<td><a href="javascript:void(0)" onclick="openSmartActionCenter(\'' + rawNo + '\')" style="color:#0d47a1; font-weight:800; text-decoration:underline;">' + rawNo + '</a></td>' +
             '<td>' + sizeStr + '</td>' +
             '<td>' + statusText + '</td>' +
             '<td class="action-cell" style="text-align:center;">' +
@@ -365,3 +365,30 @@ function printQuickModalReport() {
 
     printA4Document(html, currentQuickModalType + '_Report_' + todayStr.replace(/\//g, '-') + '.pdf');
 }
+
+// 🌟 Wrapper to ensure openSmartActionCenter automatically closes searchResultModal and quickInfoModal
+(function() {
+    var originalOpenSAC = window.openSmartActionCenter;
+    if (typeof originalOpenSAC === 'function') {
+        window.openSmartActionCenter = function(mbNum) {
+            var searchModal = document.getElementById('searchResultModal');
+            if (searchModal) searchModal.style.display = 'none';
+            var quickModal = document.getElementById('quickInfoModal');
+            if (quickModal) quickModal.style.display = 'none';
+            originalOpenSAC(mbNum);
+        };
+    } else {
+        window.addEventListener('DOMContentLoaded', function() {
+            if (typeof window.openSmartActionCenter === 'function' && window.openSmartActionCenter !== window._wrappedSAC) {
+                var orig = window.openSmartActionCenter;
+                window._wrappedSAC = window.openSmartActionCenter = function(mbNum) {
+                    var searchModal = document.getElementById('searchResultModal');
+                    if (searchModal) searchModal.style.display = 'none';
+                    var quickModal = document.getElementById('quickInfoModal');
+                    if (quickModal) quickModal.style.display = 'none';
+                    orig(mbNum);
+                };
+            }
+        });
+    }
+})();
