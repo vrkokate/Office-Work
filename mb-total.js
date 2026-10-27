@@ -1,4 +1,4 @@
-// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters, Scrollable Table & Robust Action Center Integration
+// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters, Scrollable Table & Clean Action Center Integration
 
 function animateNumberCount(elementId, finalVal) {
     var el = document.getElementById(elementId);
@@ -363,35 +363,3 @@ function printQuickModalReport() {
 
     printA4Document(html, currentQuickModalType + '_Report_' + todayStr.replace(/\//g, '-') + '.pdf');
 }
-
-// 🌟 सर्वसमावेशक ग्लोबल क्लिक लिसनर: कोणत्याही मॉडेलमधील (स्मार्ट शोध किंवा इतर) M.B. लिंकवर क्लिक केल्यावर सर्व मॉडेल्स बंद होऊन कृती केंद्र उघडेल
-document.addEventListener('click', function(e) {
-    var anchor = e.target.closest('a');
-    if (anchor) {
-        var onclickVal = anchor.getAttribute('onclick') || '';
-        var hrefVal = anchor.getAttribute('href') || '';
-        var combinedAttr = onclickVal + ' ' + hrefVal;
-        
-        if (combinedAttr.indexOf('openSmartActionCenter') !== -1) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // सर्व मॉडेल्स DOM मधून हायड करणे
-            var modals = ['quickInfoModal', 'searchResultModal', 'smartActionCenterModal', 'jeModal', 'mbModal', 'workModal', 'billModal', 'assignModal'];
-            modals.forEach(function(id) {
-                var el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
-            
-            var match = combinedAttr.match(/openSmartActionCenter\(['"]([^'"]+)['"]\)/);
-            if (match && match[1]) {
-                var mbNum = match[1];
-                setTimeout(function() {
-                    if (typeof openSmartActionCenter === 'function') {
-                        openSmartActionCenter(mbNum);
-                    }
-                }, 50);
-            }
-        }
-    }
-});
