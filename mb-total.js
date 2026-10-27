@@ -102,10 +102,6 @@ function getFilteredGivenMBs() {
         var holder = getMBDisplayHolder(statusObj, false);
         if(holder) holder = holder.replace(/^(श्री\.?\s*)+/gi, 'श्री. ').trim();
 
-        if (fSource && fSource !== 'सर्व (All)') {
-            var src = (m.receivedSource || m.receivedFrom || '').toLowerCase();
-            if (!src.includes(fSource.toLowerCase())) return false;
-        }
         if (fSize && fSize !== 'सर्व M.B.') {
             if (m.size !== fSize) return false;
         }
@@ -119,19 +115,10 @@ function getFilteredGivenMBs() {
 function getFilteredAvailableMBs() {
     var list = getAvailableStock();
     var fSize = document.getElementById('qmFilterSize') ? document.getElementById('qmFilterSize').value : '';
-    var fSource = document.getElementById('qmFilterSource') ? document.getElementById('qmFilterSource').value : '';
-    var fJe = document.getElementById('qmFilterJE') ? document.getElementById('qmFilterJE').value : '';
 
     return list.filter(function(m) {
         if (fSize && fSize !== 'सर्व M.B.') {
             if (m.size !== fSize) return false;
-        }
-        if (fSource && fSource !== 'सर्व (All)') {
-            var src = (m.receivedSource || m.receivedFrom || '').toLowerCase();
-            if (!src.includes(fSource.toLowerCase())) return false;
-        }
-        if (fJe && fJe !== 'सर्व JE') {
-            return false;
         }
         return true;
     });
@@ -168,7 +155,6 @@ function renderQuickModalTable() {
                 statusText = '<span style="color:#2e7d32; font-weight:700;">कार्यालयात उपलब्ध</span>';
             } else if (statusObj && (statusObj.lastAction === 'दिलेली M.B.' || statusObj.lastAction === 'दिलेली एमबी')) {
                 var person = statusObj.detail || statusObj.source || 'संबंधित';
-                // अतिरिक्त 'श्री' किंवा 'श्री.' काढून टाकणे आणि एकदाच 'श्री.' जोडणे
                 person = person.replace(/^(श्री\.?\s*)+/gi, '').trim();
                 statusText = '<span style="color:#e65100; font-weight:700;">श्री. ' + person + ' यांच्याकडे</span>';
             } else {
@@ -186,9 +172,10 @@ function renderQuickModalTable() {
 
             var sizeStr = m.size || 'लहान M.B.';
 
+            // सुरक्षित क्लिक ट्रान्झिशनसाठी setTimeout जोडले आहे
             html += '<tr>' +
             '<td style="text-align:center;">' + (i + 1) + '</td>' +
-            '<td><a href="javascript:void(0)" onclick="closeQuickInfoModal(); openSmartActionCenter(\'' + rawNo + '\')" style="color:#0d47a1; font-weight:800; text-decoration:underline;">' + rawNo + '</a></td>' +
+            '<td><a href="javascript:void(0)" onclick="closeQuickInfoModal(); setTimeout(function() { openSmartActionCenter(\'' + rawNo + '\'); }, 50);" style="color:#0d47a1; font-weight:800; text-decoration:underline;">' + rawNo + '</a></td>' +
             '<td>' + sizeStr + '</td>' +
             '<td>' + statusText + '</td>' +
             '<td class="action-cell" style="text-align:center;">' +
