@@ -1,4 +1,6 @@
-// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters, Scrollable Table & Clean Action Center Integration
+// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters, Scrollable Table & Variable Fix
+
+var currentQuickModalType = '';
 
 function animateNumberCount(elementId, finalVal) {
     var el = document.getElementById(elementId);
