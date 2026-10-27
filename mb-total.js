@@ -1,4 +1,4 @@
-// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters, Scrollable Table & Global Click Fix
+// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters, Scrollable Table & Robust Global Click Fix
 
 function animateNumberCount(elementId, finalVal) {
     var el = document.getElementById(elementId);
@@ -364,11 +364,11 @@ function printQuickModalReport() {
     printA4Document(html, currentQuickModalType + '_Report_' + todayStr.replace(/\//g, '-') + '.pdf');
 }
 
-// 🌟 ग्लोबल क्लिक लिसनर: कोणत्याही मोडलमधील (स्मार्ट शोध किंवा इतर) M.B. लिंकवर क्लिक केल्यावर कृती केंद्र सुरळीत उघडेल
+// 🌟 सुधारित ग्लोबल क्लिक लिसनर: .closest('a') वापरल्यामुळे कोणत्याही उप-घटकावर क्लिक झाले तरी कृती केंद्र अचूकपणे उघडेल
 document.addEventListener('click', function(e) {
-    var target = e.target;
-    if (target && target.tagName === 'A' && target.getAttribute('onclick')) {
-        var onclickVal = target.getAttribute('onclick');
+    var anchor = e.target.closest('a');
+    if (anchor && anchor.getAttribute('onclick')) {
+        var onclickVal = anchor.getAttribute('onclick');
         if (onclickVal.indexOf('openSmartActionCenter') !== -1) {
             e.preventDefault();
             e.stopPropagation();
