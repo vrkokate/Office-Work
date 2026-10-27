@@ -174,7 +174,7 @@ function renderQuickModalTable() {
 
             html += '<tr>' +
             '<td style="text-align:center;">' + (i + 1) + '</td>' +
-            '<td><a href="javascript:void(0)" onclick="closeQuickInfoModal(); setTimeout(function() { openSmartActionCenter(\'' + rawNo + '\'); }, 50);" style="color:#0d47a1; font-weight:800; text-decoration:underline;">' + rawNo + '</a></td>' +
+            '<td><a href="javascript:void(0)" onclick="openSmartActionCenter(\'' + rawNo + '\')" style="color:#0d47a1; font-weight:800; text-decoration:underline;">' + rawNo + '</a></td>' +
             '<td>' + sizeStr + '</td>' +
             '<td>' + statusText + '</td>' +
             '<td class="action-cell" style="text-align:center;">' +
@@ -364,25 +364,33 @@ function printQuickModalReport() {
     printA4Document(html, currentQuickModalType + '_Report_' + todayStr.replace(/\//g, '-') + '.pdf');
 }
 
-// 🌟 सुधारित ग्लोबल क्लिक लिसनर: .closest('a') वापरल्यामुळे कोणत्याही उप-घटकावर क्लिक झाले तरी कृती केंद्र अचूकपणे उघडेल
+// 🌟 सर्वसमावेशक ग्लोबल क्लिक लिसनर: कोणत्याही मॉडेलमधील (स्मार्ट शोध किंवा इतर) M.B. लिंकवर क्लिक केल्यावर सर्व मॉडेल्स बंद होऊन कृती केंद्र उघडेल
 document.addEventListener('click', function(e) {
     var anchor = e.target.closest('a');
-    if (anchor && anchor.getAttribute('onclick')) {
-        var onclickVal = anchor.getAttribute('onclick');
-        if (onclickVal.indexOf('openSmartActionCenter') !== -1) {
+    if (anchor) {
+        var onclickVal = anchor.getAttribute('onclick') || '';
+        var hrefVal = anchor.getAttribute('href') || '';
+        var combinedAttr = onclickVal + ' ' + hrefVal;
+        
+        if (combinedAttr.indexOf('openSmartActionCenter') !== -1) {
             e.preventDefault();
             e.stopPropagation();
-            if (typeof closeSearchResultModal === 'function') closeSearchResultModal();
-            if (typeof closeQuickInfoModal === 'function') closeQuickInfoModal();
-            if (typeof closeSmartActionCenter === 'function') closeSmartActionCenter();
-            var match = onclickVal.match(/openSmartActionCenter\(['"]([^'"]+)['"]\)/);
+            
+            // सर्व मॉडेल्स DOM मधून हायड करणे
+            var modals = ['quickInfoModal', 'searchResultModal', 'smartActionCenterModal', 'jeModal', 'mbModal', 'workModal', 'billModal', 'assignModal'];
+            modals.forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            
+            var match = combinedAttr.match(/openSmartActionCenter\(['"]([^'"]+)['"]\)/);
             if (match && match[1]) {
                 var mbNum = match[1];
                 setTimeout(function() {
                     if (typeof openSmartActionCenter === 'function') {
                         openSmartActionCenter(mbNum);
                     }
-                }, 60);
+                }, 50);
             }
         }
     }
