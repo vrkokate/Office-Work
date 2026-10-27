@@ -1,4 +1,4 @@
-// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters, Scrollable Table & Action Center Wrapper Fix
+// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters, Scrollable Table & Action Center Integration
 
 var currentQuickModalType = '';
 
@@ -176,7 +176,7 @@ function renderQuickModalTable() {
 
             html += '<tr>' +
             '<td style="text-align:center;">' + (i + 1) + '</td>' +
-            '<td><a href="javascript:void(0)" onclick="openSmartActionCenter(\'' + rawNo + '\')" style="color:#0d47a1; font-weight:800; text-decoration:underline;">' + rawNo + '</a></td>' +
+            '<td><a href="javascript:void(0)" onclick="closeQuickInfoModal(); if(typeof closeSearchResultModal===\'function\') closeSearchResultModal(); openSmartActionCenter(\'' + rawNo + '\');" style="color:#0d47a1; font-weight:800; text-decoration:underline;">' + rawNo + '</a></td>' +
             '<td>' + sizeStr + '</td>' +
             '<td>' + statusText + '</td>' +
             '<td class="action-cell" style="text-align:center;">' +
@@ -333,7 +333,7 @@ function printQuickModalReport() {
         for (var secKey in groups[mainKey]) {
             html += '<div style="margin:6px 0 4px 10px; font-size:10pt; font-weight:700; color:#333;">👉 सद्यस्थिती व धारक: ' + secKey + '</div>';
             html += '<table class="print-table" style="margin-bottom:8px; width:100%; border-collapse:collapse; font-size:9.5pt;">' +
-                '<thead><tr style="background:#f5f5f5;">' +
+                '<thead><tr style="background:#f5f5f5;">`' +
                 '<th style="width:40px; text-align:center;">अ.क्र.</th>' +
                 '<th>M.B. क्रमांक</th>' +
                 '<th>साईज</th>' +
@@ -365,30 +365,3 @@ function printQuickModalReport() {
 
     printA4Document(html, currentQuickModalType + '_Report_' + todayStr.replace(/\//g, '-') + '.pdf');
 }
-
-// 🌟 Wrapper to ensure openSmartActionCenter automatically closes searchResultModal and quickInfoModal
-(function() {
-    var originalOpenSAC = window.openSmartActionCenter;
-    if (typeof originalOpenSAC === 'function') {
-        window.openSmartActionCenter = function(mbNum) {
-            var searchModal = document.getElementById('searchResultModal');
-            if (searchModal) searchModal.style.display = 'none';
-            var quickModal = document.getElementById('quickInfoModal');
-            if (quickModal) quickModal.style.display = 'none';
-            originalOpenSAC(mbNum);
-        };
-    } else {
-        window.addEventListener('DOMContentLoaded', function() {
-            if (typeof window.openSmartActionCenter === 'function' && window.openSmartActionCenter !== window._wrappedSAC) {
-                var orig = window.openSmartActionCenter;
-                window._wrappedSAC = window.openSmartActionCenter = function(mbNum) {
-                    var searchModal = document.getElementById('searchResultModal');
-                    if (searchModal) searchModal.style.display = 'none';
-                    var quickModal = document.getElementById('quickInfoModal');
-                    if (quickModal) quickModal.style.display = 'none';
-                    orig(mbNum);
-                };
-            }
-        });
-    }
-})();
