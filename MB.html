@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>मोजमाप पुस्तिका नियंत्रण प्रणाली - M.B. System</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- 🌟 मॉड्यूलर CSS लिंक्स -->
+<link rel="stylesheet" href="mb.css">
+<link rel="stylesheet" href="mb-print.css" media="print">
+</head>
+<body>
+
+<div id="customAlertModal" class="modal-overlay" style="display:none; z-index:4000;">
+<div class="modal-card" style="max-width:350px; text-align:center; padding:22px; border-radius:12px;">
+<div id="customAlertIcon" style="font-size:36px; margin-bottom:8px;">⚠️</div>
+<div id="customAlertTitle" style="font-size:15px; font-weight:800; color:#0d47a1; margin-bottom:6px;">माहिती व सूचना</div>
+<div id="customAlertText" style="font-size:13px; font-weight:600; line-height: 1.55; color: #37474f; margin-bottom:18px;">मेसेज</div>
+<button class="btn-report" style="background:#0d47a1; margin-top:0; padding:9px 18px; width:100%;" onclick="closeCustomAlert()">समजले (OK)</button>
+</div>
+</div>
+
+<div id="customConfirmModal" class="modal-overlay" style="display:none; z-index:4500;">
+<div class="modal-card" style="max-width:340px; text-align:center; padding:20px; border-radius:12px;">
+<div style="font-size:32px; margin-bottom:4px;" id="confirmModalIcon">⚠️</div>
+<div style="font-size:14.5px; font-weight:800; color:#333; margin-bottom:8px;" id="confirmModalTitle">ही नोंद हटवायची का?</div>
+<div id="confirmSubText" style="font-size:11.5px; color:#555; margin-bottom:12px; line-height:1.4;"></div>
+<div id="confirmInputContainer" style="margin-bottom:12px; display:none;">
+    <label style="display:block; font-size:11px; font-weight:700; color:#333; margin-bottom:4px;">खात्री करण्यासाठी संबंधित M.B. क्रमांक प्रविष्ट करा:</label>
+    <input type="text" class="form-control" id="confirmMBVerifyInput" placeholder="M.B. क्रमांक टाका" style="text-align:center; font-weight:bold; font-size:13px;" oninput="checkVerifyInputMatch(this)">
+</div>
+<div style="display:flex; gap:8px;">
+<button id="btnConfirmCancelAction" class="btn-report" style="background:#757575; margin:0; flex:1; padding:9px; font-size:12px;" onclick="closeCustomConfirm(false)">❌ CANCEL</button>
+<button id="btnConfirmOkAction" class="btn-report" style="background:#d32f2f; margin:0; flex:1; padding:9px; font-size:12px;" onclick="closeCustomConfirm(true)">✅ DELETE</button>
+</div>
+</div>
+</div>
+
+<!-- 📘 M.B. कृती केंद्र MODAL -->
+<div id="smartActionCenterModal" class="quick-info-overlay" style="display:none; z-index: 3900;">
+<div class="quick-info-card" style="max-width: 480px; padding: 16px;">
+<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0d47a1; padding-bottom:6px; margin-bottom:10px;">
+<h3 style="font-size: 14.5px; color:#0d47a1; font-weight: 800;">📘 M.B. कृती केंद्र</h3>
+<button class="btn-close" onclick="closeSmartActionCenter()">X</button>
+</div>
+
+<div id="sacDetailsBox" class="sac-main-box"></div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+    <button class="sac-btn-transfer" onclick="sacOpenTransferForm()">📤 हस्तांतरण</button>
+    <button class="sac-btn-receive" onclick="sacTriggerReceiveMB()">📥 घेणे</button>
+    <button class="sac-btn-edit" onclick="sacTriggerEditRecord()">✏️ दुरुस्ती</button>
+    <button class="sac-btn-history" onclick="sacToggleHistoryView()">🕒 इतिहास</button>
+    <button class="sac-btn-history" onclick="sacOpenWorkForCurrentMB()">📋 काम</button>
+    <button class="sac-btn-print" onclick="sacOpenBillForCurrentMB()">📄 बिल</button>
+</div>
+<button class="sac-btn-print" onclick="printHistoryFromSAC()">📄 REPORT / PRINT</button>
+
+<div id="sacSubActionContainer" style="display:none; background:#fff; border:1.5px solid #0d47a1; border-radius:8px; padding:10px; margin-top:8px;"></div>
+
+<div id="sacHistoryContainer" style="display:none; margin-top:10px; background:#fff; border:1px solid #ccc; border-radius:6px; padding:8px;">
+    <div style="font-size:12px; font-weight:700; color:#333; margin-bottom:6px; border-bottom:1px solid #eee; padding-bottom:3px;">📜 M.B. Movement History</div>
+    <div id="sacHistoryTableWrapper" style="max-height:180px; overflow-y:auto; overflow-x:auto;"></div>
+</div>
+</div>
+</div>
+
+<!-- स्मार्ट शोध निकाल मॉडेल -->
+<div id="searchResultModal" class="quick-info-overlay" style="display:none; z-index: 3800;">
+<div class="quick-info-card" style="max-width: 520px;">
+<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
+<h3 id="searchResultModalTitle" style="font-size: 14px; color:#0d47a1; font-weight: 800;">🔍 शोध तपशील व सद्यस्थिती</h3>
+<button class="btn-close" onclick="closeSearchResultModal()">X</button>
+</div>
+<div style="background:#e3f2fd; color:#0d47a1; font-size:11px; padding:6px 10px; border-radius:6px; margin-bottom:8px; font-weight:600;">
+👉 <b>टीप:</b> Action Center, Transfer व History साठी M.B. क्रमांकावर क्लिक करा.
+</div>
+<div class="table-responsive-box" id="searchResultModalBody" style="max-height: 270px; margin-bottom: 12px;"></div>
+<button class="btn-report" style="background:#0d47a1; margin-top:4px;" onclick="printSearchResultFromPopup()">📄 REPORT / PRINT</button>
+</div>
+</div>
+
+<!-- क्विक इन्फो मॉडेल -->
+<div id="quickInfoModal" class="quick-info-overlay" style="display:none;">
+<div class="quick-info-card">
+<div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:12px;">
+<h3 id="quickModalTitle" style="font-size: 14px; color:#0d47a1;">तपशील</h3>
+<button class="btn-close" onclick="closeQuickInfoModal()">X</button>
+</div>
+<div class="table-responsive-box" id="quickModalBody" style="max-height:240px; overflow-y:auto; margin-bottom:10px;"></div>
+<button class="btn-report" style="margin-top:0;" onclick="printQuickModalReport()">📄 REPORT / PRINT</button>
+</div>
+</div>
+
+<!-- M.B. नियंत्रण प्रणाली मुख्य डॅशबोर्ड -->
+<div id="mbSystemSection">
+<div class="top-header">
+<a href="index.html" class="btn-back-hub">🏠 मुखपृष्ठ</a>
+<h1>मोजमाप पुस्तिका नियंत्रण प्रणाली</h1>
+<p>सार्वजनिक बांधकाम विभाग</p>
+</div>
+
+<div class="action-grid">
+<button class="action-btn btn-je" onclick="openModule('jeModal')"><span>👷</span>JE</button>
+<button class="action-btn btn-mb-act" onclick="openModule('mbModal')"><span>📖</span>M.B.</button>
+<button class="action-btn btn-work" onclick="openModule('workModal')"><span>📋</span>Work list</button>
+<button class="action-btn btn-bill" onclick="openModule('billModal')"><span>📄</span>Bill reg.</button>
+<button class="action-btn btn-assign" onclick="openModule('assignModal')"><span>📁</span>Assign</button>
+<a href="DataManager.html" class="action-btn btn-settings"><span>⚙</span>Data Manager</a>
+</div>
+
+<div class="container">
+<div class="summary-box">
+<div class="summary-title">📖 मोजमाप पुस्तिका (M.B.) स्थिती</div>
+<div class="card-grid">
+<div class="stat-card" onclick="openQuickInfoModal('घेणेD'); event.stopPropagation();">
+    <div class="stat-num" id="countReceivedMB">0</div>
+    <div class="stat-label">एकूण M.B.</div>
+</div>
+<div class="stat-card" onclick="openQuickInfoModal('GIVEN'); event.stopPropagation();">
+    <div class="stat-num" id="countGivenMB">0</div>
+    <div class="stat-label">दिलेली M.B.</div>
+</div>
+<div class="stat-card" onclick="openQuickInfoModal('AVAILABLE'); event.stopPropagation();">
+    <div class="stat-num" id="countAvailableMB">0</div>
+    <div class="stat-label">उपलब्ध M.B.</div>
+</div>
+</div>
+</div>
+
+<div class="filter-card">
+<h3 style="font-size: 13.5px; color:#0d47a1; margin-bottom: 10px;">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</h3>
+<div class="form-row">
+<div class="form-group"><label>दिनांक पासून *</label><input type="date" class="form-control date-placeholder-input empty-date" id="repFromDate" onchange="checkDatePlaceholder(this)"></div>
+<div class="form-group"><label>दिनांक पर्यंत *</label><input type="date" class="form-control date-placeholder-input empty-date" id="repToDate" onchange="checkDatePlaceholder(this)"></div>
+</div>
+
+<div class="form-group">
+<label>मुख्य घटक</label>
+<select class="form-control" id="repMainCategory" onchange="onMainCategoryChange()">
+<option value="">-- मुख्य घटक निवडा --</option>
+<option value="M.B.">M.B.</option>
+<option value="J.E.">J.E.</option>
+<option value="Bill">Bill</option>
+<option value="Contractor">Contractor</option>
+<option value="Agency">Agency</option>
+</select>
+</div>
+
+<div class="form-group" id="dynamicOptionGroup1" style="display:none;"><label id="lblDynamic1">पुढील पर्याय</label><select class="form-control" id="repDynamicSelect1" onchange="onDynamicSelect1Change()"></select></div>
+
+<div class="form-group" style="position: relative;">
+<label>स्मार्ट शोध (M.B. क्र., नाव किंवा तपशील)</label>
+<input type="text" class="form-control" id="smartSearchInput" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका" oninput="handleSmartSearchInput(this)">
+<div id="smartSearchSuggestions"></div>
+</div>
+
+<div style="display:flex; gap:8px; width:100%; margin-top:6px;">
+    <button class="btn-report" style="margin:0; flex:1; background:#0d47a1;" onclick="executeSmartSearchOrReport()">🔍 SEARCH</button>
+    <button class="btn-report" style="margin:0; flex:1; background:#546e7a;" onclick="resetSearchSectionForm()">🔄 RESET</button>
+</div>
+</div>
+</div>
+
+<!-- 1. JE मोडल -->
+<div id="jeModal" class="modal-overlay"><div class="modal-card">
+<div class="modal-header"><h3 style="font-size: 14px; color:#1976d2;">👷 कनिष्ठ अभियंता (JE) व्यवस्थापन</h3><button class="btn-close" onclick="closeModule('jeModal')">X</button></div>
+<input type="hidden" id="editJEIndex" value="-1">
+<div class="form-group"><label>कनिष्ठ अभियंत्याचे पूर्ण नाव *</label><input type="text" class="form-control" id="newJEName" placeholder="उदा. श्री. ए. बी. पाटील"></div>
+<div style="display:flex; gap:6px;"><button id="btnSaveJE" class="btn-report" style="background:#1976d2; flex:1;" onclick="saveOrUpdateJE()">Save JE</button><button id="btnCancelJE" class="btn-report" style="background:#757575; width:80px; display:none;" onclick="cancelJEEdit()">रद्द करा</button></div>
+<div class="je-scroll-box"><table class="data-table"><thead><tr><th>अ.क्र.</th><th>नाव</th><th style="width:25%; text-align:center;">Action</th></tr></thead><tbody id="jeListBody"></tbody></table></div>
+<button class="btn-report" style="background:#0d47a1; margin-top:12px;" onclick="printJEReport()">📄 REPORT / PRINT</button>
+</div></div>
+
+<!-- 2. M.B. नोंद मोडल -->
+<div id="mbModal" class="modal-overlay"><div class="modal-card">
+<div class="modal-header"><h3 style="font-size: 14px; color:#2e7d32;">📖 मोजमाप पुस्तिका (M.B.) नोंद</h3><button class="btn-close" onclick="closeModule('mbModal')">X</button></div>
+<input type="hidden" id="editMBIndex" value="-1">
+<div class="form-group"><label>नोंद प्रकार निवडा *</label><select class="form-control" id="mbActionType" onchange="onMBActionTypeChange()"><option value="">-- नोंद प्रकार --</option><option value="मिळालेली M.B.">मिळालेली M.B.</option><option value="दिलेली M.B.">दिलेली M.B.</option></select></div>
+<div class="form-group" id="groupMBSizeSelect" style="display:none;"><label>M.B. आकार *</label><select class="form-control" id="newMBSize" onchange="onMBSizeChange()"><option value="">-- आकार --</option><option value="लहान M.B.">लहान M.B.</option><option value="मोठी M.B.">मोठी M.B.</option></select></div>
+<div class="form-group" id="groupMBInput" style="display:none; position:relative;">
+    <label>नवीन M.B. क्रमांक *</label><input type="text" class="form-control" id="newMBNo" placeholder="उदा. 015750" oninput="checkRealTimeMBInput(this)">
+    <div id="mbRealtimeStatus" style="font-size:11.5px; margin-top:3px; display:none;"></div>
+</div>
+<div class="form-group" id="groupMBSelect" style="display:none;"><label>उपलब्ध M.B. निवडा *</label><select class="form-control" id="selectAvailableMB" onchange="onSelectAvailableMBChange()"><option value="">-- निवडा --</option></select></div>
+<div class="form-group" id="givenRecipientGroup" style="display:none;"><label>कोणाला दिली? *</label><select class="form-control" id="mbGivenRecipientType" onchange="onMBGivenRecipientTypeChange()"><option value="">-- निवडा --</option><option value="JE">कनिष्ठ अभियंता (JE)</option><option value="Office">विभागीय कार्यालय</option></select></div>
+<div class="form-group" id="givenJEGroup" style="display:none;"><label>कनिष्ठ अभियंता (JE) निवडा *</label><select class="form-control" id="selectGivenJE"><option value="">-- निवडा --</option></select></div>
+<div class="form-group" id="givenOfficeGroup" style="display:none;"><label>विभागीय कार्यालय नाव *</label><input type="text" class="form-control" id="givenOfficeInput" placeholder="कार्यालय नाव"></div>
+<div class="form-group" id="receivedMainGroup" style="display:none;"><label>कोणाकडून मिळाली? *</label><select class="form-control" id="mbReceivedType" onchange="onMBReceivedTypeChange()"><option value="">-- निवडा --</option><option value="नवीन">नवीन</option><option value="चालू">चालू</option></select></div>
+<div class="form-group" id="bhandarpalGroup" style="display:none;"><label>भांडारपाल *</label><input type="text" class="form-control" id="bhandarpalNameInput" placeholder="नाव टाईप करा"></div>
+<div class="form-group"><label>दिनांक *</label><input type="date" class="form-control" id="newMBDate"></div>
+
+<div style="display:flex; gap:6px;"><button id="btnSaveMB" class="btn-report" style="background:#2e7d32; flex:1;" onclick="saveOrUpdateMB()">Save Entry</button><button id="btnCancelMB" class="btn-report" style="background:#757575; width:80px; display:none;" onclick="cancelMBEdit()">रद्द करा</button></div>
+
+<div class="table-scroll-box">
+<table class="data-table"><thead><tr><th>अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>हस्तांतरण</th><th style="width:25%; text-align:center;">Action</th></tr></thead><tbody id="mbListBody"></tbody></table>
+</div>
+<button class="btn-report" style="background:#0d47a1; margin-top:12px;" onclick="printMBReport()">📄 REPORT / PRINT</button>
+</div></div>
+
+<!-- 3. Work List मोडल -->
+<div id="workModal" class="modal-overlay"><div class="modal-card">
+<div class="modal-header"><h3 style="font-size: 14px; color:#00897b;">📋 कामांची यादी (Work List)</h3><button class="btn-close" onclick="closeModule('workModal')">X</button></div>
+<input type="hidden" id="editWorkIndex" value="-1">
+<div class="form-group"><label>कनिष्ठ अभियंता (JE) निवडा *</label><select class="form-control" id="workJE" onchange="onWorkJEChange()"><option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option></select></div>
+<div class="form-group"><label>वाटप केलेली M.B. निवडा *</label><select class="form-control" id="workMB" onchange="onWorkMBChange()"><option value="">-- वाटप केलेली M.B. निवडा --</option></select></div>
+<div class="form-group"><label>कामाचे नाव *</label><input type="text" class="form-control" id="workName" placeholder="कामाचे नाव"></div>
+<div class="form-group"><label>कंत्राटदार / एजन्सीचे नाव *</label><input type="text" class="form-control" id="workContractor" placeholder="कंत्राटदार / एजन्सीचे नाव"></div>
+<div style="display:flex; gap:6px;"><button id="btnSaveWork" class="btn-report" style="background:#00897b; flex:1;" onclick="saveOrUpdateWork()">Save Work</button><button class="btn-report" style="background:#0d47a1; flex:1;" onclick="printWorkReport()">📄 प्रिंट</button></div>
+<button id="btnCancelWork" class="btn-report" style="background:#757575; margin-top:6px; display:none;" onclick="cancelWorkEdit()">रद्द करा</button>
+
+<div class="table-scroll-box" style="margin-top:10px;">
+<table class="data-table">
+    <thead>
+        <tr>
+            <th style="text-align:center;">अ.क्र.</th>
+            <th>कामाचे नाव</th>
+            <th>कंत्राटदार / एजन्सी</th>
+            <th>संबंधित JE</th>
+            <th>M.B. क्रमांक</th>
+            <th style="text-align:center;">Action</th>
+        </tr>
+    </thead>
+    <tbody id="workListBody"></tbody>
+</table>
+</div>
+</div></div>
+
+<!-- 4. Bill Reg. मोडल -->
+<div id="billModal" class="modal-overlay"><div class="modal-card" style="max-width:480px;">
+<div class="modal-header">
+    <h3 style="font-size: 15px; color:#f57c00; font-weight:800;">📄 देयक नोंदवही (Bill Register)</h3>
+    <button class="btn-close" onclick="closeModule('billModal')">X</button>
+</div>
+
+<div class="summary-grid" style="margin-bottom:10px;">
+    <div class="sum-card-clickable" onclick="openDetailPopup('TOTAL_BILLS')"><div class="label" style="font-size:11px; color:#666;">Total Bills</div><div class="val" style="font-size:16px; font-weight:700; color:#0d47a1;" id="sumTotalBills">0</div></div>
+    <div class="sum-card-clickable" onclick="openDetailPopup('TOTAL_AMOUNT')"><div class="label" style="font-size:11px; color:#666;">Total Amount</div><div class="val" style="font-size:16px; font-weight:700; color:#0d47a1;" id="sumTotalAmount">₹ 0</div></div>
+    <div class="sum-card-clickable" onclick="openDetailPopup('TOTAL_DEDUCTION')"><div class="label" style="font-size:11px; color:#666;">Total Deduction</div><div class="val" style="font-size:16px; font-weight:700; color:#d32f2f;" id="sumTotalDed">₹ 0</div></div>
+    <div class="sum-card-clickable net" onclick="openDetailPopup('NET_PAYABLE')"><div class="label" style="font-size:11px; color:#666;">Net Payable</div><div class="val" style="font-size:16px; font-weight:700; color:#16a34a;" id="sumNetPay">₹ 0</div></div>
+</div>
+
+<div style="display: flex; gap: 8px; margin-bottom: 12px;">
+    <button type="button" class="btn-report" style="background:#f97316; margin:0; flex:1;" onclick="openWizard(1)"><i class="fa-solid fa-plus"></i> नवीन देयक नोंदवा</button>
+    <button type="button" class="btn-report" style="background:#1d4ed8; margin:0; flex:1;" onclick="printMasterBillReport()">🖨️ प्रिंट / पीडीएफ रिपोर्ट</button>
+</div>
+
+<div class="bill-scroll-container">
+    <div id="billListContainer">
+        <div style="text-align:center; padding:15px; color:#666; font-size:12px;">कोणतीही नोंद उपलब्ध नाही.</div>
+    </div>
+</div>
+</div></div>
+
+<!-- 5. Assign मोडल -->
+<div id="assignModal" class="modal-overlay"><div class="modal-card">
+<div class="modal-header"><h3 style="font-size: 14px; color:#7b1fa2;">📁 M.B. वाटप (Assign)</h3><button class="btn-close" onclick="closeModule('assignModal')">X</button></div>
+<div class="form-group"><label>उपलब्ध M.B.</label><select class="form-control" id="assignMBSelect"></select></div>
+<div class="form-group"><label>कनिष्ठ अभियंता (JE)</label><select class="form-control" id="assignJESelect"></select></div>
+<div class="form-group"><label>दिनांक</label><input type="date" class="form-control" id="assignDate"></div>
+<button class="btn-report" style="background:#7b1fa2;" onclick="saveAssign()">Assign M.B.</button>
+<div class="assign-list-wrap" style="margin-top:10px; max-height:300px; overflow:auto; -webkit-overflow-scrolling:touch; border:1px solid #ddd; border-radius:8px; background:#fff;">
+<table class="data-table" style="margin:0; min-width:520px;"><thead><tr><th>M.B.</th><th>JE</th><th>वाटप दिनांक</th><th>Action</th></tr></thead><tbody id="assignListBody"></tbody></table>
+</div>
+
+<div id="assignActionModal" class="modal-overlay" style="z-index:1200; display:none;">
+  <div class="modal-card" style="max-width:430px;">
+    <div class="modal-header"><h3 style="font-size:15px;color:#7b1fa2;">📁 M.B. वाटप — पुढील कृती</h3><button class="btn-close" onclick="closeModule('assignActionModal')">X</button></div>
+    <div id="assignActionInfo" style="background:#f5f7fa;border:1px solid #ddd;border-radius:10px;padding:12px;margin-bottom:12px;font-weight:600;"></div>
+    <div class="form-group"><label>पुढील कृती निवडा</label><select class="form-control" id="assignNextAction" onchange="showAssignActionFields()">
+      <option value="">-- कृती निवडा --</option><option value="give">दुसऱ्या व्यक्तीला द्या</option><option value="receive">कार्यालयात जमा / परत घ्या</option><option value="change">वाटप माहिती बदला</option>
+    </select></div>
+    <div id="assignActionFields" style="display:none;">
+      <div class="form-group"><label id="assignActionJELabel">कनिष्ठ अभियंता / धारक</label><select class="form-control" id="assignActionJE"></select></div>
+      <div class="form-group"><label>दिनांक</label><input type="date" class="form-control" id="assignActionDate"></div>
+      <button class="btn-report" style="background:#7b1fa2;" onclick="saveAssignAction()">जतन करा</button>
+    </div>
+    <div id="assignReceiveFields" style="display:none;">
+      <div class="form-group"><label>जमा दिनांक</label><input type="date" class="form-control" id="assignReceiveDate"></div>
+      <button class="btn-report" style="background:#1976d2;" onclick="saveAssignReceive()">जमा नोंदवा</button>
+    </div>
+    <button class="btn-report" style="background:#757575;margin-top:8px;" onclick="closeModule('assignActionModal')">बंद करा</button>
+  </div>
+</div>
+</div>
+
+</div>
+
+<div id="printableArea" style="display:none;"></div>
+
+<!-- 🌟 मॉड्यूलर JavaScript फाइल्स योग्य क्रमाने लोड होत आहेत -->
+<script src="common.js"></script>
+<script src="mb-storage.js"></script>
+<script src="mb-common.js"></script>
+<script src="mb-available.js"></script>
+<script src="mb-given.js"></script>
+<script src="mb-total.js"></script>
+<script src="mb-report.js"></script>
+<script src="mb-print.js"></script>
+<script>
+/* =========================================================
+   JE MANAGEMENT FIX — additive patch; existing modules preserved
+   Uses the existing common.js getData()/setData() data layer.
+   ========================================================= */
+function escapeJEHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch];
+    });
+}
+
+function refreshJEList() {
+    var tbody = document.getElementById('jeListBody');
+    if (!tbody) return;
+    var list = getData('je_records');
+    if (!Array.isArray(list)) list = [];
+    tbody.innerHTML = '';
+    if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#777;padding:10px;">अद्याप कोणत्याही कनिष्ठ अभियंत्याची नोंद नाही.</td></tr>';
+        return;
+    }
+    list.forEach(function(item, idx) {
+        if (!item || typeof item !== 'object') return;
+        var name = String(item.name == null ? '' : item.name);
+        var tr = document.createElement('tr');
+        var serial = document.createElement('td'); serial.textContent = String(idx + 1);
+        var nameCell = document.createElement('td'); nameCell.textContent = name;
+        var actionCell = document.createElement('td'); actionCell.className = 'action-cell'; actionCell.style.textAlign = 'center';
+        var editBtn = document.createElement('button'); editBtn.type = 'button'; editBtn.className = 'btn-action';
+        editBtn.textContent = 'Edit'; editBtn.style.cssText = 'background:#2e7d32;padding:3px 6px;color:#fff;border:none;border-radius:3px;';
+        editBtn.addEventListener('click', function() { editJE(idx); });
+        var deleteBtn = document.createElement('button'); deleteBtn.type = 'button'; deleteBtn.className = 'btn-action';
+        deleteBtn.textContent = 'Delete'; deleteBtn.style.cssText = 'background:#d32f2f;padding:3px 6px;color:#fff;border:none;border-radius:3px;margin-left:4px;';
+        deleteBtn.addEventListener('click', function() { deleteJE(idx); });
+        actionCell.appendChild(editBtn); actionCell.appendChild(deleteBtn);
+        tr.appendChild(serial); tr.appendChild(nameCell); tr.appendChild(actionCell); tbody.appendChild(tr);
+    });
+}
+
+function saveOrUpdateJE() {
+    var input = document.getElementById('newJEName');
+    var indexInput = document.getElementById('editJEIndex');
+    if (!input || !indexInput) return;
+    var name = input.value.trim().replace(/\s+/g, ' ');
+    var idx = parseInt(indexInput.value, 10);
+    if (!name) {
+        if (typeof showAlert === 'function') showAlert('कृपया कनिष्ठ अभियंत्याचे पूर्ण नाव भरा.', 'WARNING');
+        else alert('कृपया कनिष्ठ अभियंत्याचे पूर्ण नाव भरा.');
+        input.focus(); return;
+    }
+    var list = getData('je_records');
+    if (!Array.isArray(list)) list = [];
+    if (Number.isInteger(idx) && idx >= 0) {
+        if (idx >= list.length || !list[idx] || typeof list[idx] !== 'object') {
+            if (typeof showAlert === 'function') showAlert('दुरुस्तीसाठी निवडलेली नोंद सापडली नाही. यादी पुन्हा तपासा.', 'WARNING');
+            refreshJEList(); return;
+        }
+        list[idx].name = name;
+    } else {
+        var duplicate = list.some(function(item) { return item && String(item.name || '').trim().toLocaleLowerCase() === name.toLocaleLowerCase(); });
+        if (duplicate) {
+            if (typeof showAlert === 'function') showAlert('या नावाची कनिष्ठ अभियंता नोंद आधीच उपलब्ध आहे.', 'WARNING');
+            else alert('या नावाची नोंद आधीच उपलब्ध आहे.');
+            return;
+        }
+        list.push({ name: name });
+    }
+    setData('je_records', list);
+    cancelJEEdit();
+    refreshJEList();
+    if (typeof refreshMBDashboard === 'function') refreshMBDashboard();
+    if (typeof showAlert === 'function') showAlert('कनिष्ठ अभियंत्याची नोंद यशस्वीपणे सेव्ह झाली!', 'SUCCESS');
+}
+
+function editJE(idx) {
+    var list = getData('je_records');
+    if (!Array.isArray(list) || !list[idx]) return;
+    document.getElementById('newJEName').value = String(list[idx].name || '');
+    document.getElementById('editJEIndex').value = String(idx);
+    document.getElementById('btnSaveJE').textContent = 'Update JE';
+    document.getElementById('btnCancelJE').style.display = 'block';
+    document.getElementById('newJEName').focus();
+}
+
+function cancelJEEdit() {
+    var input = document.getElementById('newJEName');
+    var idx = document.getElementById('editJEIndex');
+    var save = document.getElementById('btnSaveJE');
+    var cancel = document.getElementById('btnCancelJE');
+    if (input) input.value = '';
+    if (idx) idx.value = '-1';
+    if (save) save.textContent = 'Save JE';
+    if (cancel) cancel.style.display = 'none';
+}
+
+async function deleteJE(idx) {
+    var confirmed = typeof window.appConfirm === 'function'
+        ? await window.appConfirm('ही कनिष्ठ अभियंता नोंद हटवायची आहे का?')
+        : window.confirm('ही कनिष्ठ अभियंता नोंद हटवायची आहे का?');
+    if (!confirmed) return;
+    var list = getData('je_records');
+    if (!Array.isArray(list) || idx < 0 || idx >= list.length) return;
+    list.splice(idx, 1);
+    setData('je_records', list);
+    cancelJEEdit();
+    refreshJEList();
+    if (typeof refreshMBDashboard === 'function') refreshMBDashboard();
+    if (typeof showAlert === 'function') showAlert('कनिष्ठ अभियंता नोंद हटवली!', 'SUCCESS');
+}
+
+function printJEReport() {
+    var list = getData('je_records');
+    if (!Array.isArray(list) || list.length === 0) {
+        if (typeof showAlert === 'function') showAlert('कोणतीही कनिष्ठ अभियंता (JE) नोंद उपलब्ध नाही.', 'WARNING');
+        else window.alert('कोणतीही कनिष्ठ अभियंता (JE) नोंद उपलब्ध नाही.');
+        return;
+    }
+
+    /* JE report is printed in an isolated document. Never write report markup
+       into the live page/#printableArea: that caused report text to leak behind
+       the open modal in some WebViews. No application DOM or LocalStorage data
+       is changed by this print operation. */
+    var rows = list.map(function(item, i) {
+        return '<tr><td>' + (i + 1) + '</td><td><strong>' + escapeJEHtml(item && item.name) + '</strong></td></tr>';
+    }).join('');
+    var reportHtml = '<!doctype html><html lang="mr"><head><meta charset="utf-8">' +
+        '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+        '<title>JE Register Report</title><style>' +
+        '@page{size:A4 portrait;margin:12mm}*{box-sizing:border-box}body{font-family:Arial,"Noto Sans Devanagari",sans-serif;color:#111;margin:0;font-size:12pt}' +
+        'h2{text-align:center;font-size:18pt;margin:0 0 18px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #222;padding:8px;text-align:left}th{background:#eee}tr{break-inside:avoid}' +
+        '</style></head><body><h2>कनिष्ठ अभियंता (JE) व्यवस्थापन अहवाल</h2>' +
+        '<table><thead><tr><th style="width:18%">अ.क्र.</th><th>कनिष्ठ अभियंत्याचे नाव</th></tr></thead><tbody>' + rows +
+        '</tbody></table><script>window.onload=function(){setTimeout(function(){window.focus();window.print();},250);};<\/script></body></html>';
+
+    var printWindow = window.open('', '_blank');
+    if (!printWindow) {
+        if (typeof showAlert === 'function') showAlert('प्रिंट विंडो उघडता आली नाही. कृपया ब्राउझरमध्ये Pop-ups/Print परवानगी द्या.', 'WARNING');
+        else window.alert('प्रिंट विंडो उघडता आली नाही. कृपया Pop-ups/Print परवानगी द्या.');
+        return;
+    }
+    printWindow.document.open();
+    printWindow.document.write(reportHtml);
+    printWindow.document.close();
+}
+
+/* =========================================================
+   QUICK INFO MODAL REPORT PRINT FIX
+   Print Quick Info reports in an isolated document. Do not put
+   report HTML into the live page/#printableArea, because that can
+   leak behind dashboard cards/modals in some WebViews.
+   This overrides the older helper loaded by mb-print.js only for
+   the Quick Info modal's REPORT / PRINT button.
+   ========================================================= */
+function printQuickModalReport() {
+    var titleNode = document.getElementById('quickModalTitle');
+    var bodyNode = document.getElementById('quickModalBody');
+    if (!titleNode || !bodyNode) {
+        if (typeof showAlert === 'function') showAlert('रिपोर्टचा तपशील उपलब्ध नाही.', 'WARNING');
+        else window.alert('रिपोर्टचा तपशील उपलब्ध नाही.');
+        return false;
+    }
+
+    var reportTitle = String(titleNode.innerText || titleNode.textContent || 'M.B. Report').trim();
+    var reportContent = String(bodyNode.innerHTML || '').trim();
+    if (!reportContent) {
+        if (typeof showAlert === 'function') showAlert('प्रिंट करण्यासाठी कोणताही तपशील उपलब्ध नाही.', 'WARNING');
+        else window.alert('प्रिंट करण्यासाठी कोणताही तपशील उपलब्ध नाही.');
+        return false;
+    }
+
+    /* Build a detached copy and remove interactive filters/actions before printing. */
+    var cleanHost = document.createElement('div');
+    cleanHost.innerHTML = reportContent;
+
+    /* Filters may be rendered as controls or as small wrappers above the table. */
+    cleanHost.querySelectorAll('select, input, button, .btn-action, .btn-report, .filter-row, .filters, .table-filters, .mb-filters, [data-print="hide"]').forEach(function(el) {
+        el.remove();
+    });
+    cleanHost.querySelectorAll('label').forEach(function(label) {
+        var txt = String(label.innerText || label.textContent || '').trim();
+        if (/स्रोत|M\.?B\.? आकार|कनिष्ठ अभियंता|फिल्टर|filter/i.test(txt)) {
+            var parent = label.parentElement;
+            if (parent && parent !== cleanHost && parent.querySelectorAll('select,input').length) parent.remove();
+            else label.remove();
+        }
+    });
+
+    /* Remove Action/कृती columns from every table by matching header text. */
+    cleanHost.querySelectorAll('table').forEach(function(table) {
+        var headerRows = table.querySelectorAll('thead tr');
+        var actionIndexes = [];
+        headerRows.forEach(function(row) {
+            Array.prototype.forEach.call(row.children, function(cell, index) {
+                var headerText = String(cell.innerText || cell.textContent || '').trim();
+                if (/^(action|actions|कृती|ॲक्शन|क्रिया)$/i.test(headerText)) actionIndexes.push(index);
+            });
+        });
+        if (!actionIndexes.length) {
+            var firstRow = table.querySelector('tr');
+            if (firstRow) Array.prototype.forEach.call(firstRow.children, function(cell, index) {
+                var headerText = String(cell.innerText || cell.textContent || '').trim();
+                if (/^(action|actions|कृती|ॲक्शन|क्रिया)$/i.test(headerText)) actionIndexes.push(index);
+            });
+        }
+        actionIndexes = Array.from(new Set(actionIndexes)).sort(function(a,b){return b-a;});
+        actionIndexes.forEach(function(index) {
+            table.querySelectorAll('tr').forEach(function(row) { if (row.children[index]) row.children[index].remove(); });
+        });
+        /* A table that only contains action buttons should not leave button remnants. */
+        table.querySelectorAll('button, .btn-action, .btn-edit, .btn-delete, [onclick*="quickPopup"]').forEach(function(el){el.remove();});
+    });
+    reportContent = cleanHost.innerHTML;
+
+    var safeTitle = reportTitle.replace(/[&<>"']/g, function(ch) {
+        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch];
+    });
+    var reportHtml = '<!doctype html><html lang="mr"><head><meta charset="utf-8">' +
+        '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+        '<title>' + safeTitle + '</title><style>' +
+        '@page{size:A4 portrait;margin:10mm}*{box-sizing:border-box}html,body{background:#fff!important;color:#111!important;margin:0;padding:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;font-size:10pt}' +
+        'h1,h2,h3{color:#111!important;text-align:center;margin:0 0 14px}table{width:100%;border-collapse:collapse;border-spacing:0}thead{display:table-header-group}tr{break-inside:avoid;page-break-inside:avoid}th,td{border:1px solid #333;padding:5px 6px;text-align:left;vertical-align:top;color:#111!important;background:#fff!important}th{font-weight:700}button,.btn-action,.btn-report{display:none!important}img{max-width:100%;height:auto} .table-responsive-box{max-height:none!important;overflow:visible!important;border:0!important} @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}' +
+        '</style></head><body><h2>' + safeTitle + '</h2>' + reportContent +
+        '<script>window.onload=function(){setTimeout(function(){window.focus();window.print();},300);};<\/script></body></html>';
+
+    var printWindow;
+    try {
+        printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            if (typeof showAlert === 'function') showAlert('प्रिंट विंडो उघडता आली नाही. ब्राउझरमध्ये Pop-ups परवानगी द्या.', 'WARNING');
+            else window.alert('प्रिंट विंडो उघडता आली नाही. ब्राउझरमध्ये Pop-ups परवानगी द्या.');
+            return false;
+        }
+        printWindow.document.open();
+        printWindow.document.write(reportHtml);
+        printWindow.document.close();
+        return true;
+    } catch (err) {
+        console.error('Quick Info report print failed:', err);
+        if (printWindow && !printWindow.closed) printWindow.close();
+        if (typeof showAlert === 'function') showAlert('रिपोर्ट प्रिंट विंडो तयार करता आली नाही.', 'ERROR');
+        else window.alert('रिपोर्ट प्रिंट विंडो तयार करता आली नाही.');
+        return false;
+    }
+}
+
+/* Additive initialization: do not overwrite other modules' onload handlers. */
+window.addEventListener('load', function() {
+    var fDate = document.getElementById('repFromDate');
+    var tDate = document.getElementById('repToDate');
+    if (fDate && typeof checkDatePlaceholder === 'function') checkDatePlaceholder(fDate);
+    if (tDate && typeof checkDatePlaceholder === 'function') checkDatePlaceholder(tDate);
+
+    var searchInput = document.getElementById('smartSearchInput');
+    if (searchInput) searchInput.value = '';
+    var box = document.getElementById('smartSearchSuggestions');
+    if (box) box.style.display = 'none';
+
+    if (typeof refreshJEList === 'function') refreshJEList();
+    if (typeof refreshMBDashboard === 'function') refreshMBDashboard();
+});
+
+/* Refresh the JE table whenever its module is opened. */
+(function() {
+    var originalOpenModule = window.openModule;
+    if (typeof originalOpenModule === 'function') {
+        window.openModule = function(moduleId) {
+            var result = originalOpenModule.apply(this, arguments);
+            if (moduleId === 'jeModal' && typeof refreshJEList === 'function') refreshJEList();
+            return result;
+        };
+    }
+})();
+</script>
+</body>
+</html>
