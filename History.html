@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<script id="office-work-custom-dialogs">
+(function(){
+  if (window.__officeWorkDialogsInstalled) return;
+  window.__officeWorkDialogsInstalled = true;
+  function ensureDialog(){
+    var old=document.getElementById('ow-dialog-overlay'); if(old) return old;
+    var style=document.createElement('style'); style.id='ow-dialog-style'; style.textContent=`#ow-dialog-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;font-family:inherit}#ow-dialog-card{width:min(100%,520px);max-height:85vh;overflow:auto;background:#fff;color:#24313b;border-radius:18px;box-shadow:0 18px 55px rgba(0,0,0,.35);padding:22px;box-sizing:border-box}#ow-dialog-head{display:flex;align-items:center;gap:10px;border-bottom:3px solid #174ea6;padding-bottom:12px;margin-bottom:16px;color:#174ea6;font-weight:800;font-size:18px}#ow-dialog-message{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font-size:16px;margin:12px 0 20px}#ow-dialog-input{width:100%;box-sizing:border-box;border:1px solid #aeb8c2;border-radius:9px;padding:12px;font-size:16px;margin:0 0 18px;color:#202124;background:#fff}#ow-dialog-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}#ow-dialog-actions button{border:0;border-radius:9px;padding:12px 20px;font-size:16px;font-weight:700;cursor:pointer;min-width:100px}#ow-dialog-cancel{background:#e7edf5;color:#24313b}#ow-dialog-ok{background:#174ea6;color:#fff}#ow-dialog-ok.danger{background:#c62828}@media(max-width:420px){#ow-dialog-card{padding:17px}#ow-dialog-actions button{flex:1}}`;
+    (document.head||document.documentElement).appendChild(style);
+    var overlay=document.createElement('div'); overlay.id='ow-dialog-overlay'; overlay.innerHTML='<div id="ow-dialog-card" role="dialog" aria-modal="true" aria-labelledby="ow-dialog-title"><div id="ow-dialog-head"><span>📘</span><span id="ow-dialog-title">कार्यालयीन डिजिटल हब</span></div><div id="ow-dialog-message"></div><input id="ow-dialog-input" style="display:none" autocomplete="off"><div id="ow-dialog-actions"><button type="button" id="ow-dialog-cancel">Cancel</button><button type="button" id="ow-dialog-ok">OK</button></div></div>';
+    (document.body||document.documentElement).appendChild(overlay); return overlay;
+  }
+  function openDialog(kind,message,options){options=options||{};return new Promise(function(resolve){var overlay=ensureDialog(),msg=overlay.querySelector('#ow-dialog-message'),input=overlay.querySelector('#ow-dialog-input'),cancel=overlay.querySelector('#ow-dialog-cancel'),ok=overlay.querySelector('#ow-dialog-ok'),title=overlay.querySelector('#ow-dialog-title');title.textContent=options.title||'कार्यालयीन डिजिटल हब';msg.textContent=String(message==null?'':message);input.style.display=kind==='prompt'?'block':'none';input.value=kind==='prompt'?(options.defaultValue||''):'';input.placeholder=options.placeholder||'';cancel.style.display=kind==='alert'?'none':'inline-block';cancel.textContent=options.cancelText||'Cancel';ok.textContent=options.okText||'OK';ok.classList.toggle('danger',!!options.danger);overlay.style.display='flex';var done=false;function finish(value){if(done)return;done=true;overlay.style.display='none';cancel.onclick=null;ok.onclick=null;overlay.onclick=null;document.removeEventListener('keydown',keyHandler);resolve(value)}cancel.onclick=function(){finish(kind==='prompt'?null:false)};ok.onclick=function(){finish(kind==='prompt'?input.value:(kind==='alert'?undefined:true))};overlay.onclick=function(e){if(e.target===overlay&&kind!=='alert')finish(kind==='prompt'?null:false)};function keyHandler(e){if(e.key==='Escape'&&kind!=='alert'){e.preventDefault();finish(kind==='prompt'?null:false)}else if(e.key==='Enter'&&kind==='prompt'){e.preventDefault();finish(input.value)}else if(e.key==='Enter'&&kind==='alert'){e.preventDefault();finish(undefined)}}document.addEventListener('keydown',keyHandler);setTimeout(function(){(kind==='prompt'?input:ok).focus()},0)})}
+  window.appAlert=function(message,options){return openDialog('alert',message,options)};window.appConfirm=function(message,options){return openDialog('confirm',message,options)};window.appPrompt=function(message,options){return openDialog('prompt',message,options)};
+})();
+</script>
+
+<script src="app-shell.js?v=20261011-final2"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>📜 Central History - Digital Hub & Office Work</title>
+    <!-- Tailwind CSS for Clean, Professional & Mobile-First UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; overflow: hidden; height: 100vh; }
+        
+        /* Fixed Page & Scroll Box Container as requested */
+        .main-fixed-wrapper {
+            height: calc(100vh - 60px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-scroll-container {
+            max-height: 260px; /* अंदाजे ५ ओळी दिसेल अशी फिक्स उंची */
+            overflow-y: auto;
+            overflow-x: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid #d1d5db;
+            padding: 6px 8px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .data-table th {
+            background-color: #f3f4f6;
+            font-weight: 700;
+            color: #1f2937;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        /* Print / PDF Styling */
+        @media print {
+            body * { visibility: hidden !important; }
+            #printableArea, #printableArea * { visibility: visible !important; }
+            #printableArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 4mm; display: block !important; }
+            @page { size: A4 portrait; margin: 4mm; }
+            .print-table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+            .print-table th, .print-table td { border: 1px solid #222; padding: 4px 5px; text-align: left; }
+            .print-table th { background-color: #eee !important; -webkit-print-color-adjust: exact; }
+        }
+        #printableArea { display: none; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Top Header Bar -->
+    <header class="bg-[#0d47a1] text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-2.5 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <a href="index.html" class="bg-[#ff9800] hover:bg-[#f57c00] text-black font-extrabold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow" title="मुखपृष्ठ">
+                    <i class="fa-solid fa-house"></i> मुखपृष्ठ
+                </a>
+                <h1 class="text-sm md:text-base font-bold tracking-wide flex items-center gap-2">
+                    <i class="fa-solid fa-scroll"><span>📜 Central System History</span></i>
+                </h1>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container Wrapper (Fixed Height to prevent mobile page bounce) -->
+    <main class="max-w-4xl mx-auto px-3 py-3 main-fixed-wrapper space-y-3">
+
+        <!-- Summary & Report / Print Action Bar -->
+        <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-200 flex flex-wrap justify-between items-center gap-2 text-xs font-semibold text-gray-700 flex-shrink-0">
+            <div class="flex items-center gap-2">
+                <span id="totalHistoryCount" class="bg-blue-50 text-blue-800 px-2 py-0.5 rounded border border-blue-100">Total: 0</span>
+                <span>|</span>
+                <span id="filteredHistoryCount" class="bg-gray-50 text-gray-700 px-2 py-0.5 rounded border border-gray-200">Showing: 0</span>
+            </div>
+            <div>
+                <button onclick="printHistoryReport()" class="bg-[#0d47a1] hover:bg-blue-800 text-white px-3 py-1.5 rounded-lg font-medium transition shadow flex items-center gap-1.5 text-xs">
+                    <i class="fa-solid fa-print"></i> REPORT / PRINT
+                </button>
+            </div>
+        </div>
+
+        <!-- Search & Filters Section -->
+        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-200 space-y-2 flex-shrink-0">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <!-- Global Search -->
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                    </span>
+                    <input type="text" id="searchInput" oninput="filterHistory()" placeholder="Search text, ID, Module, Action, Remark..." class="w-full pl-9 pr-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs">
+                </div>
+                <!-- Module Filter -->
+                <div>
+                    <select id="moduleFilter" onchange="filterHistory()" class="w-full py-1.5 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white font-medium">
+                        <option value="">सर्व Modules (All)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <!-- Action Filter -->
+                <div>
+                    <select id="actionFilter" onchange="filterHistory()" class="w-full py-1.5 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs bg-white font-medium">
+                        <option value="">सर्व Actions (All)</option>
+                    </select>
+                </div>
+                <!-- Date Filters -->
+                <div class="flex items-center gap-1.5">
+                    <input type="date" id="dateFrom" onchange="filterHistory()" class="border border-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs flex-1">
+                    <span class="text-xs text-gray-500">ते</span>
+                    <input type="date" id="dateTo" onchange="filterHistory()" class="border border-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs flex-1">
+                </div>
+            </div>
+
+            <div class="text-right">
+                <button onclick="resetFilters()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2.5 py-1 rounded transition text-[11px] font-semibold">
+                    <i class="fa-solid fa-rotate-right"></i> Reset Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- History Content Area (Scroll Box as shown in screenshot style) -->
+        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-200 flex-grow flex flex-col overflow-hidden">
+            <h3 class="text-xs font-bold text-[#0d47a1] mb-2 flex items-center justify-between">
+                <span><i class="fa-solid fa-table-list"></i> सर्व हिस्ट्री नोंदी (Scrollable Table View)</span>
+                <span class="text-[10px] text-gray-500 font-normal">उभी व आडवी स्क्रोल सोय उपलब्ध</span>
+            </h3>
+            <div class="table-scroll-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align:center; width:6%;">अ.क्र.</th>
+                            <th style="width:14%;">दिनांक / वेळ</th>
+                            <th style="width:12%;">Module</th>
+                            <th style="width:10%;">Action</th>
+                            <th style="width:40%;">Record / तपशील</th>
+                            <th style="width:18%; text-align:center;">Action / Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <!-- Dynamic Records will load here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Detail View Modal -->
+    <div id="detailModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-3">
+        <div class="bg-white rounded-xl max-w-lg w-full p-4 shadow-2xl space-y-2.5 max-h-[90vh] overflow-y-auto relative">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="text-xs md:text-sm font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-blue-600"></i> History Record Details
+                </h3>
+                <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600 text-lg font-bold bg-gray-100 px-2 py-0.5 rounded" title="Close" aria-label="Close">&times;</button>
+            </div>
+            <div id="modalContent" class="space-y-1.5 text-xs">
+                <!-- Details injected dynamically -->
+            </div>
+            <div class="text-right pt-2 border-t">
+                <button onclick="closeDetailModal()" class="bg-[#0d47a1] hover:bg-blue-800 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition shadow">बंद करा</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Printable Area for PDF / Report -->
+    <div id="printableArea"></div>
+
+    <!-- JavaScript Central History Core Logic -->
+    <script>
+        const STORAGE_KEY = "digital_hub_central_history";
+        const SCHEMA_VERSION = "1.0";
+
+        const MODULES = [
+            "M.B.", "Pay Fixation", "Est.", "Form", "Work List", 
+            "Bill Register", "Assign", "JE Management", "Data Manager", "General"
+        ];
+
+        const ACTIONS = [
+            "ADD", "EDIT", "DELETE", "ISSUE", "RECEIVE", "RETURN", 
+            "STATUS CHANGE", "UPDATE", "IMPORT", "EXPORT", "BACKUP", "RESTORE"
+        ];
+
+        function populateFilterDropdowns() {
+            let modSelect = document.getElementById("moduleFilter");
+            if (modSelect) {
+                MODULES.forEach(mod => {
+                    let opt = document.createElement("option");
+                    opt.value = mod;
+                    opt.textContent = mod;
+                    modSelect.appendChild(opt);
+                });
+            }
+
+            let actSelect = document.getElementById("actionFilter");
+            if (actSelect) {
+                ACTIONS.forEach(act => {
+                    let opt = document.createElement("option");
+                    opt.value = act;
+                    opt.textContent = act;
+                    actSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function loadHistoryStorage() {
+            try {
+                let data = localStorage.getItem(STORAGE_KEY);
+                if (!data) return [];
+                let parsed = JSON.parse(data);
+                if (Array.isArray(parsed)) return parsed;
+                return [];
+            } catch (e) {
+                console.error("Storage corrupted:", e);
+                return [];
+            }
+        }
+
+        function saveHistoryStorage(records) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+            } catch (e) {
+                console.error("Failed to save history storage:", e);
+            }
+        }
+
+        function getAllHistory() {
+            return loadHistoryStorage();
+        }
+
+        function generateHistoryId(dateStr) {
+            let records = getAllHistory();
+            let parts = dateStr.split('-');
+            let dateCode = (parts.length === 3) ? `${parts[2]}${parts[1]}${parts[0]}` : new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            
+            let prefix = `HIS-${dateCode}-`;
+            let maxSeq = 0;
+
+            records.forEach(r => {
+                if (r.id && r.id.startsWith(prefix)) {
+                    let seqPart = parseInt(r.id.replace(prefix, ''), 10);
+                    if (!isNaN(seqPart) && seqPart > maxSeq) {
+                        maxSeq = seqPart;
+                    }
+                }
+            });
+
+            let newSeq = maxSeq + 1;
+            return `${prefix}${String(newSeq).padStart(6, '0')}`;
+        }
+
+        function validateHistoryRecord(record) {
+            if (!record || typeof record !== 'object') return false;
+            if (!record.id || typeof record.id !== 'string') return false;
+            if (!record.date || typeof record.date !== 'string') return false;
+            if (!record.timestamp || typeof record.timestamp !== 'string') return false;
+            if (!record.module || typeof record.module !== 'string') return false;
+            if (!record.action || typeof record.action !== 'string') return false;
+            return true;
+        }
+
+        function addHistory(recordData) {
+            let records = getAllHistory();
+            
+            let now = new Date();
+            let dd = String(now.getDate()).padStart(2, '0');
+            let mm = String(now.getMonth() + 1).padStart(2, '0');
+            let yyyy = now.getFullYear();
+            let dateStr = `${dd}-${mm}-${yyyy}`;
+            let timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+            let timestamp = now.toISOString();
+
+            let uniqueId = recordData.id || generateHistoryId(dateStr);
+
+            let newRecord = {
+                schemaVersion: SCHEMA_VERSION,
+                source: recordData.source || recordData.module || "General",
+                createdAt: timestamp,
+                id: uniqueId,
+                date: recordData.date || dateStr,
+                time: recordData.time || timeStr,
+                timestamp: recordData.timestamp || timestamp,
+                module: recordData.module || "General",
+                action: recordData.action || "UPDATE",
+                recordName: recordData.recordName || "Unknown Record",
+                recordId: recordData.recordId || "—",
+                mbNumber: recordData.mbNumber || "—",
+                mbSize: recordData.mbSize || "—",
+                receivedFrom: recordData.receivedFrom || "—",
+                givenTo: recordData.givenTo || "—",
+                oldData: recordData.oldData || {},
+                newData: recordData.newData || {},
+                changes: recordData.changes || "—",
+                status: recordData.status || "—",
+                user: recordData.user || "Operator",
+                remark: recordData.remark || "—"
+            };
+
+            if (validateHistoryRecord(newRecord)) {
+                records.unshift(newRecord);
+                saveHistoryStorage(records);
+                loadHistoryUI();
+            }
+        }
+
+        window.addHistory = addHistory;
+
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        let currentFilteredList = [];
+
+        // Load History Table inside scroll box sequentially by timestamp (Newest -> Oldest)
+        function loadHistoryUI(filteredData = null) {
+            let list = filteredData || getAllHistory();
+            currentFilteredList = list;
+            
+            list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            let tbody = document.getElementById("historyTableBody");
+            tbody.innerHTML = "";
+
+            let totalCount = getAllHistory().length;
+            document.getElementById("totalHistoryCount").innerText = `Total: ${totalCount}`;
+            document.getElementById("filteredHistoryCount").innerText = `Showing: ${list.length}`;
+
+            if (list.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align:center; padding:20px; color:#9ca3af;">
+                            📜 कोणतीही History उपलब्ध नाही.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            list.forEach((item, idx) => {
+                let badgeColor = getActionBadgeColor(item.action);
+                let recordNameEsc = escapeHTML(item.recordName);
+                let mbNoEsc = item.mbNumber !== '—' ? '(' + escapeHTML(item.mbNumber) + ')' : '';
+                let givenToEsc = item.givenTo !== '—' ? ' → ' + escapeHTML(item.givenTo) : '';
+
+                let tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td style="text-align:center; font-weight:600;">${idx + 1}</td>
+                    <td>${escapeHTML(item.date)} <span style="font-size:9px; color:#6b7280;">${escapeHTML(item.time)}</span></td>
+                    <td><strong>${escapeHTML(item.module)}</strong></td>
+                    <td><span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${badgeColor}">${escapeHTML(item.action)}</span></td>
+                    <td style="max-width:250px; overflow:hidden; text-overflow:ellipsis;">${recordNameEsc} ${mbNoEsc} ${givenToEsc}</td>
+                    <td style="text-align:center;">
+                        <button onclick="openDetailModal('${item.id}')" class="bg-[#0d47a1] hover:bg-blue-800 text-white px-2 py-0.5 rounded text-[10px] font-medium transition shadow">
+                            details
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function getActionBadgeColor(action) {
+            switch(action) {
+                case 'ADD': return 'bg-emerald-100 text-emerald-800';
+                case 'EDIT': case 'UPDATE': return 'bg-amber-100 text-amber-800';
+                case 'DELETE': return 'bg-red-100 text-red-800';
+                case 'ISSUE': case 'EXPORT': return 'bg-blue-100 text-blue-800';
+                case 'RECEIVE': case 'RETURN': return 'bg-purple-100 text-purple-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function parseDateToInternal(dateStr) {
+            if (!dateStr) return null;
+            let parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+            }
+            return new Date(dateStr);
+        }
+
+        function filterHistory() {
+            let text = document.getElementById("searchInput").value.toLowerCase().trim();
+            let module = document.getElementById("moduleFilter").value;
+            let action = document.getElementById("actionFilter").value;
+            let dateFromInput = document.getElementById("dateFrom").value;
+            let dateToInput = document.getElementById("dateTo").value;
+
+            let all = getAllHistory();
+
+            let filtered = all.filter(item => {
+                let matchesText = text === "" || (
+                    item.id.toLowerCase().includes(text) ||
+                    item.module.toLowerCase().includes(text) ||
+                    item.action.toLowerCase().includes(text) ||
+                    item.recordName.toLowerCase().includes(text) ||
+                    item.recordId.toLowerCase().includes(text) ||
+                    item.mbNumber.toLowerCase().includes(text) ||
+                    item.mbSize.toLowerCase().includes(text) ||
+                    item.receivedFrom.toLowerCase().includes(text) ||
+                    item.givenTo.toLowerCase().includes(text) ||
+                    JSON.stringify(item.oldData).toLowerCase().includes(text) ||
+                    JSON.stringify(item.newData).toLowerCase().includes(text) ||
+                    item.changes.toLowerCase().includes(text) ||
+                    item.status.toLowerCase().includes(text) ||
+                    item.user.toLowerCase().includes(text) ||
+                    item.remark.toLowerCase().includes(text)
+                );
+
+                let matchesModule = module === "" || item.module === module;
+                let matchesAction = action === "" || item.action === action;
+
+                let matchesDate = true;
+                if (dateFromInput || dateToInput) {
+                    let itemDate = parseDateToInternal(item.date);
+                    if (itemDate) {
+                        itemDate.setHours(0, 0, 0, 0);
+                        if (dateFromInput) {
+                            let dFrom = new Date(dateFromInput);
+                            dFrom.setHours(0, 0, 0, 0);
+                            if (itemDate < dFrom) matchesDate = false;
+                        }
+                        if (dateToInput) {
+                            let dTo = new Date(dateToInput);
+                            dTo.setHours(0, 0, 0, 0);
+                            if (itemDate > dTo) matchesDate = false;
+                        }
+                    }
+                }
+
+                return matchesText && matchesModule && matchesAction && matchesDate;
+            });
+
+            loadHistoryUI(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById("searchInput").value = "";
+            document.getElementById("moduleFilter").value = "";
+            document.getElementById("actionFilter").value = "";
+            document.getElementById("dateFrom").value = "";
+            document.getElementById("dateTo").value = "";
+            loadHistoryUI();
+        }
+
+        function renderObjectValue(obj) {
+            if (!obj || typeof obj !== 'object' || Object.keys(obj).length === 0) {
+                return '<span class="text-gray-400">—</span>';
+            }
+            let html = '<table class="w-full text-left text-xs border-collapse">';
+            for (let key in obj) {
+                html += `<tr class="border-b border-gray-100"><td class="py-0.5 font-semibold text-gray-600">${escapeHTML(key)}:</td> <td class="py-0.5 text-gray-800">${escapeHTML(obj[key])}</td></tr>`;
+            }
+            html += '</table>';
+            return html;
+        }
+
+        function renderComparisonTable(oldObj, newObj) {
+            let keys = new Set([...Object.keys(oldObj || {}), ...Object.keys(newObj || {})]);
+            if (keys.size === 0) return '<p class="text-gray-400">—</p>';
+
+            let html = '<table class="w-full text-left text-xs border border-gray-200 rounded-lg overflow-hidden">';
+            html += '<thead class="bg-gray-100 text-gray-700 font-semibold"><tr><th class="p-1.5 border-b">Field</th><th class="p-1.5 border-b">Old Value</th><th class="p-1.5 border-b">New Value</th></tr></thead><tbody>';
+
+            keys.forEach(key => {
+                let oldVal = (oldObj && oldObj[key] !== undefined) ? oldObj[key] : '—';
+                let newVal = (newObj && newObj[key] !== undefined) ? newObj[key] : '—';
+                html += `<tr class="border-b border-gray-100">
+                    <td class="p-1.5 font-semibold text-gray-600">${escapeHTML(key)}</td>
+                    <td class="p-1.5 text-red-700 bg-red-50/50">${escapeHTML(oldVal)}</td>
+                    <td class="p-1.5 text-emerald-700 bg-emerald-50/50">${escapeHTML(newVal)}</td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            return html;
+        }
+
+        function openDetailModal(id) {
+            let all = getAllHistory();
+            let item = all.find(x => x.id === id);
+            if (!item) return;
+
+            let oldDataRender = (typeof item.oldData === 'object' && item.oldData !== null) ? renderObjectValue(item.oldData) : escapeHTML(item.oldData);
+            let newDataRender = (typeof item.newData === 'object' && item.newData !== null) ? renderObjectValue(item.newData) : escapeHTML(item.newData);
+
+            let comparisonView = "";
+            if (typeof item.oldData === 'object' && typeof item.newData === 'object' && Object.keys(item.oldData).length > 0 && Object.keys(item.newData).length > 0) {
+                comparisonView = `<div class="pt-1.5"><strong>Field-wise Comparison:</strong><div class="mt-1">${renderComparisonTable(item.oldData, item.newData)}</div></div>`;
+            }
+
+            let content = `
+                <div class="grid grid-cols-2 gap-2 bg-gray-50 p-2 rounded-lg border text-[11px]">
+                    <div><strong>ID:</strong> <span class="font-mono text-gray-700">${escapeHTML(item.id)}</span></div>
+                    <div><strong>वेळ:</strong> ${escapeHTML(item.date)} | ${escapeHTML(item.time)}</div>
+                    <div><strong>Module:</strong> <span class="text-blue-600 font-semibold">${escapeHTML(item.module)}</span></div>
+                    <div><strong>Action:</strong> <span class="font-semibold">${escapeHTML(item.action)}</span></div>
+                </div>
+                <div class="space-y-1.5 pt-1 text-[11px]">
+                    <div><strong>Record Name:</strong> ${escapeHTML(item.recordName)}</div>
+                    <div><strong>Record ID:</strong> ${escapeHTML(item.recordId)}</div>
+                    <div><strong>M.B. No:</strong> ${escapeHTML(item.mbNumber)} | <strong>Size:</strong> ${escapeHTML(item.mbSize)}</div>
+                    <div><strong>कोणाकडून:</strong> ${escapeHTML(item.receivedFrom)} | <strong>कोणाला:</strong> ${escapeHTML(item.givenTo)}</div>
+                    <div class="p-2 bg-red-50 text-red-900 rounded border border-red-100"><strong>जुनी माहिती:</strong><div class="mt-0.5">${oldDataRender}</div></div>
+                    <div class="p-2 bg-emerald-50 text-emerald-900 rounded border border-red-100"><strong>नवीन माहिती:</strong><div class="mt-0.5">${newDataRender}</div></div>
+                    ${comparisonView}
+                    <div><strong>बदल:</strong> ${escapeHTML(item.changes)}</div>
+                    <div><strong>Status:</strong> ${escapeHTML(item.status)} | <strong>User:</strong> ${escapeHTML(item.user)}</div>
+                    <div><strong>Remark:</strong> ${escapeHTML(item.remark)}</div>
+                </div>
+            `;
+            document.getElementById("modalContent").innerHTML = content;
+            document.getElementById("detailModal").classList.remove("hidden");
+        }
+
+        function closeDetailModal() {
+            document.getElementById("detailModal").classList.add("hidden");
+        }
+
+        // Report & Print function with Heading "अहवाल हिस्ट्री" in the middle
+        function printHistoryReport() {
+            let list = currentFilteredList.length > 0 ? currentFilteredList : getAllHistory();
+            if (list.length === 0) {
+                window.appAlert("प्रत काढण्यासाठी कोणतीही हिस्ट्री उपलब्ध नाही.");
+                return;
+            }
+
+            let todayStr = new Date().toLocaleDateString('en-GB');
+
+            let html = `
+                <div style="margin-bottom:10px; border-bottom:2px solid #333; padding-bottom:6px; text-align:center;">
+                    <h1 style="font-size:15px; font-weight:800; margin:0; text-transform:uppercase;">सार्वजनिक बांधकाम विभाग</h1>
+                    <h2 style="font-size:13px; font-weight:700; margin:3px 0; color:#0d47a1;">अहवाल हिस्ट्री</h2>
+                    <div style="display:flex; justify-content:space-between; font-size:10px; margin-top:5px;">
+                        <div><strong>अहवाल दिनांक:</strong> ${todayStr}</div>
+                        <div><strong>एकूण नोंदी:</strong> ${list.length}</div>
+                    </div>
+                </div>
+                <table class="print-table">
+                    <thead>
+                        <tr style="background:#eee;">
+                            <th style="text-align:center; width:6%;">अ.क्र.</th>
+                            <th style="width:14%;">दिनांक / वेळ</th>
+                            <th style="width:12%;">Module</th>
+                            <th style="width:10%;">Action</th>
+                            <th style="width:38%;">Record / तपशील</th>
+                            <th style="width:20%;">User / Remark</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            list.forEach((item, idx) => {
+                html += `
+                    <tr>
+                        <td style="text-align:center;">${idx + 1}</td>
+                        <td>${escapeHTML(item.date)}<br><span style="font-size:8pt; color:#666;">${escapeHTML(item.time)}</span></td>
+                        <td><strong>${escapeHTML(item.module)}</strong></td>
+                        <td>${escapeHTML(item.action)}</td>
+                        <td>${escapeHTML(item.recordName)} ${item.mbNumber !== '—' ? '(' + escapeHTML(item.mbNumber) + ')' : ''}</td>
+                        <td>${escapeHTML(item.user)}<br><span style="font-size:8pt; color:#666;">${escapeHTML(item.remark)}</span></td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                <div style="margin-top:20px; border-top:1px solid #333; padding-top:5px; display:flex; justify-content:space-between; font-size:9pt;">
+                    <div><strong>Digital Hub System</strong></div>
+                    <div><strong>Central Audit Log</strong></div>
+                </div>
+            `;
+
+            let printableArea = document.getElementById("printableArea");
+            const previousTitle = document.title;
+            const datePart = new Date().toISOString().slice(0, 10);
+            const moduleFilter = (document.getElementById("moduleFilter") || {}).value || "All_Modules";
+            const actionFilter = (document.getElementById("actionFilter") || {}).value || "All_Actions";
+            const safePart = function(value) {
+                return String(value || "").trim().replace(/[\\\\/:*?"<>|]+/g, "_").replace(/\\s+/g, "_").slice(0, 40);
+            };
+            const reportTitle = "History_Report_" + safePart(moduleFilter) + "_" + safePart(actionFilter) + "_" + datePart + ".pdf";
+            printableArea.innerHTML = html;
+            document.title = reportTitle;
+            window.print();
+            const restoreHistoryPrint = () => {
+                printableArea.innerHTML = "";
+                document.title = previousTitle;
+                window.removeEventListener("afterprint", restoreHistoryPrint);
+            };
+            window.addEventListener("afterprint", restoreHistoryPrint);
+            setTimeout(restoreHistoryPrint, 30000);
+        }
+
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeDetailModal();
+            }
+        });
+
+        window.onload = function() {
+            populateFilterDropdowns();
+            loadHistoryUI();
+        };
+    </script>
+</body>
+</html>

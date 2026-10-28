@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="mr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#020d1b">
+<title>वेतन व फरक प्रणाली - लॉगिन</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+  background: #020d1b;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #ffffff;
+}
+.profile-container { text-align: center; margin-bottom: 20px; }
+.profile-pic {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 3px solid #00f3ff;
+  box-shadow: 0 0 20px #00f3ff;
+  object-fit: cover;
+  margin-bottom: 12px;
+  background: #0a192f;
+}
+.app-title { font-size: 15px; font-weight: bold; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; }
+.app-title span { color: #00f3ff; }
+.app-subtitle { font-size: 12px; color: #00f3ff; margin-bottom: 20px; letter-spacing: 0.5px; }
+.login-card {
+  width: 100%;
+  max-width: 340px;
+  background: rgba(2, 6, 23, 0.9);
+  border: 2px solid #00f3ff;
+  border-radius: 20px;
+  box-shadow: 0 0 25px rgba(0, 243, 255, 0.3);
+  padding: 25px 20px;
+  text-align: center;
+}
+.login-card h2 { color: #00f3ff; font-size: 22px; margin-top: 0; margin-bottom: 5px; letter-spacing: 1.5px; }
+.login-divider { width: 45px; height: 3px; background: #00f3ff; margin: 0 auto 20px auto; border-radius: 2px; }
+.input-group { position: relative; margin-bottom: 16px; }
+.input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #00f3ff; font-size: 16px; }
+.input-box {
+  width: 100%;
+  background: #0a192f;
+  border: 1px solid rgba(0, 243, 255, 0.4);
+  border-radius: 30px;
+  padding: 12px 15px 12px 45px;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+.signin-btn {
+  width: 100%;
+  background: #00f3ff;
+  color: #020d1b;
+  border: none;
+  border-radius: 30px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+  transition: 0.3s;
+}
+.signin-btn:hover { background: #00c4d1; }
+.forgot-btn { background: none; border: none; color: #00f3ff; font-size: 13px; cursor: pointer; text-decoration: underline; }
+</style>
+</head>
+<body>
+
+  <div class="profile-container">
+    <img src="home-bg.jpg" alt="Profile" class="profile-pic">
+    <div class="app-title">SMART TOOLS <span>STRONGER WORK</span></div>
+    <div class="app-subtitle">Created by Vitthal Kokate Patil</div>
+  </div>
+
+  <div class="login-card">
+    <h2>LOGIN</h2>
+    <div class="login-divider"></div>
+    
+    <form id="loginForm" onsubmit="processLogin(event)">
+      <div class="input-group">
+        <i class="fa-solid fa-user"></i>
+        <input type="text" id="username" class="input-box" placeholder="Username" required>
+      </div>
+
+      <div class="input-group">
+        <i class="fa-solid fa-lock"></i>
+        <input type="password" id="password" class="input-box" placeholder="Password" required>
+      </div>
+
+      <button type="submit" class="signin-btn">Sign In</button>
+    </form>
+
+    <button type="button" class="forgot-btn" onclick="forgotPassword()">Forgot Password?</button>
+  </div>
+
+  <script>
+    // Session is preserved when returning to the login page; logout is explicit only.
+
+    function processLogin(event) {
+      event.preventDefault();
+      const u = document.getElementById('username').value.trim();
+      const p = document.getElementById('password').value.trim();
+
+      let accounts = {};
+      try { accounts = JSON.parse(localStorage.getItem('ow_managed_accounts') || '{}') || {}; } catch (_) {}
+      const account = accounts[u];
+      const validAdmin = u === 'admin' && p === 'admin123';
+      const validDefaultUser = u === 'user' && p === 'user123' && !account;
+      const validManaged = !!account && account.active !== false && account.password === p;
+      if (validAdmin || validDefaultUser || validManaged) {
+        const role = validAdmin ? 'admin' : (validManaged ? (account.role || 'user') : 'user');
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('currentUser', u);
+        localStorage.setItem('userRole', role);
+        localStorage.setItem('displayRole', role === 'admin' ? 'Admin' : 'User');
+        localStorage.setItem('ow_last_login', new Date().toISOString());
+        let sessions = [];
+        try { sessions = JSON.parse(localStorage.getItem('ow_login_sessions') || '[]') || []; } catch (_) {}
+        sessions.unshift({ username:u, role, time:new Date().toLocaleString('en-IN'), event:'Login' });
+        localStorage.setItem('ow_login_sessions', JSON.stringify(sessions.slice(0,500)));
+        window.location.href = 'dashboard.html';
+      } else {
+        alert('चुकीचा युजरनेम किंवा पासवर्ड किंवा खाते निष्क्रिय आहे!');
+      }
+    }
+    function forgotPassword() {
+      alert('कृपया पासवर्ड रिसेट करण्यासाठी ऍडमिनशी संपर्क साधा.');
+    }
+  </script>
+</body>
+</html>
