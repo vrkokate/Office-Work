@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -98,7 +99,7 @@
       <a href="#" class="bg-pink-600 hover:bg-pink-500 text-white text-center py-3 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center">Set-7</a>
       <a href="#advancedAdminPanel" onclick="return owOpenSettings(event)" class="bg-pink-600 hover:bg-pink-500 text-white text-center py-3 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center">Setting</a>
     </div>
-
+      
     <!-- Quote Section -->
     <div class="hub-quote w-full text-center">
       
@@ -212,13 +213,14 @@
       if(sessionHeading)sessionHeading.style.display=tab==='history'?'block':'none';if(sessionWrap)sessionWrap.style.display=tab==='history'?'block':'none';
       if(legacy)legacy.style.display=tab==='history'?'block':'none';
       panel.querySelectorAll('[data-ow-tab]').forEach(btn=>{const active=btn.dataset.owTab===tab;btn.style.background=active?'#0891b2':'#18334f';btn.style.color=active?'#fff':'#dbeafe';btn.setAttribute('aria-pressed',active?'true':'false');});
-      const modal=document.getElementById('owSettingsModal');if(modal){modal.style.display='flex';document.body.style.overflow='hidden';}
+      // Do not open the full-screen Settings overlay when tabs are initialized during dashboard load.
+      // The overlay is opened only by an explicit click on Settings via owOpenSettings().
       if(tab==='history'){loadActivityLogs();adminRefreshPanel();}
       if(tab==='permissions')adminLoadPermissions();
       if(tab==='userinfo')owRenderUserInfo();
       if(tab==='status'||tab==='credentials')adminRefreshPanel();
     }
-
+                  
     const OW_ADMIN_TABS = [
       {id:'form.html', label:'Est.'}, {id:'MB.html',label:'M.B.'}, {id:'JE.html',label:'JE'},
       {id:'BillRegister.html',label:'Bill Register'}, {id:'pay-fixation.html',label:'Pay Fixation'},
@@ -326,7 +328,8 @@
       const val={};document.querySelectorAll('#admPermissionList input[type=checkbox]').forEach(cb=>val[cb.dataset.tab]=cb.checked);
       const all=owReadPermissions();all[u]=val;localStorage.setItem('ow_tab_permissions',JSON.stringify(all));
       adminRefreshPanel();alert('Tab permissions saved. They will apply on the user’s next navigation.');
-    }
+      }
+      
     function adminRefreshPanel(){
       const accounts=owReadAccounts(), permissions=owReadPermissions();
       const names=Array.from(new Set(['user',...Object.keys(accounts)]));
@@ -414,3 +417,4 @@
   </script>
 </body>
 </html>
+
