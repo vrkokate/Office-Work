@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Digital Hub — डॅशबोर्ड</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    body {
+        background-color: #020617;
+        color: #ffffff;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding-bottom: 40px;
+    }
+    .glow-avatar {
+        box-shadow: 0 0 35px rgba(0, 243, 255, 0.7);
+        border: 3px solid #00f3ff;
+    }
+    .ellipse-glow {
+        width: 180px;
+        height: 20px;
+        background: rgba(0, 243, 255, 0.5);
+        border-radius: 50%;
+        filter: blur(8px);
+        margin: -10px auto 15px auto;
+    }
+
+    * { box-sizing: border-box; }
+    body { padding: 0 10px 24px !important; background: radial-gradient(ellipse at 50% 30%, #06234b 0%, #020b1c 55%, #00040c 100%) !important; }
+    body > div.w-full.max-w-md { max-width: 760px !important; width: 100%; }
+    .hub-topbar { width: 100%; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 4px 14px; margin:0 0 12px; border-bottom:2px solid #008cff; box-shadow:0 5px 16px -12px #00eaff; }
+    .hub-user { display:flex; align-items:center; gap:9px; min-width:0; flex:1; }
+    .hub-avatar { width:58px; height:58px; flex:0 0 58px; border-radius:50%; overflow:hidden; border:2px solid #00eaff; box-shadow:0 0 12px #00bfff88; background:#03142d; }
+    .hub-avatar img { width:100%; height:100%; object-fit:cover; object-position:center 18%; display:block; }
+    .hub-user-info { min-width:0; }
+    .hub-user-name { display:flex; align-items:center; gap:5px; font-size:12px; font-weight:800; color:#fff; white-space:nowrap; }
+    .hub-user-name .chevron { color:#00eaff; font-size:19px; line-height:12px; }
+    .hub-role { color:#00f3ff; font-size:12px; font-weight:800; margin-top:2px; }
+    .hub-online { display:flex; align-items:center; gap:5px; color:#00f3a1; font-size:10px; margin-top:3px; }
+    .online-dot { display:inline-block; width:9px; height:9px; border-radius:50%; background:#00f3a1; box-shadow:0 0 8px #00f3a1; }
+    .hub-header-actions { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+    .hub-action-btn { min-height:34px; display:flex; align-items:center; justify-content:center; gap:6px; padding:6px 9px; color:#00efff; background:linear-gradient(180deg,#06254a,#03142d); border:1px solid #00dfff; border-radius:11px; box-shadow:0 0 9px #00cfff44; font-size:11px; font-weight:800; white-space:nowrap; cursor:pointer; }
+    .hub-action-btn i { font-size:13px; }
+    .hub-tabs-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; }
+    .hub-tabs-grid > a { min-width:0; height:48px; padding:4px 2px !important; border-radius:11px !important; font-size:11px !important; line-height:1.15; box-shadow:0 0 10px currentColor, inset 0 0 8px #ffffff12; border:1px solid #00cfff55; text-decoration:none; }
+    .hub-quote { margin:22px 0 10px !important; padding:4px 2px !important; }
+    .hub-quote-text { margin:0 auto; max-width:640px; color:#00f0ff; font-size:clamp(13px,3.4vw,20px); font-weight:800; font-style:italic; line-height:1.55; text-shadow:0 0 4px #00dfff,0 0 10px #00aaff,0 0 20px #0077ff; animation: quoteGlow 3s ease-in-out infinite alternate; }
+    .hub-quote-divider { display:flex; align-items:center; justify-content:center; gap:18px; margin:7px auto 0; color:#ffdf00; }
+    .hub-quote-divider span { height:2px; width:32%; background:linear-gradient(90deg,transparent,#00efff,transparent); box-shadow:0 0 8px #00dfff; }
+    .hub-quote-divider b { font-size:22px; text-shadow:0 0 8px #ffd700; }
+    @keyframes quoteGlow { from { text-shadow:0 0 3px #00dfff,0 0 7px #008cff; } to { text-shadow:0 0 5px #00f7ff,0 0 13px #00aaff,0 0 22px #006dff; } }
+    .glow-avatar { box-shadow:0 0 30px rgba(0,243,255,.65); }
+    @media(max-width:380px) {
+      body { padding-left:7px !important; padding-right:7px !important; }
+      .hub-avatar { width:48px; height:48px; flex-basis:48px; }
+      .hub-user-name { font-size:10px; }
+      .hub-action-btn { padding:6px 6px; font-size:10px; gap:4px; }
+      .hub-tabs-grid { gap:6px; }
+      .hub-tabs-grid > a { height:43px; font-size:10px !important; }
+    }
+
+</style>
+<style id="owUserManagementLayoutFix">#owUserManagementTabs{display:flex!important;flex-wrap:nowrap!important;gap:8px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:2px 2px 10px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}#owUserManagementTabs button{flex:0 0 auto;white-space:nowrap;min-height:40px}#advancedAdminPanel{min-height:calc(100vh - 16px)}@media(max-width:700px){#owSettingsModal{padding:4px!important}#advancedAdminPanel{padding:12px!important;border-radius:10px!important}#owUserManagementTabs button{font-size:11px;padding:9px 10px!important}#owUserInfoBody{grid-template-columns:1fr!important}}</style><style id="owUserInfoResponsiveStyles">#owUserDetailContent .ow-detail-card{background:linear-gradient(145deg,#0b2b58,#06162e);border:1px solid #176ac0;border-radius:12px;overflow:hidden;min-width:0}#owUserDetailContent .ow-detail-head{padding:9px 11px;background:linear-gradient(90deg,#0753ad,#082c62);font-weight:800;color:#fff}#owUserDetailContent .ow-detail-body{padding:10px;display:grid;gap:6px;color:#e4f1ff;font-size:13px;overflow-wrap:anywhere}#owUserDetailContent .ow-photo-thumb{width:100%;aspect-ratio:1/1;object-fit:cover;border:2px solid #28baff;border-radius:12px;cursor:zoom-in}#owUserDetailContent .ow-detail-row{display:grid;grid-template-columns:minmax(90px,40%) 1fr;gap:6px}#owUserDetailContent .ow-detail-row span:first-child{color:#9cc9ff}@media(max-width:620px){#owUserDetailModal{padding:4px!important}#owUserDetailContent{grid-template-columns: minmax(0,1fr)!important;padding:8px!important;gap:8px!important}#owUserDetailContent .ow-detail-body{font-size:12px;padding:8px}#owUserDetailContent .ow-detail-row{grid-template-columns:38% 1fr}#owUserDetailContent .ow-profile-col{display:grid;grid-template-columns:86px 1fr;align-items:center;gap:10px}#owUserDetailContent .ow-photo-thumb{width:86px;height:86px}#owUserDetailContent .ow-history-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}}@media(max-height:520px){#owUserDetailContent{overflow:auto!important}}</style></head>
+
+<body class="min-h-screen flex flex-col items-center p-4">
+  <div class="w-full max-w-md flex flex-col items-center">
+
+    <!-- Compact Header: Profile on left, Home/Logout on right; no extra breadcrumb box -->
+    <header class="hub-topbar">
+      <div class="hub-user">
+        <div class="hub-avatar" id="headerAvatarUpload" role="button" tabindex="0" title="फोटो बदलण्यासाठी क्लिक करा" aria-label="प्रोफाईल फोटो बदला" style="cursor:pointer"><img id="headerProfilePhoto" src="home-bg.jpg" alt="Profile photo"></div>
+        <div class="hub-user-info">
+          <div class="hub-user-name"><span id="headerUserName">Vitthal Kokate Patil</span></div>
+          <div id="headerUserRole" class="hub-role">User</div>
+          <div class="hub-online"><span class="online-dot"></span><span>Online</span></div>
+        </div>
+      </div>
+      <div class="hub-header-actions">
+        <button type="button" class="hub-action-btn" onclick="return owGoHome(event)"><i class="fa-solid fa-house"></i><span>मुख्य पृष्ठ</span></button>
+        <button type="button" class="hub-action-btn" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button>
+      </div>
+    </header>
+
+    <!-- Dashboard Action Buttons Grid -->
+    <div class="hub-tabs-grid w-full mb-4 px-1">
+      <a href="form.html" class="bg-blue-600 hover:bg-blue-500 text-white text-center py-3 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center">Est.</a>
+      <a href="MB.html" class="bg-green-600 hover:bg-green-500 text-white text-center py-3 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center">M.B.</a>
+      <a href="form.html" class="bg-amber-600 hover:bg-amber-500 text-white text-center py-3 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center">Form</a>
+      <a href="pay-fixation.html" class="bg-purple-600 hover:bg-purple-500 text-white text-center py-3 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center">Pay Fixation</a>
+      <a href="#" class="bg-pink-600 hover:bg-pink-500 text-white text-center py-3 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center">Set-1</a>
+      <a href="#" class="bg-pink-600 hover:bg-pink-500 text-white text-center py-3 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center">Set-2</a>
+      <a href="#" class="bg-pink-600 hover:bg-pink-500 text-white text-center py-3 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center">Set-3</a>
+      <a href="#" class="bg-pink-600 hover:bg-pink-500 text-white text-center py-3 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center">Set-4</a>
+      <a href="#" class="bg-pink-600 hover:bg-pink-500 text-white text-center py-3 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center">Set-5</a>
+      <a href="#" class="bg-pink-600 hover:bg-pink-500 text-white text-center py-3 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center">Set-6</a>
+      <a href="#" class="bg-pink-600 hover:bg-pink-500 text-white text-center py-3 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center">Set-7</a>
+      <a id="adminOnlySettingButton" href="#advancedAdminPanel" onclick="return owOpenSettings(event)" style="display:none" aria-hidden="true" class="bg-pink-600 hover:bg-pink-500 text-white text-center py-3 rounded-xl font-bold text-sm shadow-md transition transform active:scale-95 flex items-center justify-center">Setting</a>
+    </div>
+
+    <!-- Quote Section -->
+    <div class="hub-quote w-full text-center">
+      
+      <p class="hub-quote-text">विद्या वितर्को विज्ञानं स्मृतिस्तत्परता क्रिया । यस्यैते षड्गुणास्तस्य नासाध्यमतिमर्तते ॥</p>
+      <div class="hub-quote-divider"><span></span><b>✦</b><span></span></div>
+    </div>
+
+    <!-- Bottom Profile Section -->
+    <div class="relative mt-2 mb-1">
+      <div class="w-32 h-32 rounded-full overflow-hidden glow-avatar bg-slate-800 flex items-center justify-center">
+        <img id="bottomProfilePhoto" data-profile-photo src="home-bg.jpg" alt="Profile" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop'">
+      </div>
+    </div>
+    <div class="ellipse-glow"></div>
+
+    <!-- Footer Titles -->
+    <h2 class="text-sm font-bold tracking-wider text-white text-center mb-1">SMART TOOLS <span class="text-cyan-400">STRONGER WORK</span></h2>
+    <p class="text-[11px] text-cyan-300 tracking-wide mb-6">Created by Vitthal Kokate Patil</p>
+
+    <!-- Admin Activity Log Panel (Visible only to Admin) -->
+    <div id="adminPanel" style="display: none;" class="w-full bg-slate-950/90 border border-cyan-500/40 rounded-2xl p-4 mt-4 shadow-xl">
+      <h3 class="text-cyan-400 font-bold text-sm mb-2 flex items-center gap-2">
+        <i class="fa-solid fa-list-check"></i> युजर ऍक्टिव्हिटी लॉग (User Activity Logs)
+      </h3>
+      <p class="text-[11px] text-slate-400 mb-3">इथे सर्व युजरच्या हालचाली आणि लॉगिन रेकॉर्ड्स दिसतील:</p>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-cyan-500/10 text-cyan-300 border-b border-cyan-500/20">
+              <th class="p-2">अ.क्र.</th>
+              <th class="p-2">युजरनेम</th>
+              <th class="p-2">केलेली कृती</th>
+              <th class="p-2">वेळ व तारीख</th>
+            </tr>
+          </thead>
+          <tbody id="logTableBody">
+            <!-- JavaScript logs -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+
+    <div id="owSettingsModal" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(1,8,20,.94);backdrop-filter:blur(9px);overflow:auto;padding:8px;align-items:stretch;justify-content:center" role="dialog" aria-modal="true" aria-label="Admin Settings"><section id="advancedAdminPanel" style="display:none;width:100%;max-width:1600px;min-height:calc(100vh - 16px);margin:0 auto;background:#07172d;border:1px solid #00d9ff66;border-radius:18px;padding:16px;color:#fff;box-shadow:0 12px 32px #0005">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h3 id="owAdminPanelHeading" style="margin:0 0 6px;color:#00eaff;font-size:17px">⚙ Admin Control & User Management</h3><button type="button" onclick="owCloseSettings()" aria-label="Close settings" style="padding:8px 12px;border:0;border-radius:8px;background:#ef4444;color:white;font-weight:800">✕ Close</button></div>
+      <p style="margin:0 0 14px;color:#b8c8dc;font-size:12px;line-height:1.5">Local account management, tab permissions and login records. Server-side authentication is required for production security.</p>
+      <nav id="owUserManagementTabs" aria-label="User Management विभाग" style="display:flex;flex-wrap:nowrap;gap:8px;margin:0 0 14px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;padding:2px 2px 10px;-webkit-overflow-scrolling:touch">
+        <button type="button" data-ow-tab="userinfo" onclick="owSwitchUserTab('userinfo')" style="padding:9px 12px;border-radius:9px;background:#18334f;color:#dbeafe;font-weight:700">०. User Info</button>
+        <button type="button" data-ow-tab="status" onclick="owSwitchUserTab('status')" style="padding:9px 12px;border-radius:9px;background:#0891b2;color:white;font-weight:700">1. Account Status</button>
+        <button type="button" data-ow-tab="history" onclick="owSwitchUserTab('history')" style="padding:9px 12px;border-radius:9px;background:#18334f;color:#dbeafe;font-weight:700">2. User History</button>
+        <button type="button" data-ow-tab="permissions" onclick="owSwitchUserTab('permissions')" style="padding:9px 12px;border-radius:9px;background:#18334f;color:#dbeafe;font-weight:700">3. Tab Permissions</button>
+        <button type="button" data-ow-tab="credentials" onclick="owSwitchUserTab('credentials')" style="padding:9px 12px;border-radius:9px;background:#18334f;color:#dbeafe;font-weight:700">४. User ID / Password</button>
+      </nav>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px">
+        <div style="background:#0b2442;padding:12px;border-radius:12px">
+          <h4 style="margin:0 0 10px;color:#9befff">Create User / Reset Password</h4>
+          <label style="display:block;font-size:12px;margin:6px 0">Username</label><input id="admUserName" autocomplete="off" style="width:100%;padding:10px;border-radius:8px;border:1px solid #31516e;background:#061326;color:#fff">
+          <label style="display:block;font-size:12px;margin:8px 0 6px">Password (visible / reset)</label><div style="display:flex;gap:6px"><input id="admUserPassword" type="password" autocomplete="new-password" style="flex:1;min-width:0;padding:10px;border-radius:8px;border:1px solid #31516e;background:#061326;color:#fff"><button type="button" onclick="owToggleAdminPassword()" style="padding:8px 10px;border:1px solid #31516e;border-radius:8px;background:#18334f;color:#fff">Show</button></div><small style="display:block;color:#9fb4ca;margin-top:5px">Select a user and enter a new password to reset it.</small>
+          <label style="display:block;font-size:12px;margin:8px 0 6px">Account Status</label><select id="admUserActive" style="width:100%;padding:10px;border-radius:8px;background:#061326;color:#fff"><option value="active">Active</option><option value="suspended">Pause</option><option value="blocked">Blocked</option></select>
+          <button type="button" onclick="adminSaveAccount()" style="margin-top:10px;width:100%;padding:10px;border:0;border-radius:8px;background:#00d7a0;color:#00261e;font-weight:800">Save Account / Update Password</button>
+        </div>
+        <div style="background:#0b2442;padding:12px;border-radius:12px">
+          <h4 style="margin:0 0 10px;color:#9befff">Individual Tab Permissions</h4>
+          <label style="display:block;font-size:12px;margin:6px 0">Select User</label><select id="admPermissionUser" style="width:100%;padding:10px;border-radius:8px;background:#061326;color:#fff" onchange="adminLoadPermissions()"></select>
+          <div id="admPermissionList" style="display:grid;gap:7px;margin:12px 0"></div>
+          <button type="button" onclick="adminSavePermissions()" style="width:100%;padding:10px;border:0;border-radius:8px;background:#3b82f6;color:white;font-weight:800">Save Tab Permissions</button>
+        </div>
+      </div>
+      <h4 style="margin:16px 0 8px;color:#9befff">Account List</h4>
+      <div style="overflow:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="color:#9befff;text-align:left"><th style="padding:8px">Username</th><th>Role</th><th>Status</th><th>Tab Permissions</th><th>Actions</th></tr></thead><tbody id="admAccountTable"></tbody></table></div>
+      <div id="owUserInfoSection" style="display:none;margin:14px 0;background:#091d35;padding:16px;border:1px solid #1c4969;border-radius:14px"><h4 style="margin:0 0 14px;color:#9befff;font-size:18px">User Information</h4><div id="owUserInfoBody" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px"></div></div><div id="owUserDetailModal" style="display:none;position:fixed;inset:0;z-index:100005;background:rgba(1,5,15,.97);padding:8px;overflow:hidden" role="dialog" aria-modal="true" aria-label="User Information Detailed View"><section style="height:100%;max-width:1500px;margin:auto;border:1px solid #168cff;border-radius:16px;background:radial-gradient(circle at 10% 10%,#103b78,#061326 48%,#020817);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 35px #075bff66"><header style="flex:0 0 auto;display:flex;align-items:center;justify-content:center;position:relative;min-height:54px;padding:8px 90px;border-bottom:1px solid #1675d5;background:#071b39"><h2 style="margin:0;text-align:center;color:#eaf5ff;font-size:clamp(17px,3vw,25px)">User Information - Detailed View</h2><button type="button" onclick="owCloseUserDetails()" style="position:absolute;right:8px;top:7px;background:#e11d2e;color:white;border:0;border-radius:9px;padding:9px 13px;font-weight:800">✕ Close</button></header><div id="owUserDetailContent" style="flex:1;min-height:0;overflow:auto;padding:12px;display:grid;grid-template-columns:minmax(120px,230px) minmax(0,1fr);gap:12px;align-content:start"></div></section></div><div id="owPhotoLightbox" onclick="owClosePhotoLightbox(event)" style="display:none;position:fixed;inset:0;z-index:100010;background:rgba(0,0,0,.92);align-items:center;justify-content:center;padding:18px"><button type="button" onclick="owClosePhotoLightbox(event)" style="position:absolute;top:18px;right:18px;background:#ef4444;color:white;border:0;border-radius:8px;padding:10px 14px;font-weight:800">Close ✕</button><img id="owPhotoLightboxImage" alt="User photo enlarged" style="max-width:92vw;max-height:86vh;object-fit:contain;border:2px solid #8bdcf4;border-radius:12px;box-shadow:0 15px 60px #000"></div>
+      <h4 style="margin:16px 0 8px;color:#9befff">Backup & Restore (Admin only)</h4><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"><button type="button" onclick="adminExportBackup()" style="padding:9px 12px;border:0;border-radius:8px;background:#0d9488;color:white;font-weight:700">Download LocalStorage Backup</button><label style="padding:9px 12px;border-radius:8px;background:#7c3aed;color:white;font-weight:700;cursor:pointer">Backup Restore JSON<input id="adminRestoreFile" type="file" accept="application/json,.json" style="display:none" onchange="adminRestoreBackup(event)"></label></div><h4 style="margin:16px 0 8px;color:#9befff">Recent Login Records</h4>
+      <div id="admSessionLog" style="max-height:160px;overflow:auto;font-size:12px;color:#d5e2f1"></div>
+      <p style="font-size:11px;color:#fbbf24;line-height:1.5;margin:12px 0 0">Note: This is localStorage-based management. Browser data can be modified; production use requires server authentication, hashed passwords, an authorization API and a server database.</p>
+    </section></div>
+
+
+  <script>
+    function owReplaceOwnPhoto(event){const file=event.target.files&&event.target.files[0];event.target.value='';if(!file)return;if(!file.type||!/^image\//i.test(file.type)){owNotify('Choose a valid image file.');return;}const reader=new FileReader();reader.onerror=()=>owNotify('Could not read the selected image.');reader.onload=()=>{const img=new Image();img.onerror=()=>owNotify('Could not open this image.');img.onload=()=>{try{const scale=Math.min(1,900/Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round((img.naturalWidth||img.width)*scale));c.height=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));const ctx=c.getContext('2d');if(!ctx)throw Error('Canvas unavailable');ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height);let q=.82,data=c.toDataURL('image/jpeg',q);while(data.length>550000&&q>.42){q-=.08;data=c.toDataURL('image/jpeg',q);}if(data.length>650000)throw Error('Image too large');const username=localStorage.getItem('currentUser')||'';if(!username)throw Error('Please log in before updating your profile photo.');const profile=owReadJSON('currentUserProfile',{});const accounts=owReadAccounts(),req=owReadJSON('ow_registration_requests',{}),oldA=localStorage.getItem('ow_managed_accounts'),oldR=localStorage.getItem('ow_registration_requests'),oldP=localStorage.getItem('currentUserProfile'),oldH=localStorage.getItem('ow_user_photo_history');try{owTrackUserPhotoChange(username,data,profile);profile.photo=data;localStorage.setItem('currentUserProfile',JSON.stringify(profile));document.querySelectorAll('[data-profile-photo],#profilePhoto,.profile-photo,#headerProfilePhoto').forEach(el=>{if(el.tagName==='IMG')el.src=data;});owNotify('Profile photo updated successfully.');}catch(err){if(oldA===null)localStorage.removeItem('ow_managed_accounts');else localStorage.setItem('ow_managed_accounts',oldA);if(oldR===null)localStorage.removeItem('ow_registration_requests');else localStorage.setItem('ow_registration_requests',oldR);if(oldP===null)localStorage.removeItem('currentUserProfile');else localStorage.setItem('currentUserProfile',oldP);if(oldH===null)localStorage.removeItem('ow_user_photo_history');else localStorage.setItem('ow_user_photo_history',oldH);throw err;}}catch(err){console.error(err);owNotify('Photo could not be saved. Browser storage may be full. Please choose a smaller image.');}};img.src=String(reader.result||'');};reader.readAsDataURL(file);}
+    function owGoHome(event){
+      if(event)event.preventDefault();
+      // Stay in the current document and preserve the authenticated session.
+      try{if(typeof owCloseSettings==='function')owCloseSettings();}catch(e){}
+      try{if(typeof owCloseUserDetails==='function')owCloseUserDetails();}catch(e){}
+      try{if(typeof owClosePhotoLightbox==='function')owClosePhotoLightbox();}catch(e){}
+      document.querySelectorAll('[role="dialog"]').forEach(el=>{if(el.id!=='owPhotoLightbox'&&el.id!=='owUserDetailModal'&&el.id!=='owSettingsModal'&&getComputedStyle(el).position==='fixed')el.style.display='none';});
+      window.scrollTo({top:0,left:0,behavior:'smooth'});
+      return false;
+    }
+
+    function owCloseSettings(){const modal=document.getElementById("owSettingsModal");if(modal)modal.style.display="none";const heading=document.getElementById("owAdminPanelHeading");if(heading)heading.textContent="⚙ Admin Control & User Management";document.body.style.overflow="";}
+    document.addEventListener('click',function(e){if(e.target&&e.target.id==='owSettingsModal')owCloseSettings();});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'){owCloseSettings();owCloseUserDetails();owClosePhotoLightbox();}});
+    function owOpenSettings(event){
+      if(event)event.preventDefault();
+      if(!owIsAdmin()){owNotify('Settings are available to Admin only.');return false;}
+      const panel=document.getElementById('advancedAdminPanel');if(!panel)return false;
+      const modal=document.getElementById('owSettingsModal');if(!modal)return false;modal.style.display='flex';document.body.style.overflow='hidden';panel.style.display='block';owSwitchUserTab('userinfo');return false;
+    }
+
+    function owSwitchUserTab(tab){
+      if(!owIsAdmin()){owNotify('Admin access required.');return;}
+      const panel=document.getElementById('advancedAdminPanel');if(!panel)return;
+      const titles={userinfo:'User Info',status:'Account Status',history:'User History',permissions:'Tab Permissions',credentials:'User ID / Password'};
+      const heading=document.getElementById('owAdminPanelHeading');if(heading)heading.textContent='⚙ '+(titles[tab]||'Admin Control & User Management');
+      const ui=document.getElementById('owUserInfoSection');if(ui)ui.style.display=tab==='userinfo'?'block':'none';
+      const cards=panel.querySelector(':scope > div[style*="grid-template-columns"]');
+      const accountHeading=Array.from(panel.querySelectorAll('h4')).find(h=>h.textContent.includes('Account List'));
+      const accountWrap=accountHeading?accountHeading.nextElementSibling:null;
+      const backupHeading=Array.from(panel.querySelectorAll('h4')).find(h=>h.textContent.includes('Backup & Restore'));
+      const backupWrap=backupHeading?backupHeading.nextElementSibling:null;
+      const sessionHeading=Array.from(panel.querySelectorAll('h4')).find(h=>h.textContent.includes('Recent Login Records'));
+      const sessionWrap=sessionHeading?sessionHeading.nextElementSibling:null;
+      const legacy=document.getElementById('adminPanel');
+      if(cards)cards.style.display=(tab==='status'||tab==='permissions'||tab==='credentials')?'grid':'none';
+      if(cards){const c=cards.children;if(c[0])c[0].style.display=(tab==='status'||tab==='credentials')?'block':'none';if(c[1])c[1].style.display=tab==='permissions'?'block':'none';}
+      if(accountHeading)accountHeading.style.display=tab==='status'?'block':'none';if(accountWrap)accountWrap.style.display=tab==='status'?'block':'none';
+      if(backupHeading)backupHeading.style.display=tab==='history'?'block':'none';if(backupWrap)backupWrap.style.display=tab==='history'?'flex':'none';
+      if(sessionHeading)sessionHeading.style.display=tab==='history'?'block':'none';if(sessionWrap)sessionWrap.style.display=tab==='history'?'block':'none';
+      if(legacy)legacy.style.display=tab==='history'?'block':'none';
+      panel.querySelectorAll('[data-ow-tab]').forEach(btn=>{const active=btn.dataset.owTab===tab;btn.style.background=active?'#0891b2':'#18334f';btn.style.color=active?'#fff':'#dbeafe';btn.setAttribute('aria-pressed',active?'true':'false');});
+      // Do not open the full-screen Settings overlay when tabs are initialized during dashboard load.
+      // The overlay is opened only by an explicit click on Settings via owOpenSettings().
+      if(tab==='history'){loadActivityLogs();adminRefreshPanel();}
+      if(tab==='permissions')adminLoadPermissions();
+      if(tab==='userinfo')owRenderUserInfo();
+      if(tab==='status'||tab==='credentials')adminRefreshPanel();
+    }
+
+    const OW_ADMIN_TABS = [
+      {id:'form.html', label:'Est.'}, {id:'MB.html',label:'M.B.'}, {id:'JE.html',label:'JE'},
+      {id:'BillRegister.html',label:'Bill Register'}, {id:'pay-fixation.html',label:'Pay Fixation'},
+      {id:'WorkList.html',label:'Work List'}, {id:'Assign.html',label:'Assign'},
+      {id:'DataManager.html',label:'Data Manager'}, {id:'History.html',label:'History'}
+    ];
+    function owIsAdmin(){return (localStorage.getItem('userRole')||'').toLowerCase()==='admin' && localStorage.getItem('isLoggedIn')==='true';}
+    function owReadJSON(key,fallback){try{const v=JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));return v??fallback;}catch(e){return fallback;}}
+    function owReadAccounts(){return owReadJSON('ow_managed_accounts',{});}
+    function owReadPermissions(){return owReadJSON('ow_tab_permissions',{});}
+    function owAudit(action,detail){let logs=owReadJSON('user_activities',[]);logs.unshift({username:localStorage.getItem('currentUser')||'unknown',action:String(action),detail:String(detail||''),time:new Date().toLocaleString('en-IN')});localStorage.setItem('user_activities',JSON.stringify(logs.slice(0,1000)));}
+    function owOpenPhotoLightbox(src){
+      if(!src)return;const box=document.getElementById('owPhotoLightbox'),img=document.getElementById('owPhotoLightboxImage');
+      if(box&&img){img.src=src;box.style.display='flex';}
+    }
+    function owClosePhotoLightbox(event){
+      if(event&&event.target&&event.target.id!=='owPhotoLightbox'&&event.target.tagName!=='BUTTON')return;
+      const box=document.getElementById('owPhotoLightbox');if(box)box.style.display='none';
+    }
+    function owToggleAdminPassword(){
+      const input=document.getElementById('admUserPassword');if(!input)return;
+      const show=input.type==='password';input.type=show?'text':'password';
+      const button=input.parentElement.querySelector('button');if(button)button.textContent=show?'Hide':'Show';
+    }
+    // Admin-only profile photo history. Users only receive profile.photo (current image).
+    function owPhotoHistoryRead(){return owReadJSON('ow_user_photo_history',{});}
+    function owPhotoHistoryWrite(all){localStorage.setItem('ow_user_photo_history',JSON.stringify(all));}
+    function owTrackUserPhotoChange(username,newPhoto,profile){
+      if(!username||!newPhoto)return false;
+      const accounts=owReadAccounts(),requests=owReadJSON('ow_registration_requests',{}),history=owPhotoHistoryRead();
+      const acc=accounts[username]||requests[username]||{};const old=(acc.profile&&acc.profile.photo)||'';
+      if(old===newPhoto)return true;
+      const list=Array.isArray(history[username])?history[username]:[];
+      if(old&&!list.some(x=>x.data===old))list.unshift({id:'ph_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),data:old,uploadedAt:new Date().toISOString(),type:'previous'});
+      if(!list.some(x=>x.data===newPhoto))list.unshift({id:'ph_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),data:newPhoto,uploadedAt:new Date().toISOString(),type:'current'});
+      list.forEach((x,i)=>x.type=i===0?'current':'previous');history[username]=list;owPhotoHistoryWrite(history);
+      [accounts,requests].forEach(store=>{if(store[username]){store[username]={...store[username],profile:{...(store[username].profile||{}),...(profile||{}),photo:newPhoto}};}});
+      localStorage.setItem('ow_managed_accounts',JSON.stringify(accounts));localStorage.setItem('ow_registration_requests',JSON.stringify(requests));
+      return true;
+    }
+    function owEnsurePhotoHistory(username,profile){if(!username||!profile||!profile.photo)return;const h=owPhotoHistoryRead(),list=Array.isArray(h[username])?h[username]:[];if(!list.some(x=>x.data===profile.photo)){list.unshift({id:'ph_'+Date.now(),data:profile.photo,uploadedAt:new Date().toISOString(),type:'current'});h[username]=list;owPhotoHistoryWrite(h);}}
+    async function owPhotoAdminDelete(username,id){if(!owIsAdmin())return owNotify('Admin access required.');if(!(await owAskConfirm('Permanently delete this photo from history?')))return;const h=owPhotoHistoryRead(),list=h[username]||[],item=list.find(x=>x.id===id);if(!item)return;const isCurrent=item.type==='current';h[username]=list.filter(x=>x.id!==id);if(isCurrent){const next=(h[username]||[])[0];if(next){next.type='current';const accounts=owReadAccounts(),req=owReadJSON('ow_registration_requests',{});[accounts,req].forEach(store=>{if(store[username])store[username]={...store[username],profile:{...(store[username].profile||{}),photo:next.data}};});localStorage.setItem('ow_managed_accounts',JSON.stringify(accounts));localStorage.setItem('ow_registration_requests',JSON.stringify(req));}else{const accounts=owReadAccounts(),req=owReadJSON('ow_registration_requests',{});[accounts,req].forEach(store=>{if(store[username])store[username]={...store[username],profile:{...(store[username].profile||{}),photo:''}};});localStorage.setItem('ow_managed_accounts',JSON.stringify(accounts));localStorage.setItem('ow_registration_requests',JSON.stringify(req));}}owPhotoHistoryWrite(h);owAudit('User photo deleted',username+' photo '+id);owRenderUserInfo();owOpenUserDetails(username);}
+    function owPhotoAdminRestore(username,id){if(!owIsAdmin())return owNotify('Admin access required.');const h=owPhotoHistoryRead(),list=h[username]||[],item=list.find(x=>x.id===id);if(!item)return;list.forEach(x=>x.type=x.id===id?'current':'previous');h[username]=list;owPhotoHistoryWrite(h);const accounts=owReadAccounts(),req=owReadJSON('ow_registration_requests',{});[accounts,req].forEach(store=>{if(store[username])store[username]={...store[username],profile:{...(store[username].profile||{}),photo:item.data}};});localStorage.setItem('ow_managed_accounts',JSON.stringify(accounts));localStorage.setItem('ow_registration_requests',JSON.stringify(req));owAudit('User photo restored',username+' photo '+id);owRenderUserInfo();owOpenUserDetails(username);}
+    function owCloseUserDetails(){const m=document.getElementById('owUserDetailModal');if(m)m.style.display='none';}
+    function owOpenUserDetails(username){if(!owIsAdmin())return;const accounts=owReadAccounts(),req=owReadJSON('ow_registration_requests',{}),acc=accounts[username]||req[username]||{},profile=acc.profile||{},h=owPhotoHistoryRead(),photos=h[username]||[];const root=document.getElementById('owUserDetailContent');if(!root)return;root.innerHTML='';const photoCol=document.createElement('div');photoCol.className='ow-profile-col';const current=document.createElement('img');current.className='ow-photo-thumb';current.alt='Current profile photo';current.src=profile.photo||'';current.title='Click to view photo gallery';current.onclick=()=>{const g=document.getElementById('owAdminPhotoHistory');if(g)g.scrollIntoView({behavior:'smooth',block:'start'});else owOpenPhotoLightbox(profile.photo);};photoCol.appendChild(current);const summary=document.createElement('div');summary.style.cssText='color:#fff;font-weight:800;font-size:clamp(14px,2vw,20px)';summary.textContent=profile.fullName||username;const sub=document.createElement('div');sub.style.cssText='font-size:12px;color:#a8d7ff;font-weight:500;margin-top:5px';sub.textContent=(profile.designation||'')+' · '+(profile.department||'');summary.appendChild(sub);photoCol.appendChild(summary);root.appendChild(photoCol);
+      const grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;min-width:0';root.appendChild(grid);
+      function section(title,fields){const c=document.createElement('section');c.className='ow-detail-card';const hd=document.createElement('div');hd.className='ow-detail-head';hd.textContent=title;c.appendChild(hd);const b=document.createElement('div');b.className='ow-detail-body';fields.forEach(([k,v])=>{const r=document.createElement('div');r.className='ow-detail-row';const a=document.createElement('span');a.textContent=k;const z=document.createElement('strong');z.textContent=v||'—';r.append(a,z);b.appendChild(r);});c.appendChild(b);grid.appendChild(c);}
+      section('User Profile',[['Name',profile.fullName||[profile.firstName,profile.fatherName,profile.surname].filter(Boolean).join(' ')],['User ID',username],['Designation',profile.designation],['Department',profile.department],['Office & District',[profile.office,profile.district].filter(Boolean).join(' / ')],['Mobile',profile.mobile],['Status',String(acc.status||(acc.active===false?'inactive':'active')).toLowerCase()==='active'?'Active':'Deactive']]);
+      const history=document.createElement('section');history.id='owAdminPhotoHistory';history.className='ow-detail-card';history.style.gridColumn='1 / -1';const hh=document.createElement('div');hh.className='ow-detail-head';hh.textContent='Admin Photo History ('+photos.length+')';history.appendChild(hh);const hb=document.createElement('div');hb.className='ow-detail-body';const hg=document.createElement('div');hg.className='ow-history-grid';hg.style.cssText='display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:9px';photos.forEach(ph=>{const item=document.createElement('div');item.style.cssText='background:#071a32;border:1px solid #24588a;border-radius:9px;padding:7px;min-width:0';const im=document.createElement('img');im.src=ph.data;im.alt='User photo history';im.style.cssText='width:100%;aspect-ratio:1;object-fit:cover;border-radius:7px;cursor:zoom-in';im.onclick=()=>owOpenPhotoLightbox(ph.data);item.appendChild(im);const tag=document.createElement('div');tag.textContent=ph.type==='current'?'Current':'Previous';tag.style.cssText='font-size:11px;color:'+(ph.type==='current'?'#4ade80':'#b8d4f2')+';margin:5px 0';item.appendChild(tag);const dt=document.createElement('div');dt.textContent=ph.uploadedAt?new Date(ph.uploadedAt).toLocaleString('en-IN'):'Date unavailable';dt.style.cssText='font-size:10px;color:#9bb5d0';item.appendChild(dt);const actions=document.createElement('div');actions.style.cssText='display:grid;gap:5px;margin-top:6px';if(ph.type!=='current'){const restore=document.createElement('button');restore.textContent='Restore';restore.style.cssText='background:#075eae;color:white;border:0;border-radius:6px;padding:6px';restore.onclick=()=>owPhotoAdminRestore(username,ph.id);actions.appendChild(restore);}const del=document.createElement('button');del.textContent='Delete';del.style.cssText='background:#a91e35;color:white;border:0;border-radius:6px;padding:6px';del.onclick=()=>owPhotoAdminDelete(username,ph.id);actions.appendChild(del);item.appendChild(actions);hg.appendChild(item);});if(!photos.length){hb.textContent='No photo history available.';}else hb.appendChild(hg);history.appendChild(hb);grid.appendChild(history);
+      const perm=document.createElement('section');perm.className='ow-detail-card';perm.style.gridColumn='1 / -1';const ph=document.createElement('div');ph.className='ow-detail-head';ph.textContent='Permissions & Activity';perm.appendChild(ph);const pb=document.createElement('div');pb.className='ow-detail-body';pb.textContent='Open the Tab Permissions and User History tabs to review detailed access and activity records.';perm.appendChild(pb);grid.appendChild(perm);
+      const manage=document.createElement('section');manage.className='ow-detail-card';manage.style.gridColumn='1 / -1';const mh=document.createElement('div');mh.className='ow-detail-head';mh.textContent='Account Controls & Profile Update';manage.appendChild(mh);const mb=document.createElement('div');mb.className='ow-detail-body';mb.style.cssText+='display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px';
+      const editFields=[['Name','fullName'],['Designation','designation'],['Department','department'],['Office','office'],['District','district'],['Mobile','mobile']];const editInputs={};editFields.forEach(([label,key])=>{const wrap=document.createElement('label');wrap.textContent=label;wrap.style.cssText='display:grid;gap:5px;color:#9cc9ff';const input=document.createElement('input');input.value=profile[key]||'';input.style.cssText='width:100%;box-sizing:border-box;padding:9px;border-radius:7px;border:1px solid #31516e;background:#061326;color:#fff';editInputs[key]=input;wrap.appendChild(input);mb.appendChild(wrap);});
+      const statusWrap=document.createElement('label');statusWrap.textContent='Account Status';statusWrap.style.cssText='display:grid;gap:5px;color:#9cc9ff';const statusSel=document.createElement('select');statusSel.style.cssText='padding:9px;border-radius:7px;background:#061326;color:#fff;border:1px solid #31516e';[['active','Active'],['inactive','Deactive']].forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;statusSel.appendChild(o);});statusSel.value=String(acc.status||(acc.active===false?'inactive':'active')).toLowerCase()==='active'?'active':'inactive';statusWrap.appendChild(statusSel);mb.appendChild(statusWrap);
+      const currentPwWrap=document.createElement('label');currentPwWrap.textContent='Current Password (if stored as readable text)';currentPwWrap.style.cssText='display:grid;gap:5px;color:#9cc9ff';const currentPw=document.createElement('input');currentPw.type='text';currentPw.readOnly=true;currentPw.value=String(acc.password||(req[username]&&req[username].password)||'');currentPw.placeholder='Not stored in readable form';currentPw.style.cssText='padding:9px;border-radius:7px;background:#061326;color:#fff;border:1px solid #31516e';currentPwWrap.appendChild(currentPw);mb.appendChild(currentPwWrap);
+      const pwWrap=document.createElement('label');pwWrap.textContent='Reset / Change Password';pwWrap.style.cssText='display:grid;gap:5px;color:#9cc9ff';const pw=document.createElement('input');pw.type='text';pw.autocomplete='new-password';pw.placeholder='Enter new password';pw.style.cssText='padding:9px;border-radius:7px;background:#061326;color:#fff;border:1px solid #31516e';pwWrap.appendChild(pw);mb.appendChild(pwWrap);
+      const save=document.createElement('button');save.type='button';save.textContent='Save Profile / Status / Password';save.style.cssText='grid-column:1/-1;padding:11px;border:0;border-radius:8px;background:#059669;color:white;font-weight:800';save.onclick=()=>{if(!owIsAdmin())return;const nextProfile={...profile};Object.keys(editInputs).forEach(k=>nextProfile[k]=editInputs[k].value.trim());const nextStatus=statusSel.value,newPass=pw.value; if(newPass&&newPass.length<6){owNotify('Password must contain at least 6 characters.');return;}const all=owReadAccounts(),allReq=owReadJSON('ow_registration_requests',{});[all,allReq].forEach(store=>{if(store[username])store[username]={...store[username],profile:nextProfile,status:nextStatus,active:nextStatus==='active',approved:nextStatus==='active',...(newPass?{password:newPass}:{}),updatedAt:new Date().toISOString()};});if(!all[username])all[username]={...acc,profile:nextProfile,status:nextStatus,active:nextStatus==='active',approved:nextStatus==='active',...(newPass?{password:newPass}:{}),updatedAt:new Date().toISOString()};localStorage.setItem('ow_managed_accounts',JSON.stringify(all));localStorage.setItem('ow_registration_requests',JSON.stringify(allReq));owAudit('Admin updated user profile',username+'; status='+nextStatus+(newPass?'; password reset':''));adminRefreshPanel();owRenderUserInfo();owOpenUserDetails(username);owNotify('User details updated.');};mb.appendChild(save);manage.appendChild(mb);grid.appendChild(manage);
+      document.getElementById('owUserDetailModal').style.display='block';}
+    function owRenderUserInfo(){
+      const body=document.getElementById('owUserInfoBody');if(!body)return;body.innerHTML='';
+      const req=owReadJSON('ow_registration_requests',{}),accounts=owReadAccounts();
+      const names=Array.from(new Set([...Object.keys(req),...Object.keys(accounts).filter(k=>accounts[k]&&accounts[k].profile)]));
+      if(!names.length){body.innerHTML='<div style="padding:16px;color:#cbd5e1">No registrations available yet.</div>';return;}
+      const wrap=document.createElement('div');wrap.id='owUserListScroll';wrap.style.cssText='width:100%;max-height:65vh;overflow:auto;border:1px solid #285b82;border-radius:12px;background:#07182b;-webkit-overflow-scrolling:touch;overscroll-behavior:contain';
+      const table=document.createElement('table');table.style.cssText='width:100%;min-width:720px;border-collapse:separate;border-spacing:0;font-size:13px;color:#e7f4ff';
+      const thead=document.createElement('thead'),hr=document.createElement('tr');
+      ['क्र.','नाव','पदनाम','जिल्हा','View','Action'].forEach(label=>{const th=document.createElement('th');th.textContent=label;th.style.cssText='position:sticky;top:0;z-index:2;background:#0c3760;color:#9befff;text-align:left;padding:11px 10px;border-bottom:1px solid #2873a8;white-space:nowrap';hr.appendChild(th);});thead.appendChild(hr);table.appendChild(thead);
+      const tbody=document.createElement('tbody');
+      names.forEach((name,index)=>{const acc=accounts[name]||req[name]||{},profile=acc.profile||{},tr=document.createElement('tr');tr.style.background=index%2?'#0a2038':'#0c2946';
+        const fullName=profile.fullName||[profile.firstName,profile.fatherName,profile.surname].filter(Boolean).join(' ')||name;
+        const values=[String(index+1),fullName,profile.designation||'—',profile.district||'—'];
+        values.forEach((value,i)=>{const td=document.createElement('td');td.textContent=value;td.style.cssText='padding:10px;border-bottom:1px solid #1e4567;white-space:normal;overflow-wrap:anywhere';if(i===1){td.style.minWidth='150px';td.style.fontWeight='800';td.style.color='#e8f8ff';td.style.cursor='pointer';td.title='Open full user profile';td.onclick=()=>owOpenUserDetails(name);}tr.appendChild(td);});
+        const viewTd=document.createElement('td');viewTd.style.cssText='padding:8px;border-bottom:1px solid #1e4567';const view=document.createElement('button');view.type='button';view.textContent='View';view.style.cssText='padding:7px 12px;background:#0876d5;color:#fff;border:0;border-radius:7px;font-weight:800';view.onclick=()=>owOpenUserDetails(name);viewTd.appendChild(view);tr.appendChild(viewTd);
+        const actionTd=document.createElement('td');actionTd.style.cssText='padding:8px;border-bottom:1px solid #1e4567';const action=document.createElement('button');action.type='button';action.textContent='Action';action.style.cssText='padding:7px 12px;background:#b45309;color:#fff;border:0;border-radius:7px;font-weight:800';action.onclick=()=>owOpenUserDetails(name);actionTd.appendChild(action);tr.appendChild(actionTd);tbody.appendChild(tr);owEnsurePhotoHistory(name,profile);
+      });
+      table.appendChild(tbody);wrap.appendChild(table);body.appendChild(wrap);
+    }
+
+    function adminSaveAccount(){
+      if(!owIsAdmin()){owNotify('Admin access required.');return;}
+      const u=(document.getElementById('admUserName').value||'').trim(); const p=document.getElementById('admUserPassword').value||'';
+      const status=document.getElementById('admUserActive').value;
+      if(!u || u==='admin'){owNotify('Enter a valid username. The built-in admin account cannot be changed here.');return;}
+      if(!p && !owReadAccounts()[u]){owNotify('नवीन खात्यासाठी किमान 6 अक्षरांचा Password आवश्यक आहे.');return;}
+      if(p && p.length<6){owNotify('किमान 6 अक्षरांचा Password द्या.');return;}
+      const accounts=owReadAccounts(), prior=accounts[u]||{};
+      accounts[u]={...prior, ...(p?{password:p}:{}), role:'user', status, active:status==='active', approved:status==='active', updatedAt:new Date().toISOString()};
+      localStorage.setItem('ow_managed_accounts',JSON.stringify(accounts));
+      {const requests=owReadJSON('ow_registration_requests',{});if(requests[u]){requests[u]={...requests[u], ...(p?{password:p}:{}),status,active:status==='active',approved:status==='active',updatedAt:new Date().toISOString()};localStorage.setItem('ow_registration_requests',JSON.stringify(requests));}}
+      document.getElementById('admUserPassword').value=''; owAudit('Account updated',u+' status='+status); adminRefreshPanel(); owNotify('Account Status/Password जतन झाले.');
+    }
+    function adminLoadPermissions(){
+      const u=document.getElementById('admPermissionUser').value;
+      const permissions=owReadPermissions(); const saved=permissions[u]||{};
+      const box=document.getElementById('admPermissionList'); if(!box)return;
+      box.innerHTML='';
+      OW_ADMIN_TABS.forEach(t=>{const row=document.createElement('label');row.style.cssText='display:flex;gap:8px;align-items:center;font-size:12px';
+        const cb=document.createElement('input');cb.type='checkbox';cb.dataset.tab=t.id;cb.checked=saved[t.id]!==false;
+        row.appendChild(cb);row.appendChild(document.createTextNode(t.label));box.appendChild(row);});
+    }
+    function adminSavePermissions(){
+      if((localStorage.getItem('userRole')||'').toLowerCase()!=='admin'){owNotify('Admin access required.');return;}
+      const u=document.getElementById('admPermissionUser').value;if(!u){owNotify('प्रथम Select User.');return;}
+      const val={};document.querySelectorAll('#admPermissionList input[type=checkbox]').forEach(cb=>val[cb.dataset.tab]=cb.checked);
+      const all=owReadPermissions();all[u]=val;localStorage.setItem('ow_tab_permissions',JSON.stringify(all));
+      adminRefreshPanel();owNotify('Tab permissions saved. They will apply on the user’s next navigation.');
+    }
+    function adminRefreshPanel(){
+      const accounts=owReadAccounts(), permissions=owReadPermissions();
+      const names=Array.from(new Set(['user',...Object.keys(accounts)]));
+      const select=document.getElementById('admPermissionUser');if(!select)return;
+      const current=select.value;select.innerHTML='';
+      names.forEach(u=>{const o=document.createElement('option');o.value=u;o.textContent=u;select.appendChild(o);});
+      if(names.includes(current))select.value=current;
+      adminLoadPermissions();
+      const tbody=document.getElementById('admAccountTable');if(!tbody)return;tbody.innerHTML='';
+      const all=[{name:'admin',role:'Admin',status:'active'}, {name:'user',role:'User',status:'active'},...Object.keys(accounts).map(name=>({name,role:accounts[name].role==='admin'?'Admin':'User',status:accounts[name].status||(accounts[name].active===false?'suspended':'active')}))];
+      all.forEach(a=>{const tr=document.createElement('tr');tr.style.borderTop='1px solid #23415d';
+        const count=permissions[a.name]?Object.values(permissions[a.name]).filter(Boolean).length+'/'+OW_ADMIN_TABS.length:'All default';
+        [a.name,a.role,({active:'Active',inactive:'Deactive',suspended:'Pause',blocked:'ब्लॉक',pending:'Pending'}[a.status]||a.status),count].forEach(v=>{const td=document.createElement('td');td.style.padding='8px';td.textContent=v;tr.appendChild(td);}); const action=document.createElement('td');action.style.padding='6px'; if(a.name!=='admin'&&a.name!=='user'){const sel=document.createElement('select');sel.style.cssText='padding:6px;background:#061326;color:#fff;border-radius:6px';[['active','Active'],['inactive','Deactive (Deactive)'],['suspended','Pause'],['blocked','Blocked']].forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;sel.appendChild(o)});sel.value=a.status;sel.onchange=()=>adminSetUserStatus(a.name,sel.value);action.appendChild(sel);const edit=document.createElement('button');edit.textContent='Select';edit.style.cssText='margin-left:5px;padding:6px;background:#2563eb;border-radius:6px';edit.onclick=()=>{document.getElementById('admUserName').value=a.name;document.getElementById('admUserActive').value=a.status;};action.appendChild(edit);}tr.appendChild(action);tbody.appendChild(tr);});
+      let logs=[];try{logs=JSON.parse(localStorage.getItem('ow_login_sessions')||'[]')||[];}catch(e){}
+      const log=document.getElementById('admSessionLog');log.innerHTML='';
+      logs.slice(0,30).forEach(item=>{const d=document.createElement('div');d.style.padding='5px 0';d.textContent=(item.time||'')+' — '+(item.username||'')+' ('+(item.role||'User')+') — '+(item.event||'Login');log.appendChild(d);});
+    }
+    function adminSetUserStatus(username,status){if(!owIsAdmin())return;const a=owReadAccounts();if(!a[username])return;const isActive=String(status).toLowerCase()==='active',stamp=new Date().toISOString();a[username].status=isActive?'active':status;a[username].active=isActive;a[username].approved=isActive;a[username].updatedAt=stamp;localStorage.setItem('ow_managed_accounts',JSON.stringify(a));const requests=owReadJSON('ow_registration_requests',{});if(requests[username]){requests[username]={...requests[username],status:isActive?'active':status,active:isActive,approved:isActive,updatedAt:stamp};localStorage.setItem('ow_registration_requests',JSON.stringify(requests));}owAudit('Account status changed',username+' => '+status);adminRefreshPanel();}
+    function adminExportBackup(){if(!owIsAdmin()){owNotify('Admin only');return;}const data={exportedAt:new Date().toISOString(),localStorage:{}};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);data.localStorage[k]=localStorage.getItem(k);}const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='office-work-localstorage-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);owAudit('Backup exported','LocalStorage');}
+    async function adminRestoreBackup(event){if(!owIsAdmin()){owNotify('Admin only');return;}const file=event.target.files&&event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=async()=>{try{const obj=JSON.parse(reader.result);const data=obj.localStorage||obj;if(!data||typeof data!=='object'||Array.isArray(data))throw new Error('Invalid backup');if(!(await owAskConfirm('Restore केल्याने backup मधील keys सध्याच्या keys वर लिहिल्या जातील. पुढे जायचे?')))return;Object.keys(data).forEach(k=>{if(typeof data[k]==='string')localStorage.setItem(k,data[k]);else localStorage.setItem(k,JSON.stringify(data[k]));});owAudit('Backup restored',file.name);owNotify('Backup restore पूर्ण. पान refresh करा.');}catch(e){owNotify('Backup फाईल योग्य JSON नाही किंवा वाचता आली नाही.');}finally{event.target.value='';}};reader.readAsText(file);}
+    function owApplyUserTabPermissions(){
+      const role=(localStorage.getItem('userRole')||'user').toLowerCase(), username=localStorage.getItem('currentUser')||'user';
+      if(role==='admin')return;
+      const all=owReadPermissions(),p=all[username];if(!p)return;
+      document.querySelectorAll('a[href]').forEach(a=>{const href=(a.getAttribute('href')||'').split(/[?#]/)[0];if(p[href]===false){a.style.display='none';a.setAttribute('aria-hidden','true');}});
+    }
+
+    window.onload = function() {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const role = (localStorage.getItem('userRole') || (localStorage.getItem('currentUser') === 'admin' ? 'admin' : 'user')).toLowerCase();
+      localStorage.setItem('userRole', role);
+      localStorage.setItem('displayRole', role === 'admin' ? 'Admin' : 'User');
+      const username = localStorage.getItem('currentUser');
+      // Settings shortcut is visible only to the authenticated admin account.
+      const settingButton = document.getElementById('adminOnlySettingButton');
+      const canSeeAdminSettings = isLoggedIn === 'true' && role === 'admin';
+      if (settingButton) {
+        settingButton.style.display = canSeeAdminSettings ? 'flex' : 'none';
+        settingButton.setAttribute('aria-hidden', canSeeAdminSettings ? 'false' : 'true');
+      }
+      const headerName = document.getElementById('headerUserName');
+      const headerRole = document.getElementById('headerUserRole');
+      if (headerRole) headerRole.textContent = role === 'admin' ? 'Admin' : 'User';
+
+      if (isLoggedIn !== 'true') {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      try {
+        const activeUsername = localStorage.getItem('currentUser') || '';
+        const currentProfileRaw = owReadJSON('currentUserProfile', {});
+        const currentProfile = currentProfileRaw && typeof currentProfileRaw === 'object' ? (currentProfileRaw[activeUsername] || currentProfileRaw) : {};
+        const accounts = owReadAccounts();
+        const account = accounts[activeUsername] || {};
+        const accountProfile = account.profile || {};
+        const requests = owReadJSON('ow_registration_requests', {});
+        const request = requests[activeUsername] || {};
+        const requestProfile = request.profile || {};
+        const profileSources = [currentProfile, accountProfile, account, requestProfile, request];
+        const photoKeys = ['photo', 'profilePhoto', 'profile_picture', 'profilePicture', 'photoUrl', 'avatar', 'image', 'imageUrl'];
+        let activePhoto = '';
+        for (const source of profileSources) {
+          if (!source || typeof source !== 'object') continue;
+          for (const key of photoKeys) {
+            const value = source[key];
+            if (typeof value === 'string' && value.trim()) { activePhoto = value.trim(); break; }
+          }
+          if (activePhoto) break;
+        }
+        const displayName = currentProfile.fullName || accountProfile.fullName || account.fullName || requestProfile.fullName || request.fullName || [currentProfile.firstName, currentProfile.fatherName, currentProfile.surname].filter(Boolean).join(' ') || [accountProfile.firstName, accountProfile.fatherName, accountProfile.surname].filter(Boolean).join(' ') || activeUsername || 'User';
+        if (headerName) headerName.textContent = displayName;
+        const headerPhoto = document.getElementById('headerProfilePhoto');
+        if (headerPhoto) {
+          if (activePhoto) {
+            headerPhoto.onerror = function () { this.onerror = null; this.style.visibility = 'hidden'; };
+            headerPhoto.src = activePhoto;
+            headerPhoto.style.visibility = 'visible';
+          } else {
+            headerPhoto.removeAttribute('src');
+            headerPhoto.style.visibility = 'hidden';
+          }
+        }
+        if (activePhoto && role !== 'admin') owTrackUserPhotoChange(activeUsername, activePhoto, currentProfile || accountProfile);
+        if (activePhoto) document.querySelectorAll('[data-profile-photo],#profilePhoto,.profile-photo').forEach(img => { if (img.tagName === 'IMG') img.src = activePhoto; });
+      } catch (e) { console.warn('Could not load the signed-in user profile photo.', e); }
+
+      if (role === 'admin') {
+        const adminPanel = document.getElementById('advancedAdminPanel'); if (adminPanel) adminPanel.style.display = 'none';
+        adminRefreshPanel();
+        owSwitchUserTab('status'); owRenderUserInfo();
+        const roleBadge = document.getElementById('userRoleBadge'); if (roleBadge) roleBadge.innerText = 'Admin: ' + username;
+        const legacyAdminPanel = document.getElementById('adminPanel'); if (legacyAdminPanel) legacyAdminPanel.style.display = 'none';
+        loadActivityLogs();
+      } else {
+        const roleBadge = document.getElementById('userRoleBadge'); if (roleBadge) roleBadge.innerText = 'User: ' + username;
+      }
+    };
+
+    function loadActivityLogs() {
+      const tbody = document.getElementById('logTableBody');
+      let logs = [];
+      try { logs = JSON.parse(localStorage.getItem('user_activities') || '[]') || []; } catch (e) { logs = []; }
+      
+      if (logs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-slate-400">कोणतेही रेकॉर्ड उपलब्ध नाही.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = logs.map((log, index) => `
+        <tr class="border-b border-slate-800">
+          <td class="p-2">${index + 1}</td>
+          <td class="p-2 text-cyan-400 font-bold">${log.username}</td>
+          <td class="p-2">${log.action}</td>
+          <td class="p-2 text-slate-400 text-[10px]">${log.time}</td>
+        </tr>
+      `).join('');
+    }
+
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('userRole');
+      window.location.href = 'index.html';
+    }
+    window.addEventListener('DOMContentLoaded', function(){ owApplyUserTabPermissions(); });
+  </script>
+
+  <!-- Custom notifications and photo source chooser: no native browser dialogs -->
+  <style>
+    #owCustomDialog{display:none;position:fixed;inset:0;z-index:100200;background:rgba(2,8,23,.78);backdrop-filter:blur(7px);align-items:center;justify-content:center;padding:18px}
+    #owCustomDialog .ow-dialog-card{width:min(100%,420px);background:#071b35;color:#f8fafc;border:1px solid #258be8;border-radius:18px;padding:20px;box-shadow:0 22px 70px #0009}
+    #owCustomDialog .ow-dialog-actions{display:flex;gap:10px;margin-top:18px}
+    #owCustomDialog button{border:0;border-radius:10px;padding:11px 14px;font-weight:800;cursor:pointer}
+    #owCustomDialog .ow-primary{background:#0284c7;color:white;flex:1}
+    #owCustomDialog .ow-danger{background:#b91c1c;color:white;flex:1}
+    #owCustomDialog .ow-muted{background:#334155;color:white;flex:1}
+    #owPhotoSourceModal{display:none;position:fixed;inset:0;z-index:100150;background:rgba(2,8,23,.8);backdrop-filter:blur(7px);align-items:center;justify-content:center;padding:18px}
+    #owPhotoSourceModal .ow-source-card{width:min(100%,390px);background:#071b35;color:#fff;border:1px solid #258be8;border-radius:18px;padding:20px;box-shadow:0 22px 70px #0009;text-align:center}
+    #owPhotoSourceModal button{width:100%;margin-top:11px;padding:13px;border:0;border-radius:11px;font-weight:800;font-size:15px;cursor:pointer}
+    #owCropStage .ow-crop-handle{width:34px;height:34px;border:2px solid #fff;border-radius:50%;background:#0284c7;color:#fff;font-size:18px;font-weight:900;box-shadow:0 2px 9px #000b;z-index:3;padding:0;touch-action:none}
+  </style>
+  <div id="owCustomDialog" role="dialog" aria-modal="true" aria-labelledby="owDialogTitle">
+    <div class="ow-dialog-card"><h3 id="owDialogTitle" style="margin:0 0 10px;font-size:19px">सूचना</h3><div id="owDialogMessage" style="white-space:pre-wrap;line-height:1.55"></div><div class="ow-dialog-actions"><button id="owDialogCancel" class="ow-muted" type="button">रद्द करा</button><button id="owDialogOk" class="ow-primary" type="button">ठीक आहे</button></div></div>
+  </div>
+  <div id="owPhotoSourceModal" role="dialog" aria-modal="true" aria-label="फोटो निवडा">
+    <div class="ow-source-card"><h3 style="margin:0 0 6px;font-size:20px">प्रोफाईल फोटो निवडा</h3><p style="margin:0;color:#cbd5e1">फोटो कॅमेऱ्यातून काढा किंवा गॅलरीमधून निवडा.</p>
+      <button id="owChooseCamera" type="button" style="background:#0369a1;color:white">📷 कॅमेरा (Camera)</button>
+      <button id="owChooseGallery" type="button" style="background:#0f766e;color:white">🖼️ गॅलरी (Gallery)</button>
+      <button id="owChooseCancel" type="button" style="background:#991b1b;color:white">रद्द करा (Close)</button>
+    </div>
+  </div>
+  <script>
+  (function(){
+    let dialogResolve=null;
+    function showDialog(message,confirmMode){const box=document.getElementById('owCustomDialog');if(!box)return Promise.resolve(!confirmMode);document.getElementById('owDialogMessage').textContent=String(message??'');document.getElementById('owDialogTitle').textContent=confirmMode?'पुष्टी आवश्यक':'सूचना';document.getElementById('owDialogCancel').style.display=confirmMode?'':'none';box.style.display='flex';return new Promise(resolve=>{dialogResolve=resolve;});}
+    window.owNotify=function(message){showDialog(message,false);};
+    window.owAskConfirm=function(message){return showDialog(message,true);};
+    function closeDialog(value){const box=document.getElementById('owCustomDialog');if(box)box.style.display='none';if(dialogResolve){const r=dialogResolve;dialogResolve=null;r(value);}}
+    document.addEventListener('DOMContentLoaded',()=>{document.getElementById('owDialogOk')?.addEventListener('click',()=>closeDialog(true));document.getElementById('owDialogCancel')?.addEventListener('click',()=>closeDialog(false));document.getElementById('owCustomDialog')?.addEventListener('click',e=>{if(e.target.id==='owCustomDialog')closeDialog(false);});});
+  })();
+  </script>
+
+  <!-- Signed-in user profile photo upload: gallery or camera -->
+  <input id="owProfilePhotoGallery" type="file" accept="image/*" style="display:none">
+  <input id="owProfilePhotoCamera" type="file" accept="image/*" capture="user" style="display:none">
+  <div id="owPhotoCropModal" role="dialog" aria-modal="true" aria-label="Crop profile photo" style="display:none;position:fixed;inset:0;z-index:100020;background:rgba(0,0,0,.94);padding:14px;align-items:center;justify-content:center;overflow:auto">
+    <section style="width:min(100%,520px);background:#071b35;border:1px solid #168cff;border-radius:16px;padding:16px;color:#fff;box-sizing:border-box">
+      <h2 style="margin:0 0 12px;text-align:center;font-size:20px">प्रोफाईल फोटो क्रॉप करा</h2>
+      <p style="text-align:center;color:#cbd5e1;font-size:13px;margin:0 0 10px">फोटो बोटाने ओढून जागा बदला. कोपऱ्यावरील हँडल ओढून झूम करा; दोन बोटांनीही झूम करता येईल.</p>
+      <div id="owCropStage" style="position:relative;width:min(78vw,300px);height:min(78vw,300px);max-width:300px;max-height:300px;margin:0 auto 14px;border:3px solid #31c7ff;border-radius:50%;overflow:hidden;background:#020817;touch-action:none;user-select:none">
+        <img id="owCropPreview" alt="Crop preview" draggable="false" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;transform-origin:center center">
+        <span style="position:absolute;inset:0;border:1px dashed #ffffff99;border-radius:50%;pointer-events:none"></span>
+        <button type="button" class="ow-crop-handle" data-corner="tl" aria-label="Zoom handle top left" style="position:absolute;left:5px;top:5px">↘</button>
+        <button type="button" class="ow-crop-handle" data-corner="tr" aria-label="Zoom handle top right" style="position:absolute;right:5px;top:5px">↙</button>
+        <button type="button" class="ow-crop-handle" data-corner="bl" aria-label="Zoom handle bottom left" style="position:absolute;left:5px;bottom:5px">↗</button>
+        <button type="button" class="ow-crop-handle" data-corner="br" aria-label="Zoom handle bottom right" style="position:absolute;right:5px;bottom:5px">↖</button>
+      </div>
+      <div style="text-align:center;color:#93c5fd;font-size:12px;margin-bottom:8px">एक बोट: फोटो हलवा · दोन बोटे: झूम · कोपरा: झूम समायोजित</div>
+      <div style="display:flex;gap:9px;margin-top:16px"><button id="owCropCancel" type="button" style="flex:1;padding:11px;border:0;border-radius:8px;background:#b91c1c;color:#fff;font-weight:800">रद्द करा</button><button id="owCropSave" type="button" style="flex:1;padding:11px;border:0;border-radius:8px;background:#059669;color:#fff;font-weight:800">क्रॉप करून सेव्ह करा</button></div>
+    </section>
+  </div>
+  <script>
+  (function(){
+    function readJSON(key, fallback){try{const v=JSON.parse(localStorage.getItem(key)||'null');return v==null?fallback:v;}catch(e){return fallback;}}
+    function currentName(){return localStorage.getItem('currentUser')||'';}
+    let cropImage=null,cropObjectUrl='',cropScale=1,cropPanX=0,cropPanY=0,pointerMap=new Map(),gesture=null,pinchStart=null;
+    const cropModal=()=>document.getElementById('owPhotoCropModal');
+    const cropStage=()=>document.getElementById('owCropStage');
+    function cropBase(){return Math.min(cropImage?.naturalWidth||1,cropImage?.naturalHeight||1);}
+    function clampCrop(){if(!cropImage)return;const base=cropBase(),side=base/Math.max(1,cropScale),maxX=Math.max(0,(cropImage.naturalWidth-side)/2),maxY=Math.max(0,(cropImage.naturalHeight-side)/2);cropPanX=Math.max(-maxX,Math.min(maxX,cropPanX));cropPanY=Math.max(-maxY,Math.min(maxY,cropPanY));}
+    function cropStageSize(){const r=cropStage().getBoundingClientRect();return Math.max(1,Math.min(r.width,r.height));}
+    function updateCropPreview(){const img=document.getElementById('owCropPreview');if(!img||!cropImage)return;const size=cropStageSize(),base=cropBase();img.style.transformOrigin='center center';img.style.transform=`translate(${cropPanX/base*size}px,${cropPanY/base*size}px) scale(${cropScale})`;}
+    function openCropper(file){if(!file||!/^image\//i.test(file.type||'')){owNotify('कृपया योग्य फोटो निवडा.');return;}if(cropObjectUrl)URL.revokeObjectURL(cropObjectUrl);cropObjectUrl=URL.createObjectURL(file);cropImage=new Image();cropImage.onload=()=>{const modal=cropModal();if(!modal)return;document.getElementById('owCropPreview').src=cropObjectUrl;cropScale=1;cropPanX=0;cropPanY=0;pointerMap.clear();updateCropPreview();modal.style.display='flex';};cropImage.onerror=()=>owNotify('फोटो उघडता आला नाही.');cropImage.src=cropObjectUrl;}
+    function stagePoint(e){const r=cropStage().getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+    function beginCropPointer(e,corner){if(!cropImage)return;e.preventDefault();const stage=cropStage();stage.setPointerCapture?.(e.pointerId);const p=stagePoint(e);pointerMap.set(e.pointerId,p);if(corner){gesture={kind:'zoom',startY:p.y,startScale:cropScale,corner};}else if(pointerMap.size===1){gesture={kind:'pan',startX:p.x,startY:p.y,panX:cropPanX,panY:cropPanY};}else if(pointerMap.size===2){const pts=[...pointerMap.values()];pinchStart={distance:Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y),scale:cropScale};gesture={kind:'pinch'};}}
+    function moveCropPointer(e){if(!pointerMap.has(e.pointerId)||!cropImage)return;e.preventDefault();const p=stagePoint(e);pointerMap.set(e.pointerId,p);if(pointerMap.size>=2){const pts=[...pointerMap.values()].slice(0,2),dist=Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);if(pinchStart&&pinchStart.distance>0)cropScale=Math.max(1,Math.min(4,pinchStart.scale*dist/pinchStart.distance));}else if(gesture?.kind==='pan'){const factor=cropBase()/cropStageSize();cropPanX=gesture.panX+(p.x-gesture.startX)*factor;cropPanY=gesture.panY+(p.y-gesture.startY)*factor;}else if(gesture?.kind==='zoom'){cropScale=Math.max(1,Math.min(4,gesture.startScale+(gesture.startY-p.y)/65));}clampCrop();updateCropPreview();}
+    function endCropPointer(e){pointerMap.delete(e.pointerId);if(pointerMap.size<2)pinchStart=null;if(!pointerMap.size)gesture=null;}
+    async function saveCroppedPhoto(){const username=currentName();if(!username){owNotify('लॉगिन युजर सापडला नाही.');return;}if(!cropImage)return;try{const w=cropImage.naturalWidth,h=cropImage.naturalHeight,base=Math.min(w,h),zoom=Math.max(1,Math.min(4,cropScale)),side=base/zoom;clampCrop();/* Preview mapping: source center minus pan; canvas uses the identical source square. */const sx=Math.max(0,Math.min(w-side,(w-side)/2-cropPanX));const sy=Math.max(0,Math.min(h-side,(h-side)/2-cropPanY));const canvas=document.createElement('canvas');canvas.width=600;canvas.height=600;const ctx=canvas.getContext('2d');if(!ctx)throw new Error('Canvas उपलब्ध नाही.');ctx.drawImage(cropImage,sx,sy,side,side,0,0,600,600);let quality=.84,photo=canvas.toDataURL('image/jpeg',quality);while(photo.length>550000&&quality>.45){quality-=.07;photo=canvas.toDataURL('image/jpeg',quality);}if(photo.length>650000)throw new Error('क्रॉप केलेला फोटो खूप मोठा आहे.');
+      /* Self-service profile photo update: deliberately independent of Admin Settings permissions. */
+      const accounts=readJSON('ow_managed_accounts',{}),requests=readJSON('ow_registration_requests',{}),account=accounts[username]||{},request=requests[username]||{};
+      let current={};try{current=JSON.parse(localStorage.getItem('currentUserProfile')||'{}')||{};}catch(e){}
+      const currentProfile=(current&&typeof current==='object'&&!Array.isArray(current)&&current[username]&&typeof current[username]==='object')?current[username]:(current&&typeof current==='object'&&!Array.isArray(current)?current:{});
+      const profile={...(account.profile||request.profile||currentProfile||{}),photo};
+      if(accounts[username])accounts[username]={...account,profile,updatedAt:new Date().toISOString()};
+      if(requests[username])requests[username]={...request,profile:{...(request.profile||{}),photo},updatedAt:new Date().toISOString()};
+      if(current&&typeof current==='object'&&!Array.isArray(current)&&current[username]&&typeof current[username]==='object')current[username]={...current[username],photo};else current={...currentProfile,photo};
+      const hist=readJSON('ow_user_photo_history',{}),list=Array.isArray(hist[username])?hist[username]:[];
+      if(!list.some(item=>item&&item.data===photo)){list.forEach(item=>{if(item)item.type='previous';});list.unshift({id:'ph_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),data:photo,uploadedAt:new Date().toISOString(),type:'current'});}else list.forEach(item=>{if(item)item.type=item.data===photo?'current':'previous';});hist[username]=list;
+      const keys=['ow_managed_accounts','ow_registration_requests','currentUserProfile','ow_user_photo_history'],old={};keys.forEach(k=>old[k]=localStorage.getItem(k));
+      try{localStorage.setItem('ow_managed_accounts',JSON.stringify(accounts));localStorage.setItem('ow_registration_requests',JSON.stringify(requests));localStorage.setItem('currentUserProfile',JSON.stringify(current));localStorage.setItem('ow_user_photo_history',JSON.stringify(hist));}
+      catch(err){keys.forEach(k=>{try{if(old[k]===null)localStorage.removeItem(k);else localStorage.setItem(k,old[k]);}catch(e){}});throw err;}
+      const header=document.getElementById('headerProfilePhoto');if(header){header.src=photo;header.style.visibility='visible';}document.querySelectorAll('[data-profile-photo],#profilePhoto,.profile-photo').forEach(el=>{if(el.tagName==='IMG')el.src=photo;});cropModal().style.display='none';cropImage=null;if(cropObjectUrl){URL.revokeObjectURL(cropObjectUrl);cropObjectUrl='';}owNotify('क्रॉप केलेला प्रोफाईल फोटो सेव्ह झाला. जुना फोटो हिस्ट्रीमध्ये जतन केला आहे.');
+    }catch(err){console.error(err);owNotify(err&&err.name==='QuotaExceededError'?'ब्राउझर स्टोरेज पूर्ण आहे. जुना डेटा हटविल्याशिवाय फोटो सेव्ह होणार नाही.':(err.message||'फोटो सेव्ह करता आला नाही.'));}}
+    document.addEventListener('DOMContentLoaded',function(){const avatar=document.getElementById('headerAvatarUpload'),gallery=document.getElementById('owProfilePhotoGallery'),camera=document.getElementById('owProfilePhotoCamera');if(!avatar||!gallery||!camera)return;const sourceModal=document.getElementById('owPhotoSourceModal');function choose(e){if(e){e.preventDefault();e.stopPropagation();}sourceModal.style.display='flex';}document.getElementById('owChooseCamera').addEventListener('click',()=>{sourceModal.style.display='none';camera.click();});document.getElementById('owChooseGallery').addEventListener('click',()=>{sourceModal.style.display='none';gallery.click();});document.getElementById('owChooseCancel').addEventListener('click',()=>sourceModal.style.display='none');avatar.addEventListener('click',choose);avatar.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose();}});[gallery,camera].forEach(input=>input.addEventListener('change',()=>{const f=input.files&&input.files[0];if(f)openCropper(f);input.value='';}));const stage=cropStage();stage.addEventListener('pointerdown',e=>beginCropPointer(e,null));stage.addEventListener('pointermove',moveCropPointer);stage.addEventListener('pointerup',endCropPointer);stage.addEventListener('pointercancel',endCropPointer);stage.querySelectorAll('.ow-crop-handle').forEach(handle=>{handle.addEventListener('pointerdown',e=>{e.stopPropagation();beginCropPointer(e,handle.dataset.corner);});});document.getElementById('owCropCancel').addEventListener('click',()=>{cropModal().style.display='none';cropImage=null;if(cropObjectUrl){URL.revokeObjectURL(cropObjectUrl);cropObjectUrl='';}});document.getElementById('owCropSave').addEventListener('click',saveCroppedPhoto);});
+  })();
+  </script>
+
+</body>
+</html>
