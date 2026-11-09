@@ -1,295 +1,108 @@
-/* =========================================================
-   mb-common.js
-   M.B. System - Common Utility Functions
-   Module Open/Close & Smart Action Center Fix
-   ========================================================= */
+/* mb.css - Main Stylesheet for M.B. System */
 
-"use strict";
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
-function getMBDisplayHolder(status, isAvail) {
-    if (isAvail) return 'कार्यालयात उपलब्ध';
-    if (!status) return 'कार्यालय / उपलब्ध';
-    var detail = status.detail || status.receivedDetail || '';
-    var source = status.source || status.receivedSource || status.receivedFrom || '';
-    var action = status.lastAction || status.actionType || '';
-    if (detail) return detail;
-    if (source) return source;
-    if (action && action.includes('JE')) return action;
-    return action || 'कार्यालय';
+#mbSystemSection { background: #f0f2f5; color: #212121; min-height: 100vh; padding-bottom: 20px; display: block; }
+.top-header { background: #0d47a1; color: #fff; text-align: center; padding: 12px 15px; position: relative; }
+.top-header h1 { font-size: 15px; font-weight: 700; margin-left: 70px; text-align: left; }
+.top-header p { font-size: 11px; opacity: 0.9; margin-left: 70px; text-align: left; }
+.btn-back-hub { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: #ff9800; color: #000; border: none; border-radius: 6px; padding: 6px 10px; font-size: 11.5px; font-weight: 800; cursor: pointer; z-index: 5; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+
+.action-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; padding: 10px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.action-btn { border: none; border-radius: 8px; color: #fff; padding: 10px 4px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; z-index: 10; position: relative; text-decoration: none; }
+.btn-je { background: #1976d2; } .btn-mb-act { background: #2e7d32; } .btn-work { background: #00897b; } .btn-bill { background: #f57c00; } .btn-assign { background: #7b1fa2; } .btn-settings { background: #c2185b; }
+
+.container { padding: 10px; max-width: 800px; margin: auto; }
+.summary-box { background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.summary-title { font-size: 13px; font-weight: 700; text-align: center; color: #0d47a1; margin-bottom: 8px; }
+.card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+.stat-card { border-radius: 8px; text-align: center; padding: 11px 4px; cursor: pointer; background: #fcfdfe; transition: 0.2s; position: relative; z-index: 10; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
+.stat-card:hover { transform: scale(1.02); }
+
+.stat-num { font-size: 18px; font-weight: 700; color: #0d47a1; pointer-events: none; }
+.stat-label { font-size: 11px; color: #555; margin-top: 2px; pointer-events: none; }
+
+.filter-card { background: #fff; border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); position: relative; }
+.form-group { margin-bottom: 10px; text-align: left; }
+.form-group label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 4px; }
+.form-control { width: 100%; padding: 8px 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 5px; outline: none; background: #fff; display: block; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; margin-bottom: 8px; }
+
+.btn-report { width: 100%; background: #0d47a1; color: #fff; border: none; padding: 11px; font-size: 13.5px; font-weight: 800; border-radius: 6px; cursor: pointer; margin-top: 6px; letter-spacing: 0.5px; }
+
+#smartSearchSuggestions {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    margin-bottom: 4px;
+    background: transparent;
+    border: none;
+    max-height: 180px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: none;
+    text-align: right;
+}
+.suggestion-item {
+    padding: 4px 8px;
+    font-size: 16px;
+    cursor: pointer;
+    color: #0d47a1;
+    font-weight: 800;
+    text-align: right;
+    letter-spacing: 0.5px;
+    background: transparent;
+}
+.suggestion-item:hover { background: rgba(13, 71, 161, 0.08); }
+
+.date-placeholder-input { position: relative; color: #212121; }
+.date-placeholder-input.empty-date { color: transparent !important; }
+.date-placeholder-input.empty-date::before {
+content: "दिनांक निवडा"; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #888888; pointer-events: none; font-size: 12.5px; font-weight: normal;
 }
 
-function formatTransactionSentence(h) {
-    if (!h) return '-';
-    return h.receivedSource || h.receivedFrom || h.actionType || '-';
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 999; justify-content: center; align-items: center; padding: 10px; }
+.modal-card { background: #fff; border-radius: 8px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; padding: 16px; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 12px; }
+.btn-close { background: #e53935; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+
+/* 🌟 टेबल स्क्रोल व ॲक्शन कॉलम फिक्स */
+.je-scroll-box, .table-scroll-box, .table-responsive-box {
+    max-height: 240px;
+    overflow-y: auto;
+    overflow-x: auto;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-top: 8px;
+    background: #fff;
+    -webkit-overflow-scrolling: touch;
 }
 
-function checkDatePlaceholder(input) {
-    if (!input) return;
-    if (input.value) input.classList.remove('empty-date');
-    else input.classList.add('empty-date');
+.data-table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+.data-table th, .data-table td { border: 1px solid #ddd; padding: 6px 8px; text-align: left; vertical-align: middle; }
+.data-table th { background: #f5f5f5; font-weight: 600; position: sticky; top: 0; z-index: 5; }
+
+.action-cell {
+    white-space: nowrap;
+    text-align: center;
+    vertical-align: middle;
+    position: sticky;
+    right: 0;
+    background: #ffffff;
+    z-index: 4;
+    box-shadow: -2px 0 4px rgba(0,0,0,0.08);
 }
+.data-table th:last-child { position: sticky; right: 0; background: #f5f5f5; z-index: 6; text-align: center; }
+.btn-action { border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer; color: #fff; display: inline-block; margin: 0 2px; }
 
-function escapeHtml(v) {
-    return String(v == null ? '' : v).replace(/[&<>'"]/g, function (c) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c];
-    });
-}
+.quick-info-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); z-index: 3500; justify-content: center; align-items: center; padding: 15px; }
+.quick-info-card { background: #ffffff; border-radius: 12px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 16px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
 
-function formatDateDisplay(v) {
-    if (!v) return '';
-    var p = String(v).split('-');
-    return p.length === 3 ? p[2] + '-' + p[1] + '-' + p[0] : String(v);
-}
-
-function openModule(moduleId) {
-    var modal = document.getElementById(moduleId);
-    if (!modal) return false;
-    modal.style.setProperty('display', 'flex', 'important');
-    modal.style.visibility = 'visible';
-    modal.style.opacity = '1';
-    modal.style.pointerEvents = 'auto';
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('modal-open');
-    document.body.style.overflow = 'hidden';
-    return true;
-}
-
-function closeModule(moduleId) {
-    var modal = document.getElementById(moduleId);
-    if (!modal) return false;
-    modal.style.setProperty('display', 'none', 'important');
-    modal.style.visibility = 'hidden';
-    modal.style.opacity = '0';
-    modal.style.pointerEvents = 'none';
-    modal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-    return true;
-}
-
-function openSmartActionCenter(mbNo) {
-    var modal = document.getElementById('smartActionCenterModal');
-    if (!modal) return false;
-    modal.style.setProperty('display', 'flex', 'important');
-    modal.style.visibility = 'visible';
-    modal.style.opacity = '1';
-    modal.style.pointerEvents = 'auto';
-    modal.setAttribute('aria-hidden', 'false');
-
-    var detailsBox = document.getElementById('sacDetailsBox');
-    if (detailsBox && mbNo != null) {
-        detailsBox.setAttribute('data-mb-number', String(mbNo));
-        detailsBox.innerHTML = '<strong>निवडलेला M.B. क्रमांक:</strong> ' + escapeHtml(mbNo);
-    }
-    document.body.style.overflow = 'hidden';
-    return true;
-}
-
-function closeSmartActionCenter() {
-    var modal = document.getElementById('smartActionCenterModal');
-    if (!modal) return false;
-    modal.style.setProperty('display', 'none', 'important');
-    modal.style.visibility = 'hidden';
-    modal.style.opacity = '0';
-    modal.style.pointerEvents = 'none';
-    modal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-    return true;
-}
-
-function getCurrentSmartActionMBNo() {
-    var detailsBox = document.getElementById('sacDetailsBox');
-    if (!detailsBox) return '';
-    return detailsBox.getAttribute('data-mb-number') || '';
-}
-
-/* =========================================================
-   M.B. ACTION CENTER (7 FUNCTIONS) FULL IMPLEMENTATION
-   ========================================================= */
-
-function sacOpenTransferForm() {
-    var mbNo = getCurrentSmartActionMBNo();
-    var container = document.getElementById('sacSubActionContainer');
-    if (!container) return;
-    
-    var jeList = getData('je_records') || [];
-    var jeOptions = jeList.map(function(j) { return '<option value="' + escapeHtml(j.name) + '">' + escapeHtml(j.name) + '</option>'; }).join('');
-
-    container.style.display = 'block';
-    container.innerHTML = '<strong>📤 हस्तांतरण फॉर्म (M.B. क्र: ' + escapeHtml(mbNo) + ')</strong>' +
-        '<div style="margin-top:8px;">' +
-        '<label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">कोणाकडे द्यायची? (JE)</label>' +
-        '<select id="sacTransJE" style="width:100%; padding:6px; font-size:12px; border:1px solid #ccc; border-radius:4px;"><option value="">-- JE निवडा --</option>' + jeOptions + '</select>' +
-        '</div>' +
-        '<div style="margin-top:8px;">' +
-        '<label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">दिनांक</label>' +
-        '<input type="date" id="sacTransDate" value="' + new Date().toISOString().slice(0, 10) + '" style="width:100%; padding:6px; font-size:12px; border:1px solid #ccc; border-radius:4px;">' +
-        '</div>' +
-        '<div style="margin-top:10px; display:flex; gap:6px;">' +
-        '<button type="button" onclick="sacSaveTransfer()" style="background:#2e7d32; color:#fff; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer; flex:1;">सेव्ह करा</button>' +
-        '<button type="button" onclick="document.getElementById(\'sacSubActionContainer\').style.display=\'none\';" style="background:#757575; color:#fff; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;">रद्द करा</button>' +
-        '</div>';
-}
-
-function sacSaveTransfer() {
-    var mbNo = getCurrentSmartActionMBNo();
-    var jeName = document.getElementById('sacTransJE').value;
-    var dt = document.getElementById('sacTransDate').value;
-    if (!jeName || !dt) {
-        showAlert('कृपया JE आणि दिनांक निवडा.', 'WARNING');
-        return;
-    }
-    var mbList = getData('mb_records') || [];
-    var latest = getLatestMBStatus(mbNo);
-    var size = latest ? latest.size : 'लहान M.B.';
-
-    mbList.push({
-        actionType: 'दिलेली M.B.',
-        mbNumber: mbNo,
-        size: size,
-        receivedSource: 'JE',
-        receivedDetail: jeName,
-        receivedFrom: 'M.B. ' + jeName + ' यांना दिली',
-        date: dt
-    });
-    setData('mb_records', mbList);
-    document.getElementById('sacSubActionContainer').style.display = 'none';
-    showAlert('M.B. हस्तांतरण यशस्वीरीत्या सेव्ह झाले!', 'SUCCESS');
-    if (typeof refreshMBDashboard === 'function') refreshMBDashboard();
-}
-
-function sacTriggerReceiveMB() {
-    var mbNo = getCurrentSmartActionMBNo();
-    var container = document.getElementById('sacSubActionContainer');
-    if (!container) return;
-
-    container.style.display = 'block';
-    container.innerHTML = '<strong>📥 M.B. घेणे / कार्यालय जमा (M.B. क्र: ' + escapeHtml(mbNo) + ')</strong>' +
-        '<div style="margin-top:8px;">' +
-        '<label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">जमा दिनांक</label>' +
-        '<input type="date" id="sacRecDate" value="' + new Date().toISOString().slice(0, 10) + '" style="width:100%; padding:6px; font-size:12px; border:1px solid #ccc; border-radius:4px;">' +
-        '</div>' +
-        '<div style="margin-top:10px; display:flex; gap:6px;">' +
-        '<button type="button" onclick="sacSaveReceive()" style="background:#0277bd; color:#fff; border:none; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer; flex:1;">कार्यालयात जमा करा</button>' +
-        '<button type="button" onclick="document.getElementById(\'sacSubActionContainer\').style.display=\'none\';" style="background:#757575; color:#fff; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;">रद्द करा</button>' +
-        '</div>';
-}
-
-function sacSaveReceive() {
-    var mbNo = getCurrentSmartActionMBNo();
-    var dt = document.getElementById('sacRecDate').value;
-    if (!dt) {
-        showAlert('कृपया दिनांक निवडा.', 'WARNING');
-        return;
-    }
-    var mbList = getData('mb_records') || [];
-    var latest = getLatestMBStatus(mbNo);
-    var size = latest ? latest.size : 'लहान M.B.';
-
-    mbList.push({
-        actionType: 'मिळालेली M.B.',
-        mbNumber: mbNo,
-        size: size,
-        receivedSource: 'विभागीय कार्यालय',
-        receivedDetail: 'कार्यालयात जमा',
-        receivedFrom: 'कार्यालयात जमा',
-        date: dt
-    });
-    setData('mb_records', mbList);
-    document.getElementById('sacSubActionContainer').style.display = 'none';
-    showAlert('M.B. कार्यालयात यशस्वीरीत्या जमा झाली!', 'SUCCESS');
-    if (typeof refreshMBDashboard === 'function') refreshMBDashboard();
-}
-
-function sacTriggerEditRecord() {
-    var mbNo = getCurrentSmartActionMBNo();
-    var allMBs = getData('mb_records') || [];
-    var targetIdx = -1;
-    for (var i = 0; i < allMBs.length; i++) {
-        if (normalizeMB(allMBs[i].mbNumber) === normalizeMB(mbNo)) {
-            targetIdx = i;
-            break;
-        }
-    }
-    if (targetIdx === -1) {
-        showAlert('या M.B. क्रमांकाची कोणतीही नोंद सापडली नाही.', 'WARNING');
-        return;
-    }
-    closeSmartActionCenter();
-    if (typeof openModule === 'function') openModule('mbModal');
-    if (typeof editMB === 'function') editMB(targetIdx);
-}
-
-function sacToggleHistoryView() {
-    var mbNo = getCurrentSmartActionMBNo();
-    var histContainer = document.getElementById('sacHistoryContainer');
-    var wrapper = document.getElementById('sacHistoryTableWrapper');
-    if (!histContainer || !wrapper) return;
-
-    if (histContainer.style.display === 'block') {
-        histContainer.style.display = 'none';
-        return;
-    }
-
-    var allMBs = getData('mb_records') || [];
-    var norm = normalizeMB(mbNo);
-    var historyRows = [];
-    allMBs.forEach(function(m) {
-        if (normalizeMB(m.mbNumber) === norm) {
-            historyRows.push(m);
-        }
-    });
-
-    if (historyRows.length === 0) {
-        wrapper.innerHTML = '<div style="padding:10px; text-align:center; color:#666; font-size:11px;">कोणताही इतिहास उपलब्ध नाही.</div>';
-    } else {
-        var html = '<table class="data-table" style="width:100%; font-size:11px;"><thead><tr><th>दिनांक</th><th>व्यवहार</th><th>तपशील / धारक</th></tr></thead><tbody>';
-        historyRows.forEach(function(r) {
-            html += '<tr><td>' + formatDateDisplay(r.date) + '</td><td>' + escapeHtml(r.actionType) + '</td><td>' + escapeHtml(r.receivedDetail || r.receivedSource || '-') + '</td></tr>';
-        });
-        html += '</tbody></table>';
-        wrapper.innerHTML = html;
-    }
-    histContainer.style.display = 'block';
-}
-
-function sacOpenWorkForCurrentMB() {
-    var mbNo = getCurrentSmartActionMBNo();
-    closeSmartActionCenter();
-    if (typeof openModule === 'function') openModule('workModal');
-    var workMB = document.getElementById('workMB');
-    if (workMB) workMB.value = mbNo;
-}
-
-function sacOpenBillForCurrentMB() {
-    var mbNo = getCurrentSmartActionMBNo();
-    closeSmartActionCenter();
-    if (typeof openModule === 'function') openModule('billModal');
-}
-
-function printHistoryFromSAC() {
-    var mbNo = getCurrentSmartActionMBNo();
-    var allMBs = getData('mb_records') || [];
-    var norm = normalizeMB(mbNo);
-    var historyRows = [];
-    allMBs.forEach(function(m) {
-        if (normalizeMB(m.mbNumber) === norm) {
-            historyRows.push(m);
-        }
-    });
-
-    if (historyRows.length === 0) {
-        showAlert('प्रिंट करण्यासाठी कोणताही इतिहास उपलब्ध नाही.', 'WARNING');
-        return;
-    }
-
-    var rowsHtml = historyRows.map(function(r, i) {
-        return '<tr><td style="text-align:center;">' + (i + 1) + '</td><td>' + formatDateDisplay(r.date) + '</td><td>' + escapeHtml(r.actionType) + '</td><td>' + escapeHtml(r.receivedDetail || r.receivedSource || '-') + '</td></tr>';
-    }).join('');
-
-    var reportHtml = '<h2 style="text-align:center;">M.B. Movement History Report (M.B. क्र: ' + escapeHtml(mbNo) + ')</h2>' +
-        '<table class="print-table"><thead><tr><th style="text-align:center; width:40px;">अ.क्र.</th><th>दिनांक</th><th>व्यवहार</th><th>तपशील / धारक</th></tr></thead><tbody>' + rowsHtml + '</tbody></table>';
-
-    if (typeof printA4Document === 'function') {
-        printA4Document(reportHtml, 'MB_History_' + mbNo + '.pdf');
-    }
-}
+.sac-main-box { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; font-size: 12px; line-height: 1.6; margin-bottom: 10px; }
+.sac-btn-transfer { background: #7b1fa2; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.sac-btn-receive { background: #0277bd; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.sac-btn-edit { background: #f57c00; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.sac-btn-history { background: #546e7a; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.sac-btn-print { background: #1565c0; color: #fff; border: none; border-radius: 6px; padding: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%; margin-top: 8px; }
