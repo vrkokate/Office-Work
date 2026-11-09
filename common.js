@@ -105,7 +105,7 @@ function formatDateToDMY(dateStr){
 }
 
 /* =========================================================
-   ISOLATED A4 PRINT (No background leak)
+   ISOLATED A4 PRINT (No background leak, No ghost text)
    ========================================================= */
 function printA4Document(content, optionalFileName) {
     var printTitle = String(optionalFileName || 'Office_Work_Report.pdf').replace(/[\/:*?"<>|]+/g, '_');
@@ -122,45 +122,38 @@ function printA4Document(content, optionalFileName) {
         }
     } catch(e) { console.warn('Android Print Bridge Error:', e); }
 
-    // 2. Web Browser Popup Print (Isolated)
+    // 2. Web Browser Isolated Print (Popup Window)
     var printWindow = null;
     try {
         printWindow = window.open('', '_blank');
-        if (!printWindow) {
-            printViaIframe(content, printTitle);
+        if (printWindow) {
+            var html = '<!doctype html><html lang="mr"><head><meta charset="utf-8">' +
+                '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+                '<title>' + printTitle + '</title>' +
+                '<style>' +
+                '@page { size: A4 portrait; margin: 10mm; }' +
+                '* { box-sizing: border-box; }' +
+                'body { font-family: "Noto Sans Devanagari", Arial, sans-serif; font-size: 10pt; color: #111; margin: 0; padding: 0; background: #fff; }' +
+                '.print-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }' +
+                '.print-table th, .print-table td { border: 1px solid #333; padding: 5px 6px; text-align: left; vertical-align: top; }' +
+                '.print-table th { background-color: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-weight: bold; }' +
+                'h1, h2, h3 { text-align: center; margin: 0 0 10px 0; }' +
+                'button, .btn-action, .btn-report { display: none !important; }' +
+                '</style></head><body>' + String(content || '') +
+                '<script>(function(){ var printed = false; function doPrint(){ if(printed) return; printed = true; try { window.focus(); window.print(); } catch(e) { console.error(e); } } window.addEventListener("load", function(){ setTimeout(doPrint, 200); }); window.addEventListener("afterprint", function(){ setTimeout(function(){ window.close(); }, 200); }); })();<\/script>' +
+                '</body></html>';
+                
+            printWindow.document.open();
+            printWindow.document.write(html);
+            printWindow.document.close();
             return true;
         }
-        
-        var html = '<!doctype html><html lang="mr"><head><meta charset="utf-8">' +
-            '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-            '<title>' + printTitle + '</title>' +
-            '<style>' +
-            '@page { size: A4 portrait; margin: 10mm; }' +
-            '* { box-sizing: border-box; }' +
-            'body { font-family: "Noto Sans Devanagari", Arial, sans-serif; font-size: 10pt; color: #111; margin: 0; padding: 0; background: #fff; }' +
-            '.print-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }' +
-            '.print-table th, .print-table td { border: 1px solid #333; padding: 5px 6px; text-align: left; vertical-align: top; }' +
-            '.print-table th { background-color: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-weight: bold; }' +
-            'h1, h2, h3 { text-align: center; margin: 0 0 10px 0; }' +
-            'button, .btn-action, .btn-report { display: none !important; }' +
-            '</style></head><body>' + String(content || '') +
-            '<script>(function(){ var printed = false; function doPrint(){ if(printed) return; printed = true; try { window.focus(); window.print(); } catch(e) { console.error(e); } } window.addEventListener("load", function(){ setTimeout(doPrint, 200); }); window.addEventListener("afterprint", function(){ setTimeout(function(){ window.close(); }, 200); }); })();<\/script>' +
-            '</body></html>';
-            
-        printWindow.document.open();
-        printWindow.document.write(html);
-        printWindow.document.close();
-        return true;
     } catch (err) {
-        console.error('Print error:', err);
+        console.error('Popup Print error, falling back to Iframe:', err);
         if (printWindow && !printWindow.closed) printWindow.close();
-        printViaIframe(content, printTitle);
-        return false;
     }
-}
 
-// Iframe Fallback (जर ब्राउझरने Popup ब्लॉक केले तर)
-function printViaIframe(content, printTitle) {
+    // 3. Fallback: Completely Invisible Iframe (No DOM Leak)
     var iframe = document.createElement('iframe');
     iframe.style.position = 'fixed';
     iframe.style.right = '0';
@@ -168,6 +161,7 @@ function printViaIframe(content, printTitle) {
     iframe.style.width = '0';
     iframe.style.height = '0';
     iframe.style.border = '0';
+    iframe.style.zIndex = '-9999'; // पूर्णपणे लपवण्यासाठी
     document.body.appendChild(iframe);
     
     var doc = iframe.contentWindow.document;
@@ -178,9 +172,11 @@ function printViaIframe(content, printTitle) {
     iframe.contentWindow.focus();
     iframe.contentWindow.print();
     
+    // प्रिंट झाल्यावर Iframe पूर्णपणे डिलीट करा
     setTimeout(function() {
         if (iframe && iframe.parentNode) {
             iframe.parentNode.removeChild(iframe);
         }
     }, 5000);
+    return true;
 }
