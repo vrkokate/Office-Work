@@ -1,4 +1,4 @@
-// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters, Scrollable Table & Action Center Integration
+// mb-total.js - Total, Given, and Available M.B. Dashboards
 
 var currentQuickModalType = '';
 
@@ -94,7 +94,6 @@ function getFilteredReceivedMBs() {
 
 function getFilteredGivenMBs() {
     var list = getCurrentlyActiveGivenMBs();
-    var fSource = document.getElementById('qmFilterSource') ? document.getElementById('qmFilterSource').value : '';
     var fSize = document.getElementById('qmFilterSize') ? document.getElementById('qmFilterSize').value : '';
     var fJe = document.getElementById('qmFilterJE') ? document.getElementById('qmFilterJE').value : '';
 
@@ -120,7 +119,8 @@ function getFilteredAvailableMBs() {
 
     return list.filter(function(m) {
         if (fSize && fSize !== 'सर्व M.B.') {
-            if (m.size !== fSize) return false;
+            var sizeStr = m.size || 'लहान M.B.';
+            if (sizeStr !== fSize) return false;
         }
         return true;
     });
@@ -128,9 +128,13 @@ function getFilteredAvailableMBs() {
 
 function renderQuickModalTable() {
     var list = [];
-    if (currentQuickModalType === 'घेणेD') list = getFilteredReceivedMBs();
-    else if (currentQuickModalType === 'GIVEN') list = getFilteredGivenMBs();
-    else if (currentQuickModalType === 'AVAILABLE') list = getFilteredAvailableMBs();
+    if (currentQuickModalType === 'RECEIVED' || currentQuickModalType === 'घेणेD') {
+        list = getFilteredReceivedMBs();
+    } else if (currentQuickModalType === 'GIVEN') {
+        list = getFilteredGivenMBs();
+    } else if (currentQuickModalType === 'AVAILABLE') {
+        list = getFilteredAvailableMBs();
+    }
 
     var stock = getAvailableStock();
     var isAvailableMap = {};
@@ -206,7 +210,7 @@ function openQuickInfoModal(type) {
     var availList = getAvailableStock();
 
     var title = '';
-    if (type === 'घेणेD') title = 'एकूण M.B. (एकूण: ' + totalCount + ' | लहान: ' + smallCount + ', मोठी: ' + bigCount + ')';
+    if (type === 'RECEIVED' || type === 'घेणेD') title = 'एकूण M.B. (एकूण: ' + totalCount + ' | लहान: ' + smallCount + ', मोठी: ' + bigCount + ')';
     else if (type === 'GIVEN') title = 'दिलेली M.B. (एकूण: ' + givenList.length + ')';
     else title = 'उपलब्ध M.B. (एकूण: ' + availList.length + ')';
 
@@ -281,7 +285,7 @@ function closeQuickInfoModal() { document.getElementById('quickInfoModal').style
 function printQuickModalReport() {
     var list = [];
     var reportTitle = '';
-    if (currentQuickModalType === 'घेणेD') {
+    if (currentQuickModalType === 'RECEIVED' || currentQuickModalType === 'घेणेD') {
         list = getFilteredReceivedMBs();
         reportTitle = 'एकूण मोजमाप पुस्तिका (M.B.) सविस्तर अहवाल';
     } else if (currentQuickModalType === 'GIVEN') {
@@ -333,7 +337,7 @@ function printQuickModalReport() {
         for (var secKey in groups[mainKey]) {
             html += '<div style="margin:6px 0 4px 10px; font-size:10pt; font-weight:700; color:#333;">👉 सद्यस्थिती व धारक: ' + secKey + '</div>';
             html += '<table class="print-table" style="margin-bottom:8px; width:100%; border-collapse:collapse; font-size:9.5pt;">' +
-                '<thead><tr style="background:#f5f5f5;">`' +
+                '<thead><tr style="background:#f5f5f5;">' +
                 '<th style="width:40px; text-align:center;">अ.क्र.</th>' +
                 '<th>M.B. क्रमांक</th>' +
                 '<th>साईज</th>' +
