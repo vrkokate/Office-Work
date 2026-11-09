@@ -1,5 +1,4 @@
 // mb-total.js - Total, Given, and Available M.B. Dashboards & Calculations
-// Optimized with strict Data Validation to prevent TypeErrors and isolated printing.
 
 var currentQuickModalType = '';
 
@@ -250,6 +249,7 @@ function closeQuickInfoModal() {
     if (m) m.style.display = 'none'; 
 }
 
+// 🌟 हे फंक्शन अपडेट केले आहे (डबल हेडिंग काढून टाकण्यासाठी)
 function printQuickModalReport() {
     var list = [];
     var reportTitle = '';
@@ -290,13 +290,8 @@ function printQuickModalReport() {
     var smallCount = 0, bigCount = 0;
     list.forEach(function(m){ if(m && m.size === 'मोठी M.B.') bigCount++; else smallCount++; });
 
-    var html = '<div style="margin-bottom:15px; border-bottom:2px solid #333; padding-bottom:8px;">' +
-        '<div style="text-align:center; margin-bottom:4px;">' +
-        '<h1 style="font-size:16px; font-weight:800; margin:0;">सार्वजनिक बांधकाम विभाग</h1>' +
-        '<h2 style="font-size:13px; font-weight:700; margin:3px 0;">' + reportTitle + ' (एकूण: ' + totalCount + ' | लहान: ' + smallCount + ', मोठी: ' + bigCount + ')</h2>' +
-        '</div>' +
-        '<div style="text-align:right; font-size:11px; margin-top:5px;"><strong>अहवाल दिनांक:</strong> ' + todayStr + '</div>' +
-        '</div>';
+    // फक्त मुख्य मजकूर (हेडिंग printA4Document आपोआप घेईल)
+    var html = '<div style="font-size:13px; font-weight:700; margin-bottom:10px; color:#0d47a1;">' + reportTitle + ' (एकूण: ' + totalCount + ' | लहान: ' + smallCount + ', मोठी: ' + bigCount + ')</div>';
 
     var globalIndex = 1;
     for (var mainKey in groups) {
@@ -321,6 +316,7 @@ function printQuickModalReport() {
         }
     }
 
+    // आपोआप हेडिंग + अहवाल दिनांक प्रिंट करण्यासाठी printA4Document ला कॉल करा
     if (typeof printA4Document === 'function') {
         printA4Document(html, currentQuickModalType + '_Report_' + todayStr.replace(/\//g, '-') + '.pdf');
     } else {
