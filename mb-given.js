@@ -1,120 +1,61 @@
-// mb-given.js - Given M.B., JE Holdings, and Stock Management Logic
-
-function normalizeMB(no) {
-    if (!no) return '';
-    return String(no).trim().replace(/^0+/, '');
-}
+// mb-given.js - Given M.B., JE Holdings Logic
 
 function getCurrentlyActiveGivenMBs() {
     var allMBs = getData('mb_records');
-    var statusMap = {};
+    var latestMap = {};
     allMBs.forEach(function(m) {
-        var no = (m.mbNumber || '').trim();
-        var norm = normalizeMB(no);
-        if (!norm) return;
-        var isGiven = (m.actionType === 'दिलेली M.B.' || m.actionType === 'दिलेली एमबी');
-        var isReceived = (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी');
+        var norm = normalizeMB(m.mbNumber);
+        if (norm) latestMap[norm] = m;
+    });
+    var list = [];
+    for (var norm in latestMap) {
+        var m = latestMap[norm];
+        if (m.actionType === 'दिलेली M.B.' || m.actionType === 'दिलेली एमबी') list.push(m);
+    }
+    return list;
+}
 
-        if (!statusMap[norm]) {
-            statusMap[norm] = { lastAction: '', date: '', detail: '', source: '', size: m.size || 'लहान M.B.', mbNumber: no };
-        }
-        if (isGiven) {
-            statusMap[norm].lastAction = 'दिलेली M.B.';
-            statusMap[norm].date = m.date;
-            statusMap[norm].detail = m.receivedDetail || '';
-            statusMap[norm].source = m.receivedSource || '';
-            statusMap[norm].size = m.size || statusMap[norm].size;
-        } else if (isReceived) {
-            statusMap[norm].lastAction = 'मिळालेली M.B.';
-            statusMap[norm].date = m.date;
-            statusMap[norm].detail = '';
-            statusMap[norm].source = m.receivedSource || '';
-            statusMap[norm].size = m.size || statusMap[norm].size;
+function getUniqueReceivedMBs(excludeIndex = -1) {
+    var allMBs = getData('mb_records');
+    var uniqueMap = {};
+    allMBs.forEach(function(m, i) {
+        if (i === excludeIndex) return;
+        var isRcv = (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी');
+        if (isRcv) {
+            var no = (m.mbNumber || '').trim();
+            var norm = normalizeMB(no);
+            if (norm && !uniqueMap[norm]) {
+                uniqueMap[norm] = {
+                    mbNumber: no,
+                    size: m.size || 'लहान M.B.',
+                    date: m.date,
+                    receivedSource: m.receivedSource || m.receivedFrom || '-',
+                    receivedDetail: m.receivedDetail || '-'
+                };
+            }
         }
     });
-
-    var activeList = [];
-    for (var norm in statusMap) {
-        var st = statusMap[norm];
-        if (st.lastAction === 'दिलेली M.B.') {
-            activeList.push({
-                mbNumber: st.mbNumber,
-                size: st.size,
-                date: st.date,
-                recipient: st.detail || st.source
-            });
-        }
+    var list = [];
+    for (var k in uniqueMap) {
+        list.push(uniqueMap[k]);
     }
-    return activeList;
+    return list;
 }
 
 function getCurrentlyHeldMBsByJE(jeName) {
-    var givenList = getCurrentlyActiveGivenMBs();
-    var stock = getAvailableStock();
-    var availMap = {};
-    stock.forEach(function(s){ availMap[normalizeMB(s.mbNumber)] = true; });
-
-    return givenList.filter(function(g){
-        var norm = normalizeMB(g.mbNumber);
-        if (availMap[norm]) return false;
-        var recip = (g.recipient || '').toLowerCase();
-        var target = (jeName || '').toLowerCase();
-        return recip.includes(target);
-    });
-}
-
-function getAvailableStock() {
-    var allMBs = getData('mb_records');
-    var map = {};
-    allMBs.forEach(function(m) {
-        var no = (m.mbNumber || '').trim();
-    var norm = normalizeMB(no);
-        if (!norm) return;
-        var isGiven = (m.actionType === 'दिलेली M.B.' || m.actionType === 'दिलेली एमबी');
-        var isReceived = (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी');
-
-        if (!map[norm]) {
-            map[norm] = { isAvailable: true, size: m.size || 'लहान M.B.', mbNumber: no, date: m.date };
-        }
-        if (isGiven) {
-            map[norm].isAvailable = false;
-        } else if (isReceived) {
-            map[norm].isAvailable = true;
-            map[norm].size = m.size || map[norm].size;
-            map[norm].date = m.date;
-        }
-    });
-
-    var stock = [];
-    for (var norm in map) {
-        if (map[norm].isAvailable) {
-            stock.push({
-                mbNumber: map[norm].mbNumber,
-                size: map[norm].size,
-                date: map[norm].date
-            });
-        }
-    }
-    return stock;
-}
-
-function getLatestMBStatus(mbNo) {
-    var allMBs = getData('mb_records');
-    var normTarget = normalizeMB(mbNo);
-    var latest = null;
-    allMBs.forEach(function(m, idx) {
-        var no = (m.mbNumber || '').trim();
-        if (normalizeMB(no) === normTarget) {
-            latest = {
-                index: idx,
-                mbNumber: no,
-                size: m.size || 'लहान M.B.',
-                lastAction: m.actionType,
-                date: m.date,
-                detail: m.receivedDetail || '',
-                source: m.receivedSource || m.receivedFrom || ''
-            };
-        }
-    });
-    return latest;
+    if (!jeName) return [];
+    var active = getCurrentlyActiveGivenMBs();
+    var target = String(jeName).trim().toLowerCase();
+    return active
+        .filter(function(item) {
+            var detail = String(item.receivedDetail || '').trim().toLowerCase();
+            var source = String(item.receivedSource || '').trim().toLowerCase();
+            if (detail === target) return true;
+            if (source === target) return true;
+            if (detail.indexOf(target) !== -1 && detail.split(/\s+/).length <= target.split(/\s+/).length + 3) return true;
+            return false;
+        })
+        .map(function(item) {
+            return { mbNo: item.mbNumber, size: item.size || 'लहान M.B.', date: item.date };
+        });
 }
