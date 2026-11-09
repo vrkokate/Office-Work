@@ -392,19 +392,11 @@ function printHistoryReport() {
     if (typeof printA4Document === 'function') {
         printA4Document(html, 'History_Report_' + new Date().toISOString().slice(0,10) + '.pdf');
     } else {
-        let printableArea = document.getElementById("printableArea");
-        const previousTitle = document.title;
-        const reportTitle = "History_Report_" + new Date().toISOString().slice(0,10) + ".pdf";
-        printableArea.innerHTML = html;
-        document.title = reportTitle;
-        window.print();
-        const restoreHistoryPrint = () => {
-            printableArea.innerHTML = "";
-            document.title = previousTitle;
-            window.removeEventListener("afterprint", restoreHistoryPrint);
-        };
-        window.addEventListener("afterprint", restoreHistoryPrint);
-        setTimeout(restoreHistoryPrint, 30000);
+        let printWindow = window.open('', '_blank');
+        printWindow.document.write('<html><head><title>History Report</title><style>@page { size: A4 portrait; margin: 10mm; } body { font-family: Arial, sans-serif; font-size: 10pt; } .print-table { width: 100%; border-collapse: collapse; } .print-table th, .print-table td { border: 1px solid #333; padding: 5px; } .print-table th { background: #eee; }</style></head><body>' + html + '</body></html>');
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(function(){ printWindow.print(); printWindow.close(); }, 300);
     }
 }
 
