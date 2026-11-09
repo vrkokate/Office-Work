@@ -162,18 +162,96 @@
 <div id="mbModal" class="modal-overlay"><div class="modal-card">
 <div class="modal-header"><h3 style="font-size:14px; color:#2e7d32;">📖 मोजमाप पुस्तिका (M.B.) नोंद</h3><button class="btn-close" onclick="closeModule('mbModal')">X</button></div>
 <input type="hidden" id="editMBIndex" value="-1">
-<div class="form-group"><label>नोंद प्रकार निवडा *</label><select class="form-control" id="mbActionType" onchange="onMBActionTypeChange()"><option value="">-- नोंद प्रकार --</option><option value="मिळालेली M.B.">मिळालेली M.B.</option><option value="दिलेली M.B.">दिलेली M.B.</option></select></div>
-<div class="form-group" id="receivedMainGroup" style="display:none;"><label>कोणाकडून मिळाली? *</label><select class="form-control" id="mbReceivedType" onchange="onMBReceivedTypeChange()"><option value="">-- निवडा --</option><option value="नवीन">नवीन</option><option value="चालू">चालू</option></select></div>
-<div class="form-group" id="bhandarpalGroup" style="display:none;"><label>भांडारपाल / स्त्रोत *</label><input type="text" class="form-control" id="bhandarpalNameInput" placeholder="नाव टाईप करा"></div>
-<div class="form-group" id="groupMBSizeSelect" style="display:none;"><label>M.B. आकार *</label><select class="form-control" id="newMBSize" onchange="onMBSizeChange()"><option value="">-- आकार --</option><option value="लहान M.B.">लहान M.B.</option><option value="मोठी M.B.">मोठी M.B.</option></select></div>
-<div class="form-group" id="groupMBInput" style="display:none; position:relative;"><label>नवीन M.B. क्रमांक *</label><input type="text" class="form-control" id="newMBNo" placeholder="उदा. 015750" oninput="checkRealTimeMBInput(this)"><div id="mbRealtimeStatus" style="font-size:11.5px; margin-top:3px; display:none;"></div></div>
-<div class="form-group" id="groupMBSelect" style="display:none;"><label>उपलब्ध M.B. निवडा *</label><select class="form-control" id="selectAvailableMB" onchange="onSelectAvailableMBChange()"><option value="">-- निवडा --</option></select></div>
-<div class="form-group" id="givenRecipientGroup" style="display:none;"><label>कोणाला दिली? *</label><select class="form-control" id="mbGivenRecipientType" onchange="onMBGivenRecipientTypeChange()"><option value="">-- निवडा --</option><option value="JE">कनिष्ठ अभियंता (JE)</option><option value="Office">विभागीय कार्यालय</option></select></div>
-<div class="form-group" id="givenJEGroup" style="display:none;"><label>कनिष्ठ अभियंता (JE) निवडा *</label><select class="form-control" id="selectGivenJE"><option value="">-- निवडा --</option></select></div>
-<div class="form-group" id="givenOfficeGroup" style="display:none;"><label>विभागीय कार्यालय नाव *</label><input type="text" class="form-control" id="givenOfficeInput" placeholder="कार्यालय नाव"></div>
-<div class="form-group"><label>दिनांक *</label><input type="date" class="form-control" id="newMBDate"></div>
-<div style="display:flex; gap:6px;"><button id="btnSaveMB" class="btn-report" style="background:#2e7d32; flex:1;" onclick="saveOrUpdateMB()">Save Entry</button><button id="btnCancelMB" class="btn-report" style="background:#757575; width:80px; display:none;" onclick="cancelMBEdit()">रद्द करा</button></div>
-<div class="table-scroll-box"><table class="data-table"><thead><tr><th>अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>हस्तांतरण</th><th style="width:25%; text-align:center;">Action</th></tr></thead><tbody id="mbListBody"></tbody></table></div>
+
+<div class="form-group">
+<label>नोंद प्रकार निवडा *</label>
+<select class="form-control" id="mbActionType" onchange="onMBActionTypeChange()">
+<option value="">-- नोंद प्रकार --</option>
+<option value="मिळालेली M.B.">मिळालेली M.B.</option>
+<option value="दिलेली M.B.">दिलेली M.B.</option>
+</select>
+</div>
+
+<!-- १. मिळालेली M.B. साठीचा फॉर्म (Wrapper) -->
+<div id="receivedFlowWrapper" style="display:none;">
+    <div class="form-group" id="receivedMainGroup">
+        <label>कोणाकडून मिळाली? *</label>
+        <select class="form-control" id="mbReceivedType" onchange="onMBReceivedTypeChange()">
+            <option value="">-- निवडा --</option>
+            <option value="नवीन">नवीन</option>
+            <option value="चालू">चालू</option>
+        </select>
+    </div>
+    
+    <div class="form-group" id="bhandarpalGroup" style="display:none;">
+        <label>भांडारपाल / स्त्रोत *</label>
+        <input type="text" class="form-control" id="bhandarpalNameInput" placeholder="नाव टाईप करा">
+    </div>
+    
+    <div class="form-group" id="groupMBSizeSelect">
+        <label>M.B. आकार *</label>
+        <select class="form-control" id="newMBSize" onchange="onMBSizeChange()">
+            <option value="">-- आकार --</option>
+            <option value="लहान M.B.">लहान M.B.</option>
+            <option value="मोठी M.B.">मोठी M.B.</option>
+        </select>
+    </div>
+    
+    <div class="form-group" id="groupMBInput" style="display:none; position:relative;">
+        <label>नवीन M.B. क्रमांक *</label>
+        <input type="text" class="form-control" id="newMBNo" placeholder="उदा. 015750" oninput="checkRealTimeMBInput(this)">
+        <div id="mbRealtimeStatus" style="font-size:11.5px; margin-top:3px; display:none;"></div>
+    </div>
+</div>
+
+<!-- २. दिलेली M.B. साठीचा फॉर्म (Wrapper) -->
+<div id="givenFlowWrapper" style="display:none;">
+    <div class="form-group" id="groupMBSelect">
+        <label>उपलब्ध M.B. निवडा *</label>
+        <select class="form-control" id="selectAvailableMB" onchange="onSelectAvailableMBChange()">
+            <option value="">-- निवडा --</option>
+        </select>
+    </div>
+    
+    <div class="form-group" id="givenRecipientGroup">
+        <label>कोणाला दिली? *</label>
+        <select class="form-control" id="mbGivenRecipientType" onchange="onMBGivenRecipientTypeChange()">
+            <option value="">-- निवडा --</option>
+            <option value="JE">कनिष्ठ अभियंता (JE)</option>
+            <option value="Office">विभागीय कार्यालय</option>
+        </select>
+    </div>
+    
+    <div class="form-group" id="givenJEGroup" style="display:none;">
+        <label>कनिष्ठ अभियंता (JE) निवडा *</label>
+        <select class="form-control" id="selectGivenJE">
+            <option value="">-- निवडा --</option>
+        </select>
+    </div>
+    
+    <div class="form-group" id="givenOfficeGroup" style="display:none;">
+        <label>विभागीय कार्यालय नाव *</label>
+        <input type="text" class="form-control" id="givenOfficeInput" placeholder="कार्यालय नाव">
+    </div>
+</div>
+
+<!-- ३. दिनांक नेहमी शेवटी -->
+<div class="form-group">
+<label>दिनांक *</label>
+<input type="date" class="form-control" id="newMBDate">
+</div>
+
+<div style="display:flex; gap:6px;">
+<button id="btnSaveMB" class="btn-report" style="background:#2e7d32; flex:1;" onclick="saveOrUpdateMB()">Save Entry</button>
+<button id="btnCancelMB" class="btn-report" style="background:#757575; width:80px; display:none;" onclick="cancelMBEdit()">रद्द करा</button>
+</div>
+
+<div class="table-scroll-box">
+<table class="data-table">
+<thead><tr><th>अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>साईज</th><th>हस्तांतरण</th><th style="width:25%; text-align:center;">Action</th></tr></thead>
+<tbody id="mbListBody"></tbody>
+</table>
+</div>
 <button class="btn-report" style="background:#0d47a1; margin-top:12px;" onclick="printMBReport()">📄 REPORT / PRINT</button>
 </div></div>
 
@@ -199,9 +277,8 @@
 <div class="sum-card-clickable net" onclick="openDetailPopup('NET_PAYABLE')"><div class="label" style="font-size:11px; color:#666;">Net Payable</div><div class="val" style="font-size:16px; font-weight:700; color:#16a34a;" id="sumNetPay">₹ 0</div></div>
 </div>
 <div style="display:flex; gap:8px; margin-bottom:12px;">
-<!-- नवीन देयक नोंदवा बटन येथे BillRegister.html ला रिडायरेक्ट केले आहे -->
 <button type="button" class="btn-report" style="background:#f97316; margin:0; flex:1;" onclick="window.location.href='BillRegister.html'"><i class="fa-solid fa-plus"></i> नवीन देयक नोंदवा</button>
-<button type="button" class="btn-report" style="background:#1d4ed8; margin:0; flex:1;" onclick="printMasterBillReport()">🖨️ प्रिंट / पीडीएफ रिपोर्ट</button>
+<button type="button" class="btn-report" style="background:#1d4ed8; margin:0; flex:1;" onclick="window.location.href='BillRegister.html'">🖨️ प्रिंट / पीडीएफ रिपोर्ट</button>
 </div>
 <div class="bill-scroll-container" id="billListContainer"><div style="text-align:center; padding:15px; color:#666; font-size:12px;">कोणतीही नोंद उपलब्ध नाही.</div></div>
 </div></div>
@@ -218,7 +295,6 @@
 </div>
 <div id="printableArea" style="display:none;"></div>
 
-<!-- ✅ येथे mb-given.js आणि mb-available.js योग्य क्रमाने ॲड केले आहेत -->
 <script src="app-shell.js"></script>
 <script src="common.js"></script>
 <script src="mb-given.js"></script>
@@ -309,48 +385,74 @@ function printJEReport() {
     printA4Document(html, 'JE_Report.pdf');
 }
 
-/* ---- M.B. Management ---- */
+/* ---- M.B. Management (FIXED WORKFLOW) ---- */
 function onMBActionTypeChange() {
     var type = document.getElementById('mbActionType').value;
-    var receivedMain = document.getElementById('receivedMainGroup');
-    var bhandarpalGroup = document.getElementById('bhandarpalGroup');
-    var groupMBSizeSelect = document.getElementById('groupMBSizeSelect');
-    var groupMBInput = document.getElementById('groupMBInput');
-    var groupMBSelect = document.getElementById('groupMBSelect');
-    var givenRecipientGroup = document.getElementById('givenRecipientGroup');
-    var givenJEGroup = document.getElementById('givenJEGroup');
-    var givenOfficeGroup = document.getElementById('givenOfficeGroup');
-    receivedMain.style.display = 'none'; bhandarpalGroup.style.display = 'none';
-    groupMBSizeSelect.style.display = 'none'; groupMBInput.style.display = 'none';
-    groupMBSelect.style.display = 'none'; givenRecipientGroup.style.display = 'none';
-    givenJEGroup.style.display = 'none'; givenOfficeGroup.style.display = 'none';
-    if (type === 'मिळालेली M.B.') { receivedMain.style.display = 'block'; groupMBSizeSelect.style.display = 'block'; }
+    var receivedFlow = document.getElementById('receivedFlowWrapper');
+    var givenFlow = document.getElementById('givenFlowWrapper');
+    
+    // Hide both initially
+    receivedFlow.style.display = 'none';
+    givenFlow.style.display = 'none';
+
+    // Reset sub-fields
+    document.getElementById('bhandarpalGroup').style.display = 'none';
+    document.getElementById('groupMBInput').style.display = 'none';
+    document.getElementById('givenJEGroup').style.display = 'none';
+    document.getElementById('givenOfficeGroup').style.display = 'none';
+
+    if (type === 'मिळालेली M.B.') {
+        receivedFlow.style.display = 'block';
+        // Sequence inside receivedFlow: receivedMainGroup -> bhandarpalGroup (if चालू) -> groupMBSizeSelect -> groupMBInput
+    } 
     else if (type === 'दिलेली M.B.') {
-        groupMBSelect.style.display = 'block'; givenRecipientGroup.style.display = 'block';
+        givenFlow.style.display = 'block';
         var stock = getAvailableStock(); var sel = document.getElementById('selectAvailableMB');
         sel.innerHTML = '<option value="">-- निवडा --</option>';
-        stock.forEach(function(m) { sel.add(new Option(m.mbNumber + ' (' + m.size + ')', m.mbNumber)); });
+        if(stock && stock.length > 0) {
+            stock.forEach(function(m) { sel.add(new Option(m.mbNumber + ' (' + m.size + ')', m.mbNumber)); });
+        }
     }
 }
+
 function onMBReceivedTypeChange() {
     var type = document.getElementById('mbReceivedType').value;
     var bhandarpalGroup = document.getElementById('bhandarpalGroup');
     var groupMBSizeSelect = document.getElementById('groupMBSizeSelect');
     var groupMBInput = document.getElementById('groupMBInput');
-    if (type === 'नवीन') { bhandarpalGroup.style.display = 'none'; groupMBSizeSelect.style.display = 'block'; groupMBInput.style.display = 'none'; }
-    else if (type === 'चालू') { bhandarpalGroup.style.display = 'block'; groupMBSizeSelect.style.display = 'block'; groupMBInput.style.display = 'none'; }
+    
+    if (type === 'नवीन') { 
+        bhandarpalGroup.style.display = 'none'; 
+        groupMBSizeSelect.style.display = 'block'; 
+        groupMBInput.style.display = 'none'; 
+    }
+    else if (type === 'चालू') { 
+        bhandarpalGroup.style.display = 'block'; 
+        groupMBSizeSelect.style.display = 'block'; 
+        groupMBInput.style.display = 'none'; 
+    }
 }
-function onMBSizeChange() { var size = document.getElementById('newMBSize').value; document.getElementById('groupMBInput').style.display = size ? 'block' : 'none'; }
+
+function onMBSizeChange() { 
+    var size = document.getElementById('newMBSize').value; 
+    document.getElementById('groupMBInput').style.display = size ? 'block' : 'none'; 
+}
+
 function onMBGivenRecipientTypeChange() {
     var type = document.getElementById('mbGivenRecipientType').value;
     var givenJEGroup = document.getElementById('givenJEGroup');
     var givenOfficeGroup = document.getElementById('givenOfficeGroup');
+    
     if (type === 'JE') {
         givenJEGroup.style.display = 'block'; givenOfficeGroup.style.display = 'none';
         var sel = document.getElementById('selectGivenJE'); sel.innerHTML = '<option value="">-- निवडा --</option>';
         getData('je_records').forEach(function(j) { sel.add(new Option(j.name, j.name)); });
-    } else if (type === 'Office') { givenJEGroup.style.display = 'none'; givenOfficeGroup.style.display = 'block'; }
+    } else if (type === 'Office') { 
+        givenJEGroup.style.display = 'none'; 
+        givenOfficeGroup.style.display = 'block'; 
+    }
 }
+
 function checkRealTimeMBInput(input) {
     var val = input.value.trim();
     var status = document.getElementById('mbRealtimeStatus');
@@ -360,27 +462,34 @@ function checkRealTimeMBInput(input) {
     status.innerText = exists ? '⚠️ हा M.B. क्रमांक आधीच अस्तित्वात आहे.' : '✅ हा M.B. क्रमांक नवीन आहे.';
     status.style.color = exists ? '#d32f2f' : '#2e7d32';
 }
+
 function onSelectAvailableMBChange() { /* no-op */ }
+
 function saveOrUpdateMB() {
     var type = document.getElementById('mbActionType').value;
     var dt = document.getElementById('newMBDate').value;
     var idx = parseInt(document.getElementById('editMBIndex').value, 10);
+    
     if (!type || !dt) return showCustomAlert('कृपया नोंद प्रकार आणि दिनांक निवडा.');
     var mbList = getData('mb_records');
     var record = { actionType: type, date: dt };
+    
     if (type === 'मिळालेली M.B.') {
         var recvType = document.getElementById('mbReceivedType').value;
-        if (!recvType) return showCustomAlert('कृपया प्राप्तीचा प्रकार निवडा.');
+        if (!recvType) return showCustomAlert('कृपया प्राप्तीचा प्रकार (कोणाकडून) निवडा.');
         var size = document.getElementById('newMBSize').value;
+        if (!size) return showCustomAlert('कृपया M.B. आकार निवडा.');
         var mbNo = document.getElementById('newMBNo').value.trim();
-        if (!size || !mbNo) return showCustomAlert('कृपया M.B. आकार आणि क्रमांक भरा.');
-        record.mbNumber = mbNo; record.size = size;
+        if (!mbNo) return showCustomAlert('कृपया M.B. क्रमांक भरा.');
+        
+        record.mbNumber = mbNo; 
+        record.size = size;
         record.receivedSource = recvType === 'नवीन' ? 'भांडारपाल' : 'विभागीय कार्यालय';
         record.receivedDetail = recvType === 'नवीन' ? document.getElementById('bhandarpalNameInput').value.trim() : 'कार्यालयात जमा';
         record.receivedFrom = recvType === 'नवीन' ? 'भांडारपाल' : 'विभागीय कार्यालय';
     } else if (type === 'दिलेली M.B.') {
         var mbNoSel = document.getElementById('selectAvailableMB').value;
-        if (!mbNoSel) return showCustomAlert('कृपया M.B. निवडा.');
+        if (!mbNoSel) return showCustomAlert('कृपया उपलब्ध M.B. निवडा.');
         var latest = getLatestMBStatus(mbNoSel);
         record.mbNumber = mbNoSel;
         record.size = latest ? latest.size : 'लहान M.B.';
@@ -398,18 +507,21 @@ function saveOrUpdateMB() {
             record.receivedFrom = 'कार्यालयाला दिली';
         }
     }
+    
     if (idx === -1) mbList.push(record); else mbList[idx] = record;
     setData('mb_records', mbList);
     cancelMBEdit();
     refreshMBDashboard();
     showCustomAlert('M.B. नोंद जतन झाली!');
 }
+
 function editMB(idx) {
     var rec = getData('mb_records')[idx];
     if (!rec) return;
     document.getElementById('editMBIndex').value = idx;
     document.getElementById('mbActionType').value = rec.actionType;
     onMBActionTypeChange();
+    
     document.getElementById('newMBDate').value = rec.date || '';
     if (rec.actionType === 'मिळालेली M.B.') {
         document.getElementById('mbReceivedType').value = rec.receivedSource === 'भांडारपाल' ? 'नवीन' : 'चालू';
@@ -417,6 +529,9 @@ function editMB(idx) {
         document.getElementById('newMBSize').value = rec.size || '';
         onMBSizeChange();
         document.getElementById('newMBNo').value = rec.mbNumber || '';
+        if(rec.receivedSource === 'भांडारपाल') {
+             document.getElementById('bhandarpalNameInput').value = rec.receivedDetail || '';
+        }
     } else {
         document.getElementById('selectAvailableMB').value = rec.mbNumber || '';
         document.getElementById('mbGivenRecipientType').value = rec.receivedSource === 'JE' ? 'JE' : 'Office';
@@ -427,20 +542,26 @@ function editMB(idx) {
     document.getElementById('btnSaveMB').innerText = 'Update Entry';
     document.getElementById('btnCancelMB').style.display = 'block';
 }
+
 function cancelMBEdit() {
     document.getElementById('editMBIndex').value = '-1';
     document.getElementById('mbActionType').value = '';
+    
     document.getElementById('newMBDate').value = '';
     document.getElementById('mbReceivedType').value = '';
     document.getElementById('newMBSize').value = '';
     document.getElementById('newMBNo').value = '';
+    document.getElementById('bhandarpalNameInput').value = '';
+    
     document.getElementById('mbGivenRecipientType').value = '';
     document.getElementById('selectGivenJE').innerHTML = '<option value="">-- निवडा --</option>';
     document.getElementById('givenOfficeInput').value = '';
+    
     document.getElementById('btnSaveMB').innerText = 'Save Entry';
     document.getElementById('btnCancelMB').style.display = 'none';
     onMBActionTypeChange();
 }
+
 async function deleteMB(idx) {
     if (await window.appConfirm('ही M.B. नोंद हटवायची का?')) {
         var list = getData('mb_records'); list.splice(idx, 1);
@@ -548,14 +669,14 @@ function refreshBillDashboard() {
     }
     var c = document.getElementById('billListContainer'); if (c) c.innerHTML = listHTML;
 }
-function openDetailPopup(type) { window.location.href='BillRegister.html'; } // Redirect for details
+function openDetailPopup(type) { window.location.href='BillRegister.html'; }
 async function deleteBill(idx) {
     if (await window.appConfirm('ही देयक नोंद हटवायची का?')) {
         var bills = getData('dmbms_bills'); bills.splice(idx, 1); setData('dmbms_bills', bills);
         refreshBillDashboard(); refreshMBDashboard(); showCustomAlert('देयक हटवले!');
     }
 }
-function printMasterBillReport() { window.location.href='BillRegister.html'; } // Redirect for print
+function printMasterBillReport() { window.location.href='BillRegister.html'; }
 
 /* ---- Assign ---- */
 function refreshAssignList() {
