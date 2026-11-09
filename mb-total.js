@@ -1,4 +1,4 @@
-// mb-total.js - Total, Given, and Available M.B. Dashboards
+// mb-total.js - Total, Given, and Available M.B. Dashboards, Fixed Filters
 
 var currentQuickModalType = '';
 
@@ -34,38 +34,15 @@ function refreshMBDashboard() {
     animateNumberCount('countAvailableMB', getAvailableStock().length);
 }
 
-function getUniqueReceivedMBs(excludeIndex = -1) {
-    var allMBs = getData('mb_records');
-    var uniqueMap = {};
-    allMBs.forEach(function(m, i) {
-        if (i === excludeIndex) return;
-        var isRcv = (m.actionType === 'मिळालेली M.B.' || m.actionType === 'मिळालेली एमबी');
-        if (isRcv) {
-            var no = (m.mbNumber || '').trim();
-            var norm = normalizeMB(no);
-            if (norm && !uniqueMap[norm]) {
-                uniqueMap[norm] = {
-                    mbNumber: no,
-                    size: m.size || 'लहान M.B.',
-                    date: m.date,
-                    receivedSource: m.receivedSource || m.receivedFrom || '-',
-                    receivedDetail: m.receivedDetail || '-'
-                };
-            }
-        }
-    });
-    var list = [];
-    for (var k in uniqueMap) {
-        list.push(uniqueMap[k]);
-    }
-    return list;
-}
-
 function getFilteredReceivedMBs() {
     var list = getUniqueReceivedMBs();
-    var fSource = document.getElementById('qmFilterSource') ? document.getElementById('qmFilterSource').value : '';
-    var fSize = document.getElementById('qmFilterSize') ? document.getElementById('qmFilterSize').value : '';
-    var fJe = document.getElementById('qmFilterJE') ? document.getElementById('qmFilterJE').value : '';
+    var fSourceEl = document.getElementById('qmFilterSource');
+    var fSizeEl = document.getElementById('qmFilterSize');
+    var fJeEl = document.getElementById('qmFilterJE');
+
+    var fSource = fSourceEl ? fSourceEl.value.trim() : '';
+    var fSize = fSizeEl ? fSizeEl.value.trim() : '';
+    var fJe = fJeEl ? fJeEl.value.trim() : '';
 
     var stock = getAvailableStock();
     var isAvailableMap = {};
@@ -78,14 +55,15 @@ function getFilteredReceivedMBs() {
         var holder = getMBDisplayHolder(statusObj, isAvail);
         if(holder) holder = holder.replace(/^(श्री\.?\s*)+/gi, 'श्री. ').trim();
 
-        if (fSource && fSource !== 'सर्व (All)') {
+        // सुरक्षित फिल्टर तपासणी (Space/Mismatch टाळण्यासाठी)
+        if (fSource && fSource !== 'सर्व (All)' && fSource !== 'सर्व') {
             var src = (m.receivedSource || m.receivedFrom || '').toLowerCase();
             if (!src.includes(fSource.toLowerCase())) return false;
         }
-        if (fSize && fSize !== 'सर्व M.B.') {
+        if (fSize && fSize !== 'सर्व M.B.' && fSize !== 'सर्व') {
             if (m.size !== fSize) return false;
         }
-        if (fJe && fJe !== 'सर्व JE') {
+        if (fJe && fJe !== 'सर्व JE' && fJe !== 'सर्व') {
             if (!holder.includes(fJe)) return false;
         }
         return true;
@@ -94,8 +72,11 @@ function getFilteredReceivedMBs() {
 
 function getFilteredGivenMBs() {
     var list = getCurrentlyActiveGivenMBs();
-    var fSize = document.getElementById('qmFilterSize') ? document.getElementById('qmFilterSize').value : '';
-    var fJe = document.getElementById('qmFilterJE') ? document.getElementById('qmFilterJE').value : '';
+    var fSizeEl = document.getElementById('qmFilterSize');
+    var fJeEl = document.getElementById('qmFilterJE');
+
+    var fSize = fSizeEl ? fSizeEl.value.trim() : '';
+    var fJe = fJeEl ? fJeEl.value.trim() : '';
 
     return list.filter(function(m) {
         var rawNo = (m.mbNumber || m.mbNo || '').trim();
@@ -103,10 +84,10 @@ function getFilteredGivenMBs() {
         var holder = getMBDisplayHolder(statusObj, false);
         if(holder) holder = holder.replace(/^(श्री\.?\s*)+/gi, 'श्री. ').trim();
 
-        if (fSize && fSize !== 'सर्व M.B.') {
+        if (fSize && fSize !== 'सर्व M.B.' && fSize !== 'सर्व') {
             if (m.size !== fSize) return false;
         }
-        if (fJe && fJe !== 'सर्व JE') {
+        if (fJe && fJe !== 'सर्व JE' && fJe !== 'सर्व') {
             if (!holder.includes(fJe)) return false;
         }
         return true;
@@ -115,10 +96,11 @@ function getFilteredGivenMBs() {
 
 function getFilteredAvailableMBs() {
     var list = getAvailableStock();
-    var fSize = document.getElementById('qmFilterSize') ? document.getElementById('qmFilterSize').value : '';
+    var fSizeEl = document.getElementById('qmFilterSize');
+    var fSize = fSizeEl ? fSizeEl.value.trim() : '';
 
     return list.filter(function(m) {
-        if (fSize && fSize !== 'सर्व M.B.') {
+        if (fSize && fSize !== 'सर्व M.B.' && fSize !== 'सर्व') {
             var sizeStr = m.size || 'लहान M.B.';
             if (sizeStr !== fSize) return false;
         }
