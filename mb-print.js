@@ -1,4 +1,3 @@
-
 // mb-print.js - Isolated, clean M.B. reports and A4 printing
 // Printing is performed in a separate document. The live dashboard DOM,
 // modal state, and LocalStorage records are never modified by this module.
@@ -8,13 +7,7 @@
 
     function mbPrintEscape(value) {
         return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
-            return {
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#39;"
-            }[ch];
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
         });
     }
 
