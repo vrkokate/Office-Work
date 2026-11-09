@@ -1,98 +1,65 @@
 // mb-total.js - Total, Given, and Available M.B. Dashboards & Calculations
-// Optimized with strict Data Validation to prevent TypeErrors.
+// Optimized with strict Data Validation to prevent TypeErrors and isolated printing.
 
 var currentQuickModalType = '';
 
-// सुरक्षित संख्यात्मक ॲनिमेशन (Safe Number Animation)
 function animateNumberCount(elementId, finalVal) {
     var el = document.getElementById(elementId);
     if (!el) return;
-    
-    // NaN किंवा Undefined असल्यास ० दाखवा
     var targetValue = parseInt(finalVal, 10);
     if (isNaN(targetValue) || targetValue < 0) targetValue = 0;
-
-    if (targetValue === 0) { 
-        el.innerText = '0'; 
-        return; 
-    }
+    if (targetValue === 0) { el.innerText = '0'; return; }
 
     var startVal = 0, duration = 1600, startTime = null;
-    
     function step(timestamp) {
         if (!startTime) startTime = timestamp;
         var progress = timestamp - startTime;
         var percentage = Math.min(progress / duration, 1);
         var easePercentage = (percentage === 1) ? 1 : 1 - Math.pow(2, -10 * percentage);
         el.innerText = Math.floor(startVal + (targetValue - startVal) * easePercentage);
-        if (progress < duration) {
-            requestAnimationFrame(step);
-        } else {
-            el.innerText = targetValue;
-        }
+        if (progress < duration) requestAnimationFrame(step);
+        else el.innerText = targetValue;
     }
     requestAnimationFrame(step);
 }
 
-// डॅशबोर्ड रिफ्रेश (फक्त एकदाच डेटा वाचून अचूक काउंट्स)
 function refreshMBDashboard() {
     var rawList = getData('mb_records');
     var list = Array.isArray(rawList) ? rawList : [];
-    
     var tbody = document.getElementById('mbListBody'); 
     if(tbody) {
         var rowsHtml = [];
         list.forEach(function(m, idx) {
-            if(!m) return; // Null रेकॉर्ड सोडून द्या
-            
+            if(!m) return;
             var dateStr = typeof formatDateToDMY === 'function' ? formatDateToDMY(m.date) : (m.date || '-');
             var mbNoStr = m.mbNumber ? escapeHtml(m.mbNumber) : '-';
             var sizeStr = m.size ? escapeHtml(m.size) : '-';
             var fromStr = m.receivedFrom ? escapeHtml(m.receivedFrom) : '-';
             
-            rowsHtml.push('<tr>' +
-                '<td>' + (idx+1) + '</td>' +
-                '<td>' + dateStr + '</td>' +
-                '<td>' + mbNoStr + '</td>' +
-                '<td>' + sizeStr + '</td>' +
-                '<td>' + fromStr + '</td>' +
-                '<td class="action-cell">' +
-                '<button class="btn-action" style="background:#2e7d32;" onclick="editMB(' + idx + ')">Edit</button>' +
-                '<button class="btn-action" style="background:#d32f2f;" onclick="deleteMB(' + idx + ')">Delete</button>' +
-                '</td></tr>');
+            rowsHtml.push('<tr><td>' + (idx+1) + '</td><td>' + dateStr + '</td><td>' + mbNoStr + '</td><td>' + sizeStr + '</td><td>' + fromStr + '</td><td class="action-cell"><button class="btn-action" style="background:#2e7d32;" onclick="editMB(' + idx + ')">Edit</button><button class="btn-action" style="background:#d32f2f;" onclick="deleteMB(' + idx + ')">Delete</button></td></tr>');
         });
-        
         tbody.innerHTML = rowsHtml.length > 0 ? rowsHtml.join('') : '<tr><td colspan="6" style="text-align:center; color:#777;">कोणतीही नोंद उपलब्ध नाही.</td></tr>';
     }
-
-    // फंक्शन्स अस्तित्वात असल्यासच काउंट्स काढा (Safe check)
     var totalCount = typeof getUniqueReceivedMBs === 'function' ? (getUniqueReceivedMBs() || []).length : 0;
     var givenCount = typeof getCurrentlyActiveGivenMBs === 'function' ? (getCurrentlyActiveGivenMBs() || []).length : 0;
     var availCount = typeof getAvailableStock === 'function' ? (getAvailableStock() || []).length : 0;
-
     animateNumberCount('countReceivedMB', totalCount);
     animateNumberCount('countGivenMB', givenCount);
     animateNumberCount('countAvailableMB', availCount);
 }
 
-// फिल्टर केलेली मिळालेली M.B. (Received)
 function getFilteredReceivedMBs() {
     var list = typeof getUniqueReceivedMBs === 'function' ? getUniqueReceivedMBs() : [];
     if (!Array.isArray(list)) list = [];
-    
     var fSourceEl = document.getElementById('qmFilterSource');
     var fSizeEl = document.getElementById('qmFilterSize');
     var fJeEl = document.getElementById('qmFilterJE');
-
     var fSource = fSourceEl ? fSourceEl.value.trim() : '';
     var fSize = fSizeEl ? fSizeEl.value.trim() : '';
     var fJe = fJeEl ? fJeEl.value.trim() : '';
-
     var stock = typeof getAvailableStock === 'function' ? (getAvailableStock() || []) : [];
     var isAvailableMap = {};
-    stock.forEach(function(s) { 
-        if(s && s.mbNumber) isAvailableMap[normalizeMB(s.mbNumber)] = true; 
-    });
+    stock.forEach(function(s) { if(s && s.mbNumber) isAvailableMap[normalizeMB(s.mbNumber)] = true; });
 
     return list.filter(function(m) {
         if(!m) return false;
@@ -116,14 +83,11 @@ function getFilteredReceivedMBs() {
     });
 }
 
-// फिल्टर केलेली दिलेली M.B. (Given)
 function getFilteredGivenMBs() {
     var list = typeof getCurrentlyActiveGivenMBs === 'function' ? getCurrentlyActiveGivenMBs() : [];
     if (!Array.isArray(list)) list = [];
-
     var fSizeEl = document.getElementById('qmFilterSize');
     var fJeEl = document.getElementById('qmFilterJE');
-
     var fSize = fSizeEl ? fSizeEl.value.trim() : '';
     var fJe = fJeEl ? fJeEl.value.trim() : '';
 
@@ -133,7 +97,6 @@ function getFilteredGivenMBs() {
         var statusObj = typeof getLatestMBStatus === 'function' ? getLatestMBStatus(rawNo) : null;
         var holder = typeof getMBDisplayHolder === 'function' ? getMBDisplayHolder(statusObj, false) : '';
         if(holder) holder = holder.replace(/^(श्री\.?\s*)+/gi, 'श्री. ').trim();
-
         if (fSize && fSize !== 'सर्व M.B.' && fSize !== 'सर्व') {
             if (m.size !== fSize) return false;
         }
@@ -144,14 +107,11 @@ function getFilteredGivenMBs() {
     });
 }
 
-// फिल्टर केलेली उपलब्ध M.B. (Available)
 function getFilteredAvailableMBs() {
     var list = typeof getAvailableStock === 'function' ? getAvailableStock() : [];
     if (!Array.isArray(list)) list = [];
-
     var fSizeEl = document.getElementById('qmFilterSize');
     var fSize = fSizeEl ? fSizeEl.value.trim() : '';
-
     return list.filter(function(m) {
         if(!m) return false;
         if (fSize && fSize !== 'सर्व M.B.' && fSize !== 'सर्व') {
@@ -162,7 +122,6 @@ function getFilteredAvailableMBs() {
     });
 }
 
-// क्विक मोडलमधील टेबल रेंडर करणे
 function renderQuickModalTable() {
     var list = [];
     if (currentQuickModalType === 'RECEIVED' || currentQuickModalType === 'घेणेD') {
@@ -175,17 +134,9 @@ function renderQuickModalTable() {
 
     var stock = typeof getAvailableStock === 'function' ? (getAvailableStock() || []) : [];
     var isAvailableMap = {};
-    stock.forEach(function(s) { 
-        if(s && s.mbNumber) isAvailableMap[normalizeMB(s.mbNumber)] = true; 
-    });
+    stock.forEach(function(s) { if(s && s.mbNumber) isAvailableMap[normalizeMB(s.mbNumber)] = true; });
 
-    var html = '<table class="data-table"><thead><tr>' +
-    '<th style="text-align:center;">अ.क्र.</th>' +
-    '<th>M.B. क्र.</th>' +
-    '<th>साईज</th>' +
-    '<th>सद्यस्थिती</th>' +
-    '<th style="text-align:center;">Action</th>' +
-    '</tr></thead><tbody>';
+    var html = '<table class="data-table"><thead><tr><th style="text-align:center;">अ.क्र.</th><th>M.B. क्र.</th><th>साईज</th><th>सद्यस्थिती</th><th style="text-align:center;">Action</th></tr></thead><tbody>';
 
     if (list.length === 0) {
         html += '<tr><td colspan="5" style="text-align:center; padding:10px; color:#666;">कोणतीही नोंद उपलब्ध नाही.</td></tr>';
@@ -210,44 +161,24 @@ function renderQuickModalTable() {
             var allMBs = getData('mb_records') || [];
             var originalIdx = -1;
             for (var k = 0; k < allMBs.length; k++) {
-                if (allMBs[k] && normalizeMB(allMBs[k].mbNumber) === normNo) {
-                    originalIdx = k;
-                    break;
-                }
+                if (allMBs[k] && normalizeMB(allMBs[k].mbNumber) === normNo) { originalIdx = k; break; }
             }
 
             var sizeStr = m.size || 'लहान M.B.';
-
-            html += '<tr>' +
-            '<td style="text-align:center;">' + (i + 1) + '</td>' +
-            '<td><a href="javascript:void(0)" onclick="closeQuickInfoModal(); if(typeof closeSearchResultModal===\'function\') closeSearchResultModal(); openSmartActionCenter(\'' + escapeHtml(rawNo) + '\');" style="color:#0d47a1; font-weight:800; text-decoration:underline;">' + escapeHtml(rawNo) + '</a></td>' +
-            '<td>' + escapeHtml(sizeStr) + '</td>' +
-            '<td>' + statusText + '</td>' +
-            '<td class="action-cell" style="text-align:center;">' +
-            '<button class="btn-action" style="background:#2e7d32; padding:3px 6px;" onclick="closeQuickInfoModal(); openModule(\'mbModal\'); editMB(' + originalIdx + ')">Edit</button>' +
-            '<button class="btn-action" style="background:#d32f2f; padding:3px 6px;" onclick="quickPopupDelete(' + originalIdx + ')">Delete</button>' +
-            '</td>' +
-            '</tr>';
+            html += '<tr><td style="text-align:center;">' + (i + 1) + '</td><td><a href="javascript:void(0)" onclick="closeQuickInfoModal(); if(typeof closeSearchResultModal===\'function\') closeSearchResultModal(); openSmartActionCenter(\'' + escapeHtml(rawNo) + '\');" style="color:#0d47a1; font-weight:800; text-decoration:underline;">' + escapeHtml(rawNo) + '</a></td><td>' + escapeHtml(sizeStr) + '</td><td>' + statusText + '</td><td class="action-cell" style="text-align:center;"><button class="btn-action" style="background:#2e7d32; padding:3px 6px;" onclick="closeQuickInfoModal(); openModule(\'mbModal\'); editMB(' + originalIdx + ')">Edit</button><button class="btn-action" style="background:#d32f2f; padding:3px 6px;" onclick="quickPopupDelete(' + originalIdx + ')">Delete</button></td></tr>';
         });
     }
     html += '</tbody></table>';
-
     var container = document.getElementById('qmTableContainer');
     if (container) container.innerHTML = html;
 }
 
-// मुख्य मॉडल उघडणे
 function openQuickInfoModal(type) {
     currentQuickModalType = type;
-    
     var totalList = typeof getUniqueReceivedMBs === 'function' ? (getUniqueReceivedMBs() || []) : [];
     var totalCount = totalList.length;
     var smallCount = 0, bigCount = 0;
-    totalList.forEach(function(m) {
-        if (m && m.size === 'मोठी M.B.') bigCount++;
-        else smallCount++;
-    });
-
+    totalList.forEach(function(m) { if (m && m.size === 'मोठी M.B.') bigCount++; else smallCount++; });
     var givenList = typeof getCurrentlyActiveGivenMBs === 'function' ? (getCurrentlyActiveGivenMBs() || []) : [];
     var availList = typeof getAvailableStock === 'function' ? (getAvailableStock() || []) : [];
 
@@ -259,7 +190,6 @@ function openQuickInfoModal(type) {
     var jeMap = {};
     var jeRecords = getData('je_records') || [];
     jeRecords.forEach(function(j) { if(j && j.name) jeMap[j.name.replace(/^(श्री\.?\s*)+/gi, '').trim()] = true; });
-    
     var allMBs = getData('mb_records') || [];
     allMBs.forEach(function(m) {
         if(m && m.detail) jeMap[m.detail.replace(/^(श्री\.?\s*)+/gi, '').trim()] = true;
@@ -268,35 +198,21 @@ function openQuickInfoModal(type) {
 
     var jeOptions = '<option value="सर्व JE">सर्व JE</option>';
     for (var jeName in jeMap) {
-        if(jeName) {
-            jeOptions += '<option value="' + escapeHtml(jeName) + '">श्री. ' + escapeHtml(jeName) + '</option>';
-        }
+        if(jeName) jeOptions += '<option value="' + escapeHtml(jeName) + '">श्री. ' + escapeHtml(jeName) + '</option>';
     }
 
     var filterHTML = '<div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px; margin-bottom:8px; font-size:12px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04); flex-shrink:0;">' +
         '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">' +
-        '<div>' +
-        '<label style="display:block; font-weight:700; margin-bottom:3px; color:#0d47a1;">स्रोत:</label>' +
+        '<div><label style="display:block; font-weight:700; margin-bottom:3px; color:#0d47a1;">स्रोत:</label>' +
         '<select class="form-control" id="qmFilterSource" style="padding:6px; font-size:11.5px; border-radius:6px; border:1px solid #94a3b8; background:#fff;" onchange="renderQuickModalTable()">' +
-        '<option value="सर्व (All)">सर्व (All)</option>' +
-        '<option value="विभागीय कार्यालय">विभागीय कार्यालय</option>' +
-        '<option value="भांडारपाल">भांडारपाल</option>' +
-        '</select>' +
-        '</div>' +
-        '<div>' +
-        '<label style="display:block; font-weight:700; margin-bottom:3px; color:#0d47a1;">M.B. आकार:</label>' +
+        '<option value="सर्व (All)">सर्व (All)</option><option value="विभागीय कार्यालय">विभागीय कार्यालय</option><option value="भांडारपाल">भांडारपाल</option></select></div>' +
+        '<div><label style="display:block; font-weight:700; margin-bottom:3px; color:#0d47a1;">M.B. आकार:</label>' +
         '<select class="form-control" id="qmFilterSize" style="padding:6px; font-size:11.5px; border-radius:6px; border:1px solid #94a3b8; background:#fff;" onchange="renderQuickModalTable()">' +
-        '<option value="सर्व M.B.">सर्व M.B.</option>' +
-        '<option value="लहान M.B.">लहान M.B.</option>' +
-        '<option value="मोठी M.B.">मोठी M.B.</option>' +
-        '</select>' +
+        '<option value="सर्व M.B.">सर्व M.B.</option><option value="लहान M.B.">लहान M.B.</option><option value="मोठी M.B.">मोठी M.B.</option></select></div>' +
         '</div>' +
-        '</div>' +
-        '<div>' +
-        '<label style="display:block; font-weight:700; margin-bottom:3px; color:#0d47a1;">कनिष्ठ अभियंता (JE):</label>' +
+        '<div><label style="display:block; font-weight:700; margin-bottom:3px; color:#0d47a1;">कनिष्ठ अभियंता (JE):</label>' +
         '<select class="form-control" id="qmFilterJE" style="padding:6px; font-size:11.5px; border-radius:6px; border:1px solid #94a3b8; background:#fff;" onchange="renderQuickModalTable()">' + jeOptions + '</select>' +
-        '</div>' +
-        '</div>';
+        '</div></div>';
 
     var fullHTML = filterHTML + '<div id="qmTableContainer" style="max-height:220px; overflow-y:auto; overflow-x:auto; border:1px solid #e2e8f0; border-radius:6px;"></div>';
 
@@ -311,12 +227,10 @@ function openQuickInfoModal(type) {
     renderQuickModalTable();
 }
 
-// नोंद हटवण्यासाठी कस्टम कन्फर्म
 function quickPopupDelete(idx) {
     if (idx === -1) return showAlert('रेकॉर्ड सापडला नाही.', 'ERROR');
     var rec = getData('mb_records')[idx];
     var mbNo = (rec && rec.mbNumber) ? rec.mbNumber : '';
-    
     showCustomConfirm("ही नोंद हटवायची का?", "ही नोंद हटवण्यासाठी कृपया M.B. क्रमांक '" + mbNo + "' खालील बॉक्समध्ये टाईप करा:", mbNo, "✅ DELETE", "#d32f2f", function(confirmed) {
         if (confirmed) {
             var list = getData('mb_records');
@@ -336,7 +250,6 @@ function closeQuickInfoModal() {
     if (m) m.style.display = 'none'; 
 }
 
-// रिपोर्ट प्रिंट
 function printQuickModalReport() {
     var list = [];
     var reportTitle = '';
@@ -353,14 +266,12 @@ function printQuickModalReport() {
 
     var todayStr = typeof formatDateToDMY === 'function' ? formatDateToDMY(new Date().toISOString().slice(0, 10)) : new Date().toLocaleDateString();
     var groups = {};
-    
     list.forEach(function(m) {
         if(!m) return;
         var rawNo = (m.mbNumber || m.mbNo || '').trim();
         var statusObj = typeof getLatestMBStatus === 'function' ? getLatestMBStatus(rawNo) : null;
         var stock = typeof getAvailableStock === 'function' ? (getAvailableStock() || []) : [];
         var isAvail = stock.some(function(s){ return s && normalizeMB(s.mbNumber) === normalizeMB(rawNo); });
-        
         var holder = typeof getMBDisplayHolder === 'function' ? getMBDisplayHolder(statusObj, isAvail) : 'कार्यालय';
         if(holder) holder = holder.replace(/^(श्री\.?\s*)+/gi, 'श्री. ').trim();
 
@@ -370,7 +281,6 @@ function printQuickModalReport() {
         else mainSrc = 'इतर स्त्रोत (Other)';
 
         var secSrc = holder || 'कार्यालय';
-
         if (!groups[mainSrc]) groups[mainSrc] = {};
         if (!groups[mainSrc][secSrc]) groups[mainSrc][secSrc] = [];
         groups[mainSrc][secSrc].push(m);
@@ -378,10 +288,7 @@ function printQuickModalReport() {
 
     var totalCount = list.length;
     var smallCount = 0, bigCount = 0;
-    list.forEach(function(m){ 
-        if(m && m.size === 'मोठी M.B.') bigCount++; 
-        else smallCount++; 
-    });
+    list.forEach(function(m){ if(m && m.size === 'मोठी M.B.') bigCount++; else smallCount++; });
 
     var html = '<div style="margin-bottom:15px; border-bottom:2px solid #333; padding-bottom:8px;">' +
         '<div style="text-align:center; margin-bottom:4px;">' +
@@ -394,37 +301,21 @@ function printQuickModalReport() {
     var globalIndex = 1;
     for (var mainKey in groups) {
         html += '<div style="margin-top:12px; margin-bottom:6px; font-size:11pt; font-weight:800; color:#0d47a1; background:#e3f2fd; padding:5px 8px; border-radius:4px;">📂 मुख्य स्त्रोत: ' + escapeHtml(mainKey) + '</div>';
-        
         for (var secKey in groups[mainKey]) {
             html += '<div style="margin:6px 0 4px 10px; font-size:10pt; font-weight:700; color:#333;">👉 सद्यस्थिती व धारक: ' + escapeHtml(secKey) + '</div>';
-            html += '<table class="print-table" style="margin-bottom:8px; width:100%; border-collapse:collapse; font-size:9.5pt;">' +
-                '<thead><tr style="background:#f5f5f5;">' +
-                '<th style="width:40px; text-align:center;">अ.क्र.</th>' +
-                '<th>M.B. क्रमांक</th>' +
-                '<th>साईज</th>' +
-                '<th>नोंद दिनांक</th>' +
-                '<th>सद्यस्थिती व तपशील</th>' +
-                '</tr></thead><tbody>';
+            html += '<table class="print-table" style="margin-bottom:8px; width:100%; border-collapse:collapse; font-size:9.5pt;"><thead><tr style="background:#f5f5f5;">' +
+                '<th style="width:40px; text-align:center;">अ.क्र.</th><th>M.B. क्रमांक</th><th>साईज</th><th>नोंद दिनांक</th><th>सद्यस्थिती व तपशील</th></tr></thead><tbody>';
 
             groups[mainKey][secKey].forEach(function(item) {
                 var rawNo = (item.mbNumber || item.mbNo || '').trim();
                 var statusObj = typeof getLatestMBStatus === 'function' ? getLatestMBStatus(rawNo) : null;
                 var stock = typeof getAvailableStock === 'function' ? (getAvailableStock() || []) : [];
                 var isAvail = stock.some(function(s){ return s && normalizeMB(s.mbNumber) === normalizeMB(rawNo); });
-                
                 var holder = typeof getMBDisplayHolder === 'function' ? getMBDisplayHolder(statusObj, isAvail) : 'कार्यालय';
                 if(holder) holder = holder.replace(/^(श्री\.?\s*)+/gi, 'श्री. ').trim();
-                
                 var dateStr = typeof formatDateToDMY === 'function' ? formatDateToDMY(item.date) : (item.date || '-');
                 var sizeStr = item.size || 'लहान M.B.';
-
-                html += '<tr>' +
-                    '<td style="text-align:center;">' + (globalIndex++) + '</td>' +
-                    '<td><strong>' + escapeHtml(rawNo) + '</strong></td>' +
-                    '<td>' + escapeHtml(sizeStr) + '</td>' +
-                    '<td>' + dateStr + '</td>' +
-                    '<td>' + escapeHtml(holder) + '</td>' +
-                    '</tr>';
+                html += '<tr><td style="text-align:center;">' + (globalIndex++) + '</td><td><strong>' + escapeHtml(rawNo) + '</strong></td><td>' + escapeHtml(sizeStr) + '</td><td>' + dateStr + '</td><td>' + escapeHtml(holder) + '</td></tr>';
             });
             html += '</tbody></table>';
         }
