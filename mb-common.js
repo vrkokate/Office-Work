@@ -1,7 +1,7 @@
 /* =========================================================
    mb-common.js
    M.B. System - Common Utility Functions
-   Module Open/Close Fix & Smart Action Center Complete Integration
+   Module Open/Close & Smart Action Center Complete Integration
    ========================================================= */
 
 "use strict";
