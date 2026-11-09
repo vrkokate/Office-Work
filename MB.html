@@ -199,7 +199,8 @@
 <div class="sum-card-clickable net" onclick="openDetailPopup('NET_PAYABLE')"><div class="label" style="font-size:11px; color:#666;">Net Payable</div><div class="val" style="font-size:16px; font-weight:700; color:#16a34a;" id="sumNetPay">₹ 0</div></div>
 </div>
 <div style="display:flex; gap:8px; margin-bottom:12px;">
-<button type="button" class="btn-report" style="background:#f97316; margin:0; flex:1;" onclick="openWizard(1)"><i class="fa-solid fa-plus"></i> नवीन देयक नोंदवा</button>
+<!-- नवीन देयक नोंदवा बटन येथे BillRegister.html ला रिडायरेक्ट केले आहे -->
+<button type="button" class="btn-report" style="background:#f97316; margin:0; flex:1;" onclick="window.location.href='BillRegister.html'"><i class="fa-solid fa-plus"></i> नवीन देयक नोंदवा</button>
 <button type="button" class="btn-report" style="background:#1d4ed8; margin:0; flex:1;" onclick="printMasterBillReport()">🖨️ प्रिंट / पीडीएफ रिपोर्ट</button>
 </div>
 <div class="bill-scroll-container" id="billListContainer"><div style="text-align:center; padding:15px; color:#666; font-size:12px;">कोणतीही नोंद उपलब्ध नाही.</div></div>
@@ -217,8 +218,11 @@
 </div>
 <div id="printableArea" style="display:none;"></div>
 
+<!-- ✅ येथे mb-given.js आणि mb-available.js योग्य क्रमाने ॲड केले आहेत -->
 <script src="app-shell.js"></script>
 <script src="common.js"></script>
+<script src="mb-given.js"></script>
+<script src="mb-available.js"></script>
 <script src="mb-common.js"></script>
 <script src="mb-total.js"></script>
 <script src="mb-report.js"></script>
@@ -539,127 +543,19 @@ function refreshBillDashboard() {
     else {
         bills.slice().reverse().forEach(function(b, revIdx) {
             var actualIdx = bills.length - 1 - revIdx;
-            listHTML += '<tr><td style="text-align:center;">' + (revIdx + 1) + '</td><td><strong>' + escapeHtml(b.billNo || '-') + '</strong></td><td>' + escapeHtml(b.contractor || '-') + '</td><td>' + escapeHtml(b.workName || '-') + '</td><td>' + escapeHtml(b.je || '-') + '</td><td style="text-align:center;">' + escapeHtml(b.mbNo || '-') + '</td><td>' + escapeHtml(b.billType || '-') + '</td><td>' + (b.date ? formatDateToDMY(b.date) : '-') + '</td><td style="text-align:right;">₹ ' + (parseFloat(b.passedAmt) || 0).toLocaleString('en-IN') + '</td><td style="text-align:right;color:#d32f2f;font-weight:700;">₹ ' + (parseFloat(b.totalDed) || 0).toLocaleString('en-IN') + '</td><td style="text-align:right;color:#2e7d32;font-weight:700;">₹ ' + (parseFloat(b.netPay) || 0).toLocaleString('en-IN') + '</td><td class="action-cell" style="text-align:center;white-space:nowrap;"><button type="button" class="btn-action" style="background:#2e7d32;padding:3px 6px;color:#fff;border:none;border-radius:3px;" onclick="editBill(' + actualIdx + ')">Edit</button> <button type="button" class="btn-action" style="background:#d32f2f;padding:3px 6px;color:#fff;border:none;border-radius:3px;" onclick="deleteBill(' + actualIdx + ')">Delete</button></td></tr>';
+            listHTML += '<tr><td style="text-align:center;">' + (revIdx + 1) + '</td><td><strong>' + escapeHtml(b.billNo || '-') + '</strong></td><td>' + escapeHtml(b.contractor || '-') + '</td><td>' + escapeHtml(b.workName || '-') + '</td><td>' + escapeHtml(b.je || '-') + '</td><td style="text-align:center;">' + escapeHtml(b.mbNo || '-') + '</td><td>' + escapeHtml(b.billType || '-') + '</td><td>' + (b.date ? formatDateToDMY(b.date) : '-') + '</td><td style="text-align:right;">₹ ' + (parseFloat(b.passedAmt) || 0).toLocaleString('en-IN') + '</td><td style="text-align:right;color:#d32f2f;font-weight:700;">₹ ' + (parseFloat(b.totalDed) || 0).toLocaleString('en-IN') + '</td><td style="text-align:right;color:#2e7d32;font-weight:700;">₹ ' + (parseFloat(b.netPay) || 0).toLocaleString('en-IN') + '</td><td class="action-cell" style="text-align:center;white-space:nowrap;"><button type="button" class="btn-action" style="background:#2e7d32;padding:3px 6px;color:#fff;border:none;border-radius:3px;" onclick="window.location.href=\'BillRegister.html\'">View</button></td></tr>';
         });
     }
     var c = document.getElementById('billListContainer'); if (c) c.innerHTML = listHTML;
 }
-function openWizard(step) {
-    document.getElementById('editBillIndex').value = '-1';
-    var jeSel = document.getElementById('wJeSelect');
-    jeSel.innerHTML = '<option value="">-- JE निवडा --</option>';
-    getData('je_records').forEach(function(j) { jeSel.add(new Option(j.name, j.name)); });
-    document.getElementById('wMbSelect').innerHTML = '<option value="">-- आधी JE निवडा --</option>';
-    document.getElementById('wContractor').value = '';
-    document.getElementById('wWorkName').value = '';
-    document.getElementById('wBillType').value = '';
-    document.getElementById('wBillDate').value = new Date().toISOString().slice(0, 10);
-    document.getElementById('wPassedAmt').value = '';
-    document.querySelectorAll('.calc-ded').forEach(function(i) { i.value = 0; });
-    document.getElementById('wizardModal').style.display = 'flex';
-    goToStep(step);
-}
-function closeWizard() { document.getElementById('wizardModal').style.display = 'none'; }
-function goToStep(step) {
-    document.getElementById('step1').classList.toggle('hidden', step !== 1);
-    document.getElementById('step2').classList.toggle('hidden', step !== 2);
-    document.getElementById('step3').classList.toggle('hidden', step !== 3);
-    for (var i = 1; i <= 3; i++) { var dot = document.getElementById('dot' + i); if (dot) { dot.className = 'step-circle'; if (i < step) dot.classList.add('completed'); else if (i === step) dot.classList.add('active'); } }
-    if (step === 3) renderPreview();
-}
-function onWizardJEChange() {
-    var je = document.getElementById('wJeSelect').value;
-    var mbSel = document.getElementById('wMbSelect');
-    mbSel.innerHTML = '<option value="">-- M.B. निवडा --</option>';
-    document.getElementById('wContractor').value = '';
-    document.getElementById('wWorkName').value = '';
-    if (!je) return;
-    getCurrentlyHeldMBsByJE(je).forEach(function(a) { mbSel.add(new Option(a.mbNo + ' (' + a.size + ')', a.mbNo)); });
-}
-function onWizardMBChange() {
-    var mb = document.getElementById('wMbSelect').value;
-    document.getElementById('wContractor').value = '';
-    document.getElementById('wWorkName').value = '';
-    if (!mb) return;
-    var works = getData('work_records').filter(function(w) { return w.mbNo === mb; });
-    if (works.length > 0) { document.getElementById('wWorkName').value = works[0].name || ''; document.getElementById('wContractor').value = works[0].contractor || ''; }
-    else { document.getElementById('wWorkName').value = 'काम नोंदवलेले नाही'; document.getElementById('wContractor').value = '-'; }
-}
-function autoCalculateDeductions() {
-    var passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
-    document.getElementById('dedIT').value = Math.round(passed * 0.02 * 100) / 100;
-    document.getElementById('dedSD').value = Math.round(passed * 0.005 * 100) / 100;
-    document.getElementById('dedMaint').value = Math.round(passed * 0.005 * 100) / 100;
-    document.getElementById('dedRoyalty').value = Math.round(passed * 0.01 * 100) / 100;
-    document.getElementById('dedGovt').value = Math.round(passed * 0.01 * 100) / 100;
-    document.getElementById('dedUpkar').value = Math.round(passed * 0.01 * 100) / 100;
-    document.getElementById('dedCGST').value = Math.round(passed * 0.01 * 100) / 100;
-    document.getElementById('dedSGST').value = Math.round(passed * 0.01 * 100) / 100;
-    updateDeductionTotals();
-}
-function updateDeductionTotals() {
-    var passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
-    var totalDed = 0; document.querySelectorAll('.calc-ded').forEach(function(i) { totalDed += parseFloat(i.value) || 0; });
-    document.getElementById('wLblTotalDed').innerText = totalDed.toLocaleString('en-IN');
-    document.getElementById('wLblNetPay').innerText = (passed - totalDed).toLocaleString('en-IN');
-}
-function renderPreview() {
-    var je = document.getElementById('wJeSelect').value || '-';
-    var mb = document.getElementById('wMbSelect').value || '-';
-    var con = document.getElementById('wContractor').value || '-';
-    var work = document.getElementById('wWorkName').value || '-';
-    var type = document.getElementById('wBillType').value || '-';
-    var passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
-    var totalDed = parseFloat(document.getElementById('wLblTotalDed').innerText.replace(/,/g, '')) || 0;
-    document.getElementById('previewContent').innerHTML = '<div><strong>JE:</strong> ' + escapeHtml(je) + '</div><div><strong>M.B.:</strong> ' + escapeHtml(mb) + '</div><div><strong>कंत्राटदार:</strong> ' + escapeHtml(con) + '</div><div><strong>काम:</strong> ' + escapeHtml(work) + '</div><div><strong>प्रकार:</strong> ' + escapeHtml(type) + '</div><div><strong>Passed:</strong> ₹ ' + passed.toLocaleString('en-IN') + '</div><div style="color:#d32f2f;"><strong>कपात:</strong> ₹ ' + totalDed.toLocaleString('en-IN') + '</div><div style="color:#2e7d32;"><strong>Net:</strong> ₹ ' + (passed - totalDed).toLocaleString('en-IN') + '</div>';
-}
-function saveNewBill() {
-    var je = document.getElementById('wJeSelect').value; var mb = document.getElementById('wMbSelect').value;
-    var contractor = document.getElementById('wContractor').value; var work = document.getElementById('wWorkName').value;
-    var billType = document.getElementById('wBillType').value; var billDate = document.getElementById('wBillDate').value;
-    var passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
-    var totalDed = parseFloat(document.getElementById('wLblTotalDed').innerText.replace(/,/g, '')) || 0;
-    var netPay = passed - totalDed; var idx = parseInt(document.getElementById('editBillIndex').value, 10);
-    if (!je || !mb || !billType || !billDate) return showCustomAlert('कृपया सर्व आवश्यक माहिती भरा.');
-    var bills = getData('dmbms_bills'); var currentYear = new Date().getFullYear(); var maxSeq = 0;
-    bills.forEach(function(b) { if (!b.billNo) return; var m = String(b.billNo).match(/\/(\d+)$/); if (m) { var n = parseInt(m[1], 10); if (n > maxSeq) maxSeq = n; } });
-    var newBillNo = (idx === -1) ? currentYear + '/' + String(maxSeq + 1).padStart(2, '0') : bills[idx].billNo;
-    var dedObj = { IT: parseFloat(document.getElementById('dedIT').value) || 0, SD: parseFloat(document.getElementById('dedSD').value) || 0, Maint: parseFloat(document.getElementById('dedMaint').value) || 0, Royalty: parseFloat(document.getElementById('dedRoyalty').value) || 0, Govt: parseFloat(document.getElementById('dedGovt').value) || 0, Upkar: parseFloat(document.getElementById('dedUpkar').value) || 0, CGST: parseFloat(document.getElementById('dedCGST').value) || 0, SGST: parseFloat(document.getElementById('dedSGST').value) || 0 };
-    var billData = { billNo: newBillNo, je: je, mbNo: mb, contractor: contractor, workName: work, billType: billType, date: billDate, passedAmt: passed, totalDed: totalDed, netPay: netPay, deductions: dedObj };
-    if (idx === -1) bills.push(billData); else bills[idx] = billData;
-    setData('dmbms_bills', bills); closeWizard(); refreshBillDashboard(); refreshMBDashboard(); showCustomAlert('देयक जतन झाले!');
-}
-function editBill(idx) {
-    var b = getData('dmbms_bills')[idx]; if (!b) return;
-    openWizard(1); document.getElementById('editBillIndex').value = idx;
-    document.getElementById('wJeSelect').value = b.je || ''; onWizardJEChange();
-    var mbSel = document.getElementById('wMbSelect');
-    if (mbSel && !Array.from(mbSel.options).some(function(o) { return o.value === b.mbNo; })) mbSel.add(new Option(b.mbNo + ' (सध्याची नोंद)', b.mbNo));
-    mbSel.value = b.mbNo || ''; onWizardMBChange();
-    document.getElementById('wBillType').value = b.billType || '';
-    document.getElementById('wBillDate').value = b.date || '';
-    document.getElementById('wPassedAmt').value = b.passedAmt || '';
-    var d = b.deductions || {};
-    document.getElementById('dedIT').value = d.IT || 0; document.getElementById('dedSD').value = d.SD || 0;
-    document.getElementById('dedMaint').value = d.Maint || 0; document.getElementById('dedRoyalty').value = d.Royalty || 0;
-    document.getElementById('dedGovt').value = d.Govt || 0; document.getElementById('dedUpkar').value = d.Upkar || 0;
-    document.getElementById('dedCGST').value = d.CGST || 0; document.getElementById('dedSGST').value = d.SGST || 0;
-    updateDeductionTotals();
-}
+function openDetailPopup(type) { window.location.href='BillRegister.html'; } // Redirect for details
 async function deleteBill(idx) {
     if (await window.appConfirm('ही देयक नोंद हटवायची का?')) {
         var bills = getData('dmbms_bills'); bills.splice(idx, 1); setData('dmbms_bills', bills);
         refreshBillDashboard(); refreshMBDashboard(); showCustomAlert('देयक हटवले!');
     }
 }
-function printMasterBillReport() {
-    var bills = getData('dmbms_bills');
-    if (bills.length === 0) return showCustomAlert('रिपोर्टसाठी बिले नाहीत.');
-    var html = '<h2 style="text-align:center;">संपूर्ण देयक नोंदवही</h2><table class="print-table"><thead><tr><th>अ.क्र.</th><th>बिल क्र.</th><th>M.B.</th><th>कंत्राटदार</th><th>काम</th><th>JE</th><th>प्रकार</th><th>दिनांक</th><th>पास</th><th>कपात</th><th>निव्वळ</th></tr></thead><tbody>';
-    bills.forEach(function(b, i) { html += '<tr><td>' + (i + 1) + '</td><td>' + escapeHtml(b.billNo) + '</td><td>' + escapeHtml(b.mbNo) + '</td><td>' + escapeHtml(b.contractor) + '</td><td>' + escapeHtml(b.workName) + '</td><td>' + escapeHtml(b.je) + '</td><td>' + escapeHtml(b.billType) + '</td><td>' + formatDateToDMY(b.date) + '</td><td>₹ ' + (parseFloat(b.passedAmt) || 0).toLocaleString('en-IN') + '</td><td>₹ ' + (parseFloat(b.totalDed) || 0).toLocaleString('en-IN') + '</td><td>₹ ' + (parseFloat(b.netPay) || 0).toLocaleString('en-IN') + '</td></tr>'; });
-    html += '</tbody></table>';
-    printA4Document(html, 'Bill_Report.pdf');
-}
+function printMasterBillReport() { window.location.href='BillRegister.html'; } // Redirect for print
 
 /* ---- Assign ---- */
 function refreshAssignList() {
