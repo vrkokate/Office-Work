@@ -1,4 +1,4 @@
-// mb-print.js - Direct PDF Download with Full Formatting
+// mb-print.js - MB Module Direct PDF Download
 
 (function () {
     "use strict";
@@ -19,32 +19,6 @@
         return parts.length === 3 ? parts[2] + "-" + parts[1] + "-" + parts[0] : text;
     }
 
-    function mbPrintOpenDocument(title, bodyHtml, fileName) {
-        var safeFileName = String(fileName || "MB_Report").replace(/[\\/:*?"<>|]+/g, "_");
-        
-        // Android Bridge (जर असेल तर)
-        try {
-            if (window.AndroidPrintBridge && typeof window.AndroidPrintBridge.printHtml === 'function') {
-                window.AndroidPrintBridge.printHtml(bodyHtml, safeFileName);
-                return true;
-            }
-        } catch(e) {}
-
-        // common.js मधील नवीन युनिव्हर्सल फंक्शन वापरा
-        if (typeof printA4Document === 'function') {
-            printA4Document(bodyHtml, safeFileName);
-        } else {
-            // Fallback जर common.js लोड नसेल
-            var tempDiv = document.createElement('div');
-            tempDiv.innerHTML = bodyHtml;
-            document.body.appendChild(tempDiv);
-            html2pdf().set({margin: 15, filename: safeFileName, jsPDF: {unit: 'mm', format: 'a4', orientation: 'portrait'}}).from(tempDiv).save().then(function(){
-                document.body.removeChild(tempDiv);
-            });
-        }
-        return true;
-    }
-
     window.printMBReport = function printMBReport() {
         var records = [];
         try { records = typeof getData === "function" ? getData("mb_records") : []; } catch (e) {}
@@ -61,7 +35,21 @@
 
         var table = '<table class="print-table"><thead><tr><th>अ.क्र.</th><th>दिनांक</th><th>M.B. क्रमांक</th><th>आकार</th><th>व्यवहार</th><th>प्राप्तीचा स्रोत</th><th>तपशील</th></tr></thead><tbody>' + rows + '</tbody></table>';
 
-        return mbPrintOpenDocument("मोजमाप पुस्तिका (M.B.) नोंदवही अहवाल", table, "MB_Register_Report_" + new Date().toISOString().slice(0, 10) + ".pdf");
+        var safeFileName = "MB_Register_Report_" + new Date().toISOString().slice(0, 10) + ".pdf";
+        
+        // common.js मधील युनिव्हर्सल फंक्शनला कॉल करा
+        if (typeof printA4Document === 'function') {
+            printA4Document(table, safeFileName);
+        } else {
+            // Fallback
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = table;
+            document.body.appendChild(tempDiv);
+            html2pdf().set({margin: 15, filename: safeFileName, jsPDF: {unit: 'mm', format: 'a4', orientation: 'portrait'}}).from(tempDiv).save().then(function(){
+                document.body.removeChild(tempDiv);
+            });
+        }
+        return true;
     };
 
     window.printA4Document = function printA4Document(content, optionalFileName) {
@@ -71,6 +59,11 @@
         holder.innerHTML = String(content || "");
 
         holder.querySelectorAll("button,input,select,textarea,.btn-action,.btn-report,[data-print='hide']").forEach(function (node) { node.remove(); });
-        return mbPrintOpenDocument(title, holder.innerHTML, name);
+        
+        if (typeof window.generateUniversalPDF === 'function') {
+             window.generateUniversalPDF(holder.innerHTML, name);
+        } else {
+             if (typeof printA4Document === 'function') printA4Document(holder.innerHTML, name);
+        }
     };
 })();
