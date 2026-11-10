@@ -1,4 +1,4 @@
-/* DMBMS CENTRAL DATA LAYER + INSTANT SYNC + UNIVERSAL PDF DOWNLOAD */
+/* DMBMS CENTRAL DATA LAYER + UNIVERSAL PDF ENGINE */
 
 (function(){
     'use strict';
@@ -99,19 +99,11 @@ function formatDateToDMY(dateStr){
 }
 
 /* =========================================================
-   UNIVERSAL DIRECT PDF DOWNLOAD (No Alerts, No about:blank)
+   UNIVERSAL DIRECT PDF DOWNLOAD ENGINE
    ========================================================= */
 function printA4Document(content, optionalFileName) {
-    var printTitle = String(optionalFileName || 'Office_Work_Report.pdf').replace(/[\/:*?"<>|]+/g, '_');
+    var printTitle = String(optionalFileName || 'Report.pdf').replace(/[\/:*?"<>|]+/g, '_');
     
-    // Android APK Bridge
-    try {
-        if (window.AndroidPrintBridge && typeof window.AndroidPrintBridge.printHtml === 'function') {
-            window.AndroidPrintBridge.printHtml(String(content || ''), printTitle);
-            return true;
-        }
-    } catch(e) { console.warn('Android Print Bridge Error:', e); }
-
     if (typeof html2pdf === 'undefined') {
         var script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
@@ -128,15 +120,14 @@ function generateUniversalPDF(content, fileName) {
     var reportName = fileName.replace('.pdf', '').replace(/_/g, ' ');
 
     var tempDiv = document.createElement('div');
-    tempDiv.id = 'pdf-temp-container';
+    tempDiv.id = 'universal-pdf-container';
     tempDiv.style.position = 'absolute';
     tempDiv.style.left = '-9999px';
     tempDiv.style.top = '0';
-    tempDiv.style.width = '180mm'; // A4 Width (210mm) - 30mm Margins (15mm left + 15mm right)
+    tempDiv.style.width = '180mm'; // A4 Width with 15mm margins
     tempDiv.style.background = '#fff';
     tempDiv.style.color = '#000';
     
-    // वॉटरमार्क आणि ग्लोबल स्टाईल्स
     var html = '<style>' +
         '.pdf-wrapper { position: relative; width: 100%; font-family: "Noto Sans Devanagari", Arial, sans-serif; }' +
         '.watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 70px; font-weight: bold; color: rgba(0, 0, 0, 0.08); z-index: 0; pointer-events: none; white-space: nowrap; width: 100%; text-align: center; }' +
@@ -165,7 +156,7 @@ function generateUniversalPDF(content, fileName) {
     document.body.appendChild(tempDiv);
 
     var opt = {
-        margin: [15, 15, 20, 15], // Top, Left, Bottom (for footer), Right
+        margin: [15, 15, 20, 15], 
         filename: fileName,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, letterRendering: true },
@@ -178,9 +169,7 @@ function generateUniversalPDF(content, fileName) {
             pdf.setPage(i);
             pdf.setFontSize(10);
             pdf.setTextColor(100);
-            // Footer Left
             pdf.text('Created by Vitthal kokate | Mb. No. 8446556141', 15, 287);
-            // Page Number Right
             pdf.text('Page ' + i + ' of ' + totalPages, 195, 287, { align: 'right' });
         }
     }).save().then(function() {
