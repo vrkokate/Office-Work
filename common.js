@@ -1,4 +1,4 @@
-/* DMBMS CENTRAL DATA LAYER + INSTANT SYNC + DIRECT PDF DOWNLOAD */
+/* DMBMS CENTRAL DATA LAYER + INSTANT SYNC + UNIVERSAL PDF DOWNLOAD */
 
 (function(){
     'use strict';
@@ -99,7 +99,7 @@ function formatDateToDMY(dateStr){
 }
 
 /* =========================================================
-   DIRECT PDF DOWNLOAD (No about:blank, No Print Dialog)
+   UNIVERSAL A4 PDF DOWNLOAD (No about:blank, No Alert, Full Formatting)
    ========================================================= */
 function printA4Document(content, optionalFileName) {
     var printTitle = String(optionalFileName || 'Office_Work_Report.pdf').replace(/[\/:*?"<>|]+/g, '_');
@@ -118,70 +118,85 @@ function printA4Document(content, optionalFileName) {
 
     // जर html2pdf लोड नसेल तर ते लोड करा
     if (typeof html2pdf === 'undefined') {
-        showAlert('PDF जनरेटर लोड होत आहे, कृपया २ सेकंद थांबा आणि पुन्हा प्रयत्न करा.', 'INFO');
         var script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
         script.onload = function() {
-            generatePDF(content, printTitle);
+            generateUniversalPDF(content, printTitle);
         };
         document.head.appendChild(script);
         return;
     }
 
-    generatePDF(content, printTitle);
+    generateUniversalPDF(content, printTitle);
 }
 
-function generatePDF(content, fileName) {
-    // तात्पुरता डिव्ह तयार करा जो स्क्रीनवर दिसणार नाही
+function generateUniversalPDF(content, fileName) {
+    var todayStr = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+    var reportName = fileName.replace('.pdf', '').replace(/_/g, ' ');
+
     var tempDiv = document.createElement('div');
     tempDiv.id = 'pdf-temp-container';
+    // A4 साईज आणि मार्जिन (15mm) सेट करणे जेणेकरून ब्लँक पेज येणार नाही
     tempDiv.style.position = 'absolute';
     tempDiv.style.left = '-9999px';
     tempDiv.style.top = '0';
-    tempDiv.style.width = '210mm'; // A4 Width
+    tempDiv.style.width = '180mm'; // A4 width (210mm) - 30mm Margins (15mm x 2)
     tempDiv.style.background = '#fff';
-    tempDiv.style.padding = '10mm';
-    tempDiv.style.boxSizing = 'border-box';
+    tempDiv.style.color = '#000';
     
-    // रिपोर्टचा मजकूर आणि स्टाईल्स टाका
-    tempDiv.innerHTML = '<style>' +
-        'body { font-family: "Noto Sans Devanagari", Arial, sans-serif; font-size: 10pt; color: #111; }' +
-        '.print-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }' +
-        '.print-table th, .print-table td { border: 1px solid #333 !important; padding: 6px !important; text-align: left; vertical-align: top; font-size: 10pt; }' +
-        '.print-table th { background-color: #eee !important; font-weight: bold; -webkit-print-color-adjust: exact; }' +
-        'h1, h2, h3 { text-align: center; margin: 0 0 10px 0; }' +
-        'button, .btn-action, .btn-report { display: none !important; }' +
-        '.data-table { width: 100%; border-collapse: collapse; }' +
-        '.data-table th, .data-table td { border: 1px solid #333 !important; padding: 5px; }' +
-        '</style>' + String(content || '');
-        
+    // वॉटरमार्क आणि स्टाईल्स
+    var html = '<style>' +
+        '.pdf-wrapper { position: relative; width: 100%; font-family: "Noto Sans Devanagari", Arial, sans-serif; }' +
+        '.watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 70px; font-weight: bold; color: rgba(0, 0, 0, 0.07); z-index: 0; pointer-events: none; white-space: nowrap; }' +
+        '.pdf-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; position: relative; z-index: 1; }' +
+        '.pdf-header h1 { margin: 0; font-size: 20px; font-weight: bold; }' +
+        '.pdf-header h2 { margin: 5px 0; font-size: 14px; font-weight: bold; text-transform: capitalize; }' +
+        '.pdf-header p { margin: 5px 0; font-size: 12px; }' +
+        '.pdf-content { position: relative; z-index: 1; }' +
+        '.print-table, .data-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 11px; }' +
+        '.print-table th, .print-table td, .data-table th, .data-table td { border: 1px solid #000 !important; padding: 6px !important; text-align: left; vertical-align: top; word-wrap: break-word; }' +
+        '.print-table th, .data-table th { background-color: #eaeaea !important; font-weight: bold; -webkit-print-color-adjust: exact; }' +
+        'thead { display: table-header-group; }' + // हेडिंग पुन्हा पुन्हा येण्यासाठी
+        'tr { page-break-inside: avoid; }' + // कोरे पेज टाळण्यासाठी
+        '</style>' +
+        '<div class="pdf-wrapper">' +
+        '<div class="watermark">PWD SOLAPUR</div>' +
+        '<div class="pdf-header">' +
+        '<h1>सार्वजनिक बांधकाम विभाग</h1>' +
+        '<h2>' + reportName + '</h2>' +
+        '<p>अहवाल दिनांक: ' + todayStr + '</p>' +
+        '</div>' +
+        '<div class="pdf-content">' + String(content || '') + '</div>' +
+        '</div>';
+
+    tempDiv.innerHTML = html;
     document.body.appendChild(tempDiv);
 
-    // PDF पर्याय (Options)
     var opt = {
-        margin: [10, 10, 10, 10], // Top, Left, Bottom, Right
+        margin: [15, 15, 20, 15], // Top, Left, Bottom (20mm for footer), Right
         filename: fileName,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['css', 'legacy'] }
     };
 
-    // PDF जनरेट आणि डाउनलोड करा
-    html2pdf().set(opt).from(tempDiv).save().then(function() {
-        // काम झाल्यावर डिव्ह डिलीट करा
-        if (tempDiv && tempDiv.parentNode) {
-            tempDiv.parentNode.removeChild(tempDiv);
+    html2pdf().set(opt).from(tempDiv).toPdf().get('pdf').then(function(pdf) {
+        var totalPages = pdf.internal.getNumberOfPages();
+        for (var i = 1; i <= totalPages; i++) {
+            pdf.setPage(i);
+            pdf.setFontSize(10);
+            pdf.setTextColor(100);
+            // Footer
+            pdf.text('Created by Vitthal kokate | Mb. No. 8446556141', 105, 287, { align: 'center' });
+            // Page Number
+            pdf.text('Page ' + i + ' of ' + totalPages, 195, 287, { align: 'right' });
         }
-        if (typeof showAlert === 'function') {
-            showAlert('PDF यशस्वीरीत्या डाउनलोड झाली आहे!', 'SUCCESS');
-        }
+    }).save().then(function() {
+        // काम झाल्यावर डिव्ह डिलीट करा (अलर्ट न देता)
+        if (tempDiv && tempDiv.parentNode) tempDiv.parentNode.removeChild(tempDiv);
     }).catch(function(err) {
         console.error('PDF Error:', err);
-        if (tempDiv && tempDiv.parentNode) {
-            tempDiv.parentNode.removeChild(tempDiv);
-        }
-        if (typeof showAlert === 'function') {
-            showAlert('PDF तयार करताना त्रुटी आली. कृपया पुन्हा प्रयत्न करा.', 'ERROR');
-        }
+        if (tempDiv && tempDiv.parentNode) tempDiv.parentNode.removeChild(tempDiv);
     });
 }
