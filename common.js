@@ -1,4 +1,4 @@
-/* DMBMS CENTRAL DATA LAYER + INSTANT SYNC + ISOLATED PRINT */
+/* DMBMS CENTRAL DATA LAYER + INSTANT SYNC + DIRECT PDF DOWNLOAD */
 
 (function(){
     'use strict';
@@ -32,9 +32,6 @@
     window.addEventListener('focus', refresh);
 })();
 
-/* =========================================================
-   SMART SYSTEM MESSAGE (custom, no browser URL)
-   ========================================================= */
 function showAlert(msg, type){
     if(typeof window.appAlert === 'function') return window.appAlert(msg, { type: type });
     var old = document.getElementById('dmbmsInlineMessage'); if(old) old.remove();
@@ -47,9 +44,6 @@ function showAlert(msg, type){
     document.body.appendChild(box);
 }
 
-/* =========================================================
-   CENTRAL DATA READ / WRITE
-   ========================================================= */
 function getData(key){
     try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e){ return []; }
 }
@@ -105,12 +99,12 @@ function formatDateToDMY(dateStr){
 }
 
 /* =========================================================
-   ISOLATED A4 PRINT (No background leak, No ghost text)
+   DIRECT PDF DOWNLOAD (No about:blank, No Print Dialog)
    ========================================================= */
 function printA4Document(content, optionalFileName) {
     var printTitle = String(optionalFileName || 'Office_Work_Report.pdf').replace(/[\/:*?"<>|]+/g, '_');
     
-    // 1. Android APK Bridge
+    // Android APK Bridge (जर असेल तर)
     try {
         if (window.AndroidPrintBridge && typeof window.AndroidPrintBridge.printHtml === 'function') {
             window.AndroidPrintBridge.printHtml(String(content || ''), printTitle);
@@ -122,61 +116,72 @@ function printA4Document(content, optionalFileName) {
         }
     } catch(e) { console.warn('Android Print Bridge Error:', e); }
 
-    // 2. Web Browser Isolated Print (Popup Window)
-    var printWindow = null;
-    try {
-        printWindow = window.open('', '_blank');
-        if (printWindow) {
-            var html = '<!doctype html><html lang="mr"><head><meta charset="utf-8">' +
-                '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-                '<title>' + printTitle + '</title>' +
-                '<style>' +
-                '@page { size: A4 portrait; margin: 10mm; }' +
-                '* { box-sizing: border-box; }' +
-                'body { font-family: "Noto Sans Devanagari", Arial, sans-serif; font-size: 10pt; color: #111; margin: 0; padding: 0; background: #fff; }' +
-                '.print-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }' +
-                '.print-table th, .print-table td { border: 1px solid #333; padding: 5px 6px; text-align: left; vertical-align: top; }' +
-                '.print-table th { background-color: #eee !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-weight: bold; }' +
-                'h1, h2, h3 { text-align: center; margin: 0 0 10px 0; }' +
-                'button, .btn-action, .btn-report { display: none !important; }' +
-                '</style></head><body>' + String(content || '') +
-                '<script>(function(){ var printed = false; function doPrint(){ if(printed) return; printed = true; try { window.focus(); window.print(); } catch(e) { console.error(e); } } window.addEventListener("load", function(){ setTimeout(doPrint, 200); }); window.addEventListener("afterprint", function(){ setTimeout(function(){ window.close(); }, 200); }); })();<\/script>' +
-                '</body></html>';
-                
-            printWindow.document.open();
-            printWindow.document.write(html);
-            printWindow.document.close();
-            return true;
-        }
-    } catch (err) {
-        console.error('Popup Print error, falling back to Iframe:', err);
-        if (printWindow && !printWindow.closed) printWindow.close();
+    // जर html2pdf लोड नसेल तर ते लोड करा
+    if (typeof html2pdf === 'undefined') {
+        showAlert('PDF जनरेटर लोड होत आहे, कृपया २ सेकंद थांबा आणि पुन्हा प्रयत्न करा.', 'INFO');
+        var script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        script.onload = function() {
+            generatePDF(content, printTitle);
+        };
+        document.head.appendChild(script);
+        return;
     }
 
-    // 3. Fallback: Completely Invisible Iframe (No DOM Leak)
-    var iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = '0';
-    iframe.style.zIndex = '-9999'; // पूर्णपणे लपवण्यासाठी
-    document.body.appendChild(iframe);
+    generatePDF(content, printTitle);
+}
+
+function generatePDF(content, fileName) {
+    // तात्पुरता डिव्ह तयार करा जो स्क्रीनवर दिसणार नाही
+    var tempDiv = document.createElement('div');
+    tempDiv.id = 'pdf-temp-container';
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    tempDiv.style.top = '0';
+    tempDiv.style.width = '210mm'; // A4 Width
+    tempDiv.style.background = '#fff';
+    tempDiv.style.padding = '10mm';
+    tempDiv.style.boxSizing = 'border-box';
     
-    var doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write('<!doctype html><html><head><title>' + printTitle + '</title><style>@page { size: A4 portrait; margin: 10mm; } body { font-family: "Noto Sans Devanagari", Arial, sans-serif; font-size: 10pt; } .print-table { width: 100%; border-collapse: collapse; } .print-table th, .print-table td { border: 1px solid #333; padding: 5px; } .print-table th { background: #eee; } button, .btn-action, .btn-report { display: none !important; }</style></head><body>' + content + '</body></html>');
-    doc.close();
-    
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-    
-    // प्रिंट झाल्यावर Iframe पूर्णपणे डिलीट करा
-    setTimeout(function() {
-        if (iframe && iframe.parentNode) {
-            iframe.parentNode.removeChild(iframe);
+    // रिपोर्टचा मजकूर आणि स्टाईल्स टाका
+    tempDiv.innerHTML = '<style>' +
+        'body { font-family: "Noto Sans Devanagari", Arial, sans-serif; font-size: 10pt; color: #111; }' +
+        '.print-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }' +
+        '.print-table th, .print-table td { border: 1px solid #333 !important; padding: 6px !important; text-align: left; vertical-align: top; font-size: 10pt; }' +
+        '.print-table th { background-color: #eee !important; font-weight: bold; -webkit-print-color-adjust: exact; }' +
+        'h1, h2, h3 { text-align: center; margin: 0 0 10px 0; }' +
+        'button, .btn-action, .btn-report { display: none !important; }' +
+        '.data-table { width: 100%; border-collapse: collapse; }' +
+        '.data-table th, .data-table td { border: 1px solid #333 !important; padding: 5px; }' +
+        '</style>' + String(content || '');
+        
+    document.body.appendChild(tempDiv);
+
+    // PDF पर्याय (Options)
+    var opt = {
+        margin: [10, 10, 10, 10], // Top, Left, Bottom, Right
+        filename: fileName,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // PDF जनरेट आणि डाउनलोड करा
+    html2pdf().set(opt).from(tempDiv).save().then(function() {
+        // काम झाल्यावर डिव्ह डिलीट करा
+        if (tempDiv && tempDiv.parentNode) {
+            tempDiv.parentNode.removeChild(tempDiv);
         }
-    }, 5000);
-    return true;
+        if (typeof showAlert === 'function') {
+            showAlert('PDF यशस्वीरीत्या डाउनलोड झाली आहे!', 'SUCCESS');
+        }
+    }).catch(function(err) {
+        console.error('PDF Error:', err);
+        if (tempDiv && tempDiv.parentNode) {
+            tempDiv.parentNode.removeChild(tempDiv);
+        }
+        if (typeof showAlert === 'function') {
+            showAlert('PDF तयार करताना त्रुटी आली. कृपया पुन्हा प्रयत्न करा.', 'ERROR');
+        }
+    });
 }
