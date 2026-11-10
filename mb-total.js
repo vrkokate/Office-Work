@@ -1,4 +1,4 @@
-// mb-total.js - Total, Given, and Available M.B. Dashboards & Calculations
+// mb-total.js - Total, Given, and Available M.B. Dashboards
 
 var currentQuickModalType = '';
 
@@ -34,7 +34,6 @@ function refreshMBDashboard() {
             var mbNoStr = m.mbNumber ? escapeHtml(m.mbNumber) : '-';
             var sizeStr = m.size ? escapeHtml(m.size) : '-';
             var fromStr = m.receivedFrom ? escapeHtml(m.receivedFrom) : '-';
-            
             rowsHtml.push('<tr><td>' + (idx+1) + '</td><td>' + dateStr + '</td><td>' + mbNoStr + '</td><td>' + sizeStr + '</td><td>' + fromStr + '</td><td class="action-cell"><button class="btn-action" style="background:#2e7d32;" onclick="editMB(' + idx + ')">Edit</button><button class="btn-action" style="background:#d32f2f;" onclick="deleteMB(' + idx + ')">Delete</button></td></tr>');
         });
         tbody.innerHTML = rowsHtml.length > 0 ? rowsHtml.join('') : '<tr><td colspan="6" style="text-align:center; color:#777;">कोणतीही नोंद उपलब्ध नाही.</td></tr>';
@@ -249,7 +248,6 @@ function closeQuickInfoModal() {
     if (m) m.style.display = 'none'; 
 }
 
-// 🌟 हे फंक्शन अपडेट केले आहे (डबल हेडिंग काढून टाकण्यासाठी)
 function printQuickModalReport() {
     var list = [];
     var reportTitle = '';
@@ -290,12 +288,12 @@ function printQuickModalReport() {
     var smallCount = 0, bigCount = 0;
     list.forEach(function(m){ if(m && m.size === 'मोठी M.B.') bigCount++; else smallCount++; });
 
-    // फक्त मुख्य मजकूर (हेडिंग printA4Document आपोआप घेईल)
     var html = '<div style="font-size:13px; font-weight:700; margin-bottom:10px; color:#0d47a1;">' + reportTitle + ' (एकूण: ' + totalCount + ' | लहान: ' + smallCount + ', मोठी: ' + bigCount + ')</div>';
 
     var globalIndex = 1;
     for (var mainKey in groups) {
-        html += '<div style="margin-top:12px; margin-bottom:6px; font-size:11pt; font-weight:800; color:#0d47a1; background:#e3f2fd; padding:5px 8px; border-radius:4px;">📂 मुख्य स्त्रोत: ' + escapeHtml(mainKey) + '</div>';
+        // 🌟 border-radius काढून टाकले आहे
+        html += '<div style="margin-top:12px; margin-bottom:6px; font-size:11pt; font-weight:800; color:#0d47a1; background:#e3f2fd; padding:5px 8px; border: 1px solid #90caf9;">📂 मुख्य स्त्रोत: ' + escapeHtml(mainKey) + '</div>';
         for (var secKey in groups[mainKey]) {
             html += '<div style="margin:6px 0 4px 10px; font-size:10pt; font-weight:700; color:#333;">👉 सद्यस्थिती व धारक: ' + escapeHtml(secKey) + '</div>';
             html += '<table class="print-table" style="margin-bottom:8px; width:100%; border-collapse:collapse; font-size:9.5pt;"><thead><tr style="background:#f5f5f5;">' +
@@ -316,10 +314,7 @@ function printQuickModalReport() {
         }
     }
 
-    // आपोआप हेडिंग + अहवाल दिनांक प्रिंट करण्यासाठी printA4Document ला कॉल करा
     if (typeof printA4Document === 'function') {
         printA4Document(html, currentQuickModalType + '_Report_' + todayStr.replace(/\//g, '-') + '.pdf');
-    } else {
-        window.print();
     }
 }
