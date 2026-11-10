@@ -1,4 +1,4 @@
-// mb-report.js - Smart Search, Suggestion List Handling, and Report Generation
+// mb-report.js - Smart Search & General Report
 
 function handleSmartSearchInput(input) {
     var query = (input.value || '').trim().toLowerCase();
@@ -16,6 +16,7 @@ function handleSmartSearchInput(input) {
     var seen = {};
 
     allMBs.forEach(function(m) {
+        if(!m) return;
         var no = (m.mbNumber || '').trim();
         if (no.toLowerCase().includes(query) && !seen[no]) {
             seen[no] = true;
@@ -31,7 +32,7 @@ function handleSmartSearchInput(input) {
 
     var html = '';
     matches.forEach(function(mbNo) {
-        html += '<div class="suggestion-item" onclick="selectSuggestionItem(\'' + mbNo + '\')">' + mbNo + '</div>';
+        html += '<div class="suggestion-item" onclick="selectSuggestionItem(\'' + escapeHtml(mbNo) + '\')">' + escapeHtml(mbNo) + '</div>';
     });
 
     box.innerHTML = html;
@@ -48,7 +49,6 @@ function selectSuggestionItem(mbNo) {
     openSmartActionCenter(mbNo);
 }
 
-// बाहेर क्लिक केल्यास सजेस्ट बॉक्स बंद करणे
 document.addEventListener('click', function(e) {
     var searchInput = document.getElementById('smartSearchInput');
     var box = document.getElementById('smartSearchSuggestions');
@@ -57,12 +57,17 @@ document.addEventListener('click', function(e) {
     }
 });
 
+/* 🌟 नवीन लॉजिक: शोध बॉक्समध्ये काही असेल तर दिनांक न देता देखील शोधणार */
 function executeSmartSearchOrReport() {
     var searchTxt = document.getElementById('smartSearchInput').value.trim();
+    
+    // जर शोध बॉक्समध्ये काही लिहिले असेल, तर दिनांक न देता थेट शोध घ्या
     if (searchTxt) {
         showSmartSearchResultModal(searchTxt);
         return;
     }
+    
+    // जर शोध बॉक्स रिकामा असेल, तरच दिनांक तपासा
     generateGeneralReport();
 }
 
@@ -74,6 +79,7 @@ function showSmartSearchResultModal(query) {
     var stock = getAvailableStock();
 
     var matched = allMBs.filter(function(m) {
+        if(!m) return false;
         var rawNo = (m.mbNumber || '').trim();
         var noLower = rawNo.toLowerCase();
         var noMB = normalizeMB(rawNo);
@@ -113,10 +119,10 @@ function showSmartSearchResultModal(query) {
     '</tr></thead><tbody>';
 
     var isAvailableMap = {};
-    stock.forEach(function(s) { isAvailableMap[normalizeMB(s.mbNumber)] = true; });
+    stock.forEach(function(s) { if(s) isAvailableMap[normalizeMB(s.mbNumber)] = true; });
 
     resultList.forEach(function(item, idx) {
-        var mbNo = item.mbNumber || (getData('mb_records')[item.index] ? getData('mb_records')[item.index].mbNumber : '-');
+        var mbNo = item.mbNumber || '-';
         var size = item.size || 'लहान M.B.';
         var dateStr = formatDateToDMY(item.date);
         var statusText = '';
@@ -127,15 +133,15 @@ function showSmartSearchResultModal(query) {
         } else if (item.lastAction === 'दिलेली M.B.' || item.lastAction === 'दिलेली एमबी') {
             var person = item.detail || item.source || 'संबंधित';
             person = person.replace(/^श्री.?\s*/i, '');
-            statusText = '<span style="color:#e65100; font-weight:700;">JE श्री. ' + person + '</span>';
+            statusText = '<span style="color:#e65100; font-weight:700;">JE श्री. ' + escapeHtml(person) + '</span>';
         } else {
             statusText = '<span style="color:#0d47a1; font-weight:600;">उपलब्ध</span>';
         }
 
         tableHTML += '<tr>' +
         '<td style="text-align:center;">' + (idx + 1) + '</td>' +
-        '<td><a href="javascript:void(0)" onclick="closeSearchResultModal(); openSmartActionCenter(\'' + mbNo + '\')" style="color:#0d47a1; font-size:12.5px; font-weight:800; text-decoration:underline;">' + mbNo + '</a></td>' +
-        '<td>' + size + '</td>' +
+        '<td><a href="javascript:void(0)" onclick="closeSearchResultModal(); openSmartActionCenter(\'' + escapeHtml(mbNo) + '\')" style="color:#0d47a1; font-size:12.5px; font-weight:800; text-decoration:underline;">' + escapeHtml(mbNo) + '</a></td>' +
+        '<td>' + escapeHtml(size) + '</td>' +
         '<td>' + dateStr + '</td>' +
         '<td>' + statusText + '</td>' +
         '</tr>';
@@ -150,6 +156,12 @@ function showSmartSearchResultModal(query) {
 
 function closeSearchResultModal() {
     document.getElementById('searchResultModal').style.display = 'none';
+}
+
+function printSearchResultFromPopup() {
+    var title = document.getElementById('searchResultModalTitle').innerText;
+    var body = document.getElementById('searchResultModalBody').innerHTML;
+    printA4Document(body, 'Search_Result_' + new Date().toISOString().slice(0,10) + '.pdf');
 }
 
 function generateGeneralReport() {
