@@ -37,7 +37,6 @@
 
         var safeFileName = "MB_Register_Report_" + new Date().toISOString().slice(0, 10) + ".pdf";
         
-        // कॉलिंग युनिव्हर्सल इंजिन
         if (typeof printA4Document === 'function') {
             printA4Document(table, safeFileName);
         }
