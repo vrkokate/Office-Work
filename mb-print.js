@@ -1,4 +1,4 @@
-// mb-print.js - MB Module Direct PDF Download
+// mb-print.js - MB Module PDF Download Trigger
 
 (function () {
     "use strict";
@@ -37,17 +37,9 @@
 
         var safeFileName = "MB_Register_Report_" + new Date().toISOString().slice(0, 10) + ".pdf";
         
-        // common.js मधील युनिव्हर्सल फंक्शनला कॉल करा
+        // कॉलिंग युनिव्हर्सल इंजिन
         if (typeof printA4Document === 'function') {
             printA4Document(table, safeFileName);
-        } else {
-            // Fallback
-            var tempDiv = document.createElement('div');
-            tempDiv.innerHTML = table;
-            document.body.appendChild(tempDiv);
-            html2pdf().set({margin: 15, filename: safeFileName, jsPDF: {unit: 'mm', format: 'a4', orientation: 'portrait'}}).from(tempDiv).save().then(function(){
-                document.body.removeChild(tempDiv);
-            });
         }
         return true;
     };
@@ -62,8 +54,6 @@
         
         if (typeof window.generateUniversalPDF === 'function') {
              window.generateUniversalPDF(holder.innerHTML, name);
-        } else {
-             if (typeof printA4Document === 'function') printA4Document(holder.innerHTML, name);
         }
     };
 })();
