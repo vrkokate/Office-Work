@@ -1,4 +1,4 @@
-// mb-print.js - MB Module PDF Download Trigger
+// mb-print.js - MB Module PDF Trigger
 
 (function () {
     "use strict";
@@ -33,7 +33,7 @@
             return "<tr><td style='text-align:center'>" + (index + 1) + "</td><td>" + mbPrintEscape(mbPrintDate(item.date)) + "</td><td>" + mbPrintEscape(item.mbNumber || "-") + "</td><td>" + mbPrintEscape(item.size || "-") + "</td><td>" + mbPrintEscape(item.actionType || "-") + "</td><td>" + mbPrintEscape(item.receivedFrom || item.receivedSource || "-") + "</td><td>" + mbPrintEscape(item.receivedDetail || "-") + "</td></tr>";
         }).join("");
 
-        var table = '<table class="print-table"><thead><tr><th>अ.क्र.</th><th>दिनांक</th><th>M.B. क्रमांक</th><th>आकार</th><th>व्यवहार</th><th>प्राप्तीचा स्रोत</th><th>तपशील</th></tr></thead><tbody>' + rows + '</tbody></table>';
+        var table = '<table><thead><tr><th>अ.क्र.</th><th>दिनांक</th><th>M.B. क्रमांक</th><th>आकार</th><th>व्यवहार</th><th>प्राप्तीचा स्रोत</th><th>तपशील</th></tr></thead><tbody>' + rows + '</tbody></table>';
 
         var safeFileName = "MB_Register_Report_" + new Date().toISOString().slice(0, 10) + ".pdf";
         
@@ -51,8 +51,8 @@
 
         holder.querySelectorAll("button,input,select,textarea,.btn-action,.btn-report,[data-print='hide']").forEach(function (node) { node.remove(); });
         
-        if (typeof window.generateUniversalPDF === 'function') {
-             window.generateUniversalPDF(holder.innerHTML, name);
+        if (typeof printA4Document === 'function') {
+            printA4Document(holder.innerHTML, name);
         }
     };
 })();
