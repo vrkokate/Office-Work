@@ -1,4 +1,4 @@
-// mb-total.js - Total, Given, and Available M.B. Dashboards
+// mb-total.js - Total, Given, Available M.B. Dashboard & Print
 
 var currentQuickModalType = '';
 
@@ -292,7 +292,6 @@ function printQuickModalReport() {
 
     var globalIndex = 1;
     for (var mainKey in groups) {
-        // 🌟 border-radius काढून टाकले आहे
         html += '<div style="margin-top:12px; margin-bottom:6px; font-size:11pt; font-weight:800; color:#0d47a1; background:#e3f2fd; padding:5px 8px; border: 1px solid #90caf9;">📂 मुख्य स्त्रोत: ' + escapeHtml(mainKey) + '</div>';
         for (var secKey in groups[mainKey]) {
             html += '<div style="margin:6px 0 4px 10px; font-size:10pt; font-weight:700; color:#333;">👉 सद्यस्थिती व धारक: ' + escapeHtml(secKey) + '</div>';
