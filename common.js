@@ -1,4 +1,4 @@
-/* DMBMS CENTRAL DATA LAYER + ZERO-FLICKER UNIVERSAL PDF ENGINE */
+/* DMBMS CENTRAL DATA LAYER + FIXED UNIVERSAL PDF ENGINE */
 
 (function(){
     'use strict';
@@ -99,12 +99,12 @@ function formatDateToDMY(dateStr){
 }
 
 /* =========================================================
-   ZERO-FLICKER UNIVERSAL DIRECT PDF DOWNLOAD ENGINE
+   FIXED UNIVERSAL DIRECT PDF DOWNLOAD ENGINE
    ========================================================= */
 window.__isPrinting = false;
 
 function printA4Document(content, optionalFileName) {
-    if (window.__isPrinting) return; // डबल क्लिक प्रोटेक्शन
+    if (window.__isPrinting) return; 
     window.__isPrinting = true;
 
     var printTitle = String(optionalFileName || 'Report.pdf').replace(/[\/:*?"<>|]+/g, '_');
@@ -121,7 +121,7 @@ function printA4Document(content, optionalFileName) {
             script.onerror = function() {
                 window.__isHtml2PdfLoading = false;
                 window.__isPrinting = false;
-                showAlert('PDF लायब्ररी लोड होऊ शकली नाही. कृपया इंटरनेट तपासा.', 'ERROR');
+                showAlert('PDF लायब्ररी लोड होऊ शकली नाही. इंटरनेट तपासा.', 'ERROR');
             };
             document.head.appendChild(script);
         } else {
@@ -138,26 +138,20 @@ function generateUniversalPDF(content, fileName) {
         var todayStr = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
         var reportName = fileName.replace('.pdf', '').replace(/_/g, ' ');
 
-        // रॅपर तयार करा (जेणेकरून स्क्रीनवर काहीही दिसणार नाही)
+        // 🌟 स्क्रीनवर काहीही न दिसण्यासाठी डिव्ह स्क्रीनच्या खूप बाहेर (-9999px) ठेवला आहे
         var wrapper = document.createElement('div');
         wrapper.id = 'pdf-hidden-wrapper';
-        wrapper.style.position = 'fixed';
-        wrapper.style.top = '0';
-        wrapper.style.left = '0';
-        wrapper.style.width = '100vw';
-        wrapper.style.height = '100vh';
-        wrapper.style.overflow = 'hidden';
-        wrapper.style.zIndex = '-99999';
-        wrapper.style.opacity = '0.01'; // अत्यंत पारदर्शक (html2canvas ला गरज असते)
-        wrapper.style.pointerEvents = 'none';
+        wrapper.style.position = 'absolute';
+        wrapper.style.top = '-9999px';
+        wrapper.style.left = '-9999px';
+        wrapper.style.width = '180mm';
+        wrapper.style.background = '#fff';
+        wrapper.style.zIndex = '-1';
 
         var tempDiv = document.createElement('div');
-        tempDiv.style.width = '180mm'; // A4 Width (210mm) - 30mm Margins
+        tempDiv.style.width = '100%';
         tempDiv.style.background = '#fff';
         tempDiv.style.color = '#000';
-        tempDiv.style.position = 'absolute';
-        tempDiv.style.top = '0';
-        tempDiv.style.left = '0';
         
         var html = '<style>' +
             '.pdf-wrapper { position: relative; width: 100%; font-family: "Noto Sans Devanagari", Arial, sans-serif; }' +
@@ -187,27 +181,25 @@ function generateUniversalPDF(content, fileName) {
         wrapper.appendChild(tempDiv);
         document.body.appendChild(wrapper);
 
+        // 🌟 मेमरी वाचवण्यासाठी scale 1.5 आणि compress true केले आहे
         var opt = {
-            margin: [15, 15, 20, 15], 
+            margin: [10, 10, 15, 10], 
             filename: fileName,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            image: { type: 'jpeg', quality: 0.95 },
+            html2canvas: { scale: 1.5, useCORS: true, letterRendering: true, logging: false },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true }
         };
 
-        // थोडा वेळ द्या जेणेकरून DOM मध्ये रेंडर होईल
         setTimeout(function() {
             html2pdf().set(opt).from(tempDiv).toPdf().get('pdf').then(function(pdf) {
                 try {
                     var totalPages = pdf.internal.getNumberOfPages();
                     for (var i = 1; i <= totalPages; i++) {
                         pdf.setPage(i);
-                        pdf.setFontSize(10);
+                        pdf.setFontSize(9);
                         pdf.setTextColor(100);
-                        // Footer
-                        pdf.text('Created by Vitthal kokate | Mb. No. 8446556141', 15, 287);
-                        // Page Number
-                        pdf.text('Page ' + i + ' of ' + totalPages, 195, 287, { align: 'right' });
+                        pdf.text('Created by Vitthal kokate | Mb. No. 8446556141', 10, 287);
+                        pdf.text('Page ' + i + ' of ' + totalPages, 200, 287, { align: 'right' });
                     }
                 } catch(e) { console.warn('Page number error', e); }
             }).save().then(function() {
@@ -217,11 +209,13 @@ function generateUniversalPDF(content, fileName) {
                 console.error('PDF Error:', err);
                 if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
                 window.__isPrinting = false;
+                showAlert('PDF तयार करताना त्रुटी आली. कृपया पुन्हा प्रयत्न करा किंवा रेकॉर्डची संख्या कमी करा.', 'ERROR');
             });
-        }, 100);
+        }, 150);
 
     } catch(err) {
         console.error('PDF Generation Error:', err);
         window.__isPrinting = false;
+        showAlert('प्रणालीत तांत्रिक अडचण आली.', 'ERROR');
     }
 }
