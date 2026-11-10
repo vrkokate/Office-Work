@@ -99,30 +99,23 @@ function formatDateToDMY(dateStr){
 }
 
 /* =========================================================
-   UNIVERSAL A4 PDF DOWNLOAD (No about:blank, No Alert, Full Formatting)
+   UNIVERSAL DIRECT PDF DOWNLOAD (No Alerts, No about:blank)
    ========================================================= */
 function printA4Document(content, optionalFileName) {
     var printTitle = String(optionalFileName || 'Office_Work_Report.pdf').replace(/[\/:*?"<>|]+/g, '_');
     
-    // Android APK Bridge (जर असेल तर)
+    // Android APK Bridge
     try {
         if (window.AndroidPrintBridge && typeof window.AndroidPrintBridge.printHtml === 'function') {
             window.AndroidPrintBridge.printHtml(String(content || ''), printTitle);
             return true;
         }
-        if (window.Android && typeof window.Android.printHtml === 'function') {
-            window.Android.printHtml(String(content || ''), printTitle);
-            return true;
-        }
     } catch(e) { console.warn('Android Print Bridge Error:', e); }
 
-    // जर html2pdf लोड नसेल तर ते लोड करा
     if (typeof html2pdf === 'undefined') {
         var script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-        script.onload = function() {
-            generateUniversalPDF(content, printTitle);
-        };
+        script.onload = function() { generateUniversalPDF(content, printTitle); };
         document.head.appendChild(script);
         return;
     }
@@ -136,18 +129,17 @@ function generateUniversalPDF(content, fileName) {
 
     var tempDiv = document.createElement('div');
     tempDiv.id = 'pdf-temp-container';
-    // A4 साईज आणि मार्जिन (15mm) सेट करणे जेणेकरून ब्लँक पेज येणार नाही
     tempDiv.style.position = 'absolute';
     tempDiv.style.left = '-9999px';
     tempDiv.style.top = '0';
-    tempDiv.style.width = '180mm'; // A4 width (210mm) - 30mm Margins (15mm x 2)
+    tempDiv.style.width = '180mm'; // A4 Width (210mm) - 30mm Margins (15mm left + 15mm right)
     tempDiv.style.background = '#fff';
     tempDiv.style.color = '#000';
     
-    // वॉटरमार्क आणि स्टाईल्स
+    // वॉटरमार्क आणि ग्लोबल स्टाईल्स
     var html = '<style>' +
         '.pdf-wrapper { position: relative; width: 100%; font-family: "Noto Sans Devanagari", Arial, sans-serif; }' +
-        '.watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 70px; font-weight: bold; color: rgba(0, 0, 0, 0.07); z-index: 0; pointer-events: none; white-space: nowrap; }' +
+        '.watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 70px; font-weight: bold; color: rgba(0, 0, 0, 0.08); z-index: 0; pointer-events: none; white-space: nowrap; width: 100%; text-align: center; }' +
         '.pdf-header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; position: relative; z-index: 1; }' +
         '.pdf-header h1 { margin: 0; font-size: 20px; font-weight: bold; }' +
         '.pdf-header h2 { margin: 5px 0; font-size: 14px; font-weight: bold; text-transform: capitalize; }' +
@@ -156,8 +148,8 @@ function generateUniversalPDF(content, fileName) {
         '.print-table, .data-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 11px; }' +
         '.print-table th, .print-table td, .data-table th, .data-table td { border: 1px solid #000 !important; padding: 6px !important; text-align: left; vertical-align: top; word-wrap: break-word; }' +
         '.print-table th, .data-table th { background-color: #eaeaea !important; font-weight: bold; -webkit-print-color-adjust: exact; }' +
-        'thead { display: table-header-group; }' + // हेडिंग पुन्हा पुन्हा येण्यासाठी
-        'tr { page-break-inside: avoid; }' + // कोरे पेज टाळण्यासाठी
+        'thead { display: table-header-group; }' + 
+        'tr { page-break-inside: avoid; }' + 
         '</style>' +
         '<div class="pdf-wrapper">' +
         '<div class="watermark">PWD SOLAPUR</div>' +
@@ -173,12 +165,11 @@ function generateUniversalPDF(content, fileName) {
     document.body.appendChild(tempDiv);
 
     var opt = {
-        margin: [15, 15, 20, 15], // Top, Left, Bottom (20mm for footer), Right
+        margin: [15, 15, 20, 15], // Top, Left, Bottom (for footer), Right
         filename: fileName,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] }
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
     html2pdf().set(opt).from(tempDiv).toPdf().get('pdf').then(function(pdf) {
@@ -187,13 +178,12 @@ function generateUniversalPDF(content, fileName) {
             pdf.setPage(i);
             pdf.setFontSize(10);
             pdf.setTextColor(100);
-            // Footer
-            pdf.text('Created by Vitthal kokate | Mb. No. 8446556141', 105, 287, { align: 'center' });
-            // Page Number
+            // Footer Left
+            pdf.text('Created by Vitthal kokate | Mb. No. 8446556141', 15, 287);
+            // Page Number Right
             pdf.text('Page ' + i + ' of ' + totalPages, 195, 287, { align: 'right' });
         }
     }).save().then(function() {
-        // काम झाल्यावर डिव्ह डिलीट करा (अलर्ट न देता)
         if (tempDiv && tempDiv.parentNode) tempDiv.parentNode.removeChild(tempDiv);
     }).catch(function(err) {
         console.error('PDF Error:', err);
