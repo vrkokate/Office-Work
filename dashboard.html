@@ -36,6 +36,7 @@
             gap: 10px;
         }
 
+        /* 🌟 १. वरचा फोटो 360 डिग्री फिरणारा (2D Spin) */
         .user-photo {
             width: 45px;
             height: 45px;
@@ -43,6 +44,12 @@
             border: 2px solid #00f3ff;
             object-fit: cover;
             box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            animation: spin2D 6s linear infinite; /* सतत फिरण्यासाठी */
+        }
+
+        @keyframes spin2D {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .user-details {
@@ -176,20 +183,74 @@
             font-weight: bold;
             color: #00f3ff;
             line-height: 1.8;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             text-shadow: 0 0 8px rgba(0, 243, 255, 0.5);
             padding: 0 10px;
         }
         .shloka-line { display: block; }
 
+        /* 🌟 २. मधला फोटो ॲनिमेशन कंटेनर */
+        .main-photo-wrapper {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 15px;
+            perspective: 1000px; /* ३डी इफेक्टसाठी */
+            animation: float 3s ease-in-out infinite; /* ४. हवेत तरंगण्यासाठी */
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* २. निऑन रिंग (फिरणारी) */
+        .glow-ring {
+            position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00f3ff, #00ff88, #ff00ea, #00f3ff);
+            background-size: 300% 300%;
+            z-index: 1;
+            animation: spinRing 4s linear infinite, pulseGlow 2s infinite alternate;
+            filter: blur(6px);
+            opacity: 0.8;
+        }
+
+        @keyframes spinRing {
+            0% { background-position: 0% 50%; transform: rotate(0deg); }
+            100% { background-position: 100% 50%; transform: rotate(360deg); }
+        }
+
+        /* ५. पल्सिंग ग्लो */
+        @keyframes pulseGlow {
+            0% { opacity: 0.6; filter: blur(4px); }
+            100% { opacity: 1; filter: blur(8px); box-shadow: 0 0 25px rgba(0, 243, 255, 0.8); }
+        }
+
+        /* ३. मुख्य फोटो (३डी फ्लिप) */
         .profile-main-img {
-            width: 120px;
-            height: 120px;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             border: 3px solid #00f3ff;
-            box-shadow: 0 0 25px rgba(0, 243, 255, 0.6);
             object-fit: cover;
-            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+            /* 3D फिरणे आणि ग्लो */
+            animation: spin3D 6s linear infinite;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        @keyframes spin3D {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        /* 🌟 टच केल्यावर वेगाने फिरण्यासाठी */
+        .fast-spin {
+            animation: spin3D 0.5s linear infinite !important;
         }
 
         .app-title { font-size: 14px; font-weight: bold; letter-spacing: 1px; margin-bottom: 2px; }
@@ -245,7 +306,7 @@
             cursor: pointer;
         }
 
-        /* 🌟 माहिती एका खाली एक दिसण्यासाठी */
+        /* माहिती एका खाली एक दिसण्यासाठी */
         .p-user-info { 
             font-size: 12.5px; 
             line-height: 1.6; 
@@ -276,7 +337,7 @@
 
         .no-pending { text-align: center; color: #888; font-size: 13px; padding: 20px 0; }
         
-        /* 🌟 फुल स्क्रीन फोटो व्यूअर */
+        /* फुल स्क्रीन फोटो व्यूअर */
         .fullscreen-viewer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 2000; display: none;
@@ -289,7 +350,7 @@
         .btn-save-img { background: #00ff88; color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; }
         .btn-close-viewer { background: #ff4d4d; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; }
 
-        /* 🌟 कस्टम लॉगआउट मोडल (इंग्रजी) */
+        /* कस्टम लॉगआउट मोडल */
         .logout-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); z-index: 3000; display: none;
@@ -322,13 +383,11 @@
         </div>
         
         <div class="header-actions">
-            <!-- ॲडमिन बेल (फक्त ॲडमिनला दिसणार) -->
             <button id="adminBell" class="bell-btn hidden" onclick="openAdminPanel()" title="प्रलंबित युजर्स">
                 <i class="fa-solid fa-bell"></i>
                 <span id="bellBadge" class="bell-badge"></span>
             </button>
             
-            <!-- Logout बटन -->
             <button class="logout-btn" onclick="showLogoutModal()">Logout</button>
         </div>
     </header>
@@ -351,7 +410,11 @@
                 <span class="shloka-line">यस्यैते षड्गुणास्तस्य नासाध्यमतिवर्तते ॥</span>
             </div>
             
-            <img src="home-bg.jpg" alt="Profile" class="profile-main-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+            <!-- 🌟 मधला फोटो ॲनिमेशन रॅपर -->
+            <div class="main-photo-wrapper">
+                <div class="glow-ring"></div>
+                <img id="mainProfilePhoto" src="home-bg.jpg" alt="Profile" class="profile-main-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+            </div>
             
             <div class="app-title">SMART TOOLS <span>STRONGER WORK</span></div>
             <div class="app-subtitle">Created by Vitthal Kokate Patil</div>
@@ -359,7 +422,7 @@
 
     </div>
 
-    <!-- 🌟 ॲडमिन पॅनेल मोडल (प्रलंबित युजर्स) -->
+    <!-- 🌟 ॲडमिन पॅनेल मोडल -->
     <div id="adminModal" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
@@ -381,7 +444,7 @@
         </div>
     </div>
 
-    <!-- 🌟 कस्टम लॉगआउट मोडल (इंग्रजी) -->
+    <!-- 🌟 कस्टम लॉगआउट मोडल -->
     <div id="logoutModal" class="logout-modal">
         <div class="logout-box">
             <h3><i class="fa-solid fa-right-from-bracket"></i> Confirm Logout</h3>
@@ -394,7 +457,6 @@
     </div>
 
     <script>
-        // १. लॉगिन तपासणी
         if (localStorage.getItem('isLoggedIn') !== 'true') {
             window.location.href = 'index.html';
         }
@@ -405,22 +467,44 @@
         let usersData = JSON.parse(localStorage.getItem('ow_users') || '{}');
         let myData = usersData[currentUser];
 
-        // २. हेडर अपडेट करणे
+        // ॲनिमेशनसाठी मुख्य फोटो सिलेक्ट करणे
+        const mainPhotoElement = document.getElementById('mainProfilePhoto');
+
         if (myData) {
             document.getElementById('headerName').textContent = myData.name;
             document.getElementById('headerDesig').textContent = myData.designation;
             
             const photoSrc = myData.photo || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+            
+            // दोन्हीकडे फोटो सेट करणे
             document.getElementById('headerPhoto').src = photoSrc;
+            mainPhotoElement.src = photoSrc;
         }
 
-        // ३. ॲडमिन असल्यास बेल दाखवणे आणि काउंट तपासणे
+        // 🌟 टच केल्यावर मधला फोटो वेगाने फिरण्यासाठी इव्हेंट्स
+        mainPhotoElement.addEventListener('touchstart', () => {
+            mainPhotoElement.classList.add('fast-spin');
+        });
+        mainPhotoElement.addEventListener('touchend', () => {
+            mainPhotoElement.classList.remove('fast-spin');
+        });
+        // माऊस साठी (कॉम्प्युटरवर पाहत असल्यास)
+        mainPhotoElement.addEventListener('mousedown', () => {
+            mainPhotoElement.classList.add('fast-spin');
+        });
+        mainPhotoElement.addEventListener('mouseup', () => {
+            mainPhotoElement.classList.remove('fast-spin');
+        });
+        mainPhotoElement.addEventListener('mouseleave', () => {
+            mainPhotoElement.classList.remove('fast-spin');
+        });
+
+
         if (userRole === 'admin') {
             document.getElementById('adminBell').classList.remove('hidden');
             checkPendingUsers();
         }
 
-        // ४. प्रलंबित युजर्स तपासणे (बेलवर लाल डॉट येण्यासाठी)
         function checkPendingUsers() {
             let users = JSON.parse(localStorage.getItem('ow_users') || '{}');
             let pendingCount = 0;
@@ -429,16 +513,10 @@
                     pendingCount++;
                 }
             }
-            
             const badge = document.getElementById('bellBadge');
-            if (pendingCount > 0) {
-                badge.style.display = 'block';
-            } else {
-                badge.style.display = 'none';
-            }
+            badge.style.display = pendingCount > 0 ? 'block' : 'none';
         }
 
-        // ५. ॲडमिन पॅनेल उघडणे
         function openAdminPanel() {
             document.getElementById('adminModal').style.display = 'flex';
             loadPendingUsers();
@@ -448,22 +526,18 @@
             document.getElementById('adminModal').style.display = 'none';
         }
 
-        // ६. युजर्सची यादी लोड करणे (संपूर्ण माहिती एकाखाली एक, पासवर्डसह)
         function loadPendingUsers() {
             const listContainer = document.getElementById('pendingUsersList');
             let users = JSON.parse(localStorage.getItem('ow_users') || '{}');
             let usersHTML = '';
             let hasUsers = false;
 
-            // ॲडमिन वगळून बाकीचे युजर्स दाखवायचे
             for (let u in users) {
                 if (u === 'admin') continue; 
-
                 hasUsers = true;
                 let user = users[u];
                 let photo = user.photo || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
                 
-                // जर कृती झाली असेल तर फेडेड क्लास
                 let isProcessed = (user.status === 'approved' || user.status === 'rejected');
                 let cardClass = isProcessed ? 'pending-user-card processed' : 'pending-user-card';
                 
@@ -484,7 +558,6 @@
                 usersHTML += `
                     <div class="${cardClass}">
                         <div class="p-user-top">
-                            <!-- फोटोवर क्लिक केल्यास फुल स्क्रीन ओपन होईल -->
                             <img src="${photo}" alt="User" onclick="viewFullPhoto('${photo}')">
                             <div class="p-user-info">
                                 <strong>${user.name}</strong>
@@ -493,7 +566,6 @@
                                 <span><b>जिल्हा:</b> ${user.district || '-'}</span>
                                 <span><b>मोबाईल:</b> ${user.mobile || '-'}</span>
                                 <span><b>युजरनेम:</b> ${u}</span>
-                                <!-- 🌟 येथे पासवर्ड ॲड केला आहे -->
                                 <span><b>पासवर्ड:</b> ${user.password || '-'}</span>
                             </div>
                         </div>
@@ -509,20 +581,16 @@
             }
         }
 
-        // ७. मंजूरी (Approve) किंवा नाकारणे (Reject)
         function processUser(username, status) {
             let users = JSON.parse(localStorage.getItem('ow_users') || '{}');
             if (users[username]) {
                 users[username].status = status;
                 localStorage.setItem('ow_users', JSON.stringify(users));
-                
-                // यादी पुन्हा लोड करा आणि बेलचा डॉट तपासा
                 loadPendingUsers();
                 checkPendingUsers();
             }
         }
 
-        // ८. फोटो फुल स्क्रीन पाहणे
         function viewFullPhoto(src) {
             document.getElementById('fullSizeImage').src = src;
             document.getElementById('photoViewer').style.display = 'flex';
@@ -532,7 +600,6 @@
             document.getElementById('photoViewer').style.display = 'none';
         }
 
-        // ९. फोटो सेव्ह (डाऊनलोड) करणे
         function downloadPhoto() {
             const imgSrc = document.getElementById('fullSizeImage').src;
             const a = document.createElement('a');
@@ -543,7 +610,6 @@
             document.body.removeChild(a);
         }
 
-        // १०. कस्टम लॉगआउट मोडल
         function showLogoutModal() {
             document.getElementById('logoutModal').style.display = 'flex';
         }
@@ -560,7 +626,6 @@
             window.location.href = 'index.html';
         }
 
-        // मोडल बाहेर क्लिक केल्यास बंद करणे
         window.onclick = function(event) {
             if (event.target === document.getElementById('adminModal')) closeAdminPanel();
             if (event.target === document.getElementById('photoViewer')) closePhotoViewer();
