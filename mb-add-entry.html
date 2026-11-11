@@ -95,6 +95,18 @@
         .alert-actions { display: flex; gap: 10px; }
         .btn-cancel-alert { flex: 1; background: #757575; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-confirm-alert { flex: 1; background: #d32f2f; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+        /* 🌟 दिनांक प्लेसहोल्डर */
+        input[type="date"]:before {
+            content: attr(data-placeholder);
+            color: #999;
+            width: 100%;
+            display: block;
+        }
+        input[type="date"]:focus:before,
+        input[type="date"].has-value:before {
+            content: "";
+        }
     </style>
 </head>
 <body>
@@ -128,9 +140,14 @@
                 </select>
             </div>
 
-            <!-- ३. M.B. क्रमांक आणि स्मार्ट मॅसेज -->
+            <!-- ३. M.B. क्रमांक (इनपुट आणि ड्रॉपडाऊन) -->
             <div class="form-group hidden" id="groupMBNo">
-                <input type="text" id="mbNumber" class="form-control" placeholder="M.B. क्रमांक टाका" oninput="checkDuplicateMB()" autocomplete="off">
+                <!-- 'मिळाली' साठी इनपुट -->
+                <input type="text" id="mbNumberInput" class="form-control" placeholder="M.B. क्रमांक टाका" oninput="checkDuplicateMB()" autocomplete="off">
+                
+                <!-- 'दिली' साठी ड्रॉपडाऊन -->
+                <select id="mbNumberSelect" class="form-control" style="display: none;"></select>
+                
                 <div id="mbSmartMsg" class="smart-msg"></div>
             </div>
 
@@ -169,7 +186,7 @@
                 <input type="text" id="bhandarpalName" class="form-control" placeholder="भांडारपाल यांचे नाव टाका" autocomplete="off">
             </div>
 
-            <!-- 🌟 ५.ब चालू (कोणाकडून मिळाली? - JE / Office) -->
+            <!-- ५.ब चालू (कोणाकडून मिळाली? - JE / Office) -->
             <div class="form-group hidden" id="groupReceivedFromType">
                 <select id="receivedFromType" class="form-control" onchange="handleReceivedFromTypeChange()">
                     <option value="">-- कोणाकडून मिळाली? --</option>
@@ -185,17 +202,15 @@
                 </select>
             </div>
 
-            <!-- 🌟 ५.ब.२ चालू - विभागीय कार्यालय (हाताने टाईप + जुने सजेशन) -->
+            <!-- ५.ब.२ चालू - विभागीय कार्यालय -->
             <div class="form-group hidden" id="groupReceivedOffice">
                 <input type="text" id="receivedOfficeInput" class="form-control" list="previousNamesList" placeholder="कार्यालयाचे नाव टाईप करा" autocomplete="off">
-                <datalist id="previousNamesList">
-                    <!-- यापूर्वीची कार्यालयांची नावे इथे लोड होतील -->
-                </datalist>
+                <datalist id="previousNamesList"></datalist>
             </div>
 
             <!-- ६. दिनांक -->
             <div class="form-group hidden" id="groupDate">
-                <input type="date" id="entryDate" class="form-control">
+                <input type="date" id="entryDate" class="form-control" data-placeholder="दिनांक निवडा" onfocus="this.removeAttribute('data-placeholder')" onblur="if(!this.value)this.setAttribute('data-placeholder', 'दिनांक निवडा');" onchange="this.classList.add('has-value')">
             </div>
 
             <button class="btn-save hidden" id="saveBtn" onclick="saveEntry()">Save Entry</button>
@@ -213,9 +228,7 @@
                             <th style="text-align: center;">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="mbTableBody">
-                        <!-- डेटा इथे लोड होईल -->
-                    </tbody>
+                    <tbody id="mbTableBody"></tbody>
                 </table>
             </div>
 
@@ -225,7 +238,6 @@
         </div>
     </div>
 
-    <!-- कस्टम अलर्ट (डिलीटसाठी) -->
     <div id="deleteAlert" class="custom-alert-overlay">
         <div class="custom-alert-box">
             <p>तुम्हाला ही नोंद नक्की डिलीट करायची आहे का?</p>
@@ -243,7 +255,6 @@
         let jeRecords = [];
         let deleteTargetIndex = -1;
 
-        // १. डेटा लोड करणे
         function loadData() {
             let jeData = localStorage.getItem('mb_je_records');
             jeRecords = jeData ? JSON.parse(jeData) : [];
@@ -253,11 +264,10 @@
 
             renderTable();
             populateGivenJEList();
-            populateReceivedJEList(); // नवीन ॲड
-            populatePreviousOfficeNames(); // फक्त कार्यालयांची नावे
+            populateReceivedJEList();
+            populatePreviousOfficeNames();
         }
 
-        // २. नोंद प्रकार निवडल्यावर (दिली / मिळाली)
         function handleEntryTypeChange() {
             const type = document.getElementById('entryType').value;
             hideAllGroups();
@@ -267,7 +277,6 @@
             }
         }
 
-        // ३. आकार निवडल्यावर (लहान / मोठी)
         function handleSizeChange() {
             const size = document.getElementById('mbSize').value;
             const type = document.getElementById('entryType').value;
@@ -277,8 +286,17 @@
                 
                 if (type === 'दिली') {
                     document.getElementById('groupGivenTo').classList.remove('hidden');
+                    // 🌟 'दिली' साठी उपलब्ध M.B. ची यादी तयार करणे
+                    document.getElementById('mbNumberInput').style.display = 'none';
+                    document.getElementById('mbNumberSelect').style.display = 'block';
+                    populateAvailableMBSelect(size);
                 } else if (type === 'मिळाली') {
                     document.getElementById('groupReceivedType').classList.remove('hidden');
+                    // 'मिळाली' साठी हाताने टाईप करण्याचे फील्ड
+                    document.getElementById('mbNumberInput').style.display = 'block';
+                    document.getElementById('mbNumberSelect').style.display = 'none';
+                    document.getElementById('mbNumberInput').value = ''; // रिकामे करणे
+                    document.getElementById('mbSmartMsg').style.display = 'none';
                 }
                 document.getElementById('groupDate').classList.remove('hidden');
                 document.getElementById('saveBtn').classList.remove('hidden');
@@ -287,7 +305,44 @@
             }
         }
 
-        // ४. कुणाला दिली (JE / कार्यालय)
+        // 🌟 उपलब्ध M.B. ची यादी शोधणे आणि ड्रॉपडाऊनमध्ये टाकणे
+        function populateAvailableMBSelect(selectedSize) {
+            let uniqueMBs = {};
+            mbRecords.forEach(rec => {
+                uniqueMBs[rec.mbNo] = rec; 
+            });
+
+            let availableMBs = [];
+            for (let mbNo in uniqueMBs) {
+                if (uniqueMBs[mbNo].type === 'मिळाली' && uniqueMBs[mbNo].size === selectedSize) {
+                    availableMBs.push(mbNo);
+                }
+            }
+
+            let select = document.getElementById('mbNumberSelect');
+            select.innerHTML = '';
+
+            let editIndex = parseInt(document.getElementById('editIndex').value);
+            
+            if (availableMBs.length === 0) {
+                select.innerHTML = '<option value="">M.B. उपलब्ध नाही</option>';
+            } else {
+                select.innerHTML = '<option value="">-- M.B. निवडा --</option>';
+                availableMBs.forEach(mb => {
+                    select.innerHTML += `<option value="${mb}">${mb}</option>`;
+                });
+            }
+
+            // जर एडिट करत असेल आणि सध्याची M.B. यादीत नसेल, तर ती ॲड करणे
+            if (editIndex !== -1) {
+                let currentMB = mbRecords[editIndex].mbNo;
+                if (!availableMBs.includes(currentMB)) {
+                    select.innerHTML += `<option value="${currentMB}">${currentMB} (सध्याची नोंद)</option>`;
+                }
+                select.value = currentMB;
+            }
+        }
+
         function handleGivenToChange() {
             const givenTo = document.getElementById('givenToType').value;
             document.getElementById('groupGivenJE').classList.add('hidden');
@@ -300,11 +355,9 @@
             }
         }
 
-        // ५. मिळाली प्रकार (नवीन / चालू)
         function handleReceivedTypeChange() {
             const recType = document.getElementById('receivedType').value;
             
-            // आधी सर्व लपवा
             document.getElementById('groupBhandarpal').classList.add('hidden');
             document.getElementById('groupReceivedFromType').classList.add('hidden');
             document.getElementById('groupReceivedJE').classList.add('hidden');
@@ -317,7 +370,6 @@
             }
         }
 
-        // 🌟 ५.१ कोणाकडून मिळाली (JE / कार्यालय)
         function handleReceivedFromTypeChange() {
             const fromType = document.getElementById('receivedFromType').value;
             
@@ -331,7 +383,6 @@
             }
         }
 
-        // ६. सर्व ग्रुप्स लपवणे
         function hideAllGroups() {
             const groups = [
                 'groupMBSize', 'groupMBNo', 'groupGivenTo', 'groupGivenJE', 'groupGivenOffice', 
@@ -344,9 +395,8 @@
             document.getElementById('cancelBtn').classList.add('hidden');
         }
 
-        // ७. डुप्लिकेट M.B. क्रमांक तपासणे
         function checkDuplicateMB() {
-            const mbNo = document.getElementById('mbNumber').value.trim();
+            const mbNo = document.getElementById('mbNumberInput').value.trim();
             const msgBox = document.getElementById('mbSmartMsg');
 
             if (!mbNo) {
@@ -366,7 +416,6 @@
             }
         }
 
-        // ८. JE ची यादी (दिली साठी)
         function populateGivenJEList() {
             const jeSelect = document.getElementById('givenJE');
             jeSelect.innerHTML = '<option value="">-- JE निवडा --</option>';
@@ -375,7 +424,6 @@
             });
         }
 
-        // 🌟 ८.१ JE ची यादी (चालू मिळाली साठी)
         function populateReceivedJEList() {
             const jeSelect = document.getElementById('receivedJE');
             jeSelect.innerHTML = '<option value="">-- JE निवडा --</option>';
@@ -384,12 +432,10 @@
             });
         }
 
-        // ९. यापूर्वीची कार्यालयांची नावे (हाताने टाईप साठी सजेशन)
         function populatePreviousOfficeNames() {
             const dataList = document.getElementById('previousNamesList');
             dataList.innerHTML = '';
             
-            // फक्त विभागीय कार्यालयाची नावे गोळा करणे
             let uniqueOffices = new Set();
             mbRecords.forEach(rec => {
                 if (rec.detail && !jeRecords.some(je => je.name === rec.detail) && rec.detail !== 'उपलब्ध') {
@@ -402,21 +448,34 @@
             });
         }
 
-        // १०. नोंद सेव्ह करणे
         function saveEntry() {
             const type = document.getElementById('entryType').value;
             const size = document.getElementById('mbSize').value;
-            const mbNo = document.getElementById('mbNumber').value.trim();
             const date = document.getElementById('entryDate').value;
             const editIndex = parseInt(document.getElementById('editIndex').value);
 
-            if (!mbNo || !date) {
-                alert('कृपया M.B. क्रमांक आणि दिनांक भरा!');
-                return;
+            let mbNo = '';
+
+            if (type === 'दिली') {
+                mbNo = document.getElementById('mbNumberSelect').value;
+                if (!mbNo) {
+                    alert('कृपया उपलब्ध M.B. मधून निवडा!');
+                    return;
+                }
+            } else {
+                mbNo = document.getElementById('mbNumberInput').value.trim();
+                if (!mbNo) {
+                    alert('कृपया M.B. क्रमांक टाका!');
+                    return;
+                }
+                if (editIndex === -1 && mbRecords.some(r => r.mbNo === mbNo)) {
+                    alert('हा M.B. क्रमांक आधीच नोंदवला आहे!');
+                    return;
+                }
             }
 
-            if (editIndex === -1 && mbRecords.some(r => r.mbNo === mbNo)) {
-                alert('हा M.B. क्रमांक आधीच नोंदवला आहे!');
+            if (!date) {
+                alert('कृपया दिनांक निवडा!');
                 return;
             }
 
@@ -465,7 +524,6 @@
             loadData();
         }
 
-        // ११. टेबल रेंडर करणे
         function renderTable() {
             const tbody = document.getElementById('mbTableBody');
             tbody.innerHTML = '';
@@ -493,7 +551,6 @@
             });
         }
 
-        // १२. दिनांक फॉरमॅट
         function formatDate(dateStr) {
             if (!dateStr) return '';
             const parts = dateStr.split('-');
@@ -501,7 +558,6 @@
             return dateStr;
         }
 
-        // १३. एडिट करणे
         function editEntry(index) {
             const rec = mbRecords[index];
             document.getElementById('editIndex').value = index;
@@ -510,13 +566,13 @@
             handleEntryTypeChange();
             
             document.getElementById('mbSize').value = rec.size;
+            
+            // handleSizeChange ला ट्रिगर करणे जेणेकरून अपलोड लिस्ट तयार होईल
             handleSizeChange();
 
-            document.getElementById('mbNumber').value = rec.mbNo;
-            checkDuplicateMB();
-
             if (rec.type === 'दिली') {
-                // JE आहे की कार्यालय ते तपासा
+                document.getElementById('mbNumberSelect').value = rec.mbNo;
+                
                 const isJE = jeRecords.some(j => j.name === rec.detail);
                 if (isJE) {
                     document.getElementById('givenToType').value = 'JE';
@@ -528,7 +584,9 @@
                     document.getElementById('givenOffice').value = rec.detail;
                 }
             } else {
-                // मिळाली असल्यास (सध्या सोपे ठेवू: चालू म्हणून दाखवू)
+                document.getElementById('mbNumberInput').value = rec.mbNo;
+                checkDuplicateMB();
+
                 document.getElementById('receivedType').value = 'चालू';
                 handleReceivedTypeChange();
                 
@@ -544,7 +602,9 @@
                 }
             }
 
-            document.getElementById('entryDate').value = rec.date;
+            let dateInput = document.getElementById('entryDate');
+            dateInput.value = rec.date;
+            if(rec.date) dateInput.classList.add('has-value');
             
             document.getElementById('saveBtn').innerText = 'Update Entry';
             document.getElementById('cancelBtn').classList.remove('hidden');
@@ -552,20 +612,24 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // १४. एडिट रद्द करणे
         function cancelEdit() {
             document.getElementById('editIndex').value = '-1';
             document.getElementById('entryType').value = '';
             document.getElementById('mbSize').value = '';
-            document.getElementById('mbNumber').value = '';
-            document.getElementById('entryDate').value = '';
+            document.getElementById('mbNumberInput').value = '';
+            document.getElementById('mbNumberSelect').innerHTML = '';
+            
+            let dateInput = document.getElementById('entryDate');
+            dateInput.value = '';
+            dateInput.classList.remove('has-value');
+            dateInput.setAttribute('data-placeholder', 'दिनांक निवडा');
+
             document.getElementById('saveBtn').innerText = 'Save Entry';
             document.getElementById('cancelBtn').classList.add('hidden');
             
             hideAllGroups();
         }
 
-        // १५. डिलीट
         function showDeleteAlert(index) {
             deleteTargetIndex = index;
             document.getElementById('deleteAlert').style.display = 'flex';
@@ -583,7 +647,6 @@
             }
         });
 
-        // १६. रिपोर्ट / प्रिंट
         function printReport() {
             if (mbRecords.length === 0) {
                 alert('प्रिंट करण्यासाठी कोणतीही नोंद नाही!');
