@@ -128,11 +128,10 @@
             });
         }
 
-        // २. JE निवडल्यावर त्याच्याकडील उपलब्ध M.B. ची यादी भरणे
+        // २. JE निवडल्यावर त्याच्याकडील सर्व M.B. ची यादी भरणे
         function onWorkJEChange() {
             const selectedJE = document.getElementById('workJE').value;
             const mbSelect = document.getElementById('workMB');
-            const editIndex = parseInt(document.getElementById('editWorkIndex').value);
 
             mbSelect.innerHTML = '<option value="">-- M.B. निवडा --</option>';
             if (!selectedJE) return;
@@ -145,32 +144,21 @@
 
             let availableMBs = [];
             
-            // ज्या M.B. निवडलेल्या JE कडे 'दिली' आहेत त्या शोधणे
+            // ज्या M.B. निवडलेल्या JE कडे 'दिली' आहेत त्या सर्वांची यादी करणे
+            // 🌟 (नवीन बदल: आता 'अपूर्ण' काम आहे का हे तपासले जात नाही, सर्व M.B. दिसतील)
             for (let mbNo in uniqueMBs) {
                 let latest = uniqueMBs[mbNo];
                 if (latest.type === 'दिली' && latest.detail === selectedJE) {
-                    
-                    // त्या M.B. वर आधीच एखादे 'अपूर्ण' काम चालू आहे का ते तपासणे
-                    let activeWork = workRecords.find(w => w.mbNo === mbNo && w.status === 'अपूर्ण');
-                    
-                    // जर काम चालू नसेल, किंवा आपण सध्याचेच काम एडिट करत असू, तर ती M.B. दाखवायची
-                    if (!activeWork || (editIndex !== -1 && workRecords[editIndex].mbNo === mbNo)) {
-                        availableMBs.push(mbNo);
-                    }
+                    availableMBs.push(mbNo);
                 }
             }
 
             if (availableMBs.length === 0) {
-                mbSelect.innerHTML = '<option value="">-- या JE कडे कोणतीही मोकळी M.B. नाही --</option>';
+                mbSelect.innerHTML = '<option value="">-- या JE कडे कोणतीही M.B. नाही --</option>';
             } else {
                 availableMBs.forEach(mb => {
                     mbSelect.innerHTML += `<option value="${mb}">${mb}</option>`;
                 });
-            }
-
-            // एडिट करत असल्यास सध्याची M.B. सिलेक्ट करणे
-            if (editIndex !== -1) {
-                mbSelect.value = workRecords[editIndex].mbNo;
             }
         }
 
@@ -188,14 +176,7 @@
             if (!name) { alert('कृपया कामाचे नाव टाका!'); return; }
             if (!contractor) { alert('कृपया कंत्राटदाराचे नाव टाका!'); return; }
 
-            // डुप्लिकेट तपासणी (नवीन नोंद असल्यास)
-            if (editIndex === -1) {
-                let activeWork = workRecords.find(w => w.mbNo === mbNo && w.status === 'अपूर्ण');
-                if (activeWork) {
-                    alert(`M.B. क्रमांक ${mbNo} वर आधीच "${activeWork.name}" हे काम अपूर्ण आहे. नवीन काम ॲड करण्यापूर्वी ते पूर्ण करा!`);
-                    return;
-                }
-            }
+            // 🌟 (नवीन बदल: 'अपूर्ण' कामाची डुप्लिकेट तपासणी पूर्णपणे काढून टाकली आहे)
 
             const workData = {
                 je: je,
@@ -255,7 +236,7 @@
             
             document.getElementById('workJE').value = work.je;
             
-            // JE बदलल्यावर M.B. ची यादी लोड करणे आवश्यक आहे
+            // JE सेट केल्यावर M.B. ची यादी लोड करणे आवश्यक आहे
             onWorkJEChange(); 
             
             document.getElementById('workMB').value = work.mbNo;
