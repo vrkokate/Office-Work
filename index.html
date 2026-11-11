@@ -46,10 +46,11 @@
 
         .input-group { position: relative; margin-bottom: 6px; }
         .input-group i.main-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #00f3ff; font-size: 13px; z-index: 2; transition: 0.3s; }
+        
         .input-box {
             width: 100%; background: #0a192f; border: 1px solid rgba(0, 243, 255, 0.3);
             border-radius: 8px; padding: 8px 10px 8px 32px; color: #fff; font-size: 13px; outline: none;
-            transition: 0.3s;
+            transition: 0.3s; position: relative; z-index: 1;
         }
         .input-box:focus { border-color: #00f3ff; }
 
@@ -58,22 +59,25 @@
         .input-box.invalid-field { border-color: #ff4d4d !important; background: rgba(255, 77, 77, 0.08) !important; }
         .input-group i.main-icon.icon-invalid { color: #ff4d4d !important; }
         
-        /* 🌟 ड्रॉपडाऊनसाठी नवीन CSS */
-        select.input-box {
-            appearance: none;
-            -webkit-appearance: none;
+        /* 🌟 इनलाइन सजेशन */
+        .suggestion-wrapper { position: relative; width: 100%; }
+        .autocomplete-suggestion {
+            position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+            padding: 8px 10px 8px 32px; font-size: 13px; font-family: inherit;
+            color: transparent; background: transparent; pointer-events: none;
+            white-space: nowrap; overflow: hidden; border: 1px solid transparent; box-sizing: border-box;
         }
-        .select-arrow {
-            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-            color: #00f3ff; font-size: 12px; pointer-events: none; z-index: 2;
-        }
+        .autocomplete-suggestion .bold-part { color: transparent; }
+        .autocomplete-suggestion .faded-part { color: #888; }
+
+        select.input-box { appearance: none; -webkit-appearance: none; }
+        .select-arrow { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #00f3ff; font-size: 12px; pointer-events: none; z-index: 2; }
 
         .validation-text { font-size: 10px; margin-top: 2px; margin-left: 5px; display: block; font-weight: bold; }
         .val-success { color: #00ff88; }
         .val-error { color: #ff4d4d; }
         .eye-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #00f3ff; font-size: 14px; cursor: pointer; z-index: 2; }
 
-        /* फोटो अपलोड */
         .photo-upload-group { display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
         .photo-label {
             display: flex; align-items: center; gap: 8px;
@@ -98,7 +102,6 @@
         .msg-error { color: #ff4d4d; }
         .msg-success { color: #00ff88; }
 
-        /* स्क्रीन्स */
         .screen { text-align: center; }
         .icon-big { font-size: 35px; color: #00ff88; margin-bottom: 8px; }
         .info-box { background: #0a192f; border: 1px solid #00f3ff; border-radius: 8px; padding: 8px; text-align: left; font-size: 12px; margin-bottom: 10px; }
@@ -112,17 +115,17 @@
         /* 🌟 फोटो क्रॉप मोडल */
         #cropModal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 9999; display: flex; flex-direction: column;
+            background: rgba(0,0,0,0.95); z-index: 9999; display: flex; flex-direction: column;
         }
-        .crop-container { flex: 1; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        .crop-container { flex: 1; background: #000; overflow: hidden; position: relative; display: flex; justify-content: center; align-items: center; }
         #cropImage { max-width: 100%; max-height: 100%; display: block; }
         .crop-actions { padding: 15px; background: #020d1b; display: flex; gap: 10px; }
         .crop-actions button { flex: 1; padding: 12px; border-radius: 8px; font-weight: bold; border: none; font-size: 14px; }
         .btn-cancel { background: #d32f2f; color: #fff; }
         .btn-save-crop { background: #00ff88; color: #000; }
         
-        /* Cropper.js मधील बटणांचा रंग बदलण्यासाठी */
-        .cropper-view-box, .cropper-face { border-radius: 50%; }
+        /* क्रॉपरचा बॉर्डर व इफेक्ट */
+        .cropper-view-box, .cropper-face { border-radius: 0; }
     </style>
 </head>
 <body>
@@ -160,12 +163,10 @@
             <!-- REGISTRATION FORM -->
             <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
                 
-                <!-- फोटो अपलोड (गॅलरी) -->
                 <div class="photo-upload-group">
                     <label class="photo-label" id="photoLabel">
                         <i class="fa-solid fa-image" id="photoIcon"></i> 
                         <span id="photoText">फोटो अपलोड करा (गॅलरी)</span>
-                        <!-- फक्त image/* ठेवले आहे, capture काढले आहे जेणेकरून गॅलरी उघडेल -->
                         <input type="file" id="regPhoto" accept="image/*" onchange="openCropModal(event)" required>
                     </label>
                 </div>
@@ -181,20 +182,13 @@
                     <span id="mobileMsg" class="validation-text hidden"></span>
                 </div>
 
+                <!-- पदनाम (Inline Suggestion) -->
                 <div class="input-group">
                     <i class="fa-solid fa-briefcase main-icon"></i>
-                    <input type="text" id="regDesignation" class="input-box" placeholder="पदनाम (उदा. कनिष्ठ अभियंता)" required list="desigList" autocomplete="off" oninput="checkField(this)">
-                    <datalist id="desigList">
-                        <option value="कनिष्ठ अभियंता">
-                        <option value="कार्यकारी अभियंता">
-                        <option value="अधिक्षक अभियंता">
-                        <option value="मुख्य अभियंता">
-                        <option value="कनिष्ठ लिपिक">
-                        <option value="वरिष्ठ लिपिक">
-                        <option value="सहाय्यक">
-                        <option value="अधिकारी">
-                        <option value="शिपाई">
-                    </datalist>
+                    <div class="suggestion-wrapper">
+                        <div id="desigSuggestion" class="autocomplete-suggestion hidden"></div>
+                        <input type="text" id="regDesignation" class="input-box" placeholder="पदनाम (उदा. कनिष्ठ अभियंता)" required autocomplete="off" oninput="handleDesigInput(this)" onkeydown="handleDesigKey(event, this)">
+                    </div>
                 </div>
                 
                 <!-- कार्यालय -->
@@ -203,7 +197,7 @@
                     <input type="text" id="regOffice" class="input-box" placeholder="कार्यालयाचे नाव" required autocomplete="off" oninput="checkField(this)">
                 </div>
 
-                <!-- 🌟 जिल्हा Dropdown -->
+                <!-- जिल्हा Dropdown -->
                 <div class="input-group">
                     <i class="fa-solid fa-map-location-dot main-icon"></i>
                     <select id="regDistrict" class="input-box" required onchange="checkField(this)">
@@ -309,7 +303,7 @@
                     <i class="fa-solid fa-building main-icon"></i>
                     <input type="text" id="fOffice" class="input-box" placeholder="कार्यालयाचे नाव" required>
                 </div>
-                <!-- जिल्हा Dropdown Forgot मध्ये -->
+                
                 <div class="input-group">
                     <i class="fa-solid fa-map-location-dot main-icon"></i>
                     <select id="fDistrict" class="input-box" required>
@@ -364,22 +358,26 @@
         </div>
     </div>
 
-    <!-- 🌟 फोटो क्रॉप मोडल -->
+    <!-- फोटो क्रॉप मोडल -->
     <div id="cropModal" class="hidden">
         <div class="crop-container">
             <img id="cropImage" src="" alt="Crop Image">
         </div>
         <div class="crop-actions">
             <button type="button" class="btn-cancel" onclick="cancelCrop()">रद्द करा</button>
-            <button type="button" class="btn-save-crop" onclick="saveCrop()">फोटो जतन करा (क्रॉप)</button>
+            <button type="button" class="btn-save-crop" onclick="saveCrop()">पूर्ण फोटो जतन करा</button>
         </div>
     </div>
 
     <script>
         const ADMIN_MOBILE = "918446556141"; 
-        let cropper = null; // क्रॉपर इन्स्टन्स जतन करण्यासाठी
+        let cropper = null;
 
-        // डिफॉल्ट ॲडमिन तयार करणे
+        const designationList = [
+            "कनिष्ठ अभियंता", "कार्यकारी अभियंता", "अधिक्षक अभियंता", "मुख्य अभियंता",
+            "कनिष्ठ लिपिक", "वरिष्ठ लिपिक", "सहाय्यक", "अधिकारी", "शिपाई", "वाहनचालक"
+        ];
+
         if (!localStorage.getItem('ow_users')) {
             const defaultUsers = {
                 'admin': { name: 'Vitthal Kokate Patil', password: 'admin123', role: 'admin', status: 'approved' }
@@ -424,7 +422,6 @@
             el.classList.remove('hidden');
         }
 
-        // सामान्य फील्ड हिरवे होणे (Select साठी सुद्धा)
         function checkField(inputElement) {
             const parent = inputElement.closest('.input-group');
             const icon = parent.querySelector('.main-icon');
@@ -451,8 +448,7 @@
                 inputElement.classList.remove('valid-field'); inputElement.classList.add('invalid-field');
                 if(icon) { icon.classList.add('icon-invalid'); icon.classList.remove('icon-valid'); }
                 msg.textContent = "१० अंकी मोबाईल नंबर टाका";
-                msg.className = "validation-text val-error";
-                msg.classList.remove('hidden');
+                msg.className = "validation-text val-error"; msg.classList.remove('hidden');
             }
         }
 
@@ -500,7 +496,40 @@
             }
         }
 
-        // 🌟 फोटो क्रॉप फंक्शन्स
+        let currentSuggestion = "";
+        function handleDesigInput(inputElement) {
+            checkField(inputElement);
+            const val = inputElement.value;
+            const sugBox = document.getElementById('desigSuggestion');
+
+            if (!val) {
+                sugBox.classList.add('hidden');
+                currentSuggestion = "";
+                return;
+            }
+
+            const match = designationList.find(item => item.startsWith(val));
+
+            if (match && match !== val) {
+                currentSuggestion = match;
+                sugBox.innerHTML = `<span class="bold-part">${val}</span><span class="faded-part">${match.substring(val.length)}</span>`;
+                sugBox.classList.remove('hidden');
+            } else {
+                sugBox.classList.add('hidden');
+                currentSuggestion = "";
+            }
+        }
+
+        function handleDesigKey(e, inputElement) {
+            if ((e.key === 'Tab' || e.key === 'Enter') && currentSuggestion) {
+                e.preventDefault();
+                inputElement.value = currentSuggestion;
+                document.getElementById('desigSuggestion').classList.add('hidden');
+                checkField(inputElement);
+            }
+        }
+
+        // 🌟 फोटो क्रॉप फंक्शन्स (पूर्ण फोटो क्रॉप)
         function openCropModal(event) {
             const file = event.target.files[0];
             if (file) {
@@ -513,19 +542,18 @@
                     
                     if (cropper) { cropper.destroy(); }
                     
-                    // क्रॉपर इनिशियलाईज करणे
                     setTimeout(() => {
                         cropper = new Cropper(cropImage, {
-                            aspectRatio: 1, // चौरस (गोल) क्रॉपसाठी
+                            aspectRatio: NaN, // 🌟 फोटो पूर्ण क्रॉप करण्यासाठी फ्री (Free) मोड
                             viewMode: 1,
                             dragMode: 'move',
-                            autoCropArea: 1,
+                            autoCropArea: 1, // सुरुवातीला पूर्ण फोटो सिलेक्ट होईल
                             restore: false,
-                            guides: true,
+                            guides: false, // गाईड लाईन्स काढून टाकल्या
                             center: true,
                             highlight: false,
-                            cropBoxMovable: true, // बॉक्स हलवता येईल
-                            cropBoxResizable: true, // कोपरे ओढून मोठा/लहान करता येईल
+                            cropBoxMovable: true,
+                            cropBoxResizable: true, // चारही कोपऱ्यांनी साईज बदलता येईल
                             toggleDragModeOnDblclick: false
                         });
                     }, 100);
@@ -536,18 +564,17 @@
 
         function cancelCrop() {
             document.getElementById('cropModal').classList.add('hidden');
-            document.getElementById('regPhoto').value = ''; // इनपुट रिकामे करणे
+            document.getElementById('regPhoto').value = '';
             if (cropper) { cropper.destroy(); cropper = null; }
         }
 
         function saveCrop() {
             if (!cropper) return;
             
-            // क्रॉप केलेला फोटो डेटा URL स्वरूपात मिळवणे
-            const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+            // मूळ फोटोच्या गुणोत्तरानुसार (Aspect Ratio) कॅनव्हास तयार करणे
+            const canvas = cropper.getCroppedCanvas();
             const croppedImageUrl = canvas.toDataURL('image/jpeg');
 
-            // UI अपडेट करणे
             const label = document.getElementById('photoLabel');
             const text = document.getElementById('photoText');
             const icon = document.getElementById('photoIcon');
@@ -557,10 +584,8 @@
             icon.classList.remove('fa-image');
             icon.classList.add('fa-check-circle');
 
-            // पुढे सेव्ह करण्यासाठी डेटा साठवणे
             label.dataset.croppedImage = croppedImageUrl;
 
-            // मोडल बंद करणे
             document.getElementById('cropModal').classList.add('hidden');
             if (cropper) { cropper.destroy(); cropper = null; }
         }
@@ -631,7 +656,6 @@
             document.getElementById('btnCallAdmin').href = `tel:+${ADMIN_MOBILE}`;
         }
 
-        // फोरगॉट पासवर्ड
         function showForgotScreen() {
             document.getElementById('formContainer').classList.add('hidden');
             document.getElementById('forgotScreen').classList.remove('hidden');
