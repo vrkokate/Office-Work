@@ -5,168 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Digital Hub - MB Register</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 🌟 सामाईक CSS इथे जोडली -->
+    <link rel="stylesheet" href="common.css">
+    
+    <!-- फक्त या पेजसाठी लागणारे खास CSS (टॅब्स आणि कार्ड्स) -->
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #f0f2f5; color: #212121; min-height: 100vh; display: flex; flex-direction: column; }
-
-        /* 🌟 हेडर (मध्यभागी नाव) */
-        .top-header {
-            display: flex; justify-content: space-between; align-items: center; padding: 15px;
-            background: #0d47a1; color: #fff; position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-        
-        .back-btn, .home-icon {
-            color: #fff; font-size: 18px; cursor: pointer; 
-            text-decoration: none; display: flex; align-items: center;
-            transition: 0.3s;
-        }
-        .back-btn:hover, .home-icon:hover { color: #00e5ff; }
-
-        .header-title { 
-            font-size: 15px; font-weight: bold; color: #fff; text-align: center;
-            flex: 1; margin: 0 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-
-        /* 🌟 मुख्य भाग */
-        .main-content { padding: 15px; flex: 1; max-width: 600px; margin: 0 auto; width: 100%; }
-
-        /* ४ ॲक्शन टॅब्स */
-        .action-grid { 
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; 
-            background: #fff; padding: 10px; border-radius: 10px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 15px;
-        }
-        .action-btn {
-            border: none; border-radius: 8px; color: #fff; padding: 12px 4px; font-size: 11.5px;
-            font-weight: bold; cursor: pointer; text-align: center; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; gap: 6px; text-decoration: none;
-            background: #0d47a1; transition: 0.3s;
-        }
+        .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 15px; }
+        .action-btn { border: none; border-radius: 8px; color: #fff; padding: 12px 4px; font-size: 11.5px; font-weight: bold; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-decoration: none; background: #0d47a1; transition: 0.3s; }
         .action-btn:hover { background: #1565c0; }
         .action-btn i { font-size: 18px; }
 
-        /* समरी कार्ड्स */
         .summary-box { background: #fff; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        
         .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-
-        .stat-card { 
-            border-radius: 8px; text-align: center; padding: 12px 5px; cursor: pointer; 
-            background: #fcfdfe; transition: 0.2s; box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-            border: 2.5px solid transparent !important;
-        }
+        .stat-card { border-radius: 8px; text-align: center; padding: 12px 5px; cursor: pointer; background: #fcfdfe; transition: 0.2s; box-shadow: 0 3px 10px rgba(0,0,0,0.08); border: 2.5px solid transparent !important; }
         .stat-card:hover { transform: scale(1.02); }
-
-        /* निऑन बॉर्डर इफेक्ट */
-        .stat-card:nth-child(1) {
-            background: linear-gradient(#fcfdfe, #fcfdfe) padding-box, linear-gradient(90deg, #00c853, #00e5ff, #76ff03, #00c853) border-box;
-            background-size: 100% 100%, 300% 300%; animation: borderFlow 3s linear infinite;
-        }
-        .stat-card:nth-child(2) {
-            background: linear-gradient(#fcfdfe, #fcfdfe) padding-box, linear-gradient(90deg, #2979ff, #aa00ff, #ff4081, #2979ff) border-box;
-            background-size: 100% 100%, 300% 300%; animation: borderFlow 3s linear infinite;
-        }
-        .stat-card:nth-child(3) {
-            background: linear-gradient(#fcfdfe, #fcfdfe) padding-box, linear-gradient(90deg, #ff9100, #ffea00, #ff1744, #ff9100) border-box;
-            background-size: 100% 100%, 300% 300%; animation: borderFlow 3s linear infinite;
-        }
-
+        
+        .stat-card:nth-child(1) { background: linear-gradient(#fcfdfe, #fcfdfe) padding-box, linear-gradient(90deg, #00c853, #00e5ff, #76ff03, #00c853) border-box; background-size: 100% 100%, 300% 300%; animation: borderFlow 3s linear infinite; }
+        .stat-card:nth-child(2) { background: linear-gradient(#fcfdfe, #fcfdfe) padding-box, linear-gradient(90deg, #2979ff, #aa00ff, #ff4081, #2979ff) border-box; background-size: 100% 100%, 300% 300%; animation: borderFlow 3s linear infinite; }
+        .stat-card:nth-child(3) { background: linear-gradient(#fcfdfe, #fcfdfe) padding-box, linear-gradient(90deg, #ff9100, #ffea00, #ff1744, #ff9100) border-box; background-size: 100% 100%, 300% 300%; animation: borderFlow 3s linear infinite; }
         @keyframes borderFlow { 0% { background-position: 0% 0%, 0% 50%; } 50% { background-position: 0% 0%, 100% 50%; } 100% { background-position: 0% 0%, 0% 50%; } }
 
         .stat-num { font-size: 20px; font-weight: 800; color: #0d47a1; }
         .stat-label { font-size: 11.5px; color: #555; margin-top: 3px; font-weight: 600; }
 
-        /* सर्च आणि फिल्टर सेक्शन */
         .filter-card { background: #fff; border-radius: 10px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .filter-title { font-size: 14px; color: #0d47a1; margin-bottom: 12px; font-weight: bold; }
-        
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-size: 12px; font-weight: bold; color: #333; margin-bottom: 5px; }
-        
-        .form-control {
-            width: 100%; padding: 10px; font-size: 13px; border: 1px solid #ccc;
-            border-radius: 6px; outline: none; background: #fff; color: #333;
-        }
-        .form-control:focus { border-color: #0d47a1; }
-
-        /* 🌟 दिनांक प्लेसहोल्डर स्टाईल */
-        input[type="date"]:before {
-            content: attr(placeholder);
-            color: #999;
-            width: 100%;
-            display: block;
-        }
-        input[type="date"]:focus:before,
-        input[type="date"].has-value:before {
-            content: "";
-        }
-
         .btn-row { display: flex; gap: 10px; margin-top: 15px; }
         .btn-search { flex: 1; background: #0d47a1; color: #fff; border: none; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; }
         .btn-reset { flex: 1; background: #546e7a; color: #fff; border: none; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; }
-
     </style>
 </head>
 <body>
 
-    <!-- 🌟 हेडर (मध्यभागी नाव) -->
     <header class="top-header">
         <a href="establishment.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <div class="header-title">📖 मोजमाप पुस्तिका (M.B.) स्थिती</div>
         <a href="dashboard.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
     </header>
 
-    <!-- 🌟 मुख्य भाग -->
     <div class="main-content">
-        
         <!-- ४ ॲक्शन टॅब्स -->
         <div class="action-grid">
-            <a href="mb-je.html" class="action-btn">
-                <i class="fa-solid fa-user-tie"></i> JE
-            </a>
-            <a href="mb-add-entry.html" class="action-btn">
-                <i class="fa-solid fa-book"></i> M.B.
-            </a>
-            <a href="mb-work-list.html" class="action-btn">
-                <i class="fa-solid fa-clipboard-list"></i> Work list
-            </a>
-            <a href="mb-bill-reg.html" class="action-btn">
-                <i class="fa-solid fa-file-invoice"></i> Bill reg.
-            </a>
+            <a href="mb-je.html" class="action-btn"><i class="fa-solid fa-user-tie"></i> JE</a>
+            <a href="mb-add-entry.html" class="action-btn"><i class="fa-solid fa-book"></i> M.B.</a>
+            <a href="mb-work-list.html" class="action-btn"><i class="fa-solid fa-clipboard-list"></i> Work list</a>
+            <a href="mb-bill-reg.html" class="action-btn"><i class="fa-solid fa-file-invoice"></i> Bill reg.</a>
         </div>
 
         <!-- समरी कार्ड्स -->
         <div class="summary-box">
             <div class="card-grid">
-                <div class="stat-card">
-                    <div class="stat-num" id="countReceivedMB">0</div>
-                    <div class="stat-label">एकूण M.B.</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-num" id="countGivenMB">0</div>
-                    <div class="stat-label">दिलेली M.B.</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-num" id="countAvailableMB">0</div>
-                    <div class="stat-label">उपलब्ध M.B.</div>
-                </div>
+                <div class="stat-card"><div class="stat-num" id="countReceivedMB">0</div><div class="stat-label">एकूण M.B.</div></div>
+                <div class="stat-card"><div class="stat-num" id="countGivenMB">0</div><div class="stat-label">दिलेली M.B.</div></div>
+                <div class="stat-card"><div class="stat-num" id="countAvailableMB">0</div><div class="stat-label">उपलब्ध M.B.</div></div>
             </div>
         </div>
 
         <!-- सर्च आणि फिल्टर -->
         <div class="filter-card">
             <div class="filter-title">🔍 सविस्तर संबंधित माहिती व रिपोर्ट</div>
-            
             <div class="form-row">
                 <div class="form-group">
                     <label>दिनांक पासून *</label>
-                    <input type="date" class="form-control" id="repFromDate" placeholder="दिनांक निवडा" onchange="checkDatePlaceholder(this)">
+                    <input type="date" class="form-control" id="repFromDate" data-placeholder="दिनांक निवडा" onchange="checkDatePlaceholder(this)">
                 </div>
                 <div class="form-group">
                     <label>दिनांक पर्यंत *</label>
-                    <input type="date" class="form-control" id="repToDate" placeholder="दिनांक निवडा" onchange="checkDatePlaceholder(this)">
+                    <input type="date" class="form-control" id="repToDate" data-placeholder="दिनांक निवडा" onchange="checkDatePlaceholder(this)">
                 </div>
             </div>
 
@@ -197,39 +104,25 @@
                 <button class="btn-reset" onclick="resetForm()">🔄 RESET</button>
             </div>
         </div>
-
     </div>
 
+    <!-- 🌟 सामाईक JS इथे जोडली -->
+    <script src="common.js"></script>
+
+    <!-- फक्त या पेजसाठी लागणारे लॉजिक -->
     <script>
-        if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'index.html';
+        checkAuth(); // सुरक्षेसाठी लॉगिन चेक
 
-        // 🌟 १. दिनांक प्लेसहोल्डर तपासणे
-        function checkDatePlaceholder(input) {
-            if (input.value) {
-                input.classList.add('has-value');
-            } else {
-                input.classList.remove('has-value');
-            }
-        }
-
-        // 🌟 २. डेटा कॅल्क्युलेशन आणि ॲनिमेशन फंक्शन्स
         function updateDashboardCounts() {
             let mbRecords = JSON.parse(localStorage.getItem('mb_records') || '[]');
-            
             let uniqueMBs = {};
-            mbRecords.forEach(rec => {
-                uniqueMBs[rec.mbNo] = rec; 
-            });
+            mbRecords.forEach(rec => { uniqueMBs[rec.mbNo] = rec; });
 
             let total = Object.keys(uniqueMBs).length;
             let given = 0;
-            
             for (let mbNo in uniqueMBs) {
-                if (uniqueMBs[mbNo].type === 'दिली') {
-                    given++;
-                }
+                if (uniqueMBs[mbNo].type === 'दिली') given++;
             }
-            
             let available = total - given;
             if (available < 0) available = 0;
 
@@ -239,13 +132,8 @@
         }
 
         function animateValue(id, start, end, duration) {
-            if (start === end) {
-                document.getElementById(id).innerText = end;
-                return;
-            }
-            let range = end - start;
-            let startTime = null;
-            
+            if (start === end) { document.getElementById(id).innerText = end; return; }
+            let range = end - start; let startTime = null;
             function step(timestamp) {
                 if (!startTime) startTime = timestamp;
                 let progress = timestamp - startTime;
@@ -253,72 +141,51 @@
                 let eased = 1 - Math.pow(1 - percentage, 3); 
                 let current = Math.floor(start + (range * eased));
                 document.getElementById(id).innerText = current;
-                
-                if (progress < duration) {
-                    window.requestAnimationFrame(step);
-                } else {
-                    document.getElementById(id).innerText = end;
-                }
+                if (progress < duration) window.requestAnimationFrame(step);
+                else document.getElementById(id).innerText = end;
             }
             window.requestAnimationFrame(step);
         }
 
-        // 🌟 ३. मुख्य घटकानुसार ड्रॉपडाऊन बदलणे
         function updateDynamicOptions() {
             const mainCat = document.getElementById('mainCategory').value;
             const group = document.getElementById('dynamicOptionsGroup');
             const select = document.getElementById('dynamicSelect');
             const label = document.getElementById('dynamicLabel');
 
-            if (!mainCat) {
-                group.style.display = 'none';
-                return;
-            }
-
+            if (!mainCat) { group.style.display = 'none'; return; }
             group.style.display = 'block';
             select.innerHTML = '';
 
             if (mainCat === 'M.B.') {
                 label.innerText = 'M.B. प्रकार निवडा';
-                select.innerHTML = '<option value="">-- पर्याय निवडा --</option>';
-                select.innerHTML += '<option value="All M.B.">All M.B.</option><option value="Small M.B.">Small M.B.</option><option value="Big M.B.">Big M.B.</option>';
+                select.innerHTML = '<option value="">-- पर्याय निवडा --</option><option value="All M.B.">All M.B.</option><option value="Small M.B.">Small M.B.</option><option value="Big M.B.">Big M.B.</option>';
             } else if (mainCat === 'J.E.') {
                 label.innerText = 'JE निवडा';
-                // 🌟 नवीन बदल: सर्व JE हा पर्याय सर्वात वर
                 select.innerHTML = '<option value="All_JE">सर्व कनिष्ठ अभियंता</option>';
                 let jeRecords = JSON.parse(localStorage.getItem('mb_je_records') || '[]');
-                jeRecords.forEach(je => {
-                    select.innerHTML += `<option value="${je.name}">${je.name}</option>`;
-                });
+                jeRecords.forEach(je => { select.innerHTML += `<option value="${je.name}">${je.name}</option>`; });
             } else {
                 label.innerText = 'पर्याय निवडा';
                 select.innerHTML = '<option value="">-- पर्याय निवडा --</option>';
             }
         }
 
-        function performSearch() {
-            alert('सर्च फंक्शन पुढील टप्प्यात ॲक्टिव्ह होईल.');
-        }
+        function performSearch() { alert('सर्च फंक्शन पुढील टप्प्यात ॲक्टिव्ह होईल.'); }
 
         function resetForm() {
             document.getElementById('mainCategory').value = '';
             document.getElementById('dynamicOptionsGroup').style.display = 'none';
             document.getElementById('smartSearch').value = '';
-            
             let fromDate = document.getElementById('repFromDate');
             let toDate = document.getElementById('repToDate');
-            fromDate.value = '';
-            toDate.value = '';
-            checkDatePlaceholder(fromDate);
-            checkDatePlaceholder(toDate);
+            fromDate.value = ''; toDate.value = '';
+            checkDatePlaceholder(fromDate); checkDatePlaceholder(toDate);
         }
 
         window.onload = function() {
-            // सुरुवातीला प्लेसहोल्डर तपासणे
             checkDatePlaceholder(document.getElementById('repFromDate'));
             checkDatePlaceholder(document.getElementById('repToDate'));
-            
-            // काउंट्स अपडेट करणे
             updateDashboardCounts();
         };
     </script>
