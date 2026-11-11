@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Digital Hub - Login & Registration</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- फोटो क्रॉप करण्यासाठी Cropper.js लायब्ररी -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         html, body {
@@ -54,6 +58,16 @@
         .input-box.invalid-field { border-color: #ff4d4d !important; background: rgba(255, 77, 77, 0.08) !important; }
         .input-group i.main-icon.icon-invalid { color: #ff4d4d !important; }
         
+        /* 🌟 ड्रॉपडाऊनसाठी नवीन CSS */
+        select.input-box {
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .select-arrow {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            color: #00f3ff; font-size: 12px; pointer-events: none; z-index: 2;
+        }
+
         .validation-text { font-size: 10px; margin-top: 2px; margin-left: 5px; display: block; font-weight: bold; }
         .val-success { color: #00ff88; }
         .val-error { color: #ff4d4d; }
@@ -94,6 +108,21 @@
         .contact-btn { flex: 1; padding: 8px; border-radius: 8px; text-decoration: none; color: #fff; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-call { background: #2196F3; }
         .btn-wa { background: #25D366; }
+
+        /* 🌟 फोटो क्रॉप मोडल */
+        #cropModal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 9999; display: flex; flex-direction: column;
+        }
+        .crop-container { flex: 1; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        #cropImage { max-width: 100%; max-height: 100%; display: block; }
+        .crop-actions { padding: 15px; background: #020d1b; display: flex; gap: 10px; }
+        .crop-actions button { flex: 1; padding: 12px; border-radius: 8px; font-weight: bold; border: none; font-size: 14px; }
+        .btn-cancel { background: #d32f2f; color: #fff; }
+        .btn-save-crop { background: #00ff88; color: #000; }
+        
+        /* Cropper.js मधील बटणांचा रंग बदलण्यासाठी */
+        .cropper-view-box, .cropper-face { border-radius: 50%; }
     </style>
 </head>
 <body>
@@ -131,13 +160,13 @@
             <!-- REGISTRATION FORM -->
             <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
                 
-                <!-- 🌟 फोटो अपलोड (फक्त गॅलरी) -->
+                <!-- फोटो अपलोड (गॅलरी) -->
                 <div class="photo-upload-group">
                     <label class="photo-label" id="photoLabel">
                         <i class="fa-solid fa-image" id="photoIcon"></i> 
                         <span id="photoText">फोटो अपलोड करा (गॅलरी)</span>
-                        <!-- capture काढले आहे, जेणेकरून फक्त गॅलरी उघडेल -->
-                        <input type="file" id="regPhoto" accept="image/*" onchange="previewPhoto(event)" required>
+                        <!-- फक्त image/* ठेवले आहे, capture काढले आहे जेणेकरून गॅलरी उघडेल -->
+                        <input type="file" id="regPhoto" accept="image/*" onchange="openCropModal(event)" required>
                     </label>
                 </div>
 
@@ -168,15 +197,55 @@
                     </datalist>
                 </div>
                 
-                <!-- 🌟 कार्यालय (फक्त हाताने टाईप) -->
+                <!-- कार्यालय -->
                 <div class="input-group">
                     <i class="fa-solid fa-building main-icon"></i>
                     <input type="text" id="regOffice" class="input-box" placeholder="कार्यालयाचे नाव" required autocomplete="off" oninput="checkField(this)">
                 </div>
 
+                <!-- 🌟 जिल्हा Dropdown -->
                 <div class="input-group">
                     <i class="fa-solid fa-map-location-dot main-icon"></i>
-                    <input type="text" id="regDistrict" class="input-box" placeholder="जिल्हा" required oninput="checkField(this)">
+                    <select id="regDistrict" class="input-box" required onchange="checkField(this)">
+                        <option value="" disabled selected>जिल्हा निवडा</option>
+                        <option value="अहमदनगर">अहमदनगर</option>
+                        <option value="अकोला">अकोला</option>
+                        <option value="अमरावती">अमरावती</option>
+                        <option value="औरंगाबाद (छत्रपती संभाजीनगर)">औरंगाबाद (छत्रपती संभाजीनगर)</option>
+                        <option value="बीड">बीड</option>
+                        <option value="भंडारा">भंडारा</option>
+                        <option value="बुलढाणा">बुलढाणा</option>
+                        <option value="चंद्रपूर">चंद्रपूर</option>
+                        <option value="धुळे">धुळे</option>
+                        <option value="गडचिरोली">गडचिरोली</option>
+                        <option value="गोंदिया">गोंदिया</option>
+                        <option value="हिंगोली">हिंगोली</option>
+                        <option value="जळगाव">जळगाव</option>
+                        <option value="जालना">जालना</option>
+                        <option value="कोल्हापूर">कोल्हापूर</option>
+                        <option value="लातूर">लातूर</option>
+                        <option value="मुंबई शहर">मुंबई शहर</option>
+                        <option value="मुंबई उपनगर">मुंबई उपनगर</option>
+                        <option value="नागपूर">नागपूर</option>
+                        <option value="नांदेड">नांदेड</option>
+                        <option value="नंदुरबार">नंदुरबार</option>
+                        <option value="नाशिक">नाशिक</option>
+                        <option value="उस्मानाबाद (धाराशिव)">उस्मानाबाद (धाराशिव)</option>
+                        <option value="पालघर">पालघर</option>
+                        <option value="परभणी">परभणी</option>
+                        <option value="पुणे">पुणे</option>
+                        <option value="रायगड">रायगड</option>
+                        <option value="रत्नागिरी">रत्नागिरी</option>
+                        <option value="सांगली">सांगली</option>
+                        <option value="सातारा">सातारा</option>
+                        <option value="सिंधुदुर्ग">सिंधुदुर्ग</option>
+                        <option value="सोलापूर">सोलापूर</option>
+                        <option value="ठाणे">ठाणे</option>
+                        <option value="वर्धा">वर्धा</option>
+                        <option value="वाशिम">वाशिम</option>
+                        <option value="यवतमाळ">यवतमाळ</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down select-arrow"></i>
                 </div>
 
                 <div class="input-group">
@@ -196,7 +265,7 @@
             </form>
         </div>
 
-        <!-- 🌟 सक्सेस स्क्रीन (रजिस्ट्रेशन नंतर) -->
+        <!-- सक्सेस स्क्रीन (रजिस्ट्रेशन नंतर) -->
         <div class="login-card hidden screen" id="successScreen">
             <div class="icon-big"><i class="fa-solid fa-circle-check"></i></div>
             <h3 style="color: #00ff88; margin-bottom: 4px; font-size: 15px;">रजिस्ट्रेशन यशस्वी!</h3>
@@ -219,7 +288,7 @@
             <button onclick="location.reload()" style="margin-top: 12px; background: none; border: none; color: #888; text-decoration: underline; cursor: pointer; font-size: 11px;">लॉगिन पेजवर परत जा</button>
         </div>
 
-        <!-- 🌟 फोरगॉट पासवर्ड स्क्रीन (पासवर्ड रिसेट फॉर्म) -->
+        <!-- फोरगॉट पासवर्ड स्क्रीन -->
         <div class="login-card hidden" id="forgotScreen">
             <h3 style="color: #00f3ff; font-size: 14px; margin-bottom: 10px; text-align: center;">पासवर्ड रिसेट विनंती</h3>
             
@@ -240,9 +309,49 @@
                     <i class="fa-solid fa-building main-icon"></i>
                     <input type="text" id="fOffice" class="input-box" placeholder="कार्यालयाचे नाव" required>
                 </div>
+                <!-- जिल्हा Dropdown Forgot मध्ये -->
                 <div class="input-group">
                     <i class="fa-solid fa-map-location-dot main-icon"></i>
-                    <input type="text" id="fDistrict" class="input-box" placeholder="जिल्हा" required>
+                    <select id="fDistrict" class="input-box" required>
+                        <option value="" disabled selected>जिल्हा निवडा</option>
+                        <option value="अहमदनगर">अहमदनगर</option>
+                        <option value="अकोला">अकोला</option>
+                        <option value="अमरावती">अमरावती</option>
+                        <option value="औरंगाबाद (छत्रपती संभाजीनगर)">औरंगाबाद</option>
+                        <option value="बीड">बीड</option>
+                        <option value="भंडारा">भंडारा</option>
+                        <option value="बुलढाणा">बुलढाणा</option>
+                        <option value="चंद्रपूर">चंद्रपूर</option>
+                        <option value="धुळे">धुळे</option>
+                        <option value="गडचिरोली">गडचिरोली</option>
+                        <option value="गोंदिया">गोंदिया</option>
+                        <option value="हिंगोली">हिंगोली</option>
+                        <option value="जळगाव">जळगाव</option>
+                        <option value="जालना">जालना</option>
+                        <option value="कोल्हापूर">कोल्हापूर</option>
+                        <option value="लातूर">लातूर</option>
+                        <option value="मुंबई शहर">मुंबई शहर</option>
+                        <option value="मुंबई उपनगर">मुंबई उपनगर</option>
+                        <option value="नागपूर">नागपूर</option>
+                        <option value="नांदेड">नांदेड</option>
+                        <option value="नंदुरबार">नंदुरबार</option>
+                        <option value="नाशिक">नाशिक</option>
+                        <option value="उस्मानाबाद (धाराशिव)">उस्मानाबाद</option>
+                        <option value="पालघर">पालघर</option>
+                        <option value="परभणी">परभणी</option>
+                        <option value="पुणे">पुणे</option>
+                        <option value="रायगड">रायगड</option>
+                        <option value="रत्नागिरी">रत्नागिरी</option>
+                        <option value="सांगली">सांगली</option>
+                        <option value="सातारा">सातारा</option>
+                        <option value="सिंधुदुर्ग">सिंधुदुर्ग</option>
+                        <option value="सोलापूर">सोलापूर</option>
+                        <option value="ठाणे">ठाणे</option>
+                        <option value="वर्धा">वर्धा</option>
+                        <option value="वाशिम">वाशिम</option>
+                        <option value="यवतमाळ">यवतमाळ</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down select-arrow"></i>
                 </div>
                 <div class="input-group">
                     <i class="fa-solid fa-briefcase main-icon"></i>
@@ -253,12 +362,24 @@
                 <a onclick="backToLogin()" style="display:block; text-align:center; margin-top:10px; color:#00f3ff; font-size:12px; cursor:pointer;">लॉगिन वर परत जा</a>
             </form>
         </div>
+    </div>
 
+    <!-- 🌟 फोटो क्रॉप मोडल -->
+    <div id="cropModal" class="hidden">
+        <div class="crop-container">
+            <img id="cropImage" src="" alt="Crop Image">
+        </div>
+        <div class="crop-actions">
+            <button type="button" class="btn-cancel" onclick="cancelCrop()">रद्द करा</button>
+            <button type="button" class="btn-save-crop" onclick="saveCrop()">फोटो जतन करा (क्रॉप)</button>
+        </div>
     </div>
 
     <script>
         const ADMIN_MOBILE = "918446556141"; 
+        let cropper = null; // क्रॉपर इन्स्टन्स जतन करण्यासाठी
 
+        // डिफॉल्ट ॲडमिन तयार करणे
         if (!localStorage.getItem('ow_users')) {
             const defaultUsers = {
                 'admin': { name: 'Vitthal Kokate Patil', password: 'admin123', role: 'admin', status: 'approved' }
@@ -303,6 +424,7 @@
             el.classList.remove('hidden');
         }
 
+        // सामान्य फील्ड हिरवे होणे (Select साठी सुद्धा)
         function checkField(inputElement) {
             const parent = inputElement.closest('.input-group');
             const icon = parent.querySelector('.main-icon');
@@ -378,19 +500,69 @@
             }
         }
 
-        // फोटो अपलोड
-        function previewPhoto(event) {
+        // 🌟 फोटो क्रॉप फंक्शन्स
+        function openCropModal(event) {
             const file = event.target.files[0];
             if (file) {
-                const label = document.getElementById('photoLabel');
-                const text = document.getElementById('photoText');
-                const icon = document.getElementById('photoIcon');
-                
-                label.classList.add('uploaded');
-                text.textContent = "फोटो अपलोड झाला (बदलण्यासाठी क्लिक करा)";
-                icon.classList.remove('fa-image');
-                icon.classList.add('fa-check-circle');
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const cropImage = document.getElementById('cropImage');
+                    cropImage.src = e.target.result;
+                    
+                    document.getElementById('cropModal').classList.remove('hidden');
+                    
+                    if (cropper) { cropper.destroy(); }
+                    
+                    // क्रॉपर इनिशियलाईज करणे
+                    setTimeout(() => {
+                        cropper = new Cropper(cropImage, {
+                            aspectRatio: 1, // चौरस (गोल) क्रॉपसाठी
+                            viewMode: 1,
+                            dragMode: 'move',
+                            autoCropArea: 1,
+                            restore: false,
+                            guides: true,
+                            center: true,
+                            highlight: false,
+                            cropBoxMovable: true, // बॉक्स हलवता येईल
+                            cropBoxResizable: true, // कोपरे ओढून मोठा/लहान करता येईल
+                            toggleDragModeOnDblclick: false
+                        });
+                    }, 100);
+                };
+                reader.readAsDataURL(file);
             }
+        }
+
+        function cancelCrop() {
+            document.getElementById('cropModal').classList.add('hidden');
+            document.getElementById('regPhoto').value = ''; // इनपुट रिकामे करणे
+            if (cropper) { cropper.destroy(); cropper = null; }
+        }
+
+        function saveCrop() {
+            if (!cropper) return;
+            
+            // क्रॉप केलेला फोटो डेटा URL स्वरूपात मिळवणे
+            const canvas = cropper.getCroppedCanvas({ width: 300, height: 300 });
+            const croppedImageUrl = canvas.toDataURL('image/jpeg');
+
+            // UI अपडेट करणे
+            const label = document.getElementById('photoLabel');
+            const text = document.getElementById('photoText');
+            const icon = document.getElementById('photoIcon');
+            
+            label.classList.add('uploaded');
+            text.textContent = "फोटो अपलोड झाला (बदलण्यासाठी क्लिक करा)";
+            icon.classList.remove('fa-image');
+            icon.classList.add('fa-check-circle');
+
+            // पुढे सेव्ह करण्यासाठी डेटा साठवणे
+            label.dataset.croppedImage = croppedImageUrl;
+
+            // मोडल बंद करणे
+            document.getElementById('cropModal').classList.add('hidden');
+            if (cropper) { cropper.destroy(); cropper = null; }
         }
 
         function handleLogin(e) {
@@ -415,13 +587,20 @@
 
         function handleRegister(e) {
             e.preventDefault();
+            
+            const photoLabel = document.getElementById('photoLabel');
+            const croppedImage = photoLabel.dataset.croppedImage;
+            if (!croppedImage) {
+                return showMsg('कृपया फोटो अपलोड करून क्रॉप करा!', true);
+            }
+
             const u = document.getElementById('regUsername').value.trim();
             const p = document.getElementById('regPassword').value.trim();
             const name = document.getElementById('regName').value.trim();
             const mobile = document.getElementById('regMobile').value.trim();
             const desig = document.getElementById('regDesignation').value.trim();
             const office = document.getElementById('regOffice').value.trim();
-            const district = document.getElementById('regDistrict').value.trim();
+            const district = document.getElementById('regDistrict').value;
             
             let users = JSON.parse(localStorage.getItem('ow_users') || '{}');
             
@@ -431,7 +610,7 @@
 
             users[u] = {
                 name: name, mobile: mobile, designation: desig, office: office, district: district,
-                password: p, role: 'user', status: 'pending'
+                password: p, role: 'user', status: 'pending', photo: croppedImage
             };
 
             localStorage.setItem('ow_users', JSON.stringify(users));
@@ -452,7 +631,7 @@
             document.getElementById('btnCallAdmin').href = `tel:+${ADMIN_MOBILE}`;
         }
 
-        // 🌟 फोरगॉट पासवर्ड फंक्शन्स
+        // फोरगॉट पासवर्ड
         function showForgotScreen() {
             document.getElementById('formContainer').classList.add('hidden');
             document.getElementById('forgotScreen').classList.remove('hidden');
@@ -469,7 +648,7 @@
             const name = document.getElementById('fName').value.trim();
             const mobile = document.getElementById('fMobile').value.trim();
             const office = document.getElementById('fOffice').value.trim();
-            const district = document.getElementById('fDistrict').value.trim();
+            const district = document.getElementById('fDistrict').value;
             const desig = document.getElementById('fDesignation').value.trim();
             
             const users = JSON.parse(localStorage.getItem('ow_users') || '{}');
@@ -480,19 +659,15 @@
                 return;
             }
 
-            // तपासणी: नाव किंवा मोबाईल जुळतो का?
             if (user.name.toLowerCase() !== name.toLowerCase() || user.mobile !== mobile) {
                 alert("तुमचे नाव किंवा मोबाईल नंबर जुळत नाही! कृपया बरोबर माहिती भरा.");
                 return;
             }
 
-            // जर सर्व जुळले तर रिसेट विनंती ॲडमिनकडे पाठवणे
             const resetMsg = `नमस्कार ॲडमिन,%0A%0Aमी माझा पासवर्ड विसरलो आहे. कृपया माझा पासवर्ड रिसेट करून मला कळवावे.%0A%0A*माझी माहिती:*%0A*नाव:* ${name}%0A*पदनाम:* ${desig}%0A*कार्यालय:* ${office}%0A*जिल्हा:* ${district}%0A*युजरनेम:* ${u}%0A*मोबाईल:* ${mobile}%0A%0Aधन्यवाद!`;
             
-            // व्हॉट्सॲप ओपन करणे
             window.open(`https://wa.me/${ADMIN_MOBILE}?text=${resetMsg}`, '_blank');
             
-            // युजरला मेसेज दाखवणे
             alert("तुमची पासवर्ड रिसेट विनंती ॲडमिनकडे प्रलंबित आहे. ॲडमिनने अप्रूव्ह केल्यानंतर तुम्ही नवीन पासवर्डने लॉगिन करू शकाल.");
             backToLogin();
         }
