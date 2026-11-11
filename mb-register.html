@@ -91,6 +91,18 @@
         }
         .form-control:focus { border-color: #0d47a1; }
 
+        /* 🌟 दिनांक प्लेसहोल्डर स्टाईल */
+        input[type="date"]:before {
+            content: attr(placeholder);
+            color: #999;
+            width: 100%;
+            display: block;
+        }
+        input[type="date"]:focus:before,
+        input[type="date"].has-value:before {
+            content: "";
+        }
+
         .btn-row { display: flex; gap: 10px; margin-top: 15px; }
         .btn-search { flex: 1; background: #0d47a1; color: #fff; border: none; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; }
         .btn-reset { flex: 1; background: #546e7a; color: #fff; border: none; padding: 12px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer; }
@@ -150,11 +162,11 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>दिनांक पासून *</label>
-                    <input type="date" class="form-control" id="repFromDate">
+                    <input type="date" class="form-control" id="repFromDate" placeholder="दिनांक निवडा" onchange="checkDatePlaceholder(this)">
                 </div>
                 <div class="form-group">
                     <label>दिनांक पर्यंत *</label>
-                    <input type="date" class="form-control" id="repToDate">
+                    <input type="date" class="form-control" id="repToDate" placeholder="दिनांक निवडा" onchange="checkDatePlaceholder(this)">
                 </div>
             </div>
 
@@ -191,14 +203,22 @@
     <script>
         if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'index.html';
 
-        // 🌟 १. डेटा कॅल्क्युलेशन आणि ॲनिमेशन फंक्शन्स
+        // 🌟 १. दिनांक प्लेसहोल्डर तपासणे
+        function checkDatePlaceholder(input) {
+            if (input.value) {
+                input.classList.add('has-value');
+            } else {
+                input.classList.remove('has-value');
+            }
+        }
+
+        // 🌟 २. डेटा कॅल्क्युलेशन आणि ॲनिमेशन फंक्शन्स
         function updateDashboardCounts() {
             let mbRecords = JSON.parse(localStorage.getItem('mb_records') || '[]');
             
-            // प्रत्येक M.B. ची शेवटची स्थिती शोधण्यासाठी ऑब्जेक्ट
             let uniqueMBs = {};
             mbRecords.forEach(rec => {
-                uniqueMBs[rec.mbNo] = rec; // जी शेवटची नोंद असेल ती ओव्हरराईट होईल
+                uniqueMBs[rec.mbNo] = rec; 
             });
 
             let total = Object.keys(uniqueMBs).length;
@@ -213,7 +233,6 @@
             let available = total - given;
             if (available < 0) available = 0;
 
-            // काउंटिंग ॲनिमेशन सुरू करणे
             animateValue("countReceivedMB", 0, total, 1500);
             animateValue("countGivenMB", 0, given, 1500);
             animateValue("countAvailableMB", 0, available, 1500);
@@ -231,7 +250,6 @@
                 if (!startTime) startTime = timestamp;
                 let progress = timestamp - startTime;
                 let percentage = Math.min(progress / duration, 1);
-                // Ease-out cubic (हळूहळू वाढण्यासाठी)
                 let eased = 1 - Math.pow(1 - percentage, 3); 
                 let current = Math.floor(start + (range * eased));
                 document.getElementById(id).innerText = current;
@@ -245,7 +263,7 @@
             window.requestAnimationFrame(step);
         }
 
-        // 🌟 २. इतर फंक्शन्स
+        // 🌟 ३. मुख्य घटकानुसार ड्रॉपडाऊन बदलणे
         function updateDynamicOptions() {
             const mainCat = document.getElementById('mainCategory').value;
             const group = document.getElementById('dynamicOptionsGroup');
@@ -258,19 +276,23 @@
             }
 
             group.style.display = 'block';
-            select.innerHTML = '<option value="">-- पर्याय निवडा --</option>';
+            select.innerHTML = '';
 
             if (mainCat === 'M.B.') {
                 label.innerText = 'M.B. प्रकार निवडा';
+                select.innerHTML = '<option value="">-- पर्याय निवडा --</option>';
                 select.innerHTML += '<option value="All M.B.">All M.B.</option><option value="Small M.B.">Small M.B.</option><option value="Big M.B.">Big M.B.</option>';
             } else if (mainCat === 'J.E.') {
                 label.innerText = 'JE निवडा';
+                // 🌟 नवीन बदल: सर्व JE हा पर्याय सर्वात वर
+                select.innerHTML = '<option value="All_JE">सर्व कनिष्ठ अभियंता</option>';
                 let jeRecords = JSON.parse(localStorage.getItem('mb_je_records') || '[]');
                 jeRecords.forEach(je => {
                     select.innerHTML += `<option value="${je.name}">${je.name}</option>`;
                 });
             } else {
                 label.innerText = 'पर्याय निवडा';
+                select.innerHTML = '<option value="">-- पर्याय निवडा --</option>';
             }
         }
 
@@ -282,12 +304,23 @@
             document.getElementById('mainCategory').value = '';
             document.getElementById('dynamicOptionsGroup').style.display = 'none';
             document.getElementById('smartSearch').value = '';
-            document.getElementById('repFromDate').value = '';
-            document.getElementById('repToDate').value = '';
+            
+            let fromDate = document.getElementById('repFromDate');
+            let toDate = document.getElementById('repToDate');
+            fromDate.value = '';
+            toDate.value = '';
+            checkDatePlaceholder(fromDate);
+            checkDatePlaceholder(toDate);
         }
 
-        // पेज लोड झाल्यावर काउंट्स अपडेट करणे
-        window.onload = updateDashboardCounts;
+        window.onload = function() {
+            // सुरुवातीला प्लेसहोल्डर तपासणे
+            checkDatePlaceholder(document.getElementById('repFromDate'));
+            checkDatePlaceholder(document.getElementById('repToDate'));
+            
+            // काउंट्स अपडेट करणे
+            updateDashboardCounts();
+        };
     </script>
 </body>
 </html>
