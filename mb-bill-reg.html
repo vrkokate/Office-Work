@@ -39,7 +39,6 @@
         th, td { padding: 4px 6px; border: 1px solid #ddd; text-align: center; white-space: nowrap; }
         th { background-color: #f5f5f5; font-size: 11px; position: sticky; top: 0; z-index: 10; }
         
-        /* 🌟 Sticky Columns */
         th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 5; background-color: #fff; }
         th:nth-child(1) { z-index: 6; background-color: #f5f5f5; }
         th:nth-child(11), td:nth-child(11) { position: sticky; right: 0; z-index: 5; background-color: #fff; box-shadow: -2px 0 5px -2px rgba(0,0,0,0.2); }
@@ -75,15 +74,15 @@
         .wizard-form-control { width: 100%; padding: 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none; box-sizing: border-box; }
         .wizard-form-control[readonly] { background-color: #f0f2f5; color: #666; }
         
-        /* 🌟 दिनांक दुरुस्ती */
+        /* 🌟 १. दिनांक दुरुस्ती (Date Input Fix) */
         input[type="date"].wizard-form-control { 
             -webkit-appearance: none;
             appearance: none;
-            min-height: 42px; 
-            display: flex;
-            align-items: center;
             width: 100%;
+            min-height: 42px;
             box-sizing: border-box;
+            text-align: left !important;
+            padding: 10px;
         }
 
         .wizard-btns { display: flex; gap: 10px; margin-top: 15px; }
@@ -98,7 +97,11 @@
         .deduction-scroll-box { max-height: 250px; overflow-y: auto; padding-right: 5px; border: 1px solid #eee; border-radius: 6px; padding: 10px; margin-bottom: 10px; }
         .ded-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .ded-row label { font-size: 12px; font-weight: 600; margin: 0; }
+        
+        /* 🌟 ३. 'Other' इनपुट आणि बटन स्टाईल */
         .ded-row input { width: 90px; padding: 6px; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; text-align: right; box-sizing: border-box; }
+        .btn-add-small { background: #2e7d32; color: #fff; border: none; border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .btn-remove-small { background: #d32f2f; color: #fff; border: none; border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; cursor: pointer; }
 
         .total-summary-box { background: #fff3e0; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 13px; font-weight: bold; }
         .total-summary-box div { display: flex; justify-content: space-between; margin-bottom: 4px; }
@@ -602,7 +605,18 @@
             for (let key in rates) {
                 grid.innerHTML += `<div class="ded-row" data-key="${escapeHtml(key)}"><label>${escapeHtml(key)} ${rates[key]}%</label><input type="number" id="ded_${escapeHtml(key)}" value="0" oninput="updateTotalDeductions()"></div>`;
             }
-            grid.innerHTML += `<div class="ded-row" data-key="Other"><label><span contenteditable="true" oninput="this.closest('.ded-row').dataset.key = (this.innerText.trim() || 'Other');" style="border-bottom:1px dashed #999; outline:none;">Other</span></label><div style="display:flex; gap:5px;"><input type="number" id="ded_Other" value="0" oninput="updateTotalDeductions()"><button type="button" onclick="addOtherDeductionRow()" style="background:#2e7d32; color:#fff; border:none; border-radius:4px; width:25px; font-weight:bold;">+</button></div></div>`;
+            // 🌟 ३. 'Other' इनपुट आणि '+' बटन स्टाईल दुरुस्ती
+            grid.innerHTML += `
+                <div class="ded-row" data-key="Other">
+                    <label style="display:flex; align-items:center; gap:5px; flex: 1;">
+                        <span contenteditable="true" oninput="this.closest('.ded-row').dataset.key = (this.innerText.trim() || 'Other');" style="border-bottom:1px dashed #999; outline:none;">Other</span>
+                    </label>
+                    <div style="display:flex; gap:5px; align-items:center;">
+                        <input type="number" id="ded_Other" value="0" oninput="updateTotalDeductions()">
+                        <button type="button" class="btn-add-small" onclick="addOtherDeductionRow()">+</button>
+                    </div>
+                </div>
+            `;
         }
 
         function addOtherDeductionRow() {
@@ -611,7 +625,15 @@
             const newRow = document.createElement('div');
             newRow.className = 'ded-row';
             newRow.dataset.key = 'Other-' + otherCount;
-            newRow.innerHTML = `<label><span contenteditable="true" oninput="this.closest('.ded-row').dataset.key = (this.innerText.trim() || 'Other-${otherCount}');" style="border-bottom:1px dashed #999; outline:none;">Other-${otherCount}</span></label><div style="display:flex; gap:5px;"><input type="number" value="0" oninput="updateTotalDeductions()"><button type="button" onclick="this.closest('.ded-row').remove(); updateTotalDeductions();" style="background:#d32f2f; color:#fff; border:none; border-radius:4px; width:25px; font-weight:bold;">-</button></div>`;
+            newRow.innerHTML = `
+                <label style="display:flex; align-items:center; gap:5px; flex: 1;">
+                    <span contenteditable="true" oninput="this.closest('.ded-row').dataset.key = (this.innerText.trim() || 'Other-${otherCount}');" style="border-bottom:1px dashed #999; outline:none;">Other-${otherCount}</span>
+                </label>
+                <div style="display:flex; gap:5px; align-items:center;">
+                    <input type="number" value="0" oninput="updateTotalDeductions()">
+                    <button type="button" class="btn-remove-small" onclick="this.closest('.ded-row').remove(); updateTotalDeductions();">-</button>
+                </div>
+            `;
             grid.appendChild(newRow);
         }
 
@@ -673,22 +695,40 @@
             let selectedWork = relevantWorks[currentSelectedWorkIndex];
             if (!selectedWork) { showToast('वैध काम निवडा!', true); return; }
 
-            // 🌟 १. डुप्लिकेट बिल चेक (कामानुसार)
-            const isDuplicate = billRecords.some(b => b.workName === selectedWork.name && b.billType === billType && b.mb === mb && billRecords.indexOf(b) !== editIndex);
-            if (isDuplicate) {
+            // 🌟 २. कडक बिल सिक्वेन्स आणि डुप्लिकेट चेक (Strict Bill Sequence & Duplicate Check)
+            const sequenceMap = {
+                "First RA Bill": [],
+                "Second RA Bill": ["First RA Bill"],
+                "Third RA Bill": ["First RA Bill", "Second RA Bill"],
+                "Fourth RA Bill": ["First RA Bill", "Second RA Bill", "Third RA Bill"],
+                "Fifth RA Bill": ["First RA Bill", "Second RA Bill", "Third RA Bill", "Fourth RA Bill"],
+                "Sixth RA Bill": ["First RA Bill", "Second RA Bill", "Third RA Bill", "Fourth RA Bill", "Fifth RA Bill"],
+                "Seventh RA Bill": ["First RA Bill", "Second RA Bill", "Third RA Bill", "Fourth RA Bill", "Fifth RA Bill", "Sixth RA Bill"],
+                "Eighth RA Bill": ["First RA Bill", "Second RA Bill", "Third RA Bill", "Fourth RA Bill", "Fifth RA Bill", "Sixth RA Bill", "Seventh RA Bill"],
+                "Ninth RA Bill": ["First RA Bill", "Second RA Bill", "Third RA Bill", "Fourth RA Bill", "Fifth RA Bill", "Sixth RA Bill", "Seventh RA Bill", "Eighth RA Bill"],
+                "Tenth RA Bill": ["First RA Bill", "Second RA Bill", "Third RA Bill", "Fourth RA Bill", "Fifth RA Bill", "Sixth RA Bill", "Seventh RA Bill", "Eighth RA Bill", "Ninth RA Bill"],
+                "First and Final Bill": [],
+                "Second and Final Bill": ["First RA Bill"],
+                "Third and Final Bill": ["First RA Bill", "Second RA Bill"]
+            };
+
+            const prerequisites = sequenceMap[billType] || [];
+            
+            // सध्याच्या एडिट नोंदी वगळून बाकीच्या नोंदी तपासणे
+            const otherBillsForWork = billRecords.filter((b, idx) => {
+                return b.workName === selectedWork.name && b.mb === mb && idx !== editIndex;
+            });
+
+            // डुप्लिकेट चेक
+            if (otherBillsForWork.some(b => b.billType === billType)) {
                 showToast("या कामासाठी हे बिल ("+billType+") आधीच नोंदवले आहे!", true);
                 return;
             }
 
-            // 🌟 २. बिल सिक्वेन्स चेक (कामानुसार)
-            const billOrder = ["First RA Bill", "Second RA Bill", "Third RA Bill", "Fourth RA Bill", "Fifth RA Bill", "Sixth RA Bill", "Seventh RA Bill", "Eighth RA Bill", "Ninth RA Bill", "Tenth RA Bill"];
-            let currentIdx = billOrder.indexOf(billType);
-            
-            if (currentIdx > 0) {
-                let prevBillType = billOrder[currentIdx - 1];
-                let hasPrev = billRecords.some(b => b.workName === selectedWork.name && b.billType === prevBillType && b.mb === mb);
-                if (!hasPrev && editIndex === -1) { // जर नवीन एंट्री असेल तरच चेक करा
-                    showToast("कृपया आधी " + prevBillType + " ची नोंद करा!", true);
+            // सिक्वेन्स चेक
+            for (let req of prerequisites) {
+                if (!otherBillsForWork.some(b => b.billType === req)) {
+                    showToast("कृपया आधी " + req + " ची नोंद करा!", true);
                     return;
                 }
             }
@@ -873,7 +913,6 @@
                         <tbody>
             `;
 
-            // 🌟 ग्रुपिंग लॉजिक (कंत्राटदार + काम + JE + MB)
             let grouped = [];
             let currentKey = null;
             let currentGroup = null;
