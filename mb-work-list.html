@@ -5,19 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Digital Hub - Work List</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- 🌟 सामाईक CSS -->
     <link rel="stylesheet" href="common.css">
-    
     <style>
-        /* फक्त या पेजसाठीचे खास CSS (Status रंग) */
         .status-incomplete { color: #d32f2f; font-weight: bold; }
         .status-complete { color: #2e7d32; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- 🌟 हेडर -->
     <header class="top-header">
         <a href="mb-register.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <div class="header-title">📋 कामांची यादी (Work List)</div>
@@ -26,34 +21,28 @@
 
     <div class="main-content">
         <div class="card-box">
-            
             <input type="hidden" id="editWorkIndex" value="-1">
 
-            <!-- १. JE निवड -->
             <div class="form-group">
                 <select id="workJE" class="form-control" onchange="onWorkJEChange()">
                     <option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option>
                 </select>
             </div>
 
-            <!-- २. वाटप केलेली M.B. (JE वर डिपेंडंट) -->
             <div class="form-group">
                 <select id="workMB" class="form-control">
                     <option value="">-- आधी JE निवडा --</option>
                 </select>
             </div>
 
-            <!-- ३. कामाचे नाव -->
             <div class="form-group">
                 <input type="text" id="workName" class="form-control" placeholder="कामाचे नाव टाईप करा" autocomplete="off">
             </div>
 
-            <!-- ४. कंत्राटदार / एजन्सी -->
             <div class="form-group">
                 <input type="text" id="workContractor" class="form-control" placeholder="कंत्राटदार / एजन्सीचे नाव टाईप करा" autocomplete="off">
             </div>
 
-            <!-- ५. कामाची स्थिती -->
             <div class="form-group">
                 <select id="workStatus" class="form-control">
                     <option value="अपूर्ण">अपूर्ण (चालू काम)</option>
@@ -64,7 +53,6 @@
             <button class="btn-save" id="saveBtn" onclick="saveWork()">Save Work</button>
             <button class="btn-save btn-cancel" id="cancelBtn" onclick="cancelEdit()">रद्द करा (Cancel)</button>
 
-            <!-- टेबल -->
             <div class="table-container">
                 <table>
                     <thead>
@@ -78,9 +66,7 @@
                             <th style="text-align: center;">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="workTableBody">
-                        <!-- डेटा इथे लोड होईल -->
-                    </tbody>
+                    <tbody id="workTableBody"></tbody>
                 </table>
             </div>
 
@@ -90,7 +76,6 @@
         </div>
     </div>
 
-    <!-- कस्टम अलर्ट (डिलीटसाठी) -->
     <div id="deleteAlert" class="custom-alert-overlay">
         <div class="custom-alert-box">
             <p>तुम्हाला हे काम नक्की डिलीट करायचे आहे का?</p>
@@ -101,17 +86,28 @@
         </div>
     </div>
 
-    <!-- 🌟 सामाईक JS -->
+    <!-- 🌟 खालचे ४ टॅब्स -->
+    <div class="bottom-nav">
+        <a href="mb-je.html" class="nav-item">
+            <i class="fa-solid fa-user-tie"></i><span>JE</span>
+        </a>
+        <a href="mb-register.html" class="nav-item">
+            <i class="fa-solid fa-book"></i><span>MB</span>
+        </a>
+        <a href="mb-work-list.html" class="nav-item active">
+            <i class="fa-solid fa-hammer"></i><span>Work</span>
+        </a>
+        <a href="mb-bill-reg.html" class="nav-item">
+            <i class="fa-solid fa-file-invoice-dollar"></i><span>Bill Reg</span>
+        </a>
+    </div>
+
     <script src="common.js"></script>
-
-    <!-- फक्त या पेजसाठी लागणारे लॉजिक -->
     <script>
-        checkAuth(); // सुरक्षेसाठी लॉगिन चेक
-
+        checkAuth();
         let workRecords = [];
         let deleteTargetIndex = -1;
 
-        // १. डेटा लोड करणे आणि JE ची यादी भरणे
         function loadData() {
             workRecords = JSON.parse(localStorage.getItem('work_records') || '[]');
             renderTable();
@@ -121,48 +117,30 @@
         function populateJEList() {
             const jeSelect = document.getElementById('workJE');
             jeSelect.innerHTML = '<option value="">-- कनिष्ठ अभियंता (JE) निवडा --</option>';
-            
             let jeRecords = JSON.parse(localStorage.getItem('mb_je_records') || '[]');
-            jeRecords.forEach(je => {
-                jeSelect.innerHTML += `<option value="${je.name}">${je.name}</option>`;
-            });
+            jeRecords.forEach(je => { jeSelect.innerHTML += `<option value="${je.name}">${je.name}</option>`; });
         }
 
-        // २. JE निवडल्यावर त्याच्याकडील सर्व M.B. ची यादी भरणे
         function onWorkJEChange() {
             const selectedJE = document.getElementById('workJE').value;
             const mbSelect = document.getElementById('workMB');
-
             mbSelect.innerHTML = '<option value="">-- M.B. निवडा --</option>';
             if (!selectedJE) return;
 
             let mbRecords = JSON.parse(localStorage.getItem('mb_records') || '[]');
-            
-            // प्रत्येक M.B. ची शेवटची स्थिती शोधणे
             let uniqueMBs = {};
             mbRecords.forEach(rec => { uniqueMBs[rec.mbNo] = rec; });
 
             let availableMBs = [];
-            
-            // ज्या M.B. निवडलेल्या JE कडे 'दिली' आहेत त्या सर्वांची यादी करणे
-            // 🌟 (नवीन बदल: आता 'अपूर्ण' काम आहे का हे तपासले जात नाही, सर्व M.B. दिसतील)
             for (let mbNo in uniqueMBs) {
                 let latest = uniqueMBs[mbNo];
-                if (latest.type === 'दिली' && latest.detail === selectedJE) {
-                    availableMBs.push(mbNo);
-                }
+                if (latest.type === 'दिली' && latest.detail === selectedJE) availableMBs.push(mbNo);
             }
 
-            if (availableMBs.length === 0) {
-                mbSelect.innerHTML = '<option value="">-- या JE कडे कोणतीही M.B. नाही --</option>';
-            } else {
-                availableMBs.forEach(mb => {
-                    mbSelect.innerHTML += `<option value="${mb}">${mb}</option>`;
-                });
-            }
+            if (availableMBs.length === 0) mbSelect.innerHTML = '<option value="">-- या JE कडे M.B. नाही --</option>';
+            else availableMBs.forEach(mb => { mbSelect.innerHTML += `<option value="${mb}">${mb}</option>`; });
         }
 
-        // ३. काम सेव्ह किंवा अपडेट करणे
         function saveWork() {
             const je = document.getElementById('workJE').value;
             const mbNo = document.getElementById('workMB').value;
@@ -176,81 +154,57 @@
             if (!name) { alert('कृपया कामाचे नाव टाका!'); return; }
             if (!contractor) { alert('कृपया कंत्राटदाराचे नाव टाका!'); return; }
 
-            // 🌟 (नवीन बदल: 'अपूर्ण' कामाची डुप्लिकेट तपासणी पूर्णपणे काढून टाकली आहे)
+            const workData = { je: je, mbNo: mbNo, name: name, contractor: contractor, status: status };
 
-            const workData = {
-                je: je,
-                mbNo: mbNo,
-                name: name,
-                contractor: contractor,
-                status: status
-            };
-
-            if (editIndex === -1) {
-                workRecords.push(workData);
-            } else {
-                workRecords[editIndex] = workData;
-            }
+            if (editIndex === -1) workRecords.push(workData);
+            else workRecords[editIndex] = workData;
 
             localStorage.setItem('work_records', JSON.stringify(workRecords));
             cancelEdit();
             loadData();
         }
 
-        // ४. टेबल रेंडर करणे
         function renderTable() {
             const tbody = document.getElementById('workTableBody');
             tbody.innerHTML = '';
-
             if (workRecords.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #888;">कोणतीही कामाची नोंद उपलब्ध नाही.</td></tr>';
                 return;
             }
-
             workRecords.forEach((work, index) => {
                 const statusClass = work.status === 'पूर्ण' ? 'status-complete' : 'status-incomplete';
-                
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="text-align: center;">${index + 1}</td>
-                    <td><b>${work.name}</b></td>
-                    <td>${work.contractor}</td>
-                    <td>${work.je}</td>
-                    <td style="text-align: center;">${work.mbNo}</td>
-                    <td class="${statusClass}">${work.status}</td>
-                    <td>
-                        <div class="action-btns">
-                            <button class="btn-edit" onclick="editWork(${index})">Edit</button>
-                            <button class="btn-delete" onclick="showDeleteAlert(${index})">Delete</button>
-                        </div>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="text-align: center;">${index + 1}</td>
+                        <td><b>${work.name}</b></td>
+                        <td>${work.contractor}</td>
+                        <td>${work.je}</td>
+                        <td style="text-align: center;">${work.mbNo}</td>
+                        <td class="${statusClass}">${work.status}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-edit" onclick="editWork(${index})">Edit</button>
+                                <button class="btn-delete" onclick="showDeleteAlert(${index})">Delete</button>
+                            </div>
+                        </td>
+                    </tr>`;
             });
         }
 
-        // ५. एडिट करणे
         function editWork(index) {
             const work = workRecords[index];
             document.getElementById('editWorkIndex').value = index;
-            
             document.getElementById('workJE').value = work.je;
-            
-            // JE सेट केल्यावर M.B. ची यादी लोड करणे आवश्यक आहे
-            onWorkJEChange(); 
-            
+            onWorkJEChange();
             document.getElementById('workMB').value = work.mbNo;
             document.getElementById('workName').value = work.name;
             document.getElementById('workContractor').value = work.contractor;
             document.getElementById('workStatus').value = work.status;
-
             document.getElementById('saveBtn').innerText = 'Update Work';
             document.getElementById('cancelBtn').style.display = 'block';
-
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ६. एडिट रद्द करणे
         function cancelEdit() {
             document.getElementById('editWorkIndex').value = '-1';
             document.getElementById('workJE').value = '';
@@ -258,12 +212,10 @@
             document.getElementById('workName').value = '';
             document.getElementById('workContractor').value = '';
             document.getElementById('workStatus').value = 'अपूर्ण';
-            
             document.getElementById('saveBtn').innerText = 'Save Work';
             document.getElementById('cancelBtn').style.display = 'none';
         }
 
-        // ७. डिलीट अलर्ट
         function showDeleteAlert(index) {
             deleteTargetIndex = index;
             document.getElementById('deleteAlert').style.display = 'flex';
@@ -282,49 +234,15 @@
             }
         });
 
-        // ८. रिपोर्ट / प्रिंट
         function printReport() {
-            if (workRecords.length === 0) {
-                alert('प्रिंट करण्यासाठी कोणतीही नोंद नाही!');
-                return;
-            }
-
+            if (workRecords.length === 0) { alert('प्रिंट करण्यासाठी नोंद नाही!'); return; }
             let printWindow = window.open('', '_blank');
-            let html = `
-                <html><head><title>Work List Report</title>
-                <style>
-                    body { font-family: Arial, sans-serif; padding: 20px; }
-                    h2 { text-align: center; color: #0d47a1; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { border: 1px solid #333; padding: 8px; text-align: left; font-size: 12px; }
-                    th { background-color: #f2f2f2; }
-                </style></head><body>
-                <h2>कामांची यादी (Work Register)</h2>
-                <table><thead><tr>
-                    <th>अ.क्र.</th><th>कामाचे नाव</th><th>कंत्राटदार</th><th>JE</th><th>M.B. क्र.</th><th>स्थिती</th>
-                </tr></thead><tbody>
-            `;
-
-            workRecords.forEach((work, index) => {
-                html += `<tr>
-                    <td>${index + 1}</td>
-                    <td>${work.name}</td>
-                    <td>${work.contractor}</td>
-                    <td>${work.je}</td>
-                    <td>${work.mbNo}</td>
-                    <td>${work.status}</td>
-                </tr>`;
-            });
-
+            let html = `<html><head><title>Work List</title><style>body{font-family:Arial;padding:20px;} h2{text-align:center;color:#0d47a1;} table{width:100%;border-collapse:collapse;} th,td{border:1px solid #333;padding:8px;text-align:left;} th{background:#f2f2f2;}</style></head><body><h2>कामांची यादी</h2><table><thead><tr><th>अ.क्र.</th><th>कामाचे नाव</th><th>कंत्राटदार</th><th>JE</th><th>M.B. क्र.</th><th>स्थिती</th></tr></thead><tbody>`;
+            workRecords.forEach((work, i) => { html += `<tr><td>${i + 1}</td><td>${work.name}</td><td>${work.contractor}</td><td>${work.je}</td><td>${work.mbNo}</td><td>${work.status}</td></tr>`; });
             html += `</tbody></table></body></html>`;
-
-            printWindow.document.write(html);
-            printWindow.document.close();
-            printWindow.focus();
+            printWindow.document.write(html); printWindow.document.close(); printWindow.focus();
             setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
         }
-
-        // पेज लोड झाल्यावर डेटा आणणे
         window.onload = loadData;
     </script>
 </body>
