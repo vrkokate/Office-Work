@@ -49,28 +49,14 @@
         }
         .input-box:focus { border-color: #00f3ff; }
 
-        /* 🌟 व्हॅलिड (हिरवे) आणि इनव्हॅलिड (लाल) रंग */
-        .input-box.valid-field {
-            border-color: #00ff88 !important;
-            background: rgba(0, 255, 136, 0.08) !important;
-        }
-        .input-group i.main-icon.icon-valid {
-            color: #00ff88 !important;
-        }
-        .input-box.invalid-field {
-            border-color: #ff4d4d !important;
-            background: rgba(255, 77, 77, 0.08) !important;
-        }
-        .input-group i.main-icon.icon-invalid {
-            color: #ff4d4d !important;
-        }
+        .input-box.valid-field { border-color: #00ff88 !important; background: rgba(0, 255, 136, 0.08) !important; }
+        .input-group i.main-icon.icon-valid { color: #00ff88 !important; }
+        .input-box.invalid-field { border-color: #ff4d4d !important; background: rgba(255, 77, 77, 0.08) !important; }
+        .input-group i.main-icon.icon-invalid { color: #ff4d4d !important; }
         
-        /* Live Validation Text */
         .validation-text { font-size: 10px; margin-top: 2px; margin-left: 5px; display: block; font-weight: bold; }
         .val-success { color: #00ff88; }
         .val-error { color: #ff4d4d; }
-
-        /* Eye Icon */
         .eye-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #00f3ff; font-size: 14px; cursor: pointer; z-index: 2; }
 
         /* फोटो अपलोड */
@@ -82,19 +68,15 @@
             transition: 0.3s;
         }
         .photo-label input { display: none; }
-        
         .photo-label.uploaded {
-            border-color: #00ff88 !important;
-            color: #00ff88 !important;
-            background: rgba(0, 255, 136, 0.08) !important;
-            border-style: solid !important;
+            border-color: #00ff88 !important; color: #00ff88 !important;
+            background: rgba(0, 255, 136, 0.08) !important; border-style: solid !important;
         }
 
         .btn-submit {
             width: 100%; background: #00f3ff; color: #020d1b; border: none;
             border-radius: 8px; padding: 10px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 4px;
         }
-        
         .forgot-link { display: block; text-align: center; margin-top: 8px; font-size: 11.5px; color: #00f3ff; cursor: pointer; text-decoration: none; }
         
         .hidden { display: none !important; }
@@ -102,17 +84,14 @@
         .msg-error { color: #ff4d4d; }
         .msg-success { color: #00ff88; }
 
-        /* सक्सेस स्क्रीन */
-        #successScreen { text-align: center; }
-        .success-icon { font-size: 35px; color: #00ff88; margin-bottom: 8px; }
-        .success-details { background: #0a192f; border: 1px solid #00f3ff; border-radius: 8px; padding: 8px; text-align: left; font-size: 12px; margin-bottom: 10px; }
-        .success-details p { margin: 2px 0; }
-        .success-details strong { color: #00f3ff; }
+        /* स्क्रीन्स */
+        .screen { text-align: center; }
+        .icon-big { font-size: 35px; color: #00ff88; margin-bottom: 8px; }
+        .info-box { background: #0a192f; border: 1px solid #00f3ff; border-radius: 8px; padding: 8px; text-align: left; font-size: 12px; margin-bottom: 10px; }
+        .info-box p { margin: 2px 0; }
+        .info-box strong { color: #00f3ff; }
         .contact-btns { display: flex; gap: 10px; justify-content: center; margin-top: 8px; }
-        .contact-btn {
-            flex: 1; padding: 8px; border-radius: 8px; text-decoration: none; color: #fff;
-            font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px;
-        }
+        .contact-btn { flex: 1; padding: 8px; border-radius: 8px; text-decoration: none; color: #fff; font-weight: bold; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-call { background: #2196F3; }
         .btn-wa { background: #25D366; }
     </style>
@@ -146,17 +125,19 @@
                     <i class="fa-solid fa-eye eye-icon" onclick="togglePassword('loginPassword', this)"></i>
                 </div>
                 <button type="submit" class="btn-submit">Sign In</button>
-                <a class="forgot-link" onclick="handleForgotPassword()">Forgot Password?</a>
+                <a class="forgot-link" onclick="showForgotScreen()">Forgot Password?</a>
             </form>
 
             <!-- REGISTRATION FORM -->
             <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
                 
+                <!-- 🌟 फोटो अपलोड (फक्त गॅलरी) -->
                 <div class="photo-upload-group">
                     <label class="photo-label" id="photoLabel">
-                        <i class="fa-solid fa-cloud-arrow-up" id="photoIcon"></i> 
-                        <span id="photoText">फोटो अपलोड करा (कॅमेरा/गॅलरी)</span>
-                        <input type="file" id="regPhoto" accept="image/*" capture="user" onchange="previewPhoto(event)" required>
+                        <i class="fa-solid fa-image" id="photoIcon"></i> 
+                        <span id="photoText">फोटो अपलोड करा (गॅलरी)</span>
+                        <!-- capture काढले आहे, जेणेकरून फक्त गॅलरी उघडेल -->
+                        <input type="file" id="regPhoto" accept="image/*" onchange="previewPhoto(event)" required>
                     </label>
                 </div>
 
@@ -165,7 +146,6 @@
                     <input type="text" id="regName" class="input-box" placeholder="पूर्ण नाव" required oninput="checkField(this)">
                 </div>
                 
-                <!-- मोबाईल नंबर (१० अंकांची खात्री) -->
                 <div class="input-group">
                     <i class="fa-solid fa-phone main-icon"></i>
                     <input type="tel" id="regMobile" class="input-box" placeholder="मोबाईल नंबर (१० अंक)" required maxlength="10" oninput="checkMobile(this)">
@@ -188,10 +168,10 @@
                     </datalist>
                 </div>
                 
-                <!-- कार्यालय (फक्त हाताने टाईप) -->
+                <!-- 🌟 कार्यालय (फक्त हाताने टाईप) -->
                 <div class="input-group">
                     <i class="fa-solid fa-building main-icon"></i>
-                    <input type="text" id="regOffice" class="input-box" placeholder="कार्यालयाचे नाव (हाताने टाईप करा)" required autocomplete="off" oninput="checkField(this)">
+                    <input type="text" id="regOffice" class="input-box" placeholder="कार्यालयाचे नाव" required autocomplete="off" oninput="checkField(this)">
                 </div>
 
                 <div class="input-group">
@@ -199,14 +179,12 @@
                     <input type="text" id="regDistrict" class="input-box" placeholder="जिल्हा" required oninput="checkField(this)">
                 </div>
 
-                <!-- युजरनेम (Live Availability Check) -->
                 <div class="input-group">
                     <i class="fa-solid fa-user-tag main-icon" id="userIcon"></i>
                     <input type="text" id="regUsername" class="input-box" placeholder="Username" required oninput="checkUsername(this)" autocomplete="off">
                     <span id="userMsg" class="validation-text hidden"></span>
                 </div>
 
-                <!-- पासवर्ड (Live Availability Check) -->
                 <div class="input-group">
                     <i class="fa-solid fa-key main-icon" id="passIcon"></i>
                     <input type="password" id="regPassword" class="input-box" placeholder="पासवर्ड (कमीत कमी ६ अक्षरे)" required minlength="6" oninput="checkPassword(this)">
@@ -218,13 +196,13 @@
             </form>
         </div>
 
-        <!-- सक्सेस स्क्रीन -->
-        <div class="login-card hidden" id="successScreen">
-            <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <!-- 🌟 सक्सेस स्क्रीन (रजिस्ट्रेशन नंतर) -->
+        <div class="login-card hidden screen" id="successScreen">
+            <div class="icon-big"><i class="fa-solid fa-circle-check"></i></div>
             <h3 style="color: #00ff88; margin-bottom: 4px; font-size: 15px;">रजिस्ट्रेशन यशस्वी!</h3>
             <p style="font-size: 11px; color: #ccc; margin-bottom: 8px;">तुमचे ॲक्टिव्हेशन ॲडमिनकडे प्रलंबित आहे.</p>
             
-            <div class="success-details">
+            <div class="info-box">
                 <p><strong>नाव:</strong> <span id="sucName"></span></p>
                 <p><strong>पदनाम:</strong> <span id="sucDesig"></span></p>
                 <p><strong>कार्यालय:</strong> <span id="sucOffice"></span></p>
@@ -240,6 +218,42 @@
             
             <button onclick="location.reload()" style="margin-top: 12px; background: none; border: none; color: #888; text-decoration: underline; cursor: pointer; font-size: 11px;">लॉगिन पेजवर परत जा</button>
         </div>
+
+        <!-- 🌟 फोरगॉट पासवर्ड स्क्रीन (पासवर्ड रिसेट फॉर्म) -->
+        <div class="login-card hidden" id="forgotScreen">
+            <h3 style="color: #00f3ff; font-size: 14px; margin-bottom: 10px; text-align: center;">पासवर्ड रिसेट विनंती</h3>
+            
+            <form id="forgotForm" onsubmit="handleForgotSubmit(event)">
+                <div class="input-group">
+                    <i class="fa-solid fa-user-tag main-icon"></i>
+                    <input type="text" id="fUsername" class="input-box" placeholder="तुमचे युजरनेम" required>
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-id-card main-icon"></i>
+                    <input type="text" id="fName" class="input-box" placeholder="पूर्ण नाव" required>
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-phone main-icon"></i>
+                    <input type="tel" id="fMobile" class="input-box" placeholder="मोबाईल नंबर" required>
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-building main-icon"></i>
+                    <input type="text" id="fOffice" class="input-box" placeholder="कार्यालयाचे नाव" required>
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-map-location-dot main-icon"></i>
+                    <input type="text" id="fDistrict" class="input-box" placeholder="जिल्हा" required>
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-briefcase main-icon"></i>
+                    <input type="text" id="fDesignation" class="input-box" placeholder="पदनाम" required>
+                </div>
+                
+                <button type="submit" class="btn-submit" style="background:#ff9800;">रिसेट विनंती पाठवा</button>
+                <a onclick="backToLogin()" style="display:block; text-align:center; margin-top:10px; color:#00f3ff; font-size:12px; cursor:pointer;">लॉगिन वर परत जा</a>
+            </form>
+        </div>
+
     </div>
 
     <script>
@@ -254,6 +268,10 @@
 
         function switchTab(tab) {
             document.getElementById('statusMessage').classList.add('hidden');
+            document.getElementById('forgotScreen').classList.add('hidden');
+            document.getElementById('successScreen').classList.add('hidden');
+            document.getElementById('formContainer').classList.remove('hidden');
+
             if(tab === 'login') {
                 document.querySelectorAll('.tab-btn')[0].classList.add('active');
                 document.querySelectorAll('.tab-btn')[1].classList.remove('active');
@@ -271,12 +289,10 @@
             const input = document.getElementById(inputId);
             if (input.type === 'password') {
                 input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
+                icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash');
             } else {
                 input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+                icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye');
             }
         }
 
@@ -287,14 +303,11 @@
             el.classList.remove('hidden');
         }
 
-        // सामान्य फील्ड हिरवे होण्यासाठी
         function checkField(inputElement) {
             const parent = inputElement.closest('.input-group');
             const icon = parent.querySelector('.main-icon');
-            
             if (inputElement.value.trim() !== '') {
-                inputElement.classList.add('valid-field');
-                inputElement.classList.remove('invalid-field');
+                inputElement.classList.add('valid-field'); inputElement.classList.remove('invalid-field');
                 if(icon) { icon.classList.add('icon-valid'); icon.classList.remove('icon-invalid'); }
             } else {
                 inputElement.classList.remove('valid-field');
@@ -302,7 +315,6 @@
             }
         }
 
-        // मोबाईल नंबर चेक (फक्त १० अंक)
         function checkMobile(inputElement) {
             const parent = inputElement.closest('.input-group');
             const icon = parent.querySelector('.main-icon');
@@ -310,13 +322,11 @@
             const val = inputElement.value.trim();
 
             if (val.length === 10) {
-                inputElement.classList.add('valid-field');
-                inputElement.classList.remove('invalid-field');
+                inputElement.classList.add('valid-field'); inputElement.classList.remove('invalid-field');
                 if(icon) { icon.classList.add('icon-valid'); icon.classList.remove('icon-invalid'); }
                 msg.classList.add('hidden');
             } else {
-                inputElement.classList.remove('valid-field');
-                inputElement.classList.add('invalid-field');
+                inputElement.classList.remove('valid-field'); inputElement.classList.add('invalid-field');
                 if(icon) { icon.classList.add('icon-invalid'); icon.classList.remove('icon-valid'); }
                 msg.textContent = "१० अंकी मोबाईल नंबर टाका";
                 msg.className = "validation-text val-error";
@@ -324,9 +334,7 @@
             }
         }
 
-        // युजरनेम चेक (Live Availability)
         function checkUsername(inputElement) {
-            const parent = inputElement.closest('.input-group');
             const icon = document.getElementById('userIcon');
             const msg = document.getElementById('userMsg');
             const val = inputElement.value.trim();
@@ -339,49 +347,38 @@
             }
 
             const users = JSON.parse(localStorage.getItem('ow_users') || '{}');
-            
             if (users[val]) {
-                inputElement.classList.remove('valid-field');
-                inputElement.classList.add('invalid-field');
+                inputElement.classList.remove('valid-field'); inputElement.classList.add('invalid-field');
                 if(icon) { icon.classList.add('icon-invalid'); icon.classList.remove('icon-valid'); }
                 msg.textContent = "हा युजरनेम आधीच उपलब्ध आहे!";
-                msg.className = "validation-text val-error";
-                msg.classList.remove('hidden');
+                msg.className = "validation-text val-error"; msg.classList.remove('hidden');
             } else {
-                inputElement.classList.remove('invalid-field');
-                inputElement.classList.add('valid-field');
+                inputElement.classList.remove('invalid-field'); inputElement.classList.add('valid-field');
                 if(icon) { icon.classList.add('icon-valid'); icon.classList.remove('icon-invalid'); }
                 msg.textContent = "✓ हा युजरनेम उपलब्ध आहे";
-                msg.className = "validation-text val-success";
-                msg.classList.remove('hidden');
+                msg.className = "validation-text val-success"; msg.classList.remove('hidden');
             }
         }
 
-        // पासवर्ड चेक (फक्त लांबी)
         function checkPassword(inputElement) {
-            const parent = inputElement.closest('.input-group');
             const icon = document.getElementById('passIcon');
             const msg = document.getElementById('passMsg');
             const val = inputElement.value;
 
             if (val.length >= 6) {
-                inputElement.classList.add('valid-field');
-                inputElement.classList.remove('invalid-field');
+                inputElement.classList.add('valid-field'); inputElement.classList.remove('invalid-field');
                 if(icon) { icon.classList.add('icon-valid'); icon.classList.remove('icon-invalid'); }
                 msg.textContent = "✓ पासवर्ड योग्य आहे";
-                msg.className = "validation-text val-success";
-                msg.classList.remove('hidden');
+                msg.className = "validation-text val-success"; msg.classList.remove('hidden');
             } else {
-                inputElement.classList.remove('valid-field');
-                inputElement.classList.add('invalid-field');
+                inputElement.classList.remove('valid-field'); inputElement.classList.add('invalid-field');
                 if(icon) { icon.classList.add('icon-invalid'); icon.classList.remove('icon-valid'); }
                 msg.textContent = "कमीत कमी ६ अक्षरे आवश्यक";
-                msg.className = "validation-text val-error";
-                msg.classList.remove('hidden');
+                msg.className = "validation-text val-error"; msg.classList.remove('hidden');
             }
         }
 
-        // फोटो अपलोड (फक्त मजकूर बदलणे)
+        // फोटो अपलोड
         function previewPhoto(event) {
             const file = event.target.files[0];
             if (file) {
@@ -391,7 +388,7 @@
                 
                 label.classList.add('uploaded');
                 text.textContent = "फोटो अपलोड झाला (बदलण्यासाठी क्लिक करा)";
-                icon.classList.remove('fa-cloud-arrow-up');
+                icon.classList.remove('fa-image');
                 icon.classList.add('fa-check-circle');
             }
         }
@@ -416,19 +413,6 @@
             window.location.href = 'dashboard.html';
         }
 
-        function handleForgotPassword() {
-            const u = prompt("तुमचे युजरनेम टाका:");
-            if (!u) return;
-            
-            const users = JSON.parse(localStorage.getItem('ow_users') || '{}');
-            const user = users[u];
-            
-            if (!user) return alert("हा युजरनेम सापडला नाही!");
-            
-            const msg = `नमस्कार ॲडमिन,%0A%0Aमी माझा पासवर्ड विसरलो आहे. कृपया माझा पासवर्ड रिसेट करावा.%0A%0A*युजरनेम:* ${u}%0A*नाव:* ${user.name}%0A*मोबाईल:* ${user.mobile || 'नाही'}`;
-            window.open(`https://wa.me/${ADMIN_MOBILE}?text=${msg}`, '_blank');
-        }
-
         function handleRegister(e) {
             e.preventDefault();
             const u = document.getElementById('regUsername').value.trim();
@@ -441,8 +425,7 @@
             
             let users = JSON.parse(localStorage.getItem('ow_users') || '{}');
             
-            // अंतिम तपासणी
-            if (users[u]) return showMsg('हा युजरनेम आधीच अस्तित्वात आहे! कृपया दुसरा निवडा.', true);
+            if (users[u]) return showMsg('हा युजरनेम आधीच अस्तित्वात आहे!', true);
             if (mobile.length !== 10) return showMsg('कृपया १० अंकी मोबाईल नंबर टाका!', true);
             if (p.length < 6) return showMsg('पासवर्ड कमीत कमी ६ अक्षरांचा असावा!', true);
 
@@ -467,6 +450,51 @@
             
             document.getElementById('btnWaAdmin').href = `https://wa.me/${ADMIN_MOBILE}?text=${waMessage}`;
             document.getElementById('btnCallAdmin').href = `tel:+${ADMIN_MOBILE}`;
+        }
+
+        // 🌟 फोरगॉट पासवर्ड फंक्शन्स
+        function showForgotScreen() {
+            document.getElementById('formContainer').classList.add('hidden');
+            document.getElementById('forgotScreen').classList.remove('hidden');
+        }
+
+        function backToLogin() {
+            document.getElementById('forgotScreen').classList.add('hidden');
+            document.getElementById('formContainer').classList.remove('hidden');
+        }
+
+        function handleForgotSubmit(e) {
+            e.preventDefault();
+            const u = document.getElementById('fUsername').value.trim();
+            const name = document.getElementById('fName').value.trim();
+            const mobile = document.getElementById('fMobile').value.trim();
+            const office = document.getElementById('fOffice').value.trim();
+            const district = document.getElementById('fDistrict').value.trim();
+            const desig = document.getElementById('fDesignation').value.trim();
+            
+            const users = JSON.parse(localStorage.getItem('ow_users') || '{}');
+            const user = users[u];
+
+            if (!user) {
+                alert("हा युजरनेम सापडला नाही! कृपया बरोबर युजरनेम टाका.");
+                return;
+            }
+
+            // तपासणी: नाव किंवा मोबाईल जुळतो का?
+            if (user.name.toLowerCase() !== name.toLowerCase() || user.mobile !== mobile) {
+                alert("तुमचे नाव किंवा मोबाईल नंबर जुळत नाही! कृपया बरोबर माहिती भरा.");
+                return;
+            }
+
+            // जर सर्व जुळले तर रिसेट विनंती ॲडमिनकडे पाठवणे
+            const resetMsg = `नमस्कार ॲडमिन,%0A%0Aमी माझा पासवर्ड विसरलो आहे. कृपया माझा पासवर्ड रिसेट करून मला कळवावे.%0A%0A*माझी माहिती:*%0A*नाव:* ${name}%0A*पदनाम:* ${desig}%0A*कार्यालय:* ${office}%0A*जिल्हा:* ${district}%0A*युजरनेम:* ${u}%0A*मोबाईल:* ${mobile}%0A%0Aधन्यवाद!`;
+            
+            // व्हॉट्सॲप ओपन करणे
+            window.open(`https://wa.me/${ADMIN_MOBILE}?text=${resetMsg}`, '_blank');
+            
+            // युजरला मेसेज दाखवणे
+            alert("तुमची पासवर्ड रिसेट विनंती ॲडमिनकडे प्रलंबित आहे. ॲडमिनने अप्रूव्ह केल्यानंतर तुम्ही नवीन पासवर्डने लॉगिन करू शकाल.");
+            backToLogin();
         }
     </script>
 </body>
