@@ -25,6 +25,7 @@
         .btn-add { flex: 1; background: #f57c00; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-print-top { flex: 1; background: #0d47a1; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
+        /* 🌟 मोबाईल स्क्रोल आणि कॉम्पॅक्ट टेबल स्टाईल */
         .table-container { 
             width: 100%; 
             overflow-x: auto; 
@@ -38,6 +39,7 @@
         th, td { padding: 4px 6px; border: 1px solid #ddd; text-align: center; white-space: nowrap; }
         th { background-color: #f5f5f5; font-size: 11px; position: sticky; top: 0; z-index: 10; }
         
+        /* 🌟 Sticky Columns */
         th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 5; background-color: #fff; }
         th:nth-child(1) { z-index: 6; background-color: #f5f5f5; }
         th:nth-child(11), td:nth-child(11) { position: sticky; right: 0; z-index: 5; background-color: #fff; box-shadow: -2px 0 5px -2px rgba(0,0,0,0.2); }
@@ -73,7 +75,16 @@
         .wizard-form-control { width: 100%; padding: 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none; box-sizing: border-box; }
         .wizard-form-control[readonly] { background-color: #f0f2f5; color: #666; }
         
-        input[type="date"].wizard-form-control { min-height: 40px; text-align: left; appearance: none; -webkit-appearance: none; }
+        /* 🌟 दिनांक दुरुस्ती */
+        input[type="date"].wizard-form-control { 
+            -webkit-appearance: none;
+            appearance: none;
+            min-height: 42px; 
+            display: flex;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
         .wizard-btns { display: flex; gap: 10px; margin-top: 15px; }
         .btn-back { flex: 1; background: #78909c; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
@@ -120,12 +131,38 @@
         .ded-detail-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 13px; gap: 10px; }
         .ded-detail-total { display: flex; justify-content: space-between; padding: 10px 0; border-top: 2px solid #333; margin-top: 10px; font-weight: bold; font-size: 15px; color: #d32f2f; }
         body { padding-bottom: 0 !important; }
+
+        /* 🌟 टोस्ट नोटिफिकेशन */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #2e7d32;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 12px;
+            position: fixed;
+            z-index: 9999;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+        #toast.error { background-color: #d32f2f; }
     </style>
 </head>
 <body>
 
     <header class="top-header">
-        <!-- 🌟 बॅक बटन: mb-dashboard.html -->
         <a href="mb-dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <div class="header-title">📄 देयक नोंदवही (Bill Register)</div>
         <a href="dashboard.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
@@ -339,6 +376,9 @@
         </div>
     </div>
 
+    <!-- टोस्ट नोटिफिकेशन -->
+    <div id="toast">यशस्वी!</div>
+
     <script src="common.js"></script>
     <script>
         checkAuth();
@@ -358,6 +398,13 @@
 
         function escapeHtml(s) {
             return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function showToast(msg, isError = false) {
+            let toast = document.getElementById("toast");
+            toast.innerText = msg;
+            toast.className = isError ? "show error" : "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", "").replace("error", ""); }, 2500);
         }
 
         function loadData() {
@@ -402,7 +449,7 @@
 
         function openWizard() {
             let jeRecords = JSON.parse(localStorage.getItem('mb_je_records') || '[]');
-            if(jeRecords.length === 0) { alert("कृपया आधी JE ॲड करा."); return; }
+            if(jeRecords.length === 0) { showToast("कृपया आधी JE ॲड करा.", true); return; }
 
             document.getElementById('editBillIndex').value = '-1';
             document.getElementById('wJeSelect').value = '';
@@ -481,7 +528,7 @@
                 const mb = document.getElementById('wMbSelect').value;
                 const billType = document.getElementById('wBillType').value;
                 const date = document.getElementById('wBillDate').value;
-                if (!je || !mb || !billType || !date || currentSelectedWorkIndex === -1) { alert('कृपया सर्व माहिती भरा!'); return; }
+                if (!je || !mb || !billType || !date || currentSelectedWorkIndex === -1) { showToast('कृपया सर्व माहिती भरा!', true); return; }
             }
             document.querySelectorAll('.wizard-step').forEach(el => el.classList.remove('active'));
             document.getElementById('step' + step).classList.add('active');
@@ -621,10 +668,30 @@
             const passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
             const editIndex = parseInt(document.getElementById('editBillIndex').value);
 
-            if(!je || !mb || !billType || !date || passed <= 0 || currentSelectedWorkIndex === -1) { alert('कृपया सर्व माहिती भरा!'); return; }
+            if(!je || !mb || !billType || !date || passed <= 0 || currentSelectedWorkIndex === -1) { showToast('कृपया सर्व माहिती भरा!', true); return; }
             let relevantWorks = allWorks.filter(w => w.je === je && w.mbNo === mb);
             let selectedWork = relevantWorks[currentSelectedWorkIndex];
-            if (!selectedWork) { alert('वैध काम निवडा!'); return; }
+            if (!selectedWork) { showToast('वैध काम निवडा!', true); return; }
+
+            // 🌟 १. डुप्लिकेट बिल चेक (कामानुसार)
+            const isDuplicate = billRecords.some(b => b.workName === selectedWork.name && b.billType === billType && b.mb === mb && billRecords.indexOf(b) !== editIndex);
+            if (isDuplicate) {
+                showToast("या कामासाठी हे बिल ("+billType+") आधीच नोंदवले आहे!", true);
+                return;
+            }
+
+            // 🌟 २. बिल सिक्वेन्स चेक (कामानुसार)
+            const billOrder = ["First RA Bill", "Second RA Bill", "Third RA Bill", "Fourth RA Bill", "Fifth RA Bill", "Sixth RA Bill", "Seventh RA Bill", "Eighth RA Bill", "Ninth RA Bill", "Tenth RA Bill"];
+            let currentIdx = billOrder.indexOf(billType);
+            
+            if (currentIdx > 0) {
+                let prevBillType = billOrder[currentIdx - 1];
+                let hasPrev = billRecords.some(b => b.workName === selectedWork.name && b.billType === prevBillType && b.mb === mb);
+                if (!hasPrev && editIndex === -1) { // जर नवीन एंट्री असेल तरच चेक करा
+                    showToast("कृपया आधी " + prevBillType + " ची नोंद करा!", true);
+                    return;
+                }
+            }
 
             const dedDetails = {};
             document.querySelectorAll('#deductionFieldsContainer .ded-row').forEach(row => {
@@ -641,11 +708,8 @@
 
             localStorage.setItem('bill_records', JSON.stringify(billRecords));
             closeWizard(); loadData();
-            document.getElementById('successMsgText').innerText = editIndex === -1 ? 'देयक यशस्वीरित्या जतन झाले!' : 'देयक अपडेट झाले!';
-            document.getElementById('successMsgModal').style.display = 'flex';
+            showToast(editIndex === -1 ? 'देयक यशस्वीरित्या जतन झाले!' : 'देयक अपडेट झाले!');
         }
-
-        function closeSuccessModal() { document.getElementById('successMsgModal').style.display = 'none'; }
 
         function renderTable() {
             const tbody = document.getElementById('billTableBody');
@@ -656,12 +720,13 @@
                 return; 
             }
 
+            // 🌟 ग्रुपिंग लॉजिक (कंत्राटदार + काम + JE + MB)
             let grouped = [];
             let currentKey = null;
             let currentGroup = null;
 
             billRecords.forEach((bill, index) => {
-                let key = `${bill.date}|${bill.contractor}|${bill.workName}|${bill.je}|${bill.mb}`;
+                let key = `${bill.contractor}|${bill.workName}|${bill.je}|${bill.mb}`;
                 if (key !== currentKey) {
                     currentKey = key;
                     currentGroup = [];
@@ -688,9 +753,9 @@
 
                     html += `<tr>`;
                     html += `<td>${srNo++}</td>`;
+                    html += `<td>${formatDate(bill.date)}</td>`; // दिनांक प्रत्येक ओळीत वेगळा
 
                     if (i === 0) {
-                        html += `<td rowspan="${rowSpan}">${formatDate(bill.date)}</td>`;
                         html += `<td rowspan="${rowSpan}" class="text-left">${escapeHtml(bill.contractor || '-')}</td>`;
                         html += `<td rowspan="${rowSpan}" class="text-left">${escapeHtml(bill.workName || '-')}</td>`;
                         html += `<td rowspan="${rowSpan}">${escapeHtml(bill.je || '-')}</td>`;
@@ -756,12 +821,13 @@
                     billRecords.splice(deleteTargetIndex, 1);
                     localStorage.setItem('bill_records', JSON.stringify(billRecords));
                     closeDeleteAlert(); loadData();
+                    showToast('नोंद यशस्वीरित्या हटवली!');
                 }
             });
         }
 
         function printReport() {
-            if (!billRecords || billRecords.length === 0) { alert('प्रिंट करण्यासाठी नोंद नाही!'); return; }
+            if (!billRecords || billRecords.length === 0) { showToast('प्रिंट करण्यासाठी नोंद नाही!', true); return; }
             let printWindow = window.open('', '_blank');
             let html = `
                 <html>
@@ -772,7 +838,6 @@
                         body { font-family: Arial, sans-serif; font-size: 11px; color: #000; }
                         .header { text-align: center; margin-bottom: 20px; }
                         .header h2 { margin: 0; font-size: 18px; }
-                        .header h4 { margin: 3px 0; font-size: 13px; font-weight: normal; }
                         .header h3 { margin: 5px 0; font-size: 15px; font-weight: bold; }
                         .date-right { text-align: right; font-size: 11px; margin-bottom: 5px; }
                         table { width: 100%; border-collapse: collapse; font-size: 11px; }
@@ -787,7 +852,6 @@
                 <body>
                     <div class="header">
                         <h2>सार्वजनिक बांधकाम विभाग</h2>
-                        <h4>महाराष्ट्र शासकीय, सुधारित प्रशासन</h4>
                         <h3>सांपूर्ण देयक नोंदवही (Master Bill Register)</h3>
                     </div>
                     <div class="date-right">अहवाल दिनांक: ${formatDate(new Date().toISOString().split('T')[0])}</div>
@@ -809,12 +873,13 @@
                         <tbody>
             `;
 
+            // 🌟 ग्रुपिंग लॉजिक (कंत्राटदार + काम + JE + MB)
             let grouped = [];
             let currentKey = null;
             let currentGroup = null;
 
             billRecords.forEach((bill) => {
-                let key = `${bill.date}|${bill.contractor}|${bill.workName}|${bill.je}|${bill.mb}`;
+                let key = `${bill.contractor}|${bill.workName}|${bill.je}|${bill.mb}`;
                 if (key !== currentKey) {
                     currentKey = key;
                     currentGroup = [];
@@ -839,9 +904,9 @@
 
                     html += `<tr>`;
                     html += `<td>${srNo++}</td>`;
+                    html += `<td>${formatDate(bill.date)}</td>`; // दिनांक वेगवेगळा
 
                     if (i === 0) {
-                        html += `<td rowspan="${rowSpan}">${formatDate(bill.date)}</td>`;
                         html += `<td rowspan="${rowSpan}" class="text-left">${escapeHtml(bill.contractor || '-')}</td>`;
                         html += `<td rowspan="${rowSpan}" class="text-left">${escapeHtml(bill.workName || '-')}</td>`;
                         html += `<td rowspan="${rowSpan}">${escapeHtml(bill.je || '-')}</td>`;
