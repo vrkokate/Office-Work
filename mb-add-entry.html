@@ -73,7 +73,7 @@
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
 
-        /* स्मार्ट सजेशन (M.B. क्रमांकासाठी) */
+        /* स्मार्ट सजेशन */
         .smart-msg {
             font-size: 11.5px; margin-top: 5px; font-weight: bold; display: none;
             padding: 4px 8px; border-radius: 4px;
@@ -143,14 +143,14 @@
                 </select>
             </div>
 
-            <!-- ४.अ JE ची यादी -->
+            <!-- ४.अ JE ची यादी (दिली) -->
             <div class="form-group hidden" id="groupGivenJE">
                 <select id="givenJE" class="form-control">
                     <option value="">-- JE निवडा --</option>
                 </select>
             </div>
 
-            <!-- ४.ब विभागीय कार्यालय (हाताने टाईप) -->
+            <!-- ४.ब विभागीय कार्यालय (दिली) -->
             <div class="form-group hidden" id="groupGivenOffice">
                 <input type="text" id="givenOffice" class="form-control" placeholder="विभागीय कार्यालयाचे नाव टाईप करा" autocomplete="off">
             </div>
@@ -169,11 +169,27 @@
                 <input type="text" id="bhandarpalName" class="form-control" placeholder="भांडारपाल यांचे नाव टाका" autocomplete="off">
             </div>
 
-            <!-- ५.ब चालू (यापूर्वीच्या व्यक्ती / टाईप करण्यायोग्य ड्रॉपडाऊन) -->
-            <div class="form-group hidden" id="groupReceivedFrom">
-                <input type="text" id="receivedFromInput" class="form-control" list="previousNamesList" placeholder="कोणाकडून मिळाली? (नाव निवडा किंवा टाईप करा)" autocomplete="off">
+            <!-- 🌟 ५.ब चालू (कोणाकडून मिळाली? - JE / Office) -->
+            <div class="form-group hidden" id="groupReceivedFromType">
+                <select id="receivedFromType" class="form-control" onchange="handleReceivedFromTypeChange()">
+                    <option value="">-- कोणाकडून मिळाली? --</option>
+                    <option value="JE">JE (कनिष्ठ अभियंता)</option>
+                    <option value="Office">विभागीय कार्यालय</option>
+                </select>
+            </div>
+
+            <!-- ५.ब.१ चालू - JE ची यादी -->
+            <div class="form-group hidden" id="groupReceivedJE">
+                <select id="receivedJE" class="form-control">
+                    <option value="">-- JE निवडा --</option>
+                </select>
+            </div>
+
+            <!-- 🌟 ५.ब.२ चालू - विभागीय कार्यालय (हाताने टाईप + जुने सजेशन) -->
+            <div class="form-group hidden" id="groupReceivedOffice">
+                <input type="text" id="receivedOfficeInput" class="form-control" list="previousNamesList" placeholder="कार्यालयाचे नाव टाईप करा" autocomplete="off">
                 <datalist id="previousNamesList">
-                    <!-- यापूर्वीची नावे इथे लोड होतील -->
+                    <!-- यापूर्वीची कार्यालयांची नावे इथे लोड होतील -->
                 </datalist>
             </div>
 
@@ -229,24 +245,21 @@
 
         // १. डेटा लोड करणे
         function loadData() {
-            // JE डेटा लोड करणे (mb_je_records मधून)
             let jeData = localStorage.getItem('mb_je_records');
             jeRecords = jeData ? JSON.parse(jeData) : [];
 
-            // M.B. डेटा लोड करणे (mb_records मधून)
             let mbData = localStorage.getItem('mb_records');
             mbRecords = mbData ? JSON.parse(mbData) : [];
 
             renderTable();
             populateGivenJEList();
-            populatePreviousNames();
+            populateReceivedJEList(); // नवीन ॲड
+            populatePreviousOfficeNames(); // फक्त कार्यालयांची नावे
         }
 
         // २. नोंद प्रकार निवडल्यावर (दिली / मिळाली)
         function handleEntryTypeChange() {
             const type = document.getElementById('entryType').value;
-            
-            // सर्व लपवणे
             hideAllGroups();
 
             if (type) {
@@ -262,7 +275,6 @@
             if (size) {
                 document.getElementById('groupMBNo').classList.remove('hidden');
                 
-                // आकारानुसार पुढील फील्ड दाखवणे
                 if (type === 'दिली') {
                     document.getElementById('groupGivenTo').classList.remove('hidden');
                 } else if (type === 'मिळाली') {
@@ -278,7 +290,6 @@
         // ४. कुणाला दिली (JE / कार्यालय)
         function handleGivenToChange() {
             const givenTo = document.getElementById('givenToType').value;
-            
             document.getElementById('groupGivenJE').classList.add('hidden');
             document.getElementById('groupGivenOffice').classList.add('hidden');
 
@@ -293,26 +304,47 @@
         function handleReceivedTypeChange() {
             const recType = document.getElementById('receivedType').value;
             
+            // आधी सर्व लपवा
             document.getElementById('groupBhandarpal').classList.add('hidden');
-            document.getElementById('groupReceivedFrom').classList.add('hidden');
+            document.getElementById('groupReceivedFromType').classList.add('hidden');
+            document.getElementById('groupReceivedJE').classList.add('hidden');
+            document.getElementById('groupReceivedOffice').classList.add('hidden');
 
             if (recType === 'नवीन') {
                 document.getElementById('groupBhandarpal').classList.remove('hidden');
             } else if (recType === 'चालू') {
-                document.getElementById('groupReceivedFrom').classList.remove('hidden');
+                document.getElementById('groupReceivedFromType').classList.remove('hidden');
+            }
+        }
+
+        // 🌟 ५.१ कोणाकडून मिळाली (JE / कार्यालय)
+        function handleReceivedFromTypeChange() {
+            const fromType = document.getElementById('receivedFromType').value;
+            
+            document.getElementById('groupReceivedJE').classList.add('hidden');
+            document.getElementById('groupReceivedOffice').classList.add('hidden');
+
+            if (fromType === 'JE') {
+                document.getElementById('groupReceivedJE').classList.remove('hidden');
+            } else if (fromType === 'Office') {
+                document.getElementById('groupReceivedOffice').classList.remove('hidden');
             }
         }
 
         // ६. सर्व ग्रुप्स लपवणे
         function hideAllGroups() {
-            const groups = ['groupMBSize', 'groupMBNo', 'groupGivenTo', 'groupGivenJE', 'groupGivenOffice', 'groupReceivedType', 'groupBhandarpal', 'groupReceivedFrom', 'groupDate'];
+            const groups = [
+                'groupMBSize', 'groupMBNo', 'groupGivenTo', 'groupGivenJE', 'groupGivenOffice', 
+                'groupReceivedType', 'groupBhandarpal', 'groupReceivedFromType', 
+                'groupReceivedJE', 'groupReceivedOffice', 'groupDate'
+            ];
             groups.forEach(id => document.getElementById(id).classList.add('hidden'));
             document.getElementById('mbSmartMsg').style.display = 'none';
             document.getElementById('saveBtn').classList.add('hidden');
             document.getElementById('cancelBtn').classList.add('hidden');
         }
 
-        // ७. डुप्लिकेट M.B. क्रमांक तपासणे (स्मार्ट मॅसेज)
+        // ७. डुप्लिकेट M.B. क्रमांक तपासणे
         function checkDuplicateMB() {
             const mbNo = document.getElementById('mbNumber').value.trim();
             const msgBox = document.getElementById('mbSmartMsg');
@@ -322,7 +354,6 @@
                 return;
             }
 
-            // डुप्लिकेट तपासणी
             const isDuplicate = mbRecords.some(record => record.mbNo === mbNo);
 
             msgBox.style.display = 'block';
@@ -335,7 +366,7 @@
             }
         }
 
-        // ८. JE ची यादी ड्रॉपडाऊन मध्ये भरणे
+        // ८. JE ची यादी (दिली साठी)
         function populateGivenJEList() {
             const jeSelect = document.getElementById('givenJE');
             jeSelect.innerHTML = '<option value="">-- JE निवडा --</option>';
@@ -344,20 +375,29 @@
             });
         }
 
-        // ९. यापूर्वीची नावे (चालू साठी) भरणे
-        function populatePreviousNames() {
+        // 🌟 ८.१ JE ची यादी (चालू मिळाली साठी)
+        function populateReceivedJEList() {
+            const jeSelect = document.getElementById('receivedJE');
+            jeSelect.innerHTML = '<option value="">-- JE निवडा --</option>';
+            jeRecords.forEach(je => {
+                jeSelect.innerHTML += `<option value="${je.name}">${je.name}</option>`;
+            });
+        }
+
+        // ९. यापूर्वीची कार्यालयांची नावे (हाताने टाईप साठी सजेशन)
+        function populatePreviousOfficeNames() {
             const dataList = document.getElementById('previousNamesList');
             dataList.innerHTML = '';
             
-            // सर्व जुनी नावे गोळा करणे (JE आणि कार्यालय)
-            let uniqueNames = new Set();
+            // फक्त विभागीय कार्यालयाची नावे गोळा करणे
+            let uniqueOffices = new Set();
             mbRecords.forEach(rec => {
-                if (rec.detail && rec.detail !== 'उपलब्ध') {
-                    uniqueNames.add(rec.detail);
+                if (rec.detail && !jeRecords.some(je => je.name === rec.detail) && rec.detail !== 'उपलब्ध') {
+                    uniqueOffices.add(rec.detail);
                 }
             });
 
-            uniqueNames.forEach(name => {
+            uniqueOffices.forEach(name => {
                 dataList.innerHTML += `<option value="${name}">`;
             });
         }
@@ -375,9 +415,8 @@
                 return;
             }
 
-            // डुप्लिकेट चेक (फक्त नवीन नोंद असल्यास)
             if (editIndex === -1 && mbRecords.some(r => r.mbNo === mbNo)) {
-                alert('हा M.B. क्रमांक आधीच नोंदवला आहे! कृपया दुसरा क्रमांक टाका.');
+                alert('हा M.B. क्रमांक आधीच नोंदवला आहे!');
                 return;
             }
 
@@ -397,7 +436,12 @@
                     detail = document.getElementById('bhandarpalName').value.trim();
                     if (!detail) { alert('भांडारपाल यांचे नाव टाका!'); return; }
                 } else {
-                    detail = document.getElementById('receivedFromInput').value.trim();
+                    const fromType = document.getElementById('receivedFromType').value;
+                    if (fromType === 'JE') {
+                        detail = document.getElementById('receivedJE').value;
+                    } else {
+                        detail = document.getElementById('receivedOfficeInput').value.trim();
+                    }
                     if (!detail) { alert('कोणाकडून मिळाली हे निवडा किंवा टाईप करा!'); return; }
                 }
             }
@@ -417,7 +461,6 @@
             }
 
             localStorage.setItem('mb_records', JSON.stringify(mbRecords));
-            
             cancelEdit();
             loadData();
         }
@@ -450,7 +493,7 @@
             });
         }
 
-        // १२. दिनांक फॉरमॅट (YYYY-MM-DD to DD-MM-YYYY)
+        // १२. दिनांक फॉरमॅट
         function formatDate(dateStr) {
             if (!dateStr) return '';
             const parts = dateStr.split('-');
@@ -473,14 +516,32 @@
             checkDuplicateMB();
 
             if (rec.type === 'दिली') {
-                // सध्या सोपे ठेवण्यासाठी फक्त डिटेल दाखवू
-                document.getElementById('givenOffice').value = rec.detail;
-                document.getElementById('givenToType').value = 'Office';
-                handleGivenToChange();
+                // JE आहे की कार्यालय ते तपासा
+                const isJE = jeRecords.some(j => j.name === rec.detail);
+                if (isJE) {
+                    document.getElementById('givenToType').value = 'JE';
+                    handleGivenToChange();
+                    document.getElementById('givenJE').value = rec.detail;
+                } else {
+                    document.getElementById('givenToType').value = 'Office';
+                    handleGivenToChange();
+                    document.getElementById('givenOffice').value = rec.detail;
+                }
             } else {
-                document.getElementById('receivedFromInput').value = rec.detail;
+                // मिळाली असल्यास (सध्या सोपे ठेवू: चालू म्हणून दाखवू)
                 document.getElementById('receivedType').value = 'चालू';
                 handleReceivedTypeChange();
+                
+                const isJE = jeRecords.some(j => j.name === rec.detail);
+                if (isJE) {
+                    document.getElementById('receivedFromType').value = 'JE';
+                    handleReceivedFromTypeChange();
+                    document.getElementById('receivedJE').value = rec.detail;
+                } else {
+                    document.getElementById('receivedFromType').value = 'Office';
+                    handleReceivedFromTypeChange();
+                    document.getElementById('receivedOfficeInput').value = rec.detail;
+                }
             }
 
             document.getElementById('entryDate').value = rec.date;
@@ -504,7 +565,7 @@
             hideAllGroups();
         }
 
-        // १५. डिलीट अलर्ट
+        // १५. डिलीट
         function showDeleteAlert(index) {
             deleteTargetIndex = index;
             document.getElementById('deleteAlert').style.display = 'flex';
