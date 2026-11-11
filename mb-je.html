@@ -9,7 +9,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: #f0f2f5; color: #212121; min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* 🌟 हेडर (फक्त आयकॉन्स) */
+        /* 🌟 हेडर (मध्यभागी नाव) */
         .top-header {
             display: flex; justify-content: space-between; align-items: center; padding: 15px;
             background: #0d47a1; color: #fff; position: sticky; top: 0; z-index: 100;
@@ -23,20 +23,36 @@
         }
         .back-btn:hover, .home-icon:hover { color: #00e5ff; }
 
+        .header-title { 
+            font-size: 15px; 
+            font-weight: bold; 
+            color: #fff; 
+            text-align: center;
+            flex: 1; /* उर्वरित जागा घेण्यासाठी */
+            margin: 0 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         /* 🌟 मुख्य भाग */
         .main-content { padding: 15px; flex: 1; max-width: 600px; margin: 0 auto; width: 100%; }
         .card-box { background: #fff; border-radius: 10px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
-        .page-title { font-size: 16px; font-weight: bold; color: #1976d2; margin-bottom: 15px; text-align: center; }
-
         /* फॉर्म सेक्शन */
         .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-size: 13px; font-weight: bold; color: #333; margin-bottom: 6px; }
+        
         .form-control {
             width: 100%; padding: 12px; font-size: 14px; border: 1px solid #ccc;
             border-radius: 6px; outline: none; background: #fff; color: #333;
         }
         .form-control:focus { border-color: #1976d2; }
+        
+        /* Placeholder ला अंधुक (faded) करण्यासाठी */
+        .form-control::placeholder {
+            color: #999;
+            font-weight: normal;
+        }
 
         /* बटन्स */
         .btn-save {
@@ -88,14 +104,6 @@
         .alert-actions { display: flex; gap: 10px; }
         .btn-cancel-alert { flex: 1; background: #757575; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-confirm-alert { flex: 1; background: #d32f2f; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-
-        /* प्रिंटसाठी लपवायचे भाग */
-        @media print {
-            body * { visibility: hidden; }
-            #printSection, #printSection * { visibility: visible; }
-            #printSection { position: absolute; left: 0; top: 0; width: 100%; }
-            .top-header, .card-box { display: none !important; }
-        }
     </style>
 </head>
 <body>
@@ -103,19 +111,19 @@
     <!-- 🌟 हेडर -->
     <header class="top-header">
         <a href="mb-register.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <div class="header-title">👷 कनिष्ठ अभियंता (JE) व्यवस्थापन</div>
         <a href="dashboard.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
     </header>
 
     <!-- 🌟 मुख्य भाग -->
     <div class="main-content">
         <div class="card-box">
-            <div class="page-title" id="formTitle">👷 कनिष्ठ अभियंता (JE) व्यवस्थापन</div>
-
+            
             <input type="hidden" id="editIndex" value="-1">
 
             <div class="form-group">
-                <label>कनिष्ठ अभियंत्याचे पूर्ण नाव *</label>
-                <input type="text" id="jeName" class="form-control" placeholder="उदा. श्री. ए. बी. पाटील" required>
+                <!-- लेबल काढून टाकले आहे -->
+                <input type="text" id="jeName" class="form-control" placeholder="कनिष्ठ अभियंत्याचे पूर्ण नाव *" required>
             </div>
 
             <button class="btn-save" id="saveBtn" onclick="saveJE()">Save JE</button>
