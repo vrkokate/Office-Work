@@ -6,135 +6,215 @@
     <title>Digital Hub - Login & Registration</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* स्क्रीन स्थिर ठेवण्यासाठी */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body {
+        html, body {
+            height: 100%;
+            overflow: hidden; 
             background: #020d1b;
             color: #ffffff;
-            min-height: 100vh;
+        }
+        body {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 10px;
         }
-        .profile-container { text-align: center; margin-bottom: 20px; }
+
+        .main-wrapper {
+            width: 100%;
+            max-width: 360px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .profile-container { text-align: center; margin-bottom: 10px; }
         .profile-pic {
-            width: 100px; height: 100px; border-radius: 50%;
-            border: 3px solid #00f3ff; box-shadow: 0 0 20px #00f3ff;
-            object-fit: cover; background: #0a192f; margin-bottom: 10px;
+            width: 80px; height: 80px; border-radius: 50%;
+            border: 3px solid #00f3ff; box-shadow: 0 0 15px #00f3ff;
+            object-fit: cover; background: #0a192f; margin-bottom: 5px;
         }
-        .app-title { font-size: 16px; font-weight: bold; letter-spacing: 1px; }
+        .app-title { font-size: 14px; font-weight: bold; letter-spacing: 1px; }
         .app-title span { color: #00f3ff; }
-        .app-subtitle { font-size: 12px; color: #00f3ff; margin-bottom: 15px; }
+        .app-subtitle { font-size: 11px; color: #00f3ff; margin-bottom: 10px; }
         
         .login-card {
-            width: 100%; max-width: 350px;
-            background: rgba(2, 6, 23, 0.9);
-            border: 2px solid #00f3ff; border-radius: 20px;
-            box-shadow: 0 0 25px rgba(0, 243, 255, 0.3);
-            padding: 25px 20px;
+            width: 100%;
+            background: rgba(2, 6, 23, 0.95);
+            border: 1px solid #00f3ff; border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            padding: 15px;
+            position: relative;
         }
         
-        .tab-buttons { display: flex; margin-bottom: 20px; border-bottom: 1px solid #1e3a5f; }
+        .tab-buttons { display: flex; margin-bottom: 12px; border-bottom: 1px solid #1e3a5f; }
         .tab-btn {
             flex: 1; background: none; border: none; color: #888;
-            font-size: 15px; font-weight: bold; padding: 10px; cursor: pointer;
+            font-size: 14px; font-weight: bold; padding: 8px; cursor: pointer;
         }
         .tab-btn.active { color: #00f3ff; border-bottom: 2px solid #00f3ff; }
 
-        .input-group { position: relative; margin-bottom: 15px; }
-        .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #00f3ff; }
+        /* फॉर्म इनपुट आणि अंतर कमी करणे */
+        .input-group { position: relative; margin-bottom: 8px; }
+        .input-group i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #00f3ff; font-size: 14px; }
         .input-box {
             width: 100%; background: #0a192f; border: 1px solid rgba(0, 243, 255, 0.3);
-            border-radius: 10px; padding: 12px 15px 12px 40px; color: #fff; font-size: 14px; outline: none;
+            border-radius: 8px; padding: 10px 10px 10px 35px; color: #fff; font-size: 13px; outline: none;
         }
-        .input-box:focus { border-color: #00f3ff; box-shadow: 0 0 10px rgba(0,243,255,0.3); }
+        .input-box:focus { border-color: #00f3ff; }
         
+        /* फोटो अपलोड डिझाईन */
+        .photo-upload-group {
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; margin-bottom: 8px;
+        }
+        .photo-label {
+            display: flex; align-items: center; gap: 8px;
+            background: #0a192f; border: 1px dashed #00f3ff; color: #00f3ff;
+            padding: 8px 15px; border-radius: 8px; font-size: 13px; cursor: pointer; width: 100%; justify-content: center;
+        }
+        .photo-label input { display: none; }
+        #photoPreview { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; display: none; border: 2px solid #00f3ff; }
+
         .btn-submit {
             width: 100%; background: #00f3ff; color: #020d1b; border: none;
-            border-radius: 10px; padding: 12px; font-size: 16px; font-weight: bold;
-            cursor: pointer; margin-top: 10px; box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            border-radius: 8px; padding: 10px; font-size: 14px; font-weight: bold;
+            cursor: pointer; margin-top: 5px;
         }
         .btn-submit:hover { background: #00c4d1; }
         .hidden { display: none !important; }
         
-        .status-msg { font-size: 12px; text-align: center; margin-top: 10px; font-weight: bold; }
+        .status-msg { font-size: 12px; text-align: center; margin-bottom: 8px; font-weight: bold; }
         .msg-error { color: #ff4d4d; }
         .msg-success { color: #00ff88; }
+
+        /* सक्सेस स्क्रीन */
+        #successScreen {
+            text-align: center;
+        }
+        .success-icon { font-size: 40px; color: #00ff88; margin-bottom: 10px; }
+        .success-details {
+            background: #0a192f; border: 1px solid #00f3ff;
+            border-radius: 8px; padding: 10px; text-align: left; font-size: 13px; margin-bottom: 12px;
+        }
+        .success-details p { margin: 3px 0; }
+        .success-details strong { color: #00f3ff; }
+        .contact-btns { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+        .contact-btn {
+            flex: 1; padding: 10px; border-radius: 8px; text-decoration: none; color: #fff;
+            font-weight: bold; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .btn-call { background: #2196F3; }
+        .btn-wa { background: #25D366; }
     </style>
 </head>
 <body>
 
-    <div class="profile-container">
-        <img src="home-bg.jpg" alt="Profile" class="profile-pic" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
-        <div class="app-title">SMART TOOLS <span>STRONGER WORK</span></div>
-        <div class="app-subtitle">Created by Vitthal Kokate Patil</div>
-    </div>
-
-    <div class="login-card">
-        <!-- Tabs -->
-        <div class="tab-buttons">
-            <button class="tab-btn active" onclick="switchTab('login')">लॉगिन</button>
-            <button class="tab-btn" onclick="switchTab('register')">नवीन रजिस्ट्रेशन</button>
+    <div class="main-wrapper">
+        <div class="profile-container">
+            <img src="home-bg.jpg" alt="Profile" class="profile-pic" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+            <div class="app-title">SMART TOOLS <span>STRONGER WORK</span></div>
+            <div class="app-subtitle">Created by Vitthal Kokate Patil</div>
         </div>
 
-        <div id="statusMessage" class="status-msg hidden"></div>
+        <div class="login-card" id="formContainer">
+            <!-- Tabs -->
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('login')">लॉगिन</button>
+                <button class="tab-btn" onclick="switchTab('register')">रजिस्ट्रेशन</button>
+            </div>
 
-        <!-- LOGIN FORM -->
-        <form id="loginForm" onsubmit="handleLogin(event)">
-            <div class="input-group">
-                <i class="fa-solid fa-user"></i>
-                <input type="text" id="loginUsername" class="input-box" placeholder="Username" required>
-            </div>
-            <div class="input-group">
-                <i class="fa-solid fa-lock"></i>
-                <input type="password" id="loginPassword" class="input-box" placeholder="Password" required>
-            </div>
-            <button type="submit" class="btn-submit">Sign In</button>
-        </form>
+            <div id="statusMessage" class="status-msg hidden"></div>
 
-        <!-- REGISTRATION FORM -->
-        <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
-            <div class="input-group">
-                <i class="fa-solid fa-id-card"></i>
-                <input type="text" id="regName" class="input-box" placeholder="पूर्ण नाव" required>
+            <!-- LOGIN FORM -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="loginUsername" class="input-box" placeholder="Username" required>
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="loginPassword" class="input-box" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn-submit">Sign In</button>
+            </form>
+
+            <!-- REGISTRATION FORM -->
+            <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
+                
+                <!-- फोटो अपलोड (पासवर्डच्या जागी) -->
+                <div class="photo-upload-group">
+                    <label class="photo-label">
+                        <img id="photoPreview" src="" alt="Photo">
+                        <i class="fa-solid fa-camera"></i> <span id="photoText">फोटो अपलोड करा (गॅलरी/कॅमेरा)</span>
+                        <!-- capture="user" मुळे मोबाईल मध्ये कॅमेरा किंवा गॅलरी ओपन होईल -->
+                        <input type="file" id="regPhoto" accept="image/*" capture="user" onchange="previewPhoto(event)" required>
+                    </label>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-id-card"></i>
+                    <input type="text" id="regName" class="input-box" placeholder="पूर्ण नाव" required>
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-briefcase"></i>
+                    <input type="text" id="regDesignation" class="input-box" placeholder="पदनाम" required>
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-building"></i>
+                    <input type="text" id="regOffice" class="input-box" placeholder="कार्यालयाचे नाव" required>
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <input type="text" id="regDistrict" class="input-box" placeholder="जिल्हा" required>
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-user-tag"></i>
+                    <input type="text" id="regUsername" class="input-box" placeholder="Username" required>
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-key"></i>
+                    <input type="password" id="regPassword" class="input-box" placeholder="पासवर्ड" required minlength="6">
+                </div>
+                
+                <button type="submit" class="btn-submit" style="background:#00ff88; color:#000;">रजिस्टर करा</button>
+            </form>
+        </div>
+
+        <!-- सक्सेस स्क्रीन (रजिस्ट्रेशन नंतर दिसणारी) -->
+        <div class="login-card hidden" id="successScreen">
+            <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <h3 style="color: #00ff88; margin-bottom: 5px;">रजिस्ट्रेशन यशस्वी!</h3>
+            <p style="font-size: 12px; color: #ccc; margin-bottom: 10px;">तुमचे ॲक्टिव्हेशन ॲडमिनकडे प्रलंबित आहे. अधिक माहितीसाठी ॲडमिनशी संपर्क करा.</p>
+            
+            <div class="success-details">
+                <p><strong>नाव:</strong> <span id="sucName"></span></p>
+                <p><strong>पदनाम:</strong> <span id="sucDesig"></span></p>
+                <p><strong>कार्यालय:</strong> <span id="sucOffice"></span></p>
+                <p><strong>जिल्हा:</strong> <span id="sucDistrict"></span></p>
+                <p><strong>युजरनेम:</strong> <span id="sucUsername" style="color: #00f3ff; font-weight: bold;"></span></p>
+                <p><strong>पासवर्ड:</strong> <span id="sucPassword" style="color: #00f3ff; font-weight: bold;"></span></p>
             </div>
-            <div class="input-group">
-                <i class="fa-solid fa-phone"></i>
-                <input type="tel" id="regMobile" class="input-box" placeholder="मोबाईल नंबर" required>
+
+            <div class="contact-btns">
+                <a href="#" id="btnCallAdmin" class="contact-btn btn-call"><i class="fa-solid fa-phone"></i> कॉल करा</a>
+                <a href="#" id="btnWaAdmin" class="contact-btn btn-wa" target="_blank"><i class="fa-brands fa-whatsapp"></i> व्हॉट्सॲप</a>
             </div>
-            <div class="input-group">
-                <i class="fa-solid fa-briefcase"></i>
-                <input type="text" id="regDesignation" class="input-box" placeholder="पदनाम (उदा. कनिष्ठ अभियंता)" required>
-            </div>
-            <div class="input-group">
-                <i class="fa-solid fa-building"></i>
-                <input type="text" id="regOffice" class="input-box" placeholder="विभाग / कार्यालय" required>
-            </div>
-            <div class="input-group">
-                <i class="fa-solid fa-user-tag"></i>
-                <input type="text" id="regUsername" class="input-box" placeholder="नवीन Username" required>
-            </div>
-            <div class="input-group">
-                <i class="fa-solid fa-key"></i>
-                <input type="password" id="regPassword" class="input-box" placeholder="पासवर्ड (कमीत कमी ६ अक्षरे)" required minlength="6">
-            </div>
-            <button type="submit" class="btn-submit" style="background:#00ff88; color:#000;">रजिस्टर करा</button>
-        </form>
+            
+            <button onclick="location.reload()" style="margin-top: 15px; background: none; border: none; color: #888; text-decoration: underline; cursor: pointer; font-size: 12px;">लॉगिन पेजवर परत जा</button>
+        </div>
     </div>
 
     <script>
-        // सुरुवातीला ॲडमिन अकाऊंट तयार करणे (जर नसेल तर)
+        // ॲडमिन मोबाईल नंबर (तुम्ही तुमचा नंबर येथे टाकू शकता)
+        const ADMIN_MOBILE = "918446556141"; 
+
         if (!localStorage.getItem('ow_users')) {
             const defaultUsers = {
-                'admin': { 
-                    name: 'Vitthal Kokate Patil', 
-                    password: 'admin123', 
-                    role: 'admin', 
-                    status: 'approved',
-                    designation: 'Admin',
-                    office: 'Main Office'
-                }
+                'admin': { name: 'Vitthal Kokate Patil', password: 'admin123', role: 'admin', status: 'approved' }
             };
             localStorage.setItem('ow_users', JSON.stringify(defaultUsers));
         }
@@ -161,6 +241,21 @@
             el.classList.remove('hidden');
         }
 
+        // फोटो प्रिव्ह्यू
+        function previewPhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('photoPreview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                    document.getElementById('photoText').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         function handleLogin(e) {
             e.preventDefault();
             const u = document.getElementById('loginUsername').value.trim();
@@ -171,9 +266,8 @@
 
             if (!user) return showMsg('चुकीचा युजरनेम!', true);
             if (user.password !== p) return showMsg('चुकीचा पासवर्ड!', true);
-            if (user.status !== 'approved') return showMsg('तुमचे खाते अद्याप ॲडमिनने मंजूर केलेले नाही!', true);
+            if (user.status !== 'approved') return showMsg('तुमचे खाते ॲडमिनने मंजूर केलेले नाही!', true);
 
-            // लॉगिन यशस्वी
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('currentUser', u);
             localStorage.setItem('userRole', user.role);
@@ -185,25 +279,38 @@
         function handleRegister(e) {
             e.preventDefault();
             const u = document.getElementById('regUsername').value.trim();
+            const p = document.getElementById('regPassword').value.trim();
+            const name = document.getElementById('regName').value.trim();
+            const desig = document.getElementById('regDesignation').value.trim();
+            const office = document.getElementById('regOffice').value.trim();
+            const district = document.getElementById('regDistrict').value.trim();
             
             let users = JSON.parse(localStorage.getItem('ow_users') || '{}');
-            
             if (users[u]) return showMsg('हा युजरनेम आधीच अस्तित्वात आहे!', true);
 
             users[u] = {
-                name: document.getElementById('regName').value.trim(),
-                mobile: document.getElementById('regMobile').value.trim(),
-                designation: document.getElementById('regDesignation').value.trim(),
-                office: document.getElementById('regOffice').value.trim(),
-                password: document.getElementById('regPassword').value.trim(),
-                role: 'user',
-                status: 'pending' // ॲडमिन अप्रूव्हलसाठी प्रलंबित
+                name: name, designation: desig, office: office, district: district,
+                password: p, role: 'user', status: 'pending'
             };
 
             localStorage.setItem('ow_users', JSON.stringify(users));
-            showMsg('रजिस्ट्रेशन यशस्वी! ॲडमिन मंजुरीनंतर तुम्ही लॉगिन करू शकाल.', false);
-            document.getElementById('registerForm').reset();
-            setTimeout(() => switchTab('login'), 3000);
+            
+            // सक्सेस स्क्रीन दाखवणे
+            document.getElementById('formContainer').classList.add('hidden');
+            document.getElementById('successScreen').classList.remove('hidden');
+            
+            document.getElementById('sucName').textContent = name;
+            document.getElementById('sucDesig').textContent = desig;
+            document.getElementById('sucOffice').textContent = office;
+            document.getElementById('sucDistrict').textContent = district;
+            document.getElementById('sucUsername').textContent = u;
+            document.getElementById('sucPassword').textContent = p;
+
+            // व्हॉट्सॲप मेसेज तयार करणे
+            const waMessage = `नमस्कार ॲडमिन,%0A%0Aमाझे रजिस्ट्रेशन झाले आहे. कृपया माझे खाते ॲक्टिव्हेट करावे ही विनंती.%0A%0A*माझी माहिती:*%0A*नाव:* ${name}%0A*पदनाम:* ${desig}%0A*कार्यालय:* ${office}%0A*जिल्हा:* ${district}%0A*युजरनेम:* ${u}%0A*पासवर्ड:* ${p}%0A%0Aधन्यवाद!`;
+            
+            document.getElementById('btnWaAdmin').href = `https://wa.me/${ADMIN_MOBILE}?text=${waMessage}`;
+            document.getElementById('btnCallAdmin').href = `tel:+${ADMIN_MOBILE}`;
         }
     </script>
 </body>
