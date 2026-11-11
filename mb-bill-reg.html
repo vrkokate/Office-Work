@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="common.css">
     
     <style>
+        .top-nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
+        .top-nav-item { background: #0d47a1; color: #fff; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 5px; border-radius: 8px; font-size: 11px; font-weight: bold; gap: 5px; transition: 0.3s; }
+        .top-nav-item i { font-size: 18px; }
+        .top-nav-item.active { background: #1976d2; box-shadow: 0 2px 8px rgba(25, 118, 210, 0.4); }
+
         .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .summary-card { background: #fff; border: 1px solid #bbdefb; border-radius: 8px; padding: 10px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .summary-card .label { font-size: 12px; color: #666; font-weight: 600; }
@@ -20,12 +25,11 @@
         .btn-add { flex: 1; background: #f57c00; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-print-top { flex: 1; background: #0d47a1; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
-        /* 🌟 मोबाईल स्क्रोल आणि कॉम्पॅक्ट टेबल स्टाईल */
         .table-container { 
             width: 100%; 
             overflow-x: auto; 
             overflow-y: auto; 
-            max-height: 60vh; /* उभे स्क्रोल */
+            max-height: 60vh; 
             -webkit-overflow-scrolling: touch; 
             border: 1px solid #ddd; 
             border-radius: 6px;
@@ -34,6 +38,14 @@
         th, td { padding: 4px 6px; border: 1px solid #ddd; text-align: center; white-space: nowrap; }
         th { background-color: #f5f5f5; font-size: 11px; position: sticky; top: 0; z-index: 10; }
         
+        th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 5; background-color: #fff; }
+        th:nth-child(1) { z-index: 6; background-color: #f5f5f5; }
+        th:nth-child(11), td:nth-child(11) { position: sticky; right: 0; z-index: 5; background-color: #fff; box-shadow: -2px 0 5px -2px rgba(0,0,0,0.2); }
+        th:nth-child(11) { z-index: 6; background-color: #f5f5f5; }
+        tr.total-row td { background-color: #f0f2f5 !important; font-weight: bold; }
+        tr.total-row td:nth-child(1) { z-index: 5; background-color: #f0f2f5; }
+        tr.total-row td:nth-child(11) { z-index: 5; background-color: #f0f2f5; }
+
         .text-left { text-align: left; }
         .text-right { text-align: right; }
         
@@ -107,18 +119,33 @@
         .ded-detail-list { overflow-y: auto; flex: 1; }
         .ded-detail-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 13px; gap: 10px; }
         .ded-detail-total { display: flex; justify-content: space-between; padding: 10px 0; border-top: 2px solid #333; margin-top: 10px; font-weight: bold; font-size: 15px; color: #d32f2f; }
+        body { padding-bottom: 0 !important; }
     </style>
 </head>
 <body>
 
     <header class="top-header">
-        <!-- 🌟 बॅक बटन: establishment.html -->
         <a href="establishment.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <div class="header-title">📄 देयक नोंदवही (Bill Register)</div>
         <a href="dashboard.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
     </header>
 
     <div class="main-content">
+        <div class="top-nav-grid">
+            <a href="mb-je.html" class="top-nav-item">
+                <i class="fa-solid fa-user-tie"></i><span>JE</span>
+            </a>
+            <a href="mb-register.html" class="top-nav-item">
+                <i class="fa-solid fa-book"></i><span>M.B.</span>
+            </a>
+            <a href="mb-work-list.html" class="top-nav-item">
+                <i class="fa-solid fa-hammer"></i><span>Work list</span>
+            </a>
+            <a href="mb-bill-reg.html" class="top-nav-item active">
+                <i class="fa-solid fa-file-invoice-dollar"></i><span>Bill reg.</span>
+            </a>
+        </div>
+
         <div class="card-box">
             
             <div class="summary-grid">
@@ -309,22 +336,6 @@
                 <span id="dedDetailTotal">₹ 0</span>
             </div>
         </div>
-    </div>
-
-    <!-- 🌟 खालचे ४ टॅब्स -->
-    <div class="bottom-nav">
-        <a href="mb-je.html" class="nav-item">
-            <i class="fa-solid fa-user-tie"></i><span>JE</span>
-        </a>
-        <a href="mb-register.html" class="nav-item">
-            <i class="fa-solid fa-book"></i><span>MB</span>
-        </a>
-        <a href="mb-work-list.html" class="nav-item">
-            <i class="fa-solid fa-hammer"></i><span>Work</span>
-        </a>
-        <a href="mb-bill-reg.html" class="nav-item active">
-            <i class="fa-solid fa-file-invoice-dollar"></i><span>Bill Reg</span>
-        </a>
     </div>
 
     <script src="common.js"></script>
@@ -635,7 +646,6 @@
 
         function closeSuccessModal() { document.getElementById('successMsgModal').style.display = 'none'; }
 
-        // 🌟 टेबल रेंडर करणे (Rowspan आणि Total सह)
         function renderTable() {
             const tbody = document.getElementById('billTableBody');
             if (!tbody) return; tbody.innerHTML = '';
@@ -645,7 +655,6 @@
                 return; 
             }
 
-            // ग्रुपिंग लॉजिक (एकाच कामाची एकापेक्षा जास्त बिलं असल्यास)
             let grouped = [];
             let currentKey = null;
             let currentGroup = null;
@@ -680,15 +689,13 @@
                     html += `<td>${srNo++}</td>`;
 
                     if (i === 0) {
-                        // Merged Columns
-                        html += `<td rowspan="${rowSpan}">${escapeHtml(bill.date || '-')}</td>`;
+                        html += `<td rowspan="${rowSpan}">${formatDate(bill.date)}</td>`;
                         html += `<td rowspan="${rowSpan}" class="text-left">${escapeHtml(bill.contractor || '-')}</td>`;
                         html += `<td rowspan="${rowSpan}" class="text-left">${escapeHtml(bill.workName || '-')}</td>`;
                         html += `<td rowspan="${rowSpan}">${escapeHtml(bill.je || '-')}</td>`;
                         html += `<td rowspan="${rowSpan}">${escapeHtml(bill.mb || '-')}</td>`;
                     }
 
-                    // Individual Columns
                     html += `<td>${escapeHtml(bill.billType || '-')}</td>`;
                     html += `<td class="text-right">₹${pAmt.toLocaleString('en-IN')}</td>`;
                     html += `<td class="text-right" style="color:#d32f2f; cursor:pointer;" onclick="showDeductionDetails(${item.originalIndex})">₹${tDed.toLocaleString('en-IN')}</td>`;
@@ -698,8 +705,7 @@
                 });
             });
 
-            // Total Row
-            html += `<tr style="background:#f0f2f5; font-weight:bold; font-size:12px;">
+            html += `<tr class="total-row">
                         <td colspan="7" class="text-right" style="padding-right:10px;">एकूण (Total):</td>
                         <td class="text-right">₹${totalPassed.toLocaleString('en-IN')}</td>
                         <td class="text-right" style="color:#d32f2f;">₹${totalDed.toLocaleString('en-IN')}</td>
@@ -753,11 +759,9 @@
             });
         }
 
-        // 🌟 नवीन प्रिंट फंक्शन (Landscape A4, Rowspan आणि Footer सह)
         function printReport() {
             if (!billRecords || billRecords.length === 0) { alert('प्रिंट करण्यासाठी नोंद नाही!'); return; }
             let printWindow = window.open('', '_blank');
-            
             let html = `
                 <html>
                 <head>
@@ -785,7 +789,7 @@
                         <h4>महाराष्ट्र शासकीय, सुधारित प्रशासन</h4>
                         <h3>सांपूर्ण देयक नोंदवही (Master Bill Register)</h3>
                     </div>
-                    <div class="date-right">अहवाल दिनांक: ${new Date().toLocaleDateString('en-GB')}</div>
+                    <div class="date-right">अहवाल दिनांक: ${formatDate(new Date().toISOString().split('T')[0])}</div>
                     <table>
                         <thead>
                             <tr>
@@ -804,7 +808,6 @@
                         <tbody>
             `;
 
-            // Group Logic
             let grouped = [];
             let currentKey = null;
             let currentGroup = null;
@@ -837,7 +840,7 @@
                     html += `<td>${srNo++}</td>`;
 
                     if (i === 0) {
-                        html += `<td rowspan="${rowSpan}">${escapeHtml(bill.date || '-')}</td>`;
+                        html += `<td rowspan="${rowSpan}">${formatDate(bill.date)}</td>`;
                         html += `<td rowspan="${rowSpan}" class="text-left">${escapeHtml(bill.contractor || '-')}</td>`;
                         html += `<td rowspan="${rowSpan}" class="text-left">${escapeHtml(bill.workName || '-')}</td>`;
                         html += `<td rowspan="${rowSpan}">${escapeHtml(bill.je || '-')}</td>`;
@@ -852,7 +855,6 @@
                 });
             });
 
-            // Total Row
             html += `<tr class="total-row">
                         <td colspan="7" class="text-right">एकूण (Total):</td>
                         <td class="text-right">₹${totalPassed.toLocaleString('en-IN')}</td>
