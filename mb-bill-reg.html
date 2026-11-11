@@ -41,13 +41,7 @@
         .wizard-form-control { width: 100%; padding: 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none; box-sizing: border-box; }
         .wizard-form-control[readonly] { background-color: #f0f2f5; color: #666; }
         
-        /* 🌟 दिनांक फील्ड फिक्स */
-        input[type="date"].wizard-form-control {
-            min-height: 40px;
-            text-align: left;
-            appearance: none;
-            -webkit-appearance: none;
-        }
+        input[type="date"].wizard-form-control { min-height: 40px; text-align: left; appearance: none; -webkit-appearance: none; }
 
         .wizard-btns { display: flex; gap: 10px; margin-top: 15px; }
         .btn-back { flex: 1; background: #78909c; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
@@ -78,14 +72,14 @@
         .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; }
         .setting-row input { width: 80px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: right; box-sizing: border-box; }
 
-        /* 🌟 कस्टम अलर्ट (यशस्वी संदेशासाठी) */
+        /* 🌟 कस्टम मेसेज */
         .custom-msg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 5000; display: none; justify-content: center; align-items: center; padding: 20px; }
         .custom-msg-box { background: #fff; border-radius: 12px; width: 100%; max-width: 300px; padding: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .custom-msg-icon { font-size: 40px; color: #2e7d32; margin-bottom: 10px; }
         .custom-msg-text { font-size: 15px; font-weight: bold; color: #333; margin-bottom: 20px; }
         .custom-msg-btn { width: 100%; background: #2e7d32; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; }
 
-        /* 🌟 कपात तपशील (Deduction Details) मोडल */
+        /* 🌟 कपात तपशील मोडल */
         .ded-detail-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 4000; display: none; justify-content: center; align-items: center; padding: 20px; }
         .ded-detail-box { background: #fff; border-radius: 10px; width: 100%; max-width: 350px; padding: 15px; max-height: 80vh; display: flex; flex-direction: column; }
         .ded-detail-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 10px; }
@@ -268,7 +262,6 @@
         </div>
     </div>
 
-    <!-- 🌟 यशस्वी संदेश (Custom Alert) -->
     <div id="successMsgModal" class="custom-msg-overlay">
         <div class="custom-msg-box">
             <div class="custom-msg-icon"><i class="fa-solid fa-circle-check"></i></div>
@@ -277,16 +270,13 @@
         </div>
     </div>
 
-    <!-- 🌟 कपात तपशील मोडल -->
     <div id="dedDetailModal" class="ded-detail-modal">
         <div class="ded-detail-box">
             <div class="ded-detail-header">
                 <h3><i class="fa-solid fa-list"></i> कपात तपशील</h3>
                 <button class="ded-detail-close" onclick="closeDedDetail()">X</button>
             </div>
-            <div class="ded-detail-list" id="dedDetailList">
-                <!-- डिटेल्स इथे लोड होतील -->
-            </div>
+            <div class="ded-detail-list" id="dedDetailList"></div>
             <div class="ded-detail-total">
                 <span>एकूण कपात:</span>
                 <span id="dedDetailTotal">₹ 0</span>
@@ -311,12 +301,13 @@
         }
 
         function loadData() {
+            // १. सर्व डेटा सुरक्षितपणे लोड करणे
             try { billRecords = JSON.parse(localStorage.getItem('bill_records') || '[]'); } catch(e) { billRecords = []; }
             try { allWorks = JSON.parse(localStorage.getItem('work_records') || '[]'); } catch(e) { allWorks = []; }
             
             updateDashboard();
             renderTable();
-            populateJEList();
+            populateJEList(); // JE लिस्ट नक्की भरा
         }
 
         function updateDashboard() {
@@ -335,11 +326,17 @@
             document.getElementById('sumNetPay').innerText = '₹ ' + totalNet.toLocaleString('en-IN');
         }
 
+        // 🌟 JE लिस्ट भरणे (येथे बदल केला आहे)
         function populateJEList() {
             const jeSelect = document.getElementById('wJeSelect');
             jeSelect.innerHTML = '<option value="">-- JE निवडा --</option>';
             
-            let jeRecords = JSON.parse(localStorage.getItem('mb_je_records') || '[]');
+            let jeRecords = [];
+            try {
+                jeRecords = JSON.parse(localStorage.getItem('mb_je_records') || '[]');
+            } catch(e) {
+                jeRecords = [];
+            }
             
             if (jeRecords.length === 0) {
                 jeSelect.innerHTML = '<option value="">-- प्रथम JE ॲड करा --</option>';
@@ -347,12 +344,17 @@
             }
             
             jeRecords.forEach(je => { 
-                jeSelect.innerHTML += `<option value="${je.name}">${je.name}</option>`; 
+                // जर je.name असेल तरच ॲड करा
+                if(je && je.name) {
+                    jeSelect.innerHTML += `<option value="${je.name}">${je.name}</option>`; 
+                }
             });
         }
 
         function openWizard() {
-            let jeRecords = JSON.parse(localStorage.getItem('mb_je_records') || '[]');
+            let jeRecords = [];
+            try { jeRecords = JSON.parse(localStorage.getItem('mb_je_records') || '[]'); } catch(e) {}
+            
             if(jeRecords.length === 0) {
                 alert("प्रणालीमध्ये एकही कनिष्ठ अभियंता (JE) नाही. कृपया आधी JE टॅब मध्ये जाऊन JE ॲड करा.");
                 return;
@@ -376,16 +378,16 @@
             const bill = billRecords[index];
             document.getElementById('editBillIndex').value = index;
             
-            document.getElementById('wJeSelect').value = bill.je;
+            document.getElementById('wJeSelect').value = bill.je || '';
             onWizardJEChange();
-            document.getElementById('wMbSelect').value = bill.mb;
+            document.getElementById('wMbSelect').value = bill.mb || '';
             
-            document.getElementById('wContractor').value = bill.contractor;
-            document.getElementById('wWorkName').value = bill.workName;
-            document.getElementById('wBillType').value = bill.billType;
-            document.getElementById('wBillDate').value = bill.date;
+            document.getElementById('wContractor').value = bill.contractor || '';
+            document.getElementById('wWorkName').value = bill.workName || '';
+            document.getElementById('wBillType').value = bill.billType || '';
+            document.getElementById('wBillDate').value = bill.date || '';
 
-            document.getElementById('wPassedAmt').value = bill.passedAmt;
+            document.getElementById('wPassedAmt').value = bill.passedAmt || '';
             renderDeductionFields();
             
             if(bill.deductions) {
@@ -427,7 +429,9 @@
 
             if(!je) return;
 
-            let mbRecords = JSON.parse(localStorage.getItem('mb_records') || '[]');
+            let mbRecords = [];
+            try { mbRecords = JSON.parse(localStorage.getItem('mb_records') || '[]'); } catch(e) {}
+            
             let uniqueMBs = {};
             mbRecords.forEach(rec => { uniqueMBs[rec.mbNo] = rec; });
 
@@ -620,7 +624,6 @@
             closeWizard();
             loadData();
             
-            // 🌟 ब्राउझर alert ऐवजी कस्टम मोडल
             document.getElementById('successMsgText').innerText = editIndex === -1 ? 'देयक यशस्वीरित्या जतन झाले!' : 'देयक यशस्वीरित्या अपडेट झाले!';
             document.getElementById('successMsgModal').style.display = 'flex';
         }
@@ -629,7 +632,7 @@
             document.getElementById('successMsgModal').style.display = 'none';
         }
 
-        // 🌟 टेबल रेंडर करणे (कपातीवर क्लिक इव्हेंटसह)
+        // 🌟 टेबल रेंडर (जुना डेटा असला तरी एरर येणार नाही)
         function renderTable() {
             const tbody = document.getElementById('billTableBody');
             tbody.innerHTML = '';
@@ -640,6 +643,9 @@
             }
 
             billRecords.forEach((bill, index) => {
+                if(!bill) return; // जर रेकॉर्ड null असेल तर स्किप करा
+
+                // जुन्या डेटामध्ये काही फील्ड्स नसतील तर त्या जागी 0 दाखवा
                 let pAmt = Number(bill.passedAmt) || 0;
                 let tDed = Number(bill.totalDed) || 0;
                 let nPay = Number(bill.netPay) || 0;
@@ -648,8 +654,7 @@
                 tr.innerHTML = `
                     <td style="text-align: center;">${index + 1}</td>
                     <td>₹${pAmt.toLocaleString('en-IN')}</td>
-                    <!-- 🌟 कपातीवर क्लिक केल्यास पॉपअप उघडण्यासाठी onclick इव्हेंट -->
-                    <td style="color:#d32f2f; font-weight:bold; cursor:pointer; text-decoration:underline;" onclick="showDeductionDetails(${index})" title="तपशील पाहण्यासाठी क्लिक करा">₹${tDed.toLocaleString('en-IN')}</td>
+                    <td style="color:#d32f2f; font-weight:bold; cursor:pointer; text-decoration:underline;" onclick="showDeductionDetails(${index})">₹${tDed.toLocaleString('en-IN')}</td>
                     <td style="color:#2e7d32; font-weight:bold;">₹${nPay.toLocaleString('en-IN')}</td>
                     <td>
                         <div class="action-btns">
@@ -662,7 +667,6 @@
             });
         }
 
-        // 🌟 कपात तपशील दाखवणारे फंक्शन
         function showDeductionDetails(billIndex) {
             const bill = billRecords[billIndex];
             const dedList = document.getElementById('dedDetailList');
@@ -750,7 +754,7 @@
                 <table><thead><tr><th>अ.क्र.</th><th>बिल क्र.</th><th>दिनांक</th><th>कामाचे नाव</th><th>कंत्राटदार</th><th>पास रक्कम</th><th>कपात</th><th>नेट रक्कम</th></tr></thead><tbody>
             `;
             billRecords.forEach((bill, index) => {
-                html += `<tr><td>${index + 1}</td><td>${bill.billNo}</td><td>${formatDate(bill.date)}</td><td>${bill.workName}</td><td>${bill.contractor}</td><td>₹${(Number(bill.passedAmt)||0).toLocaleString('en-IN')}</td><td>₹${(Number(bill.totalDed)||0).toLocaleString('en-IN')}</td><td>₹${(Number(bill.netPay)||0).toLocaleString('en-IN')}</td></tr>`;
+                html += `<tr><td>${index + 1}</td><td>${bill.billNo || '-'}</td><td>${formatDate(bill.date) || '-'}</td><td>${bill.workName || '-'}</td><td>${bill.contractor || '-'}</td><td>₹${(Number(bill.passedAmt)||0).toLocaleString('en-IN')}</td><td>₹${(Number(bill.totalDed)||0).toLocaleString('en-IN')}</td><td>₹${(Number(bill.netPay)||0).toLocaleString('en-IN')}</td></tr>`;
             });
             html += `</tbody></table></body></html>`;
             printWindow.document.write(html);
