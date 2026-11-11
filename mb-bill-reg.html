@@ -38,9 +38,17 @@
         
         .wizard-form-group { margin-bottom: 12px; }
         .wizard-form-group label { display: block; font-size: 12px; font-weight: bold; color: #333; margin-bottom: 5px; }
-        .wizard-form-control { width: 100%; padding: 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none; }
+        .wizard-form-control { width: 100%; padding: 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none; box-sizing: border-box; }
         .wizard-form-control[readonly] { background-color: #f0f2f5; color: #666; }
         
+        /* 🌟 दिनांक फील्ड फिक्स */
+        input[type="date"].wizard-form-control {
+            min-height: 40px;
+            text-align: left;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
         .wizard-btns { display: flex; gap: 10px; margin-top: 15px; }
         .btn-back { flex: 1; background: #78909c; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
         .btn-next { flex: 2; background: #f57c00; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
@@ -53,7 +61,7 @@
         .deduction-scroll-box { max-height: 250px; overflow-y: auto; padding-right: 5px; border: 1px solid #eee; border-radius: 6px; padding: 10px; margin-bottom: 10px; }
         .ded-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .ded-row label { font-size: 12px; font-weight: 600; margin: 0; }
-        .ded-row input { width: 90px; padding: 6px; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; text-align: right; }
+        .ded-row input { width: 90px; padding: 6px; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; text-align: right; box-sizing: border-box; }
 
         .total-summary-box { background: #fff3e0; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 13px; font-weight: bold; }
         .total-summary-box div { display: flex; justify-content: space-between; margin-bottom: 4px; }
@@ -68,7 +76,24 @@
         .settings-card { background: #fff; border-radius: 10px; width: 100%; max-width: 350px; padding: 20px; }
         .settings-card h3 { margin-bottom: 15px; color: #0d47a1; text-align: center; font-size: 16px; }
         .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; }
-        .setting-row input { width: 80px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: right; }
+        .setting-row input { width: 80px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: right; box-sizing: border-box; }
+
+        /* 🌟 कस्टम अलर्ट (यशस्वी संदेशासाठी) */
+        .custom-msg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 5000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .custom-msg-box { background: #fff; border-radius: 12px; width: 100%; max-width: 300px; padding: 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .custom-msg-icon { font-size: 40px; color: #2e7d32; margin-bottom: 10px; }
+        .custom-msg-text { font-size: 15px; font-weight: bold; color: #333; margin-bottom: 20px; }
+        .custom-msg-btn { width: 100%; background: #2e7d32; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; }
+
+        /* 🌟 कपात तपशील (Deduction Details) मोडल */
+        .ded-detail-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 4000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .ded-detail-box { background: #fff; border-radius: 10px; width: 100%; max-width: 350px; padding: 15px; max-height: 80vh; display: flex; flex-direction: column; }
+        .ded-detail-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 10px; }
+        .ded-detail-header h3 { margin: 0; font-size: 15px; color: #d32f2f; }
+        .ded-detail-close { background: #e53935; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; font-weight: bold; cursor: pointer; }
+        .ded-detail-list { overflow-y: auto; flex: 1; }
+        .ded-detail-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 13px; }
+        .ded-detail-total { display: flex; justify-content: space-between; padding: 10px 0; border-top: 2px solid #333; margin-top: 10px; font-weight: bold; font-size: 15px; color: #d32f2f; }
     </style>
 </head>
 <body>
@@ -243,12 +268,28 @@
         </div>
     </div>
 
-    <div id="deleteAlert" class="custom-alert-overlay">
-        <div class="custom-alert-box">
-            <p>तुम्हाला हे बिल नक्की डिलीट करायचे आहे का?</p>
-            <div class="alert-actions">
-                <button class="btn-cancel-alert" onclick="closeDeleteAlert()">नाही (Cancel)</button>
-                <button class="btn-confirm-alert" id="confirmDeleteBtn">होय (Delete)</button>
+    <!-- 🌟 यशस्वी संदेश (Custom Alert) -->
+    <div id="successMsgModal" class="custom-msg-overlay">
+        <div class="custom-msg-box">
+            <div class="custom-msg-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="custom-msg-text" id="successMsgText">देयक यशस्वीरित्या जतन झाले!</div>
+            <button class="custom-msg-btn" onclick="closeSuccessModal()">ठीक आहे (OK)</button>
+        </div>
+    </div>
+
+    <!-- 🌟 कपात तपशील मोडल -->
+    <div id="dedDetailModal" class="ded-detail-modal">
+        <div class="ded-detail-box">
+            <div class="ded-detail-header">
+                <h3><i class="fa-solid fa-list"></i> कपात तपशील</h3>
+                <button class="ded-detail-close" onclick="closeDedDetail()">X</button>
+            </div>
+            <div class="ded-detail-list" id="dedDetailList">
+                <!-- डिटेल्स इथे लोड होतील -->
+            </div>
+            <div class="ded-detail-total">
+                <span>एकूण कपात:</span>
+                <span id="dedDetailTotal">₹ 0</span>
             </div>
         </div>
     </div>
@@ -270,7 +311,6 @@
         }
 
         function loadData() {
-            // डेटा सुरक्षितपणे लोड करणे
             try { billRecords = JSON.parse(localStorage.getItem('bill_records') || '[]'); } catch(e) { billRecords = []; }
             try { allWorks = JSON.parse(localStorage.getItem('work_records') || '[]'); } catch(e) { allWorks = []; }
             
@@ -579,10 +619,17 @@
             
             closeWizard();
             loadData();
-            alert(editIndex === -1 ? 'देयक यशस्वीरित्या जतन झाले!' : 'देयक यशस्वीरित्या अपडेट झाले!');
+            
+            // 🌟 ब्राउझर alert ऐवजी कस्टम मोडल
+            document.getElementById('successMsgText').innerText = editIndex === -1 ? 'देयक यशस्वीरित्या जतन झाले!' : 'देयक यशस्वीरित्या अपडेट झाले!';
+            document.getElementById('successMsgModal').style.display = 'flex';
         }
 
-        // 🌟 टेबल रेंडरमध्ये एरर हाताळणे (Fix)
+        function closeSuccessModal() {
+            document.getElementById('successMsgModal').style.display = 'none';
+        }
+
+        // 🌟 टेबल रेंडर करणे (कपातीवर क्लिक इव्हेंटसह)
         function renderTable() {
             const tbody = document.getElementById('billTableBody');
             tbody.innerHTML = '';
@@ -593,7 +640,6 @@
             }
 
             billRecords.forEach((bill, index) => {
-                // अपूर्ण किंवा जुना डेटा असल्यास एरर येऊ नये म्हणून || 0 वापरले आहे
                 let pAmt = Number(bill.passedAmt) || 0;
                 let tDed = Number(bill.totalDed) || 0;
                 let nPay = Number(bill.netPay) || 0;
@@ -602,7 +648,8 @@
                 tr.innerHTML = `
                     <td style="text-align: center;">${index + 1}</td>
                     <td>₹${pAmt.toLocaleString('en-IN')}</td>
-                    <td style="color:#d32f2f;">₹${tDed.toLocaleString('en-IN')}</td>
+                    <!-- 🌟 कपातीवर क्लिक केल्यास पॉपअप उघडण्यासाठी onclick इव्हेंट -->
+                    <td style="color:#d32f2f; font-weight:bold; cursor:pointer; text-decoration:underline;" onclick="showDeductionDetails(${index})" title="तपशील पाहण्यासाठी क्लिक करा">₹${tDed.toLocaleString('en-IN')}</td>
                     <td style="color:#2e7d32; font-weight:bold;">₹${nPay.toLocaleString('en-IN')}</td>
                     <td>
                         <div class="action-btns">
@@ -613,6 +660,39 @@
                 `;
                 tbody.appendChild(tr);
             });
+        }
+
+        // 🌟 कपात तपशील दाखवणारे फंक्शन
+        function showDeductionDetails(billIndex) {
+            const bill = billRecords[billIndex];
+            const dedList = document.getElementById('dedDetailList');
+            const dedTotal = document.getElementById('dedDetailTotal');
+            
+            dedList.innerHTML = '';
+            
+            if (!bill.deductions || Object.keys(bill.deductions).length === 0) {
+                dedList.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">या बिलामध्ये कोणतीही कपात नाही.</div>';
+                dedTotal.innerText = '₹ 0';
+            } else {
+                let total = 0;
+                for (let key in bill.deductions) {
+                    let val = Number(bill.deductions[key]) || 0;
+                    total += val;
+                    dedList.innerHTML += `
+                        <div class="ded-detail-item">
+                            <span>${key}</span>
+                            <span>₹ ${val.toLocaleString('en-IN')}</span>
+                        </div>
+                    `;
+                }
+                dedTotal.innerText = '₹ ' + total.toLocaleString('en-IN');
+            }
+            
+            document.getElementById('dedDetailModal').style.display = 'flex';
+        }
+
+        function closeDedDetail() {
+            document.getElementById('dedDetailModal').style.display = 'none';
         }
 
         function openSettingsModal() {
