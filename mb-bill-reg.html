@@ -8,14 +8,7 @@
     <link rel="stylesheet" href="common.css">
     
     <style>
-        /* 🌟 खालचे टॅब्स साठी नवीन CSS */
-        body { padding-bottom: 65px; } /* टॅब्स मुळे खालचा डेटा झाकला जाऊ नये म्हणून */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: #fff; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 1000; border-top: 1px solid #ddd; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #777; text-decoration: none; font-size: 11px; font-weight: bold; flex: 1; height: 100%; }
-        .nav-item i { font-size: 18px; margin-bottom: 3px; }
-        .nav-item.active { color: #f57c00; } /* सध्या ओपन असलेल्या पेजचा रंग */
-        .nav-item.active i { color: #f57c00; }
-
+        /* बिल रजिस्टरसाठी खास स्टाईल */
         .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .summary-card { background: #fff; border: 1px solid #bbdefb; border-radius: 8px; padding: 10px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .summary-card .label { font-size: 12px; color: #666; font-weight: 600; }
@@ -28,7 +21,6 @@
         .btn-add { flex: 1; background: #f57c00; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-print-top { flex: 1; background: #0d47a1; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
-        /* टेबल मोबाईलवर फिट होण्यासाठी */
         .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th, td { padding: 8px 4px; border: 1px solid #ddd; text-align: center; }
@@ -155,25 +147,20 @@
                             <th style="width: 25%;">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="billTableBody">
-                        <!-- डेटा इथे लोड होईल -->
-                    </tbody>
+                    <tbody id="billTableBody"></tbody>
                 </table>
             </div>
-
         </div>
     </div>
 
-    <!-- 🌟 विझार्ड मोडल (३ स्टेप्स) -->
+    <!-- 🌟 विझार्ड मोडल -->
     <div id="wizardModal" class="wizard-overlay">
         <div class="wizard-card">
             <div class="wizard-header">
                 <h3>नवीन देयक नोंदवा</h3>
                 <button class="wizard-close" onclick="closeWizard()">X</button>
             </div>
-
             <input type="hidden" id="editBillIndex" value="-1">
-
             <div class="steps-indicator">
                 <div class="step-circle active" id="dot1">1</div>
                 <div class="step-circle" id="dot2">2</div>
@@ -216,21 +203,9 @@
                         <option value="Third RA Bill">Third RA Bill</option>
                         <option value="Fourth RA Bill">Fourth RA Bill</option>
                         <option value="Fifth RA Bill">Fifth RA Bill</option>
-                        <option value="Sixth RA Bill">Sixth RA Bill</option>
-                        <option value="Seventh RA Bill">Seventh RA Bill</option>
-                        <option value="Eighth RA Bill">Eighth RA Bill</option>
-                        <option value="Ninth RA Bill">Ninth RA Bill</option>
-                        <option value="Tenth RA Bill">Tenth RA Bill</option>
                         <option value="First and Final Bill">First and Final Bill</option>
                         <option value="Second and Final Bill">Second and Final Bill</option>
                         <option value="Third and Final Bill">Third and Final Bill</option>
-                        <option value="Fourth and Final Bill">Fourth and Final Bill</option>
-                        <option value="Fifth and Final Bill">Fifth and Final Bill</option>
-                        <option value="Sixth and Final Bill">Sixth and Final Bill</option>
-                        <option value="Seventh and Final Bill">Seventh and Final Bill</option>
-                        <option value="Eighth and Final Bill">Eighth and Final Bill</option>
-                        <option value="Ninth and Final Bill">Ninth and Final Bill</option>
-                        <option value="Tenth and Final Bill">Tenth and Final Bill</option>
                     </select>
                 </div>
                 <div class="wizard-form-group">
@@ -245,21 +220,17 @@
             <div id="step2" class="wizard-step">
                 <div class="deduction-header">
                     <h4>Deduction (कपात तपशील)</h4>
-                    <div class="gear-icon" onclick="openSettingsModal()" title="कपात दर बदला"><i class="fa-solid fa-gear"></i></div>
+                    <div class="gear-icon" onclick="openSettingsModal()"><i class="fa-solid fa-gear"></i></div>
                 </div>
-
                 <div class="wizard-form-group">
                     <label>Passed Amount (पास रक्कम) ₹ *</label>
                     <input type="number" id="wPassedAmt" class="wizard-form-control" placeholder="उदा. 1000000" oninput="autoCalculateDeductions()">
                 </div>
-
                 <div class="deduction-scroll-box" id="deductionFieldsContainer"></div>
-
                 <div class="total-summary-box">
-                    <div><span>एकूण कपात (Total Deduction):</span> <span class="text-red" id="wLblTotalDed">₹ 0</span></div>
-                    <div><span>प्रत्यक्षात देय रक्कम (Net Payable):</span> <span class="text-green" id="wLblNetPay">₹ 0</span></div>
+                    <div><span>एकूण कपात:</span> <span class="text-red" id="wLblTotalDed">₹ 0</span></div>
+                    <div><span>प्रत्यक्षात देय रक्कम:</span> <span class="text-green" id="wLblNetPay">₹ 0</span></div>
                 </div>
-
                 <div class="wizard-btns">
                     <button class="btn-back" onclick="goToStep(1)">◀ मागे</button>
                     <button class="btn-next" onclick="goToStep(3)">पुढील ➔</button>
@@ -273,7 +244,6 @@
                     <button class="btn-save-wizard" onclick="saveNewBill()">जतन करा (Save)</button>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -298,9 +268,7 @@
 
     <div id="deleteAlert" class="custom-msg-overlay">
         <div class="custom-msg-box">
-            <div class="custom-msg-icon" style="color:#d32f2f;">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
+            <div class="custom-msg-icon" style="color:#d32f2f;"><i class="fa-solid fa-triangle-exclamation"></i></div>
             <div class="custom-msg-text">ही देयक नोंद कायमची हटवायची आहे का?</div>
             <div style="display:flex; gap:10px;">
                 <button class="custom-msg-btn" style="background:#78909c;" onclick="closeDeleteAlert()">रद्द करा</button>
@@ -323,35 +291,25 @@
         </div>
     </div>
 
-    <!-- 🌟 नवीन ॲड केलेले खालचे टॅब्स (Bottom Navigation) -->
-    <!-- लक्षात ठेवा: href मध्ये तुमच्या फाईलची अचूक नावं टाका (उदा. mb-je-reg.html, settings.html) -->
+    <!-- 🌟 खालचे ४ टॅब्स -->
     <div class="bottom-nav">
-        <a href="dashboard.html" class="nav-item">
-            <i class="fa-solid fa-house"></i>
-            <span>मुख्य पृष्ठ</span>
-        </a>
-        <a href="mb-je-reg.html" class="nav-item">
-            <i class="fa-solid fa-user-tie"></i>
-            <span>J.E.</span>
+        <a href="mb-je.html" class="nav-item">
+            <i class="fa-solid fa-user-tie"></i><span>JE</span>
         </a>
         <a href="mb-register.html" class="nav-item">
-            <i class="fa-solid fa-book"></i>
-            <span>M.B.</span>
+            <i class="fa-solid fa-book"></i><span>MB</span>
+        </a>
+        <a href="mb-work-list.html" class="nav-item">
+            <i class="fa-solid fa-hammer"></i><span>Work</span>
         </a>
         <a href="mb-bill-reg.html" class="nav-item active">
-            <i class="fa-solid fa-file-invoice-dollar"></i>
-            <span>बिल</span>
-        </a>
-        <a href="settings.html" class="nav-item">
-            <i class="fa-solid fa-gear"></i>
-            <span>सेटिंग</span>
+            <i class="fa-solid fa-file-invoice-dollar"></i><span>Bill Reg</span>
         </a>
     </div>
 
     <script src="common.js"></script>
     <script>
         checkAuth();
-
         let billRecords = [];
         let allWorks = [];
         let deleteTargetIndex = -1;
@@ -359,42 +317,25 @@
         let otherCount = 1;
         let currentTotalDed = 0;
         let currentNetPay = 0;
-
         const defaultRates = { 'IT': 2, 'SD': 0.5, 'Maint': 0.5, 'Royalty': 1, 'Govt': 1, 'Upkar': 1, 'CGST': 1, 'SGST': 1 };
 
         function getDeductionRates() {
             let saved = localStorage.getItem('bill_deduction_rates');
-            if (saved) {
-                try { return JSON.parse(saved); } catch(e) {}
-            }
-            return JSON.parse(JSON.stringify(defaultRates));
+            return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultRates));
         }
 
         function escapeHtml(s) {
-            return String(s == null ? '' : s)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+            return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
         function loadData() {
             let rawBills = localStorage.getItem('bill_records');
-            if (rawBills) {
-                try {
-                    billRecords = JSON.parse(rawBills);
-                    if (billRecords && !Array.isArray(billRecords)) billRecords = [billRecords];
-                } catch(e) { billRecords = []; }
-            } else { billRecords = []; }
+            billRecords = rawBills ? JSON.parse(rawBills) : [];
+            if (billRecords && !Array.isArray(billRecords)) billRecords = [billRecords];
 
             let rawWorks = localStorage.getItem('work_records');
-            if (rawWorks) {
-                try {
-                    allWorks = JSON.parse(rawWorks);
-                    if (allWorks && !Array.isArray(allWorks)) allWorks = [allWorks];
-                } catch(e) { allWorks = []; }
-            } else { allWorks = []; }
+            allWorks = rawWorks ? JSON.parse(rawWorks) : [];
+            if (allWorks && !Array.isArray(allWorks)) allWorks = [allWorks];
 
             updateDashboard();
             renderTable();
@@ -402,18 +343,14 @@
         }
 
         function updateDashboard() {
-            let totalBills = billRecords.length;
             let totalAmt = 0, totalDed = 0, totalNet = 0;
-
-            for (let i = 0; i < billRecords.length; i++) {
-                let b = billRecords[i];
-                if (!b) continue;
+            billRecords.forEach(b => {
+                if (!b) return;
                 totalAmt += Number(b.passedAmt) || 0;
                 totalDed += Number(b.totalDed) || 0;
                 totalNet += Number(b.netPay) || 0;
-            }
-
-            document.getElementById('sumTotalBills').innerText = totalBills;
+            });
+            document.getElementById('sumTotalBills').innerText = billRecords.length;
             document.getElementById('sumTotalAmount').innerText = '₹ ' + totalAmt.toLocaleString('en-IN');
             document.getElementById('sumTotalDed').innerText = '₹ ' + totalDed.toLocaleString('en-IN');
             document.getElementById('sumNetPay').innerText = '₹ ' + totalNet.toLocaleString('en-IN');
@@ -422,52 +359,18 @@
         function populateJEList() {
             const jeSelect = document.getElementById('wJeSelect');
             if (!jeSelect) return;
-
             jeSelect.innerHTML = '<option value="">-- JE निवडा --</option>';
-
             let rawJEs = localStorage.getItem('mb_je_records');
-            if (!rawJEs) {
-                jeSelect.innerHTML = '<option value="">-- प्रथम JE ॲड करा --</option>';
-                return;
-            }
-
-            let jeRecords = [];
-            try {
-                jeRecords = JSON.parse(rawJEs);
-                if (jeRecords && !Array.isArray(jeRecords)) jeRecords = [jeRecords];
-            } catch(e) {
-                jeSelect.innerHTML = '<option value="">-- डेटा एरर --</option>';
-                return;
-            }
-
-            if (jeRecords.length === 0) {
-                jeSelect.innerHTML = '<option value="">-- प्रथम JE ॲड करा --</option>';
-                return;
-            }
-
-            let hasData = false;
-            for (let i = 0; i < jeRecords.length; i++) {
-                if (jeRecords[i] && jeRecords[i].name) {
-                    let opt = document.createElement('option');
-                    opt.value = jeRecords[i].name;
-                    opt.textContent = jeRecords[i].name;
-                    jeSelect.appendChild(opt);
-                    hasData = true;
-                }
-            }
-            if (!hasData) {
-                jeSelect.innerHTML = '<option value="">-- प्रथम JE ॲड करा --</option>';
-            }
+            if (!rawJEs) { jeSelect.innerHTML = '<option value="">-- प्रथम JE ॲड करा --</option>'; return; }
+            let jeRecords = JSON.parse(rawJEs);
+            jeRecords.forEach(je => {
+                if (je && je.name) jeSelect.innerHTML += `<option value="${je.name}">${je.name}</option>`;
+            });
         }
 
         function openWizard() {
-            let jeRecords = [];
-            try { jeRecords = JSON.parse(localStorage.getItem('mb_je_records') || '[]'); } catch(e) {}
-
-            if(!jeRecords || jeRecords.length === 0) {
-                alert("प्रणालीमध्ये एकही कनिष्ठ अभियंता (JE) नाही. कृपया आधी JE टॅब मध्ये जाऊन JE ॲड करा.");
-                return;
-            }
+            let jeRecords = JSON.parse(localStorage.getItem('mb_je_records') || '[]');
+            if(jeRecords.length === 0) { alert("कृपया आधी JE ॲड करा."); return; }
 
             document.getElementById('editBillIndex').value = '-1';
             document.getElementById('wJeSelect').value = '';
@@ -493,7 +396,6 @@
         function editBill(index) {
             const bill = billRecords[index];
             if (!bill) return;
-
             document.getElementById('editBillIndex').value = index;
             otherCount = 1;
 
@@ -504,12 +406,8 @@
 
             const relevantWorks = allWorks.filter(w => w.je === bill.je && w.mbNo === bill.mb);
             let idx = relevantWorks.findIndex(w => w.name === bill.workName);
-            if (idx === -1) idx = relevantWorks.findIndex(w => w.contractor === bill.contractor);
-
             if (idx !== -1) {
-                if (relevantWorks.length > 1) {
-                    document.getElementById('wWorkSelect').value = String(idx);
-                }
+                if (relevantWorks.length > 1) document.getElementById('wWorkSelect').value = String(idx);
                 currentSelectedWorkIndex = idx;
                 document.getElementById('wWorkName').value = relevantWorks[idx].name;
                 document.getElementById('wContractor').value = relevantWorks[idx].contractor;
@@ -520,13 +418,11 @@
             document.getElementById('wPassedAmt').value = bill.passedAmt || '';
 
             renderDeductionFields();
-
             if (bill.deductions) {
                 for (let key in bill.deductions) {
                     let input = document.getElementById('ded_' + key);
-                    if (input) {
-                        input.value = bill.deductions[key];
-                    } else {
+                    if (input) input.value = bill.deductions[key];
+                    else {
                         addOtherDeductionRow();
                         const rows = document.querySelectorAll('#deductionFieldsContainer .ded-row');
                         const lastRow = rows[rows.length - 1];
@@ -541,14 +437,11 @@
                 }
             }
             updateTotalDeductions();
-
             goToStep(1);
             document.getElementById('wizardModal').style.display = 'flex';
         }
 
-        function closeWizard() {
-            document.getElementById('wizardModal').style.display = 'none';
-        }
+        function closeWizard() { document.getElementById('wizardModal').style.display = 'none'; }
 
         function goToStep(step) {
             if (step === 2 || step === 3) {
@@ -556,22 +449,15 @@
                 const mb = document.getElementById('wMbSelect').value;
                 const billType = document.getElementById('wBillType').value;
                 const date = document.getElementById('wBillDate').value;
-                if (!je || !mb || !billType || !date || currentSelectedWorkIndex === -1) {
-                    alert('कृपया सर्व आवश्यक माहिती भरा! (JE, M.B., काम, बिल प्रकार, दिनांक)');
-                    return;
-                }
+                if (!je || !mb || !billType || !date || currentSelectedWorkIndex === -1) { alert('कृपया सर्व माहिती भरा!'); return; }
             }
-
             document.querySelectorAll('.wizard-step').forEach(el => el.classList.remove('active'));
             document.getElementById('step' + step).classList.add('active');
-
             for (let i = 1; i <= 3; i++) {
                 let dot = document.getElementById('dot' + i);
                 dot.className = 'step-circle';
-                if (i < step) dot.classList.add('done');
-                else if (i === step) dot.classList.add('active');
+                if (i < step) dot.classList.add('done'); else if (i === step) dot.classList.add('active');
             }
-
             if (step === 3) renderPreview();
         }
 
@@ -582,47 +468,29 @@
             document.getElementById('wContractor').value = '';
             document.getElementById('wWorkName').value = '';
             document.getElementById('workSelectGroup').style.display = 'none';
-            document.getElementById('wWorkSelect').innerHTML = '';
             currentSelectedWorkIndex = -1;
-
             if(!je) return;
 
-            let mbRecords = [];
-            try { mbRecords = JSON.parse(localStorage.getItem('mb_records') || '[]'); } catch(e) {}
-
+            let mbRecords = JSON.parse(localStorage.getItem('mb_records') || '[]');
             let uniqueMBs = {};
-            mbRecords.forEach(rec => {
-                if (rec && rec.type === 'दिली' && rec.detail === je && rec.mbNo) {
-                    uniqueMBs[rec.mbNo] = rec;
-                }
-            });
-
-            for (let mbNo in uniqueMBs) {
-                mbSelect.innerHTML += `<option value="${escapeHtml(mbNo)}">${escapeHtml(mbNo)}</option>`;
-            }
+            mbRecords.forEach(rec => { if (rec && rec.type === 'दिली' && rec.detail === je && rec.mbNo) uniqueMBs[rec.mbNo] = rec; });
+            for (let mbNo in uniqueMBs) mbSelect.innerHTML += `<option value="${escapeHtml(mbNo)}">${escapeHtml(mbNo)}</option>`;
         }
 
         function onWizardMBChange() {
             const je = document.getElementById('wJeSelect').value;
             const mb = document.getElementById('wMbSelect').value;
-
             document.getElementById('wContractor').value = '';
             document.getElementById('wWorkName').value = '';
             document.getElementById('workSelectGroup').style.display = 'none';
-            document.getElementById('wWorkSelect').innerHTML = '';
             currentSelectedWorkIndex = -1;
-
             if(!je || !mb) return;
 
             let relevantWorks = allWorks.filter(w => w.je === je && w.mbNo === mb);
-
             if (relevantWorks.length === 0) {
-                document.getElementById('wWorkName').value = 'या M.B. वर कोणतेही काम नोंदवलेले नाही!';
+                document.getElementById('wWorkName').value = 'या M.B. वर काम नाही!';
                 document.getElementById('wContractor').value = '-';
-                return;
-            }
-
-            if (relevantWorks.length === 1) {
+            } else if (relevantWorks.length === 1) {
                 currentSelectedWorkIndex = 0;
                 document.getElementById('wWorkName').value = relevantWorks[0].name;
                 document.getElementById('wContractor').value = relevantWorks[0].contractor;
@@ -631,9 +499,7 @@
                 const sel = document.getElementById('wWorkSelect');
                 group.style.display = 'block';
                 sel.innerHTML = '<option value="">-- काम निवडा --</option>';
-                relevantWorks.forEach((w, i) => {
-                    sel.innerHTML += `<option value="${i}">${escapeHtml(w.name)} (${escapeHtml(w.contractor)})</option>`;
-                });
+                relevantWorks.forEach((w, i) => { sel.innerHTML += `<option value="${i}">${escapeHtml(w.name)} (${escapeHtml(w.contractor)})</option>`; });
             }
         }
 
@@ -641,14 +507,7 @@
             const je = document.getElementById('wJeSelect').value;
             const mb = document.getElementById('wMbSelect').value;
             const idx = parseInt(document.getElementById('wWorkSelect').value);
-
-            if (isNaN(idx)) {
-                currentSelectedWorkIndex = -1;
-                document.getElementById('wWorkName').value = '';
-                document.getElementById('wContractor').value = '';
-                return;
-            }
-
+            if (isNaN(idx)) { currentSelectedWorkIndex = -1; document.getElementById('wWorkName').value = ''; return; }
             const relevantWorks = allWorks.filter(w => w.je === je && w.mbNo === mb);
             if (relevantWorks[idx]) {
                 currentSelectedWorkIndex = idx;
@@ -661,29 +520,10 @@
             const grid = document.getElementById('deductionFieldsContainer');
             const rates = getDeductionRates();
             grid.innerHTML = '';
-
             for (let key in rates) {
-                grid.innerHTML += `
-                    <div class="ded-row" data-key="${escapeHtml(key)}">
-                        <label>${escapeHtml(key)} ${rates[key]}%</label>
-                        <input type="number" id="ded_${escapeHtml(key)}" value="0" oninput="updateTotalDeductions()">
-                    </div>
-                `;
+                grid.innerHTML += `<div class="ded-row" data-key="${escapeHtml(key)}"><label>${escapeHtml(key)} ${rates[key]}%</label><input type="number" id="ded_${escapeHtml(key)}" value="0" oninput="updateTotalDeductions()"></div>`;
             }
-            grid.innerHTML += `
-                <div class="ded-row" data-key="Other">
-                    <label style="display:flex; align-items:center; gap:5px;">
-                        <span contenteditable="true"
-                              oninput="this.closest('.ded-row').dataset.key = (this.innerText.trim() || 'Other');"
-                              style="border-bottom:1px dashed #999; outline:none;">Other</span>
-                    </label>
-                    <div style="display:flex; gap:5px;">
-                        <input type="number" id="ded_Other" value="0" oninput="updateTotalDeductions()">
-                        <button type="button" onclick="addOtherDeductionRow()"
-                                style="background:#2e7d32; color:#fff; border:none; border-radius:4px; width:25px; font-weight:bold;">+</button>
-                    </div>
-                </div>
-            `;
+            grid.innerHTML += `<div class="ded-row" data-key="Other"><label><span contenteditable="true" oninput="this.closest('.ded-row').dataset.key = (this.innerText.trim() || 'Other');" style="border-bottom:1px dashed #999; outline:none;">Other</span></label><div style="display:flex; gap:5px;"><input type="number" id="ded_Other" value="0" oninput="updateTotalDeductions()"><button type="button" onclick="addOtherDeductionRow()" style="background:#2e7d32; color:#fff; border:none; border-radius:4px; width:25px; font-weight:bold;">+</button></div></div>`;
         }
 
         function addOtherDeductionRow() {
@@ -692,31 +532,16 @@
             const newRow = document.createElement('div');
             newRow.className = 'ded-row';
             newRow.dataset.key = 'Other-' + otherCount;
-            newRow.innerHTML = `
-                <label style="display:flex; align-items:center; gap:5px;">
-                    <span contenteditable="true"
-                          oninput="this.closest('.ded-row').dataset.key = (this.innerText.trim() || 'Other-${otherCount}');"
-                          style="border-bottom:1px dashed #999; outline:none;">Other-${otherCount}</span>
-                </label>
-                <div style="display:flex; gap:5px;">
-                    <input type="number" value="0" oninput="updateTotalDeductions()">
-                    <button type="button" onclick="this.closest('.ded-row').remove(); updateTotalDeductions();"
-                            style="background:#d32f2f; color:#fff; border:none; border-radius:4px; width:25px; font-weight:bold;">-</button>
-                </div>
-            `;
+            newRow.innerHTML = `<label><span contenteditable="true" oninput="this.closest('.ded-row').dataset.key = (this.innerText.trim() || 'Other-${otherCount}');" style="border-bottom:1px dashed #999; outline:none;">Other-${otherCount}</span></label><div style="display:flex; gap:5px;"><input type="number" value="0" oninput="updateTotalDeductions()"><button type="button" onclick="this.closest('.ded-row').remove(); updateTotalDeductions();" style="background:#d32f2f; color:#fff; border:none; border-radius:4px; width:25px; font-weight:bold;">-</button></div>`;
             grid.appendChild(newRow);
         }
 
         function autoCalculateDeductions() {
             const passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
             const rates = getDeductionRates();
-
             for (let key in rates) {
                 let input = document.getElementById('ded_' + key);
-                if (input) {
-                    let amount = (passed * rates[key]) / 100;
-                    input.value = Math.round(amount * 100) / 100;
-                }
+                if (input) input.value = Math.round(((passed * rates[key]) / 100) * 100) / 100;
             }
             updateTotalDeductions();
         }
@@ -724,13 +549,9 @@
         function updateTotalDeductions() {
             const passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
             let totalDed = 0;
-
-            document.querySelectorAll('#deductionFieldsContainer input[type="number"]')
-                .forEach(inp => { totalDed += parseFloat(inp.value) || 0; });
-
+            document.querySelectorAll('#deductionFieldsContainer input[type="number"]').forEach(inp => { totalDed += parseFloat(inp.value) || 0; });
             currentTotalDed = Math.round(totalDed * 100) / 100;
             currentNetPay = Math.round((passed - currentTotalDed) * 100) / 100;
-
             document.getElementById('wLblTotalDed').innerText = '₹ ' + currentTotalDed.toLocaleString('en-IN');
             document.getElementById('wLblNetPay').innerText = '₹ ' + currentNetPay.toLocaleString('en-IN');
         }
@@ -742,28 +563,21 @@
             const con = document.getElementById('wContractor').value || '-';
             const billType = document.getElementById('wBillType').value || '-';
             const passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
-
             document.getElementById('previewContent').innerHTML = `
                 <div class="preview-row"><span>JE:</span> <strong>${escapeHtml(je)}</strong></div>
                 <div class="preview-row"><span>M.B.:</span> <strong>${escapeHtml(mb)}</strong></div>
                 <div class="preview-row"><span>कंत्राटदार:</span> <strong>${escapeHtml(con)}</strong></div>
-                <div class="preview-row"><span>कामाचे नाव:</span> <strong>${escapeHtml(work)}</strong></div>
+                <div class="preview-row"><span>काम:</span> <strong>${escapeHtml(work)}</strong></div>
                 <div class="preview-row"><span>प्रकार:</span> <strong>${escapeHtml(billType)}</strong></div>
                 <div class="preview-row"><span>Passed Amount:</span> <strong>₹ ${passed.toLocaleString('en-IN')}</strong></div>
                 <div class="preview-row text-red"><span>Total Deduction:</span> <strong>₹ ${currentTotalDed.toLocaleString('en-IN')}</strong></div>
-                <div class="preview-row text-green" style="font-size:15px;"><span>Net Payable:</span> <strong>₹ ${currentNetPay.toLocaleString('en-IN')}</strong></div>
-            `;
+                <div class="preview-row text-green"><span>Net Payable:</span> <strong>₹ ${currentNetPay.toLocaleString('en-IN')}</strong></div>`;
         }
 
         function generateBillNo() {
             const year = new Date().getFullYear();
             let maxSeq = 0;
-            billRecords.forEach(b => {
-                if (b && typeof b.billNo === 'string') {
-                    const m = b.billNo.match(/\/(\d+)$/);
-                    if (m) maxSeq = Math.max(maxSeq, parseInt(m[1], 10));
-                }
-            });
+            billRecords.forEach(b => { if (b && typeof b.billNo === 'string') { const m = b.billNo.match(/\/(\d+)$/); if (m) maxSeq = Math.max(maxSeq, parseInt(m[1], 10)); } });
             return `BILL/${year}/${String(maxSeq + 1).padStart(3, '0')}`;
         }
 
@@ -775,101 +589,42 @@
             const passed = parseFloat(document.getElementById('wPassedAmt').value) || 0;
             const editIndex = parseInt(document.getElementById('editBillIndex').value);
 
-            if(!je || !mb || !billType || !date || passed <= 0 || currentSelectedWorkIndex === -1) {
-                alert('कृपया सर्व आवश्यक माहिती भरा!');
-                return;
-            }
-
+            if(!je || !mb || !billType || !date || passed <= 0 || currentSelectedWorkIndex === -1) { alert('कृपया सर्व माहिती भरा!'); return; }
             let relevantWorks = allWorks.filter(w => w.je === je && w.mbNo === mb);
             let selectedWork = relevantWorks[currentSelectedWorkIndex];
-            if (!selectedWork) {
-                alert('कृपया वैध काम निवडा!');
-                return;
-            }
+            if (!selectedWork) { alert('वैध काम निवडा!'); return; }
 
             const dedDetails = {};
             document.querySelectorAll('#deductionFieldsContainer .ded-row').forEach(row => {
                 const key = (row.dataset.key || '').trim();
                 const val = parseFloat(row.querySelector('input').value) || 0;
-                if (val > 0 && key) {
-                    dedDetails[key] = (dedDetails[key] || 0) + val;
-                }
+                if (val > 0 && key) dedDetails[key] = (dedDetails[key] || 0) + val;
             });
 
-            const totalDed = currentTotalDed;
-            const netPay = currentNetPay;
-
             let autoBillNo = (editIndex === -1) ? generateBillNo() : (billRecords[editIndex] && billRecords[editIndex].billNo) || generateBillNo();
+            const billData = { billNo: autoBillNo, je: je, mb: mb, workName: selectedWork.name, contractor: selectedWork.contractor, billType: billType, date: date, passedAmt: passed, deductions: dedDetails, totalDed: currentTotalDed, netPay: currentNetPay };
 
-            const billData = {
-                billNo: autoBillNo,
-                je: je, mb: mb,
-                workName: selectedWork.name,
-                contractor: selectedWork.contractor,
-                billType: billType, date: date,
-                passedAmt: passed,
-                deductions: dedDetails,
-                totalDed: totalDed, netPay: netPay
-            };
-
-            if(editIndex === -1) {
-                billRecords.push(billData);
-            } else {
-                billRecords[editIndex] = billData;
-            }
+            if(editIndex === -1) billRecords.push(billData);
+            else billRecords[editIndex] = billData;
 
             localStorage.setItem('bill_records', JSON.stringify(billRecords));
-
-            closeWizard();
-            loadData();
-
-            document.getElementById('successMsgText').innerText = editIndex === -1 ? 'देयक यशस्वीरित्या जतन झाले!' : 'देयक यशस्वीरित्या अपडेट झाले!';
+            closeWizard(); loadData();
+            document.getElementById('successMsgText').innerText = editIndex === -1 ? 'देयक यशस्वीरित्या जतन झाले!' : 'देयक अपडेट झाले!';
             document.getElementById('successMsgModal').style.display = 'flex';
         }
 
-        function closeSuccessModal() {
-            document.getElementById('successMsgModal').style.display = 'none';
-        }
+        function closeSuccessModal() { document.getElementById('successMsgModal').style.display = 'none'; }
 
         function renderTable() {
             const tbody = document.getElementById('billTableBody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            if (!billRecords || billRecords.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888;">कोणतीही बिलाची नोंद उपलब्ध नाही.</td></tr>';
-                return;
-            }
-
+            if (!tbody) return; tbody.innerHTML = '';
+            if (!billRecords || billRecords.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888;">कोणतीही नोंद नाही.</td></tr>'; return; }
             for (let i = 0; i < billRecords.length; i++) {
                 let bill = billRecords[i];
                 if (!bill || typeof bill !== 'object') continue;
-
-                let pAmt = Number(bill.passedAmt) || 0;
-                let tDed = Number(bill.totalDed) || 0;
-                let nPay = Number(bill.netPay) || 0;
-
+                let pAmt = Number(bill.passedAmt) || 0, tDed = Number(bill.totalDed) || 0, nPay = Number(bill.netPay) || 0;
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="text-align: center; font-weight:bold;">${i + 1}</td>
-                    <td style="text-align: left;">
-                        <div class="bill-amount">₹${pAmt.toLocaleString('en-IN')}</div>
-                        <div class="bill-sub-text">${escapeHtml(bill.billNo || '-')} | ${escapeHtml(bill.date || '-')}</div>
-                        <div class="bill-sub-text">काम: ${escapeHtml(bill.workName || '-')}</div>
-                    </td>
-                    <td style="color:#d32f2f; font-weight:bold; cursor:pointer; text-decoration:underline;" onclick="showDeductionDetails(${i})">
-                        ₹${tDed.toLocaleString('en-IN')}
-                    </td>
-                    <td style="color:#2e7d32; font-weight:bold;">
-                        ₹${nPay.toLocaleString('en-IN')}
-                    </td>
-                    <td>
-                        <div class="action-btns">
-                            <button class="btn-edit" onclick="editBill(${i})"><i class="fa-solid fa-pen"></i> Edit</button>
-                            <button class="btn-delete" onclick="showDeleteAlert(${i})"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </td>
-                `;
+                tr.innerHTML = `<td style="text-align: center; font-weight:bold;">${i + 1}</td><td style="text-align: left;"><div class="bill-amount">₹${pAmt.toLocaleString('en-IN')}</div><div class="bill-sub-text">${escapeHtml(bill.billNo || '-')} | ${escapeHtml(bill.date || '-')}</div><div class="bill-sub-text">काम: ${escapeHtml(bill.workName || '-')}</div></td><td style="color:#d32f2f; font-weight:bold; cursor:pointer; text-decoration:underline;" onclick="showDeductionDetails(${i})">₹${tDed.toLocaleString('en-IN')}</td><td style="color:#2e7d32; font-weight:bold;">₹${nPay.toLocaleString('en-IN')}</td><td><div class="action-btns"><button class="btn-edit" onclick="editBill(${i})">Edit</button><button class="btn-delete" onclick="showDeleteAlert(${i})">Delete</button></div></td>`;
                 tbody.appendChild(tr);
             }
         }
@@ -878,104 +633,57 @@
             const bill = billRecords[billIndex];
             const dedList = document.getElementById('dedDetailList');
             const dedTotal = document.getElementById('dedDetailTotal');
-
             dedList.innerHTML = '';
-
-            if (!bill || !bill.deductions || Object.keys(bill.deductions).length === 0) {
-                dedList.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">या बिलामध्ये कोणतीही कपात नाही.</div>';
-                dedTotal.innerText = '₹ 0';
-            } else {
+            if (!bill || !bill.deductions || Object.keys(bill.deductions).length === 0) { dedList.innerHTML = '<div style="text-align:center; padding:20px; color:#888;">कोणतीही कपात नाही.</div>'; dedTotal.innerText = '₹ 0'; }
+            else {
                 let total = 0;
-                for (let key in bill.deductions) {
-                    let val = Number(bill.deductions[key]) || 0;
-                    total += val;
-                    dedList.innerHTML += `
-                        <div class="ded-detail-item">
-                            <span>${escapeHtml(key)}</span>
-                            <span>₹ ${val.toLocaleString('en-IN')}</span>
-                        </div>
-                    `;
-                }
+                for (let key in bill.deductions) { let val = Number(bill.deductions[key]) || 0; total += val; dedList.innerHTML += `<div class="ded-detail-item"><span>${escapeHtml(key)}</span><span>₹ ${val.toLocaleString('en-IN')}</span></div>`; }
                 dedTotal.innerText = '₹ ' + total.toLocaleString('en-IN');
             }
-
             document.getElementById('dedDetailModal').style.display = 'flex';
         }
-
-        function closeDedDetail() {
-            document.getElementById('dedDetailModal').style.display = 'none';
-        }
+        function closeDedDetail() { document.getElementById('dedDetailModal').style.display = 'none'; }
 
         function openSettingsModal() {
             const rates = getDeductionRates();
             const container = document.getElementById('settingsInputs');
             container.innerHTML = '';
-            for(let key in rates) {
-                container.innerHTML += `<div class="setting-row"><label>${escapeHtml(key)} (%)</label><input type="number" step="0.1" id="set_${escapeHtml(key)}" value="${rates[key]}"></div>`;
-            }
+            for(let key in rates) container.innerHTML += `<div class="setting-row"><label>${escapeHtml(key)} (%)</label><input type="number" step="0.1" id="set_${escapeHtml(key)}" value="${rates[key]}"></div>`;
             document.getElementById('settingsModal').style.display = 'flex';
         }
-
-        function closeSettingsModal() {
-            document.getElementById('settingsModal').style.display = 'none';
-        }
-
+        function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
         function saveSettings() {
             let newRates = {};
-            for(let key in defaultRates) {
-                newRates[key] = parseFloat(document.getElementById(`set_${key}`).value) || 0;
-            }
+            for(let key in defaultRates) newRates[key] = parseFloat(document.getElementById(`set_${key}`).value) || 0;
             localStorage.setItem('bill_deduction_rates', JSON.stringify(newRates));
-            closeSettingsModal();
-            renderDeductionFields();
-            autoCalculateDeductions();
+            closeSettingsModal(); renderDeductionFields(); autoCalculateDeductions();
         }
 
-        function showDeleteAlert(index) {
-            deleteTargetIndex = index;
-            document.getElementById('deleteAlert').style.display = 'flex';
-        }
-
-        function closeDeleteAlert() {
-            document.getElementById('deleteAlert').style.display = 'none';
-            deleteTargetIndex = -1;
-        }
-
+        function showDeleteAlert(index) { deleteTargetIndex = index; document.getElementById('deleteAlert').style.display = 'flex'; }
+        function closeDeleteAlert() { document.getElementById('deleteAlert').style.display = 'none'; deleteTargetIndex = -1; }
         const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
         if (confirmDeleteBtn) {
             confirmDeleteBtn.addEventListener('click', function() {
                 if (deleteTargetIndex > -1 && deleteTargetIndex < billRecords.length) {
                     billRecords.splice(deleteTargetIndex, 1);
                     localStorage.setItem('bill_records', JSON.stringify(billRecords));
-                    closeDeleteAlert();
-                    loadData();
+                    closeDeleteAlert(); loadData();
                 }
             });
         }
 
         function printReport() {
-            if (!billRecords || billRecords.length === 0) {
-                alert('प्रिंट करण्यासाठी कोणतीही बिलाची नोंद नाही!');
-                return;
-            }
+            if (!billRecords || billRecords.length === 0) { alert('प्रिंट करण्यासाठी नोंद नाही!'); return; }
             let printWindow = window.open('', '_blank');
-            let html = `
-                <html><head><title>Bill Register Report</title>
-                <style>body { font-family: Arial, sans-serif; padding: 20px; } h2 { text-align: center; color: #0d47a1; } table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; } th, td { border: 1px solid #333; padding: 6px; text-align: left; } th { background-color: #f2f2f2; }</style></head><body>
-                <h2>देयक नोंदवही (Bill Register)</h2>
-                <table><thead><tr><th>अ.क्र.</th><th>बिल क्र.</th><th>दिनांक</th><th>कामाचे नाव</th><th>कंत्राटदार</th><th>पास रक्कम</th><th>कपात</th><th>नेट रक्कम</th></tr></thead><tbody>
-            `;
+            let html = `<html><head><title>Bill Report</title><style>body { font-family: Arial, sans-serif; padding: 20px; } h2 { text-align: center; color: #0d47a1; } table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; } th, td { border: 1px solid #333; padding: 6px; text-align: left; } th { background-color: #f2f2f2; }</style></head><body><h2>देयक नोंदवही</h2><table><thead><tr><th>अ.क्र.</th><th>बिल क्र.</th><th>दिनांक</th><th>कामाचे नाव</th><th>कंत्राटदार</th><th>पास रक्कम</th><th>कपात</th><th>नेट रक्कम</th></tr></thead><tbody>`;
             billRecords.forEach((bill, index) => {
                 if(!bill) return;
                 html += `<tr><td>${index + 1}</td><td>${escapeHtml(bill.billNo || '-')}</td><td>${escapeHtml(bill.date || '-')}</td><td>${escapeHtml(bill.workName || '-')}</td><td>${escapeHtml(bill.contractor || '-')}</td><td>₹${(Number(bill.passedAmt)||0).toLocaleString('en-IN')}</td><td>₹${(Number(bill.totalDed)||0).toLocaleString('en-IN')}</td><td>₹${(Number(bill.netPay)||0).toLocaleString('en-IN')}</td></tr>`;
             });
             html += `</tbody></table></body></html>`;
-            printWindow.document.write(html);
-            printWindow.document.close();
-            printWindow.focus();
+            printWindow.document.write(html); printWindow.document.close(); printWindow.focus();
             setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
         }
-
         window.onload = loadData;
     </script>
 </body>
