@@ -36,7 +36,7 @@
             gap: 10px;
         }
 
-        /* 🌟 १. वरचा फोटो 360 डिग्री फिरणारा (2D Spin) */
+        /* 🌟 १. वरचा फोटो ३डी फ्लिप (नाण्यासारखा) */
         .user-photo {
             width: 45px;
             height: 45px;
@@ -44,12 +44,13 @@
             border: 2px solid #00f3ff;
             object-fit: cover;
             box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
-            animation: spin2D 6s linear infinite; /* सतत फिरण्यासाठी */
+            animation: flip3D 4s linear infinite; /* ३डी फ्लिप ॲनिमेशन */
+            transform-style: preserve-3d;
         }
 
-        @keyframes spin2D {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes flip3D {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
         }
 
         .user-details {
@@ -196,7 +197,7 @@
             height: 130px;
             margin: 0 auto 15px;
             perspective: 1000px; /* ३डी इफेक्टसाठी */
-            animation: float 3s ease-in-out infinite; /* ४. हवेत तरंगण्यासाठी */
+            animation: float 3s ease-in-out infinite; /* हवेत तरंगण्यासाठी */
         }
 
         @keyframes float {
@@ -204,31 +205,7 @@
             50% { transform: translateY(-8px); }
         }
 
-        /* २. निऑन रिंग (फिरणारी) */
-        .glow-ring {
-            position: absolute;
-            top: -5px; left: -5px; right: -5px; bottom: -5px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #00f3ff, #00ff88, #ff00ea, #00f3ff);
-            background-size: 300% 300%;
-            z-index: 1;
-            animation: spinRing 4s linear infinite, pulseGlow 2s infinite alternate;
-            filter: blur(6px);
-            opacity: 0.8;
-        }
-
-        @keyframes spinRing {
-            0% { background-position: 0% 50%; transform: rotate(0deg); }
-            100% { background-position: 100% 50%; transform: rotate(360deg); }
-        }
-
-        /* ५. पल्सिंग ग्लो */
-        @keyframes pulseGlow {
-            0% { opacity: 0.6; filter: blur(4px); }
-            100% { opacity: 1; filter: blur(8px); box-shadow: 0 0 25px rgba(0, 243, 255, 0.8); }
-        }
-
-        /* ३. मुख्य फोटो (३डी फ्लिप) */
+        /* मुख्य फोटो (३डी फ्लिप) */
         .profile-main-img {
             width: 100%;
             height: 100%;
@@ -237,10 +214,11 @@
             object-fit: cover;
             position: relative;
             z-index: 2;
-            /* 3D फिरणे आणि ग्लो */
+            /* 3D फिरणे */
             animation: spin3D 6s linear infinite;
             transform-style: preserve-3d;
             cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3); /* फक्त एक हलका सावली इफेक्ट */
         }
 
         @keyframes spin3D {
@@ -292,7 +270,6 @@
             transition: 0.4s;
         }
 
-        /* फेडेड (अंधुक) कार्ड - कृती झाल्यानंतर */
         .pending-user-card.processed {
             opacity: 0.5;
             background: #111;
@@ -306,7 +283,6 @@
             cursor: pointer;
         }
 
-        /* माहिती एका खाली एक दिसण्यासाठी */
         .p-user-info { 
             font-size: 12.5px; 
             line-height: 1.6; 
@@ -410,9 +386,8 @@
                 <span class="shloka-line">यस्यैते षड्गुणास्तस्य नासाध्यमतिवर्तते ॥</span>
             </div>
             
-            <!-- 🌟 मधला फोटो ॲनिमेशन रॅपर -->
+            <!-- मधला फोटो ॲनिमेशन रॅपर (आता मागे काहीही नाही) -->
             <div class="main-photo-wrapper">
-                <div class="glow-ring"></div>
                 <img id="mainProfilePhoto" src="home-bg.jpg" alt="Profile" class="profile-main-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
             </div>
             
@@ -467,7 +442,6 @@
         let usersData = JSON.parse(localStorage.getItem('ow_users') || '{}');
         let myData = usersData[currentUser];
 
-        // ॲनिमेशनसाठी मुख्य फोटो सिलेक्ट करणे
         const mainPhotoElement = document.getElementById('mainProfilePhoto');
 
         if (myData) {
@@ -476,7 +450,6 @@
             
             const photoSrc = myData.photo || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
             
-            // दोन्हीकडे फोटो सेट करणे
             document.getElementById('headerPhoto').src = photoSrc;
             mainPhotoElement.src = photoSrc;
         }
@@ -488,7 +461,6 @@
         mainPhotoElement.addEventListener('touchend', () => {
             mainPhotoElement.classList.remove('fast-spin');
         });
-        // माऊस साठी (कॉम्प्युटरवर पाहत असल्यास)
         mainPhotoElement.addEventListener('mousedown', () => {
             mainPhotoElement.classList.add('fast-spin');
         });
