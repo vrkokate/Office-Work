@@ -8,26 +8,53 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: #020d1b; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; }
-        .top-header { display: flex; align-items: center; padding: 15px; background: rgba(2, 6, 23, 0.95); border-bottom: 1px solid #1e3a5f; }
-        .back-btn { background: #0a192f; border: 1px solid #00f3ff; color: #00f3ff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; margin-right: 15px; transition: 0.3s; text-decoration: none; }
-        .back-btn:hover { background: #00f3ff; color: #000; }
-        .header-title { font-size: 16px; font-weight: bold; color: #00f3ff; }
-        .main-content { padding: 20px; flex: 1; display: flex; justify-content: center; align-items: center; text-align: center; }
-        .placeholder-box { background: #0a192f; border: 2px dashed #00f3ff; border-radius: 15px; padding: 40px 20px; width: 100%; max-width: 400px; }
-        .placeholder-box h2 { color: #00f3ff; margin-bottom: 10px; }
-        .placeholder-box p { color: #888; font-size: 14px; }
+        
+        /* फक्त वरचा हेडर (मागील पेजचे नाव नाही) */
+        .top-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px; background: rgba(2, 6, 23, 0.95); 
+            border-bottom: 1px solid #1e3a5f; position: sticky; top: 0; z-index: 100;
+        }
+        
+        .header-left { display: flex; align-items: center; }
+        
+        /* 🌟 बॅक बटन (फक्त आयकॉन, सर्कल नाही) */
+        .back-btn { 
+            color: #00f3ff; font-size: 22px; cursor: pointer; 
+            text-decoration: none; display: flex; align-items: center;
+            transition: 0.3s; 
+        }
+        .back-btn:hover { color: #fff; }
+
+        /* 🌟 होम आयकॉन (फक्त आयकॉन, सर्कल नाही) */
+        .home-icon { 
+            color: #00f3ff; font-size: 22px; cursor: pointer; 
+            text-decoration: none; display: flex; align-items: center;
+            transition: 0.3s;
+        }
+        .home-icon:hover { color: #fff; }
+
+        /* पूर्णपणे ब्लँक मुख्य भाग */
+        .main-content { flex: 1; padding: 15px; background: #020d1b; }
     </style>
 </head>
 <body>
+
     <header class="top-header">
-        <a href="establishment.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
-        <div class="header-title">MB Register</div>
-    </header>
-    <div class="main-content">
-        <div class="placeholder-box">
-            <h2>MB Register</h2>
-            <p>हे पेज पुढील टप्प्यात तयार केले जाईल.</p>
+        <div class="header-left">
+            <!-- फक्त बॅक बटन, मागील पेजचे नाव नाही -->
+            <a href="establishment.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         </div>
+        
+        <a href="dashboard.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
+    </header>
+
+    <!-- पूर्णपणे ब्लँक पेज -->
+    <div class="main-content">
     </div>
+
+    <script>
+        if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'index.html';
+    </script>
 </body>
 </html>
