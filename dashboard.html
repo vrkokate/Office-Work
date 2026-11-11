@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Digital Hub - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            background: #020d1b;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* 🌟 हेडर डिझाईन */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: rgba(2, 6, 23, 0.95);
+            border-bottom: 1px solid #1e3a5f;
+            box-shadow: 0 4px 15px rgba(0, 243, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-photo {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid #00f3ff;
+            object-fit: cover;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .user-designation {
+            font-size: 11px;
+            color: #00f3ff;
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ॲडमिन बेल */
+        .bell-btn {
+            position: relative;
+            background: #0a192f;
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .bell-btn:hover { background: #00f3ff; color: #000; }
+        
+        .bell-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            background: #ff4d4d;
+            border-radius: 50%;
+            border: 1px solid #020d1b;
+            display: none;
+        }
+
+        .logout-btn {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 77, 77, 0.4);
+        }
+
+        /* 🌟 मुख्य भाग */
+        .main-content {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ६ मुख्य टॅब्स */
+        .tabs-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 25px;
+        }
+
+        .tab-card {
+            background: #0a192f;
+            border: 1px solid #1e3a5f;
+            border-radius: 12px;
+            padding: 15px 5px;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+
+        .tab-card:hover, .tab-card:active {
+            transform: scale(0.96);
+            border-color: #00f3ff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+        }
+
+        .tab-card i {
+            font-size: 22px;
+        }
+        
+        .tab-card span {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .tab-est { color: #00ff88; border-color: rgba(0, 255, 136, 0.3); }
+        .tab-mb { color: #00f3ff; border-color: rgba(0, 243, 255, 0.3); }
+        .tab-pay { color: #aa00ff; border-color: rgba(170, 0, 255, 0.3); }
+        .tab-form { color: #ff9800; border-color: rgba(255, 152, 0, 0.3); }
+        .tab-history { color: #ffca28; border-color: rgba(255, 202, 40, 0.3); }
+        .tab-data { color: #ff4d4d; border-color: rgba(255, 77, 77, 0.3); }
+
+        /* मधला भाग (श्लोक व फोटो) */
+        .center-stage {
+            text-align: center;
+            margin-top: 5px;
+            margin-bottom: 20px;
+        }
+
+        /* 🌟 श्लोक डिझाईन अपडेट (नेहमी २ ओळींत दिसण्यासाठी) */
+        .shloka {
+            font-size: clamp(11px, 3.5vw, 14px); /* स्क्रीननुसार फाँट साईझ ॲडजस्ट होईल */
+            font-weight: bold;
+            color: #00f3ff;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.5);
+            padding: 0 10px;
+        }
+        .shloka-line {
+            display: block; /* प्रत्येक ओळ स्वतंत्र दिसण्यासाठी */
+        }
+
+        .profile-main-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid #00f3ff;
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.6);
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        .app-title {
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        .app-title span { color: #00f3ff; }
+        .app-subtitle { font-size: 10px; color: #888; }
+
+        /* 🌟 ॲडमिन मोडल (प्रलंबित युजर्स) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .modal-box {
+            background: #0a192f;
+            border: 1px solid #00f3ff;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #1e3a5f;
+        }
+
+        .modal-header h3 { font-size: 15px; color: #00f3ff; margin: 0; }
+        
+        .close-btn {
+            background: #ff4d4d;
+            color: #fff;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal-body {
+            padding: 15px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .pending-user-card {
+            background: #020d1b;
+            border: 1px solid #1e3a5f;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .p-user-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .p-user-top img {
+            width: 40px; height: 40px; border-radius: 50%; border: 1px solid #00f3ff; object-fit: cover;
+        }
+
+        .p-user-info { font-size: 12px; line-height: 1.4; }
+        .p-user-info strong { color: #fff; }
+        .p-user-info span { color: #888; font-size: 11px; }
+
+        .approve-btn {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 6px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .no-pending {
+            text-align: center;
+            color: #888;
+            font-size: 13px;
+            padding: 20px 0;
+        }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- 🌟 हेडर -->
+    <header class="top-header">
+        <div class="user-info">
+            <img id="headerPhoto" src="" alt="User Photo" class="user-photo">
+            <div class="user-details">
+                <span id="headerName" class="user-name">Name</span>
+                <span id="headerDesig" class="user-designation">Designation</span>
+            </div>
+        </div>
+        
+        <div class="header-actions">
+            <!-- ॲडमिन बेल (फक्त ॲडमिनला दिसणार) -->
+            <button id="adminBell" class="bell-btn hidden" onclick="openAdminPanel()" title="प्रलंबित युजर्स">
+                <i class="fa-solid fa-bell"></i>
+                <span id="bellBadge" class="bell-badge"></span>
+            </button>
+            
+            <!-- Logout बटन -->
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+
+    <!-- 🌟 मुख्य भाग -->
+    <div class="main-content">
+        
+        <!-- ६ मुख्य टॅब्स -->
+        <div class="tabs-grid">
+            <a href="#" class="tab-card tab-est">
+                <i class="fa-solid fa-building-user"></i>
+                <span>Establishment</span>
+            </a>
+            <a href="MB.html" class="tab-card tab-mb">
+                <i class="fa-solid fa-book"></i>
+                <span>M.B. System</span>
+            </a>
+            <a href="pay-fixation.html" class="tab-card tab-pay">
+                <i class="fa-solid fa-money-check-dollar"></i>
+                <span>Pay Fixation</span>
+            </a>
+            <a href="form.html" class="tab-card tab-form">
+                <i class="fa-solid fa-file-invoice"></i>
+                <span>Form</span>
+            </a>
+            <a href="History.html" class="tab-card tab-history">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>History</span>
+            </a>
+            <a href="DataManager.html" class="tab-card tab-data">
+                <i class="fa-solid fa-database"></i>
+                <span>Data Manager</span>
+            </a>
+        </div>
+
+        <!-- मधला भाग (श्लोक व फोटो) -->
+        <div class="center-stage">
+            <!-- 🌟 श्लोक २ ओळींत -->
+            <div class="shloka">
+                <span class="shloka-line">विद्या वितर्को विज्ञानं स्मृतिस्तत्परता क्रिया ।</span>
+                <span class="shloka-line">यस्यैते षड्गुणास्तस्य नासाध्यमतिवर्तते ॥</span>
+            </div>
+            
+            <img src="home-bg.jpg" alt="Profile" class="profile-main-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+            
+            <div class="app-title">SMART TOOLS <span>STRONGER WORK</span></div>
+            <div class="app-subtitle">Created by Vitthal Kokate Patil</div>
+        </div>
+
+    </div>
+
+    <!-- 🌟 ॲडमिन पॅनेल मोडल (प्रलंबित युजर्स) -->
+    <div id="adminModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-users"></i> नवीन युजर मंजुरी</h3>
+                <button class="close-btn" onclick="closeAdminPanel()">✕</button>
+            </div>
+            <div class="modal-body" id="pendingUsersList">
+                <!-- युजर्सची यादी येथे लोड होईल -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // १. लॉगिन तपासणी
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = 'index.html';
+        }
+
+        const currentUser = localStorage.getItem('currentUser');
+        const userRole = localStorage.getItem('userRole');
+        
+        let usersData = JSON.parse(localStorage.getItem('ow_users') || '{}');
+        let myData = usersData[currentUser];
+
+        // २. हेडर अपडेट करणे (फोटो, नाव, पदनाम)
+        if (myData) {
+            document.getElementById('headerName').textContent = myData.name;
+            document.getElementById('headerDesig').textContent = myData.designation;
+            
+            // जर ॲडमिनने फोटो अपलोड केला नसेल तर डिफॉल्ट फोटो
+            const photoSrc = myData.photo || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+            document.getElementById('headerPhoto').src = photoSrc;
+        }
+
+        // ३. ॲडमिन असल्यास बेल दाखवणे आणि काउंट तपासणे
+        if (userRole === 'admin') {
+            document.getElementById('adminBell').classList.remove('hidden');
+            checkPendingUsers();
+        }
+
+        // ४. प्रलंबित युजर्स तपासणे (बेलवर लाल डॉट येण्यासाठी)
+        function checkPendingUsers() {
+            let users = JSON.parse(localStorage.getItem('ow_users') || '{}');
+            let pendingCount = 0;
+            for (let key in users) {
+                if (users[key].status === 'pending') {
+                    pendingCount++;
+                }
+            }
+            
+            const badge = document.getElementById('bellBadge');
+            if (pendingCount > 0) {
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // ५. ॲडमिन पॅनेल उघडणे
+        function openAdminPanel() {
+            document.getElementById('adminModal').style.display = 'flex';
+            loadPendingUsers();
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        // ६. प्रलंबित युजर्सची यादी लोड करणे
+        function loadPendingUsers() {
+            const listContainer = document.getElementById('pendingUsersList');
+            let users = JSON.parse(localStorage.getItem('ow_users') || '{}');
+            let pendingHTML = '';
+            let hasPending = false;
+
+            for (let u in users) {
+                if (users[u].status === 'pending') {
+                    hasPending = true;
+                    let photo = users[u].photo || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
+                    pendingHTML += `
+                        <div class="pending-user-card">
+                            <div class="p-user-top">
+                                <img src="${photo}" alt="User">
+                                <div class="p-user-info">
+                                    <strong>${users[u].name}</strong><br>
+                                    <span>पदनाम: ${users[u].designation}</span><br>
+                                    <span>युजरनेम: ${u}</span>
+                                </div>
+                            </div>
+                            <div style="font-size: 11px; color: #aaa; margin: 5px 0;">
+                                <i class="fa-solid fa-phone"></i> ${users[u].mobile} | <i class="fa-solid fa-location-dot"></i> ${users[u].district}
+                            </div>
+                            <button class="approve-btn" onclick="approveUser('${u}')">
+                                <i class="fa-solid fa-check"></i> मंजूर करा (Approve)
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+
+            if (!hasPending) {
+                listContainer.innerHTML = '<div class="no-pending">सध्या कोणतेही प्रलंबित युजर नाहीत.</div>';
+            } else {
+                listContainer.innerHTML = pendingHTML;
+            }
+        }
+
+        // ७. युजरला मंजूरी देणे (Approve)
+        function approveUser(username) {
+            let users = JSON.parse(localStorage.getItem('ow_users') || '{}');
+            if (users[username]) {
+                users[username].status = 'approved';
+                localStorage.setItem('ow_users', JSON.stringify(users));
+                
+                // यादी पुन्हा लोड करा आणि बेलचा डॉट तपासा
+                loadPendingUsers();
+                checkPendingUsers();
+                
+                alert(`'${users[username].name}' यांचे खाते यशस्वीरित्या मंजूर झाले आहे!`);
+            }
+        }
+
+        // ८. लॉगआउट
+        function handleLogout() {
+            if (confirm("तुम्हाला नक्की लॉगआउट करायचे आहे का?")) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('userRole');
+                localStorage.removeItem('displayName');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // जेव्हा ॲडमिन मोडलमधून बाहेर क्लिक करेल तेव्हा बंद होण्यासाठी
+        window.onclick = function(event) {
+            const modal = document.getElementById('adminModal');
+            if (event.target === modal) {
+                closeAdminPanel();
+            }
+        }
+    </script>
+</body>
+</html>
