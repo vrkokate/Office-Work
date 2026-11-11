@@ -10,10 +10,12 @@
         body { background: #020d1b; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
         .top-header {
-            display: flex; align-items: center; padding: 15px;
+            display: flex; justify-content: space-between; align-items: center; padding: 15px;
             background: rgba(2, 6, 23, 0.95); border-bottom: 1px solid #1e3a5f;
             box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1); position: sticky; top: 0; z-index: 100;
         }
+        
+        .header-left { display: flex; align-items: center; }
         .back-btn {
             background: #0a192f; border: 1px solid #00ff88; color: #00ff88;
             width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -22,9 +24,15 @@
         .back-btn:hover { background: #00ff88; color: #000; }
         .header-title { font-size: 16px; font-weight: bold; color: #00ff88; letter-spacing: 1px; }
 
+        /* 🌟 Back Home Icon */
+        .home-icon {
+            background: #0a192f; border: 1px solid #00ff88; color: #00ff88;
+            width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; cursor: pointer; transition: 0.3s; text-decoration: none;
+        }
+        .home-icon:hover { background: #00ff88; color: #000; }
+
         .main-content { padding: 20px 15px; flex: 1; display: flex; flex-direction: column; align-items: center; }
-        
-        /* एकच टॅब असल्याने आता तो सेंटर मध्ये आणि मोठा दिसेल */
         .tabs-container { width: 100%; max-width: 400px; margin-top: 30px; }
 
         .tab-card {
@@ -33,26 +41,25 @@
             align-items: center; justify-content: center; transition: 0.3s;
             box-shadow: 0 0 20px rgba(0, 243, 255, 0.2); cursor: pointer;
         }
-        .tab-card:hover, .tab-card:active { 
-            transform: scale(0.98); 
-            box-shadow: 0 0 25px rgba(0, 243, 255, 0.5); 
-            background: #0d213d;
-        }
-        
-        /* फक्त नाव (आयकॉन नाही) */
+        .tab-card:hover, .tab-card:active { transform: scale(0.98); box-shadow: 0 0 25px rgba(0, 243, 255, 0.5); background: #0d213d; }
         .tab-card span { font-size: 22px; font-weight: bold; color: #00f3ff; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
     <header class="top-header">
-        <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
-        <div class="header-title">Establishment</div>
+        <div class="header-left">
+            <!-- बॅक बटन (मागील पेजवर जाईल) -->
+            <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="header-title">Establishment</div>
+        </div>
+        
+        <!-- 🌟 Back Home Icon (थेट डॅशबोर्डवर जाईल) -->
+        <a href="dashboard.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
     </header>
 
     <div class="main-content">
         <div class="tabs-container">
-            <!-- फक्त MB Register टॅब -->
             <a href="mb-register.html" class="tab-card">
                 <span>MB Register</span>
             </a>
@@ -60,6 +67,7 @@
     </div>
 
     <script>
+        // सुरक्षेसाठी लॉगिन चेक
         if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'index.html';
     </script>
 </body>
