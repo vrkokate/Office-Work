@@ -9,7 +9,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: #f0f2f5; color: #212121; min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* 🌟 हेडर (मध्यभागी नाव) */
+        /* 🌟 हेडर (फक्त आयकॉन्स) */
         .top-header {
             display: flex; justify-content: space-between; align-items: center; padding: 15px;
             background: #0d47a1; color: #fff; position: sticky; top: 0; z-index: 100;
@@ -24,15 +24,8 @@
         .back-btn:hover, .home-icon:hover { color: #00e5ff; }
 
         .header-title { 
-            font-size: 15px; 
-            font-weight: bold; 
-            color: #fff; 
-            text-align: center;
-            flex: 1; 
-            margin: 0 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: 15px; font-weight: bold; color: #fff; text-align: center;
+            flex: 1; margin: 0 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
         /* 🌟 मुख्य भाग */
@@ -56,9 +49,6 @@
         /* समरी कार्ड्स */
         .summary-box { background: #fff; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         
-        /* खालचे टायटल काढून टाकले आहे */
-        /* .summary-title { font-size: 14px; font-weight: bold; text-align: center; color: #0d47a1; margin-bottom: 15px; } */
-
         .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
         .stat-card { 
@@ -109,10 +99,9 @@
 </head>
 <body>
 
-    <!-- 🌟 हेडर (मध्यभागी नाव) -->
+    <!-- 🌟 हेडर -->
     <header class="top-header">
         <a href="establishment.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
-        <div class="header-title">📖 मोजमाप पुस्तिका (M.B.) स्थिती</div>
         <a href="dashboard.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
     </header>
 
@@ -180,7 +169,6 @@
                 </select>
             </div>
 
-            <!-- डिपेंडंट ड्रॉपडाऊन -->
             <div class="form-group" id="dynamicOptionsGroup" style="display: none;">
                 <label id="dynamicLabel">पुढील पर्याय</label>
                 <select class="form-control" id="dynamicSelect"></select>
@@ -202,6 +190,61 @@
     <script>
         if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'index.html';
 
+        // 🌟 १. डेटा कॅल्क्युलेशन आणि ॲनिमेशन फंक्शन्स
+        function updateDashboardCounts() {
+            let mbRecords = JSON.parse(localStorage.getItem('mb_records') || '[]');
+            
+            // प्रत्येक M.B. ची शेवटची स्थिती शोधण्यासाठी ऑब्जेक्ट
+            let uniqueMBs = {};
+            mbRecords.forEach(rec => {
+                uniqueMBs[rec.mbNo] = rec; // जी शेवटची नोंद असेल ती ओव्हरराईट होईल
+            });
+
+            let total = Object.keys(uniqueMBs).length;
+            let given = 0;
+            
+            for (let mbNo in uniqueMBs) {
+                if (uniqueMBs[mbNo].type === 'दिली') {
+                    given++;
+                }
+            }
+            
+            let available = total - given;
+            if (available < 0) available = 0;
+
+            // काउंटिंग ॲनिमेशन सुरू करणे
+            animateValue("countReceivedMB", 0, total, 1500);
+            animateValue("countGivenMB", 0, given, 1500);
+            animateValue("countAvailableMB", 0, available, 1500);
+        }
+
+        function animateValue(id, start, end, duration) {
+            if (start === end) {
+                document.getElementById(id).innerText = end;
+                return;
+            }
+            let range = end - start;
+            let startTime = null;
+            
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                let progress = timestamp - startTime;
+                let percentage = Math.min(progress / duration, 1);
+                // Ease-out cubic (हळूहळू वाढण्यासाठी)
+                let eased = 1 - Math.pow(1 - percentage, 3); 
+                let current = Math.floor(start + (range * eased));
+                document.getElementById(id).innerText = current;
+                
+                if (progress < duration) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    document.getElementById(id).innerText = end;
+                }
+            }
+            window.requestAnimationFrame(step);
+        }
+
+        // 🌟 २. इतर फंक्शन्स
         function updateDynamicOptions() {
             const mainCat = document.getElementById('mainCategory').value;
             const group = document.getElementById('dynamicOptionsGroup');
@@ -221,7 +264,10 @@
                 select.innerHTML += '<option value="All M.B.">All M.B.</option><option value="Small M.B.">Small M.B.</option><option value="Big M.B.">Big M.B.</option>';
             } else if (mainCat === 'J.E.') {
                 label.innerText = 'JE निवडा';
-                select.innerHTML += '<option value="JE1">JE 1 (उदाहरण)</option><option value="JE2">JE 2 (उदाहरण)</option>';
+                let jeRecords = JSON.parse(localStorage.getItem('mb_je_records') || '[]');
+                jeRecords.forEach(je => {
+                    select.innerHTML += `<option value="${je.name}">${je.name}</option>`;
+                });
             } else {
                 label.innerText = 'पर्याय निवडा';
             }
@@ -238,6 +284,9 @@
             document.getElementById('repFromDate').value = '';
             document.getElementById('repToDate').value = '';
         }
+
+        // पेज लोड झाल्यावर काउंट्स अपडेट करणे
+        window.onload = updateDashboardCounts;
     </script>
 </body>
 </html>
