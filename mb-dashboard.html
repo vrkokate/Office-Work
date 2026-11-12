@@ -30,14 +30,25 @@
         
         .form-control { width: 100%; padding: 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none; background: #fff; box-sizing: border-box; }
         
-        /* 🌟 दिनांक दुरुस्ती (क्रोम आणि ॲप साठी १००% फिक्स) */
+        /* 🌟 ओव्हरले पद्धत (Overlay Method) */
+        .date-wrapper { position: relative; width: 100%; display: flex; align-items: center; }
+        .fake-placeholder {
+            position: absolute;
+            left: 12px;
+            color: #999;
+            font-size: 13px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
         input[type="date"].form-control {
             -webkit-appearance: none;
             appearance: none;
             min-height: 42px;
-            display: flex;
-            align-items: center;
+            color: #333;
             background-color: #fff;
+            position: relative;
+            z-index: 2;
         }
         input[type="date"]::-webkit-datetime-edit {
             text-align: left;
@@ -50,16 +61,14 @@
             cursor: pointer;
         }
 
-        /* 🌟 दिनांकासाठी प्लेसहोल्डर (अंधुक अक्षरे) */
-        input[type="date"]:before {
-            content: attr(data-placeholder);
-            color: #999;
-            width: 100%;
-            display: block;
+        /* रिकामे असताना ब्राउझरचे अक्षर लपवणे */
+        input[type="date"]:not(.has-value):not(:focus)::-webkit-datetime-edit {
+            color: transparent;
         }
-        input[type="date"]:focus:before,
-        input[type="date"].has-value:before {
-            content: "";
+        /* क्लिक किंवा तारीख निवडल्यावर प्लेसहोल्डर लपवणे */
+        input[type="date"]:focus + .fake-placeholder,
+        input[type="date"].has-value + .fake-placeholder {
+            display: none;
         }
         
         .search-btn-row { display: flex; gap: 10px; margin-top: 15px; }
@@ -196,13 +205,17 @@
             <div class="date-row">
                 <div class="date-group">
                     <label>दिनांक पासून *</label>
-                    <!-- 🌟 Date Placeholder ॲड केला -->
-                    <input type="date" id="searchDateFrom" class="form-control" data-placeholder="दिनांक निवडा" onfocus="this.removeAttribute('data-placeholder')" onblur="if(!this.value)this.setAttribute('data-placeholder', 'दिनांक निवडा');" onchange="this.classList.toggle('has-value', this.value !== '')">
+                    <div class="date-wrapper">
+                        <input type="date" id="searchDateFrom" class="form-control" onchange="toggleDateClass(this)">
+                        <span class="fake-placeholder">दिनांक निवडा</span>
+                    </div>
                 </div>
                 <div class="date-group">
                     <label>दिनांक पर्यंत *</label>
-                    <!-- 🌟 Date Placeholder ॲड केला -->
-                    <input type="date" id="searchDateTo" class="form-control" data-placeholder="दिनांक निवडा" onfocus="this.removeAttribute('data-placeholder')" onblur="if(!this.value)this.setAttribute('data-placeholder', 'दिनांक निवडा');" onchange="this.classList.toggle('has-value', this.value !== '')">
+                    <div class="date-wrapper">
+                        <input type="date" id="searchDateTo" class="form-control" onchange="toggleDateClass(this)">
+                        <span class="fake-placeholder">दिनांक निवडा</span>
+                    </div>
                 </div>
             </div>
 
@@ -316,7 +329,10 @@
 
             <div class="form-group">
                 <label>दिनांक *</label>
-                <input type="date" id="formDate" class="form-control" data-placeholder="दिनांक निवडा" onfocus="this.removeAttribute('data-placeholder')" onblur="if(!this.value)this.setAttribute('data-placeholder', 'दिनांक निवडा');" onchange="this.classList.toggle('has-value', this.value !== '')">
+                <div class="date-wrapper">
+                    <input type="date" id="formDate" class="form-control" onchange="toggleDateClass(this)">
+                    <span class="fake-placeholder">दिनांक निवडा</span>
+                </div>
             </div>
 
             <div class="form-group" id="formTypeDiv">
@@ -403,6 +419,15 @@
             setTimeout(function(){ toast.className = toast.className.replace("show", "").replace("error", ""); }, 2500);
         }
 
+        // 🌟 दिनांकाचा क्लास टॉगल करण्यासाठी (प्लेसहोल्डर हाताळणी)
+        function toggleDateClass(input) {
+            if (input.value) {
+                input.classList.add('has-value');
+            } else {
+                input.classList.remove('has-value');
+            }
+        }
+
         function loadData() {
             let rawJEs = localStorage.getItem('mb_je_records');
             jeRecords = rawJEs ? JSON.parse(rawJEs) : [];
@@ -410,6 +435,11 @@
             mbRecords = rawMBs ? JSON.parse(rawMBs) : [];
             updateDashboard();
             populateJEList();
+            
+            // पान लोड झाल्यावर सर्व दिनांकांची स्थिती तपासणे
+            document.querySelectorAll('input[type="date"]').forEach(input => {
+                toggleDateClass(input);
+            });
         }
 
         function updateDashboard() {
@@ -516,12 +546,10 @@
             let inputFrom = document.getElementById('searchDateFrom');
             inputFrom.value = '';
             inputFrom.classList.remove('has-value');
-            inputFrom.setAttribute('data-placeholder', 'दिनांक निवडा');
 
             let inputTo = document.getElementById('searchDateTo');
             inputTo.value = '';
             inputTo.classList.remove('has-value');
-            inputTo.setAttribute('data-placeholder', 'दिनांक निवडा');
         }
 
         // --- ॲक्शन सेंटर ---
@@ -560,7 +588,7 @@
             
             let dateInput = document.getElementById('formDate');
             dateInput.value = new Date().toISOString().split('T')[0];
-            dateInput.classList.add('has-value');
+            toggleDateClass(dateInput); // क्लास अपडेट करण्यासाठी
 
             document.getElementById('formTypeDiv').style.display = 'block';
             document.getElementById('formSizeDiv').style.display = 'none';
@@ -578,7 +606,7 @@
             
             let dateInput = document.getElementById('formDate');
             dateInput.value = new Date().toISOString().split('T')[0];
-            dateInput.classList.add('has-value');
+            toggleDateClass(dateInput);
 
             document.getElementById('formTypeDiv').style.display = 'block';
             document.getElementById('formSizeDiv').style.display = 'none';
@@ -599,7 +627,7 @@
             
             let dateInput = document.getElementById('formDate');
             dateInput.value = latestRec.date;
-            if(latestRec.date) dateInput.classList.add('has-value');
+            toggleDateClass(dateInput);
 
             document.getElementById('formTypeDiv').style.display = 'none';
             document.getElementById('formJeDiv').style.display = 'none';
