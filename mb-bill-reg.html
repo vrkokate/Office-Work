@@ -36,7 +36,7 @@
             border-radius: 6px;
         }
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        th, td { padding: 4px 6px; border: 1px solid #ddd; text-align: center; white-space: nowrap; }
+        th, td { padding: 4px 6px; border: 1px solid #ddd; text-align: center; white-space: nowrap; vertical-align: middle; }
         th { background-color: #f5f5f5; font-size: 11px; position: sticky; top: 0; z-index: 10; }
         
         th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 5; background-color: #fff; }
@@ -50,9 +50,9 @@
         .text-left { text-align: left; }
         .text-right { text-align: right; }
         
-        .action-btns { display: flex; gap: 4px; justify-content: center; }
-        .btn-edit { background: #2e7d32; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; }
-        .btn-delete { background: #d32f2f; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; }
+        .action-btns { display: flex; gap: 4px; justify-content: center; flex-direction: column; }
+        .btn-edit { background: #2e7d32; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; width: 100%; margin-bottom: 2px; }
+        .btn-delete { background: #d32f2f; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; width: 100%; }
 
         .wizard-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 10px; }
         .wizard-card { background: #fff; border-radius: 12px; width: 100%; max-width: 450px; max-height: 90vh; padding: 18px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow-y: auto; }
@@ -83,6 +83,11 @@
             box-sizing: border-box;
             text-align: left !important;
             padding: 10px;
+        }
+        /* कॅलेंडर आयकॉनची जागा कमी करण्यासाठी */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            margin-left: 0;
+            padding: 0;
         }
 
         .wizard-btns { display: flex; gap: 10px; margin-top: 15px; }
@@ -806,7 +811,10 @@
                     html += `<td class="text-right">₹${pAmt.toLocaleString('en-IN')}</td>`;
                     html += `<td class="text-right" style="color:#d32f2f; cursor:pointer;" onclick="showDeductionDetails(${item.originalIndex})">₹${tDed.toLocaleString('en-IN')}</td>`;
                     html += `<td class="text-right" style="color:#2e7d32; font-weight:bold;">₹${nPay.toLocaleString('en-IN')}</td>`;
+                    
+                    // 🌟 Action बटनं सरळ रेषेत ठेवण्यासाठी flex-direction: column; आणि gap.
                     html += `<td><div class="action-btns"><button class="btn-edit" onclick="editBill(${item.originalIndex})">Edit</button><button class="btn-delete" onclick="showDeleteAlert(${item.originalIndex})">Del</button></div></td>`;
+                    
                     html += `</tr>`;
                 });
             });
