@@ -50,9 +50,10 @@
         .text-left { text-align: left; }
         .text-right { text-align: right; }
         
-        .action-btns { display: flex; gap: 4px; justify-content: center; flex-direction: column; }
-        .btn-edit { background: #2e7d32; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; width: 100%; margin-bottom: 2px; }
-        .btn-delete { background: #d32f2f; color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; width: 100%; }
+        /* 🌟 Action बटन्स एकाच रेषेत (Side-by-side) */
+        .action-btns { display: flex; gap: 4px; justify-content: center; flex-direction: row; align-items: center; }
+        .btn-edit { background: #2e7d32; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+        .btn-delete { background: #d32f2f; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
 
         .wizard-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 10px; }
         .wizard-card { background: #fff; border-radius: 12px; width: 100%; max-width: 450px; max-height: 90vh; padding: 18px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow-y: auto; }
@@ -74,7 +75,7 @@
         .wizard-form-control { width: 100%; padding: 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none; box-sizing: border-box; }
         .wizard-form-control[readonly] { background-color: #f0f2f5; color: #666; }
         
-        /* 🌟 १. दिनांक दुरुस्ती (Date Input Fix) */
+        /* 🌟 दिनांक दुरुस्ती आणि प्लेसहोल्डर */
         input[type="date"].wizard-form-control { 
             -webkit-appearance: none;
             appearance: none;
@@ -83,11 +84,21 @@
             box-sizing: border-box;
             text-align: left !important;
             padding: 10px;
+            background: #fff;
         }
-        /* कॅलेंडर आयकॉनची जागा कमी करण्यासाठी */
         input[type="date"]::-webkit-calendar-picker-indicator {
             margin-left: 0;
             padding: 0;
+        }
+        input[type="date"]:before {
+            content: attr(data-placeholder);
+            color: #999;
+            width: 100%;
+            display: block;
+        }
+        input[type="date"]:focus:before,
+        input[type="date"].has-value:before {
+            content: "";
         }
 
         .wizard-btns { display: flex; gap: 10px; margin-top: 15px; }
@@ -99,12 +110,20 @@
         .deduction-header h4 { color: #0d47a1; margin: 0; font-size: 14px; }
         .gear-icon { background: #f0f2f5; border: 1px solid #ccc; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #555; }
         
-        .deduction-scroll-box { max-height: 250px; overflow-y: auto; padding-right: 5px; border: 1px solid #eee; border-radius: 6px; padding: 10px; margin-bottom: 10px; }
-        .ded-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        /* 🌟 १५ ओळी दिसण्यासाठी स्क्रोल बॉक्सची उंची वाढवली आणि अंतर कमी केले */
+        .deduction-scroll-box { 
+            max-height: 380px; 
+            overflow-y: auto; 
+            padding-right: 5px; 
+            border: 1px solid #eee; 
+            border-radius: 6px; 
+            padding: 10px; 
+            margin-bottom: 10px; 
+        }
+        .ded-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         .ded-row label { font-size: 12px; font-weight: 600; margin: 0; }
         
-        /* 🌟 ३. 'Other' इनपुट आणि बटन स्टाईल */
-        .ded-row input { width: 90px; padding: 6px; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; text-align: right; box-sizing: border-box; }
+        .ded-row input { width: 90px; padding: 4px 6px; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; text-align: right; box-sizing: border-box; }
         .btn-add-small { background: #2e7d32; color: #fff; border: none; border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; cursor: pointer; }
         .btn-remove-small { background: #d32f2f; color: #fff; border: none; border-radius: 4px; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; cursor: pointer; }
 
@@ -303,7 +322,8 @@
                 </div>
                 <div class="wizard-form-group">
                     <label>बिलाचा दिनांक *</label>
-                    <input type="date" id="wBillDate" class="wizard-form-control">
+                    <!-- 🌟 Date Placeholder ॲड केला -->
+                    <input type="date" id="wBillDate" class="wizard-form-control" data-placeholder="दिनांक निवडा" onfocus="this.removeAttribute('data-placeholder')" onblur="if(!this.value)this.setAttribute('data-placeholder', 'दिनांक निवडा');" onchange="this.classList.toggle('has-value', this.value !== '')">
                 </div>
                 <div class="wizard-btns">
                     <button class="btn-next" onclick="goToStep(2)">पुढील ➔</button>
@@ -465,7 +485,12 @@
             document.getElementById('wContractor').value = '';
             document.getElementById('wWorkName').value = '';
             document.getElementById('wBillType').value = '';
-            document.getElementById('wBillDate').value = '';
+            
+            let dateInput = document.getElementById('wBillDate');
+            dateInput.value = '';
+            dateInput.classList.remove('has-value');
+            dateInput.setAttribute('data-placeholder', 'दिनांक निवडा');
+
             document.getElementById('wPassedAmt').value = '';
             document.getElementById('workSelectGroup').style.display = 'none';
             document.getElementById('wWorkSelect').innerHTML = '';
@@ -501,7 +526,11 @@
             }
 
             document.getElementById('wBillType').value = bill.billType || '';
-            document.getElementById('wBillDate').value = bill.date || '';
+            
+            let dateInput = document.getElementById('wBillDate');
+            dateInput.value = bill.date || '';
+            if (bill.date) dateInput.classList.add('has-value');
+
             document.getElementById('wPassedAmt').value = bill.passedAmt || '';
 
             renderDeductionFields();
@@ -610,7 +639,6 @@
             for (let key in rates) {
                 grid.innerHTML += `<div class="ded-row" data-key="${escapeHtml(key)}"><label>${escapeHtml(key)} ${rates[key]}%</label><input type="number" id="ded_${escapeHtml(key)}" value="0" oninput="updateTotalDeductions()"></div>`;
             }
-            // 🌟 ३. 'Other' इनपुट आणि '+' बटन स्टाईल दुरुस्ती
             grid.innerHTML += `
                 <div class="ded-row" data-key="Other">
                     <label style="display:flex; align-items:center; gap:5px; flex: 1;">
@@ -700,7 +728,6 @@
             let selectedWork = relevantWorks[currentSelectedWorkIndex];
             if (!selectedWork) { showToast('वैध काम निवडा!', true); return; }
 
-            // 🌟 २. कडक बिल सिक्वेन्स आणि डुप्लिकेट चेक (Strict Bill Sequence & Duplicate Check)
             const sequenceMap = {
                 "First RA Bill": [],
                 "Second RA Bill": ["First RA Bill"],
@@ -719,18 +746,15 @@
 
             const prerequisites = sequenceMap[billType] || [];
             
-            // सध्याच्या एडिट नोंदी वगळून बाकीच्या नोंदी तपासणे
             const otherBillsForWork = billRecords.filter((b, idx) => {
                 return b.workName === selectedWork.name && b.mb === mb && idx !== editIndex;
             });
 
-            // डुप्लिकेट चेक
             if (otherBillsForWork.some(b => b.billType === billType)) {
                 showToast("या कामासाठी हे बिल ("+billType+") आधीच नोंदवले आहे!", true);
                 return;
             }
 
-            // सिक्वेन्स चेक
             for (let req of prerequisites) {
                 if (!otherBillsForWork.some(b => b.billType === req)) {
                     showToast("कृपया आधी " + req + " ची नोंद करा!", true);
@@ -765,7 +789,6 @@
                 return; 
             }
 
-            // 🌟 ग्रुपिंग लॉजिक (कंत्राटदार + काम + JE + MB)
             let grouped = [];
             let currentKey = null;
             let currentGroup = null;
@@ -798,7 +821,7 @@
 
                     html += `<tr>`;
                     html += `<td>${srNo++}</td>`;
-                    html += `<td>${formatDate(bill.date)}</td>`; // दिनांक प्रत्येक ओळीत वेगळा
+                    html += `<td>${formatDate(bill.date)}</td>`; 
 
                     if (i === 0) {
                         html += `<td rowspan="${rowSpan}" class="text-left">${escapeHtml(bill.contractor || '-')}</td>`;
@@ -812,7 +835,6 @@
                     html += `<td class="text-right" style="color:#d32f2f; cursor:pointer;" onclick="showDeductionDetails(${item.originalIndex})">₹${tDed.toLocaleString('en-IN')}</td>`;
                     html += `<td class="text-right" style="color:#2e7d32; font-weight:bold;">₹${nPay.toLocaleString('en-IN')}</td>`;
                     
-                    // 🌟 Action बटनं सरळ रेषेत ठेवण्यासाठी flex-direction: column; आणि gap.
                     html += `<td><div class="action-btns"><button class="btn-edit" onclick="editBill(${item.originalIndex})">Edit</button><button class="btn-delete" onclick="showDeleteAlert(${item.originalIndex})">Del</button></div></td>`;
                     
                     html += `</tr>`;
@@ -951,7 +973,7 @@
 
                     html += `<tr>`;
                     html += `<td>${srNo++}</td>`;
-                    html += `<td>${formatDate(bill.date)}</td>`; // दिनांक वेगवेगळा
+                    html += `<td>${formatDate(bill.date)}</td>`; 
 
                     if (i === 0) {
                         html += `<td rowspan="${rowSpan}" class="text-left">${escapeHtml(bill.contractor || '-')}</td>`;
