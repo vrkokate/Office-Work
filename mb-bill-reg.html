@@ -25,7 +25,7 @@
         .btn-add { flex: 1; background: #f57c00; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-print-top { flex: 1; background: #0d47a1; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
-        /* 🌟 टेबल स्टाईल - बटनं फिक्स राहण्यासाठी */
+        /* 🌟 टेबल स्टाईल */
         .table-container { 
             width: 100%; 
             overflow-x: auto; 
@@ -42,15 +42,16 @@
         th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 5; background-color: #fff; }
         th:nth-child(1) { z-index: 6; background-color: #f5f5f5; }
         
-        /* 🌟 Action कॉलम फिक्स आणि बॅकग्राऊंड */
+        /* 🌟 Action कॉलम स्थिर (Sticky) आणि वरच्या बाजूला (Top Align) */
         th:nth-child(11), td:nth-child(11) { 
             position: sticky; 
             right: 0; 
             z-index: 20; 
             background-color: #fff; 
             box-shadow: -2px 0 5px -2px rgba(0,0,0,0.2); 
+            vertical-align: top !important; /* बटन्स वर ठेवण्यासाठी */
         }
-        th:nth-child(11) { z-index: 21; background-color: #f5f5f5; }
+        th:nth-child(11) { z-index: 21; background-color: #f5f5f5; vertical-align: middle !important; }
         
         tr.total-row td { background-color: #f0f2f5 !important; font-weight: bold; vertical-align: middle !important; }
         tr.total-row td:nth-child(1) { z-index: 5; background-color: #f0f2f5; }
@@ -59,13 +60,13 @@
         .text-left { text-align: left; }
         .text-right { text-align: right; }
         
-        /* 🌟 Action बटन्स कंटेनर - १००% फिक्स */
+        /* 🌟 बटन्सचा कंटेनर (एकाच रेषेत, वरच्या बाजूला) */
         .action-btns { 
             display: flex; 
             flex-direction: row !important; 
             gap: 4px; 
             justify-content: center; 
-            align-items: center; 
+            align-items: flex-start; /* वरच्या बाजूला ठेवण्यासाठी */
             white-space: nowrap;
         }
         .btn-edit { background: #2e7d32; color: #fff; border: none; padding: 4px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; }
@@ -645,7 +646,7 @@
                 grid.innerHTML += `<div class="ded-row" data-key="${escapeHtml(key)}"><label>${escapeHtml(key)} ${rates[key]}%</label><input type="number" id="ded_${escapeHtml(key)}" value="0" oninput="updateTotalDeductions()"></div>`;
             }
             
-            // 🌟 'Other' लेआउट अगदी फिक्स केले आहे
+            // 'Other' लेआउट
             grid.innerHTML += `
                 <div class="ded-row" data-key="Other" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 5px;">
                     <div style="display: flex; align-items: center; gap: 5px;">
@@ -840,7 +841,7 @@
                     html += `<td class="text-right" style="color:#d32f2f; cursor:pointer;" onclick="showDeductionDetails(${item.originalIndex})">₹${tDed.toLocaleString('en-IN')}</td>`;
                     html += `<td class="text-right" style="color:#2e7d32; font-weight:bold;">₹${nPay.toLocaleString('en-IN')}</td>`;
                     
-                    // 🌟 Action बटन्स सेलच्या अगदी वरच्या बाजूला (Fix)
+                    // Action बटन्स (vertical-align: top मुळे आता हे नेहमी वरच्या ओळीत स्थिर राहतील)
                     html += `<td><div class="action-btns"><button class="btn-edit" onclick="editBill(${item.originalIndex})">Edit</button><button class="btn-delete" onclick="showDeleteAlert(${item.originalIndex})">Del</button></div></td>`;
                     
                     html += `</tr>`;
