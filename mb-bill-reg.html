@@ -25,6 +25,7 @@
         .btn-add { flex: 1; background: #f57c00; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-print-top { flex: 1; background: #0d47a1; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
+        /* 🌟 टेबल स्टाईल - बटनं फिक्स राहण्यासाठी */
         .table-container { 
             width: 100%; 
             overflow-x: auto; 
@@ -35,7 +36,7 @@
             border-radius: 6px;
         }
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        th, td { padding: 4px 6px; border: 1px solid #ddd; text-align: center; white-space: nowrap; vertical-align: middle; }
+        th, td { padding: 4px 6px; border: 1px solid #ddd; text-align: center; white-space: nowrap; vertical-align: middle !important; }
         th { background-color: #f5f5f5; font-size: 11px; position: sticky; top: 0; z-index: 10; }
         
         th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 5; background-color: #fff; }
@@ -49,8 +50,14 @@
         .text-left { text-align: left; }
         .text-right { text-align: right; }
         
-        /* 🌟 Action बटन्स एकाच रेषेत (Side-by-side) */
-        .action-btns { display: flex; gap: 4px; justify-content: center; flex-direction: row !important; align-items: center; }
+        /* 🌟 Action बटन्स अगदी फिक्स आणि एकाच रेषेत */
+        .action-btns { 
+            display: inline-flex; 
+            gap: 4px; 
+            justify-content: center; 
+            align-items: center; 
+            white-space: nowrap;
+        }
         .btn-edit { background: #2e7d32; color: #fff; border: none; padding: 4px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; }
         .btn-delete { background: #d32f2f; color: #fff; border: none; padding: 4px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; }
 
@@ -74,7 +81,7 @@
         .wizard-form-control { width: 100%; padding: 8px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none; box-sizing: border-box; }
         .wizard-form-control[readonly] { background-color: #f0f2f5; color: #666; }
         
-        /* 🌟 १. दिनांक दुरुस्ती (क्रोम आणि ॲप साठी १००% फिक्स) */
+        /* 🌟 दिनांक दुरुस्ती (क्रोम आणि ॲप साठी १००% फिक्स) */
         input[type="date"].wizard-form-control { 
             -webkit-appearance: none;
             appearance: none;
@@ -107,9 +114,9 @@
         .deduction-header h4 { color: #0d47a1; margin: 0; font-size: 14px; }
         .gear-icon { background: #f0f2f5; border: 1px solid #ccc; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #555; }
         
-        /* 🌟 २. कपात तपशील (१५ ओळी दिसण्यासाठी स्पेसिंग कमी केले) */
+        /* 🌟 १५ ओळी दिसण्यासाठी स्पेसिंग कमी केले */
         .deduction-scroll-box { 
-            max-height: 380px; /* उंची वाढवली जेणेकरून १५ ओळी बसतील */
+            max-height: 380px; 
             overflow-y: auto; 
             padding: 8px; 
             border: 1px solid #eee; 
@@ -628,14 +635,15 @@
             for (let key in rates) {
                 grid.innerHTML += `<div class="ded-row" data-key="${escapeHtml(key)}"><label>${escapeHtml(key)} ${rates[key]}%</label><input type="number" id="ded_${escapeHtml(key)}" value="0" oninput="updateTotalDeductions()"></div>`;
             }
+            // 🌟 दुरुस्ती: '+' बटन 'Other' नावाच्या अगदी समोर आणले आहे
             grid.innerHTML += `
                 <div class="ded-row" data-key="Other">
                     <label style="display:flex; align-items:center; gap:5px; flex: 1;">
                         <span contenteditable="true" oninput="this.closest('.ded-row').dataset.key = (this.innerText.trim() || 'Other');" style="border-bottom:1px dashed #999; outline:none;">Other</span>
                     </label>
                     <div style="display:flex; gap:5px; align-items:center;">
-                        <input type="number" id="ded_Other" value="0" oninput="updateTotalDeductions()">
                         <button type="button" class="btn-add-small" onclick="addOtherDeductionRow()">+</button>
+                        <input type="number" id="ded_Other" value="0" oninput="updateTotalDeductions()">
                     </div>
                 </div>
             `;
@@ -647,13 +655,14 @@
             const newRow = document.createElement('div');
             newRow.className = 'ded-row';
             newRow.dataset.key = 'Other-' + otherCount;
+            // 🌟 नवीन ओळीतही '-' बटन नावाच्या समोर ठेवले आहे
             newRow.innerHTML = `
                 <label style="display:flex; align-items:center; gap:5px; flex: 1;">
                     <span contenteditable="true" oninput="this.closest('.ded-row').dataset.key = (this.innerText.trim() || 'Other-${otherCount}');" style="border-bottom:1px dashed #999; outline:none;">Other-${otherCount}</span>
                 </label>
                 <div style="display:flex; gap:5px; align-items:center;">
-                    <input type="number" value="0" oninput="updateTotalDeductions()">
                     <button type="button" class="btn-remove-small" onclick="this.closest('.ded-row').remove(); updateTotalDeductions();">-</button>
+                    <input type="number" value="0" oninput="updateTotalDeductions()">
                 </div>
             `;
             grid.appendChild(newRow);
@@ -824,6 +833,7 @@
                     html += `<td class="text-right" style="color:#d32f2f; cursor:pointer;" onclick="showDeductionDetails(${item.originalIndex})">₹${tDed.toLocaleString('en-IN')}</td>`;
                     html += `<td class="text-right" style="color:#2e7d32; font-weight:bold;">₹${nPay.toLocaleString('en-IN')}</td>`;
                     
+                    // 🌟 Action बटन्स एकाच रेषेत, फिक्स
                     html += `<td><div class="action-btns"><button class="btn-edit" onclick="editBill(${item.originalIndex})">Edit</button><button class="btn-delete" onclick="showDeleteAlert(${item.originalIndex})">Del</button></div></td>`;
                     
                     html += `</tr>`;
@@ -900,7 +910,7 @@
                         .header h3 { margin: 5px 0; font-size: 15px; font-weight: bold; }
                         .date-right { text-align: right; font-size: 11px; margin-bottom: 5px; }
                         table { width: 100%; border-collapse: collapse; font-size: 11px; }
-                        th, td { border: 1px solid #000; padding: 4px 6px; text-align: center; }
+                        th, td { border: 1px solid #000; padding: 4px 6px; text-align: center; vertical-align: middle; }
                         th { background-color: #e0e0e0; font-weight: bold; }
                         .text-left { text-align: left; }
                         .text-right { text-align: right; }
