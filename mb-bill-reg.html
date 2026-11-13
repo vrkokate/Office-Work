@@ -8,6 +8,17 @@
     <link rel="stylesheet" href="common.css">
     
     <style>
+        /* 🌟 १. पूर्ण पेज स्थिर करण्यासाठी (No Page Scroll) */
+        body { 
+            height: 100vh; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            margin: 0; 
+            background: #f0f2f5; 
+            padding-bottom: 0 !important;
+        }
+
         .top-nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
         .top-nav-item { background: #0d47a1; color: #fff; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 5px; border-radius: 8px; font-size: 11px; font-weight: bold; gap: 5px; transition: 0.3s; }
         .top-nav-item i { font-size: 18px; }
@@ -25,18 +36,44 @@
         .btn-add { flex: 1; background: #f57c00; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-print-top { flex: 1; background: #0d47a1; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
-        /* 🌟 नवीन टेबल कोडिंग - स्क्रोल आणि स्टिकी बटणांसाठी */
-        .table-container { 
+        /* 🌟 २. मुख्य भाग लेआउट (फ्लेक्सबॉक्स) */
+        .main-content { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 10px 15px; 
+            overflow: hidden; /* हे पेज स्क्रोल होऊ देत नाही */
+            max-width: 600px; 
+            margin: 0 auto; 
             width: 100%; 
-            height: 400px; /* पेज न हलता फक्त टेबलच स्क्रोल होण्यासाठी */
-            overflow: auto; 
-            -webkit-overflow-scrolling: touch; 
+            box-sizing: border-box;
+        }
+
+        .card-box { 
+            display: flex; 
+            flex-direction: column; 
+            flex: 1; 
+            overflow: hidden; /* टेबल आतमध्ये ठेवण्यासाठी */
+            background: #fff; 
+            border-radius: 10px; 
+            padding: 15px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+            margin-bottom: 10px;
+        }
+
+        /* 🌟 ३. टेबलचा बॉक्स (फक्त हाच स्क्रोल होईल) */
+        .table-container { 
+            flex: 1; /* उर्वरित सर्व जागा घेण्यासाठी */
+            overflow-y: auto; /* फक्त आतील नोंदी स्क्रोल होतील */
+            overflow-x: auto; 
+            width: 100%; 
             border: 1px solid #ddd; 
             border-radius: 6px;
             position: relative;
+            -webkit-overflow-scrolling: touch;
+            margin-top: 10px;
         }
         
-        /* border-collapse: separate वापरल्याने sticky बॉर्डर व्यवस्थित काम करतात */
         table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; }
         
         th, td { 
@@ -191,7 +228,6 @@
         .ded-detail-list { overflow-y: auto; flex: 1; }
         .ded-detail-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 13px; gap: 10px; }
         .ded-detail-total { display: flex; justify-content: space-between; padding: 10px 0; border-top: 2px solid #333; margin-top: 10px; font-weight: bold; font-size: 15px; color: #d32f2f; }
-        body { padding-bottom: 0 !important; }
 
         #toast {
             visibility: hidden;
@@ -218,7 +254,7 @@
 </head>
 <body>
 
-    <header class="top-header">
+    <header class="top-header" style="position: static;">
         <a href="mb-dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <div class="header-title">📄 देयक नोंदवही (Bill Register)</div>
         <a href="dashboard.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
@@ -806,7 +842,6 @@
             showToast(editIndex === -1 ? 'देयक यशस्वीरित्या जतन झाले!' : 'देयक अपडेट झाले!');
         }
 
-        // 🌟 पूर्णपणे नवीन रेंडर टेबल कोड (स्टिकी ॲक्शन आणि स्क्रोलसाठी)
         function renderTable() {
             const tbody = document.getElementById('billTableBody');
             if (!tbody) return; tbody.innerHTML = '';
