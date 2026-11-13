@@ -644,7 +644,6 @@
         // 🌟 नवीन: यादीतील Print बटन हाताळणे
         function handleListPrint() {
             if (currentListType === 'issued') {
-                // थेट फिल्टर केलेला अहवाल प्रिंट करा
                 let sizeVal = document.getElementById('filterSize').value;
                 let holderVal = document.getElementById('filterHolder').value;
 
@@ -655,21 +654,32 @@
                 });
                 filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-                let title = "दिलेली M.B. यादी अहवाल";
-                let filterText = `आकार: ${sizeVal === 'All' ? 'सर्व' : sizeVal} | धारक: ${holderVal === 'All' ? 'सर्व' : holderVal}`;
+                let smallCount = 0, bigCount = 0;
+                filtered.forEach(r => {
+                    if(r.size === 'लहान') smallCount++;
+                    if(r.size === 'मोठी') bigCount++;
+                });
+
+                let sizeText = (sizeVal === 'All') ? 'सर्व' : sizeVal;
+                let holderText = (holderVal === 'All') ? 'सर्व' : holderVal;
                 
-                let html = `<html><head><title>${title}</title><style>
+                let html = `<html><head><title>दिलेली M.B. यादी अहवाल</title><style>
                     body { font-family: Arial; padding: 20px; }
-                    h2 { text-align: center; color: #0d47a1; }
-                    .filter-info { text-align: center; font-size: 14px; margin-bottom: 20px; font-weight: bold; }
+                    h2 { text-align: center; color: #0d47a1; margin-bottom: 20px; }
+                    .summary-box { background: #f9f9f9; border: 1px solid #ddd; padding: 15px; border-radius: 6px; margin-bottom: 20px; text-align: center; }
+                    .summary-box div { margin-bottom: 5px; font-size: 14px; }
+                    .summary-box .bold { font-weight: bold; color: #0d47a1; }
                     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
                     th, td { border: 1px solid #333; padding: 8px; text-align: left; }
                     th { background-color: #f2f2f2; }
                     .footer { text-align: right; margin-top: 30px; font-size: 10px; font-style: italic; }
                 </style></head><body>
-                <h2>${title}</h2>
-                <div class="filter-info">${filterText}</div>
-                <p>एकूण नोंदी: <b>${filtered.length}</b></p>
+                <h2>दिलेली M.B. यादी अहवाल</h2>
+                <div class="summary-box">
+                    <div><span class="bold">आकार:</span> ${sizeText}</div>
+                    <div><span class="bold">धारक:</span> ${holderText}</div>
+                    <div class="bold">एकूण: ${filtered.length} (लहान: ${smallCount}, मोठी: ${bigCount})</div>
+                </div>
                 <table>
                     <thead>
                         <tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>धारक</th></tr>
@@ -693,7 +703,6 @@
                 printWindow.focus();
                 setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
             } else {
-                // एकूण किंवा उपलब्ध साठी रिपोर्ट जनरेटर उघडा
                 openReportGenerator();
             }
         }
