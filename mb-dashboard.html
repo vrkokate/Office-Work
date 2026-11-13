@@ -284,19 +284,28 @@
             </div>
             
             <div class="form-group">
-                <label>मुख्य घटक निवडा</label>
+                <label>मुख्य घटक निवडा (कोणाकडून मिळाली)</label>
                 <select id="reportMainComp" class="form-control" onchange="updateReportSubComp()">
                     <option value="">-- निवडा --</option>
                     <option value="JE">JE (कनिष्ठ अभियंता)</option>
                     <option value="Office">विभागीय कार्यालय</option>
                     <option value="Bhandarpal">भांडारपाल</option>
-                    <option value="MBSize">MB आकार</option>
                 </select>
             </div>
 
             <div class="form-group" id="reportSubGroup" style="display:none;">
-                <label>उप घटक निवडा</label>
+                <label>उप घटक निवडा (नाव)</label>
                 <select id="reportSubComp" class="form-control"></select>
+            </div>
+
+            <!-- 🌟 नवीन आकार फिल्टर -->
+            <div class="form-group">
+                <label>MB आकार निवडा</label>
+                <select id="reportSizeComp" class="form-control">
+                    <option value="All">सर्व MB (All)</option>
+                    <option value="लहान">लहान MB</option>
+                    <option value="मोठी">मोठी MB</option>
+                </select>
             </div>
 
             <button class="btn-search-main" style="width:100%; margin-top:15px;" onclick="generateDetailedReport()"><i class="fa-solid fa-file-invoice"></i> अहवाल काढा (Generate)</button>
@@ -470,6 +479,7 @@
         function openReportGenerator() {
             closeModal('listModal');
             document.getElementById('reportMainComp').value = '';
+            document.getElementById('reportSizeComp').value = 'All';
             document.getElementById('reportSubGroup').style.display = 'none';
             document.getElementById('reportSubComp').innerHTML = '';
             openModal('reportGeneratorModal');
@@ -489,34 +499,25 @@
                 subSelect.innerHTML = '<option value="All">सर्व JE (All JE)</option>';
                 jeRecords.forEach(je => { subSelect.innerHTML += `<option value="${je.name}">${je.name}</option>`; });
             } 
-            else if (mainComp === 'MBSize') {
-                subSelect.innerHTML = `
-                    <option value="All">सर्व MB (All MB)</option>
-                    <option value="लहान">लहान MB</option>
-                    <option value="मोठी">मोठी MB</option>
-                `;
-            } 
             else if (mainComp === 'Office') {
-                subSelect.innerHTML = '<option value="All">सर्व (All)</option>';
+                subSelect.innerHTML = '<option value="All">सर्व कार्यालये (All)</option>';
                 let uniqueNames = new Set();
                 mbRecords.forEach(rec => {
                     if (rec.type === 'मिळाली' && rec.detail) {
                         let isJE = jeRecords.some(je => je.name === rec.detail);
                         let isBhandarpal = (rec.sourceType === 'Bhandarpal');
-                        // जर ती व्यक्ती JE नसेल आणि भांडारपाल पण नसेल, तर ते कार्यालय आहे
                         if (!isJE && !isBhandarpal) uniqueNames.add(rec.detail);
                     }
                 });
                 uniqueNames.forEach(name => { subSelect.innerHTML += `<option value="${name}">${name}</option>`; });
             }
             else if (mainComp === 'Bhandarpal') {
-                subSelect.innerHTML = '<option value="All">सर्व (All)</option>';
+                subSelect.innerHTML = '<option value="All">सर्व भांडारपाल (All)</option>';
                 let uniqueNames = new Set();
                 mbRecords.forEach(rec => {
                     if (rec.type === 'मिळाली' && rec.detail) {
                         let isJE = jeRecords.some(je => je.name === rec.detail);
                         let isBhandarpal = (rec.sourceType === 'Bhandarpal');
-                        // जर ती व्यक्ती JE नसेल आणि नवीन भांडारपाल असेल
                         if (!isJE && (isBhandarpal || !rec.sourceType)) uniqueNames.add(rec.detail);
                     }
                 });
@@ -527,29 +528,45 @@
         function generateDetailedReport() {
             let mainComp = document.getElementById('reportMainComp').value;
             let subComp = document.getElementById('reportSubComp').value;
+            let sizeFilter = document.getElementById('reportSizeComp').value;
             
             if (!mainComp) { showToast('कृपया मुख्य घटक निवडा!', true); return; }
 
             let filteredList = [];
             mbRecords.forEach(rec => {
+                // १. फक्त 'मिळाली' नोंदी विचारात घ्यायच्या
+                if (rec.type !== 'मिळाली') return;
+
+                // २. आकारानुसार फिल्टर
+                if (sizeFilter !== 'All' && rec.size !== sizeFilter) return;
+
+                // ३. स्रोतानुसार फिल्टर
                 let match = false;
                 if (mainComp === 'JE') {
-                    if (rec.type === 'दिली' && (subComp === 'All' || rec.detail === subComp)) match = true;
-                } else if (mainComp === 'MBSize') {
-                    if (subComp === 'All' || rec.size === subComp) match = true;
-                } else if (mainComp === 'Office' || mainComp === 'Bhandarpal') {
-                    if (rec.type === 'मिळाली' && (subComp === 'All' || rec.detail === subComp)) {
-                        let isJE = jeRecords.some(je => je.name === rec.detail);
-                        if (!isJE) { // फक्त नॉन-JE
-                            if (subComp === 'All') match = true;
-                            else if (rec.detail === subComp) match = true;
-                        }
+                    let isJE = (rec.sourceType === 'JE' || jeRecords.some(je => je.name === rec.detail));
+                    if (isJE && (subComp === 'All' || rec.detail === subComp)) match = true;
+                } 
+                else if (mainComp === 'Office') {
+                    let isJE = jeRecords.some(je => je.name === rec.detail);
+                    let isBhandarpal = (rec.sourceType === 'Bhandarpal');
+                    if (!isJE && !isBhandarpal) {
+                        if (subComp === 'All' || rec.detail === subComp) match = true;
+                    }
+                } 
+                else if (mainComp === 'Bhandarpal') {
+                    let isJE = jeRecords.some(je => je.name === rec.detail);
+                    let isBhandarpal = (rec.sourceType === 'Bhandarpal');
+                    if (!isJE && (isBhandarpal || !rec.sourceType)) {
+                        if (subComp === 'All' || rec.detail === subComp) match = true;
                     }
                 }
+
                 if (match) filteredList.push(rec);
             });
 
+            // रिपोर्ट रेंडर करणे
             let title = "अहवाल: " + (subComp === 'All' ? "सर्व " + mainComp : subComp);
+            if (sizeFilter !== 'All') title += " (" + sizeFilter + ")";
             document.getElementById('reportResultTitle').innerHTML = `<i class="fa-solid fa-file-invoice"></i> ${title}`;
 
             let html = `<p style="font-size:12px; margin-bottom:10px;">एकूण नोंदी: <b>${filteredList.length}</b></p>`;
@@ -557,14 +574,14 @@
                 html += `<p style="text-align:center; color:#d32f2f;">कोणतीही नोंद सापडली नाही.</p>`;
             } else {
                 html += `<table class="data-table" id="reportTable">
-                            <thead><tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>धारक/तपशील</th></tr></thead><tbody>`;
+                            <thead><tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>कोणाकडून मिळाली</th></tr></thead><tbody>`;
                 filteredList.forEach((rec, i) => {
                     html += `<tr>
                         <td>${i + 1}</td>
                         <td>${rec.mbNo}</td>
                         <td>${rec.size}</td>
                         <td>${formatDate(rec.date)}</td>
-                        <td>${rec.type} (${rec.detail})</td>
+                        <td>${rec.detail}</td>
                     </tr>`;
                 });
                 html += `</tbody></table>`;
@@ -723,7 +740,6 @@
             let size = 'लहान';
             mbRecords.forEach(rec => { if (rec.mbNo === mbNo) size = rec.size; });
             
-            // 🌟 नवीन नोंद सेव्ह करताना sourceType सुद्धा सेव्ह करणे
             mbRecords.push({ type: type, size: size, mbNo: mbNo, detail: detail, sourceType: sourceType, date: date });
             localStorage.setItem('mb_records', JSON.stringify(mbRecords));
             
