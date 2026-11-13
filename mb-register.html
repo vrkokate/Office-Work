@@ -13,21 +13,13 @@
         .top-nav-item.active { background: #1976d2; box-shadow: 0 2px 8px rgba(25, 118, 210, 0.4); }
         
         .btn-save { margin-top: 15px; }
-
-        input[type="date"].form-control {
-            -webkit-appearance: none;
-            appearance: none;
-            min-height: 42px;
-            display: flex;
-            align-items: center;
-        }
+        input[type="date"].form-control { -webkit-appearance: none; appearance: none; min-height: 42px; display: flex; align-items: center; }
         body { padding-bottom: 0 !important; }
     </style>
 </head>
 <body>
 
     <header class="top-header">
-        <!-- 🌟 बॅक बटन: mb-dashboard.html -->
         <a href="mb-dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
         <div class="header-title">📖 मोजमाप पुस्तिका (M.B.) नोंद</div>
         <a href="dashboard.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
@@ -289,6 +281,7 @@
             dataList.innerHTML = '';
             let uniqueOffices = new Set();
             mbRecords.forEach(rec => {
+                // फक्त जुन्या नोंदींमधून कार्यालयाची नावे शोधणे
                 if (rec.detail && !jeRecords.some(je => je.name === rec.detail) && rec.detail !== 'उपलब्ध') uniqueOffices.add(rec.detail);
             });
             uniqueOffices.forEach(name => { dataList.innerHTML += `<option value="${name}">`; });
@@ -309,25 +302,31 @@
                 if (editIndex === -1 && mbRecords.some(r => r.mbNo === mbNo)) { alert('हा M.B. क्रमांक आधीच नोंदवला आहे!'); return; }
             }
             if (!date) { alert('कृपया दिनांक निवडा!'); return; }
+            
             let detail = '';
+            let sourceType = ''; // 🌟 नवीन फील्ड: स्रोत कोण होता
+
             if (type === 'दिली') {
                 const givenTo = document.getElementById('givenToType').value;
-                if (givenTo === 'JE') detail = document.getElementById('givenJE').value;
-                else detail = document.getElementById('givenOffice').value.trim();
+                if (givenTo === 'JE') { detail = document.getElementById('givenJE').value; sourceType = 'JE'; }
+                else { detail = document.getElementById('givenOffice').value.trim(); sourceType = 'Office'; }
                 if (!detail) { alert('कुणाला दिली हे निवडा किंवा टाईप करा!'); return; }
             } else {
                 const recType = document.getElementById('receivedType').value;
                 if (recType === 'नवीन') {
                     detail = document.getElementById('bhandarpalName').value.trim();
+                    sourceType = 'Bhandarpal'; // 🌟 भांडारपाल
                     if (!detail) { alert('भांडारपाल यांचे नाव टाका!'); return; }
                 } else {
                     const fromType = document.getElementById('receivedFromType').value;
-                    if (fromType === 'JE') detail = document.getElementById('receivedJE').value;
-                    else detail = document.getElementById('receivedOfficeInput').value.trim();
+                    if (fromType === 'JE') { detail = document.getElementById('receivedJE').value; sourceType = 'JE'; }
+                    else { detail = document.getElementById('receivedOfficeInput').value.trim(); sourceType = 'Office'; }
                     if (!detail) { alert('कोणाकडून मिळाली हे निवडा किंवा टाईप करा!'); return; }
                 }
             }
-            const newRecord = { type: type, size: size, mbNo: mbNo, detail: detail, date: date };
+            
+            const newRecord = { type: type, size: size, mbNo: mbNo, detail: detail, sourceType: sourceType, date: date };
+            
             if (editIndex === -1) mbRecords.push(newRecord);
             else mbRecords[editIndex] = newRecord;
             localStorage.setItem('mb_records', JSON.stringify(mbRecords));
@@ -384,17 +383,25 @@
             } else {
                 document.getElementById('mbNumberInput').value = rec.mbNo;
                 checkDuplicateMB();
-                document.getElementById('receivedType').value = 'चालू';
-                handleReceivedTypeChange();
-                const isJE = jeRecords.some(j => j.name === rec.detail);
-                if (isJE) {
-                    document.getElementById('receivedFromType').value = 'JE';
-                    handleReceivedFromTypeChange();
-                    document.getElementById('receivedJE').value = rec.detail;
+                
+                // 🌟 जुना डेटा असल्यास स्रोत ओळखणे
+                if (rec.sourceType === 'Bhandarpal') {
+                    document.getElementById('receivedType').value = 'नवीन';
+                    handleReceivedTypeChange();
+                    document.getElementById('bhandarpalName').value = rec.detail;
                 } else {
-                    document.getElementById('receivedFromType').value = 'Office';
-                    handleReceivedFromTypeChange();
-                    document.getElementById('receivedOfficeInput').value = rec.detail;
+                    document.getElementById('receivedType').value = 'चालू';
+                    handleReceivedTypeChange();
+                    const isJE = (rec.sourceType === 'JE' || jeRecords.some(j => j.name === rec.detail));
+                    if (isJE) {
+                        document.getElementById('receivedFromType').value = 'JE';
+                        handleReceivedFromTypeChange();
+                        document.getElementById('receivedJE').value = rec.detail;
+                    } else {
+                        document.getElementById('receivedFromType').value = 'Office';
+                        handleReceivedFromTypeChange();
+                        document.getElementById('receivedOfficeInput').value = rec.detail;
+                    }
                 }
             }
             document.getElementById('entryDate').value = rec.date;
