@@ -21,7 +21,8 @@
         .card-issued { border: 2px solid #9c27b0; }
         .card-avail { border: 2px solid #ff9800; }
 
-        .search-card { background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; }
+        /* 🌟 सामाईक कार्ड स्टाईल */
+        .search-card, .report-card { background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; margin-bottom: 15px; }
         .search-title { color: #0d47a1; font-size: 14px; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
         
         .date-row { display: flex; gap: 10px; margin-bottom: 10px; }
@@ -30,71 +31,30 @@
         
         .form-control { width: 100%; padding: 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none; background: #fff; box-sizing: border-box; }
         
-        /* 🌟 ओव्हरले पद्धत (Overlay Method) */
+        /* 🌟 ओव्हरले पद्धत (Date Overlay) */
         .date-wrapper { position: relative; width: 100%; display: flex; align-items: center; }
-        .fake-placeholder {
-            position: absolute;
-            left: 12px;
-            color: #999;
-            font-size: 13px;
-            pointer-events: none;
-            z-index: 1;
-        }
+        .fake-placeholder { position: absolute; left: 12px; color: #999; font-size: 13px; pointer-events: none; z-index: 1; }
         
         input[type="date"].form-control {
-            -webkit-appearance: none;
-            appearance: none;
-            min-height: 42px;
-            color: #333;
-            background-color: #fff;
-            position: relative;
-            z-index: 2;
+            -webkit-appearance: none; appearance: none; min-height: 42px; color: #333; background-color: #fff; position: relative; z-index: 2;
         }
-        input[type="date"]::-webkit-datetime-edit {
-            text-align: left;
-            padding: 0;
-            margin: 0;
-        }
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            margin-left: auto;
-            padding: 0;
-            cursor: pointer;
-        }
-
-        /* रिकामे असताना ब्राउझरचे अक्षर लपवणे */
-        input[type="date"]:not(.has-value):not(:focus)::-webkit-datetime-edit {
-            color: transparent;
-        }
-        /* क्लिक किंवा तारीख निवडल्यावर प्लेसहोल्डर लपवणे */
+        input[type="date"]::-webkit-datetime-edit { text-align: left; padding: 0; margin: 0; }
+        input[type="date"]::-webkit-calendar-picker-indicator { margin-left: auto; padding: 0; cursor: pointer; }
+        input[type="date"]:not(.has-value):not(:focus)::-webkit-datetime-edit { color: transparent; }
         input[type="date"]:focus + .fake-placeholder,
-        input[type="date"].has-value + .fake-placeholder {
-            display: none;
-        }
+        input[type="date"].has-value + .fake-placeholder { display: none; }
         
         .search-btn-row { display: flex; gap: 10px; margin-top: 15px; }
         .btn-search-main { flex: 1; background: #0d47a1; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-reset-main { flex: 1; background: #607d8b; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-report-main { width: 100%; background: #2e7d32; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 15px; }
 
-        /* 🌟 ऑटो-सजेशन लिस्ट (उजव्या बाजूला) */
+        /* 🌟 ऑटो-सजेशन लिस्ट */
         .suggestion-box {
-            position: absolute;
-            right: 15px;
-            top: 10px;
-            z-index: 1000;
-            max-height: 180px;
-            overflow-y: auto;
-            display: none;
-            flex-direction: column;
-            align-items: flex-end;
-            padding-right: 5px;
+            position: absolute; right: 15px; top: 10px; z-index: 1000; max-height: 180px; overflow-y: auto; display: none; flex-direction: column; align-items: flex-end; padding-right: 5px;
         }
         .suggestion-item {
-            color: #0d47a1;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 1.3;
-            padding: 2px 0;
+            color: #0d47a1; font-size: 14px; font-weight: bold; cursor: pointer; line-height: 1.3; padding: 2px 0;
             text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
         }
         .suggestion-item:hover { text-decoration: underline; }
@@ -132,25 +92,8 @@
         
         .history-item { background: #fff; padding: 10px; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid #ccc; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-        /* 🌟 टोस्ट नोटिफिकेशन */
         #toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #2e7d32;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 12px;
-            position: fixed;
-            z-index: 9999;
-            left: 50%;
-            bottom: 30px;
-            transform: translateX(-50%);
-            font-size: 14px;
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            opacity: 0;
-            transition: opacity 0.3s, bottom 0.3s;
+            visibility: hidden; min-width: 250px; background-color: #2e7d32; color: #fff; text-align: center; border-radius: 6px; padding: 12px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s, bottom 0.3s;
         }
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
         #toast.error { background-color: #d32f2f; }
@@ -168,18 +111,10 @@
         
         <!-- वरचे ४ टॅब्स -->
         <div class="top-nav-grid">
-            <a href="mb-je.html" class="top-nav-item">
-                <i class="fa-solid fa-user-tie"></i><span>JE</span>
-            </a>
-            <a href="mb-register.html" class="top-nav-item active">
-                <i class="fa-solid fa-book"></i><span>M.B.</span>
-            </a>
-            <a href="mb-work-list.html" class="top-nav-item">
-                <i class="fa-solid fa-hammer"></i><span>Work list</span>
-            </a>
-            <a href="mb-bill-reg.html" class="top-nav-item">
-                <i class="fa-solid fa-file-invoice-dollar"></i><span>Bill reg.</span>
-            </a>
+            <a href="mb-je.html" class="top-nav-item"><i class="fa-solid fa-user-tie"></i><span>JE</span></a>
+            <a href="mb-register.html" class="top-nav-item active"><i class="fa-solid fa-book"></i><span>M.B.</span></a>
+            <a href="mb-work-list.html" class="top-nav-item"><i class="fa-solid fa-hammer"></i><span>Work list</span></a>
+            <a href="mb-bill-reg.html" class="top-nav-item"><i class="fa-solid fa-file-invoice-dollar"></i><span>Bill reg.</span></a>
         </div>
 
         <!-- ३ डॅशबोर्ड कार्ड्स -->
@@ -222,8 +157,6 @@
             <div class="form-group" style="position: relative;">
                 <label>स्मार्ट शोध (M.B. क्र., नाव किंवा तपशील)</label>
                 <input type="text" id="smartSearchInput" class="form-control" placeholder="येथे थेट नाव किंवा M.B. क्रमांक टाका" oninput="handleSmartSearch()" autocomplete="off">
-                
-                <!-- ऑटो सजेशन बॉक्स -->
                 <div id="suggestionBox" class="suggestion-box"></div>
             </div>
 
@@ -233,9 +166,32 @@
             </div>
         </div>
 
+        <!-- 🌟 नवीन: सविस्तर अहवाल (Report Generator) -->
+        <div class="report-card">
+            <div class="search-title"><i class="fa-solid fa-chart-pie"></i> सविस्तर अहवाल (Detailed Report)</div>
+            
+            <div class="form-group">
+                <label>मुख्य घटक निवडा</label>
+                <select id="reportMainComponent" class="form-control" onchange="handleMainComponentChange()">
+                    <option value="">-- मुख्य घटक निवडा --</option>
+                    <option value="JE">JE (कनिष्ठ अभियंता)</option>
+                    <option value="MBSize">MB आकार</option>
+                    <option value="Office">विभागीय कार्यालय</option>
+                    <option value="Bhandarpal">भांडारपाल</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="reportSubGroup" style="display: none;">
+                <label>उप घटक निवडा</label>
+                <select id="reportSubComponent" class="form-control"></select>
+            </div>
+
+            <button class="btn-report-main" onclick="generateReport()"><i class="fa-solid fa-file-invoice"></i> अहवाल काढा (Generate)</button>
+        </div>
+
     </div>
 
-    <!-- 🌟 १. M.B. यादी मोडल (कार्डवर क्लिक केल्यावर) -->
+    <!-- 🌟 १. M.B. यादी मोडल -->
     <div id="listModal" class="custom-modal">
         <div class="modal-box">
             <div class="modal-header">
@@ -245,18 +201,9 @@
                     <button class="btn-close-modal" onclick="closeModal('listModal')">X</button>
                 </div>
             </div>
-            
             <div style="overflow-x:auto;">
                 <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>अ.क्र.</th>
-                            <th>M.B. क्र.</th>
-                            <th>आकार</th>
-                            <th>दिनांक</th>
-                            <th>धारक</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>धारक</th></tr></thead>
                     <tbody id="listModalBody"></tbody>
                 </table>
             </div>
@@ -273,15 +220,7 @@
             <p style="font-size:12px; color:#666; margin-bottom:10px;">👉 Action Center साठी M.B. क्रमांकावर क्लिक करा.</p>
             <div style="overflow-x:auto;">
                 <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>अ.क्र.</th>
-                            <th>M.B. क्र.</th>
-                            <th>आकार</th>
-                            <th>दिनांक</th>
-                            <th>सद्यस्थिती व धारक</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>सद्यस्थिती व धारक</th></tr></thead>
                     <tbody id="searchResultBody"></tbody>
                 </table>
             </div>
@@ -295,7 +234,6 @@
                 <h3><i class="fa-solid fa-book"></i> M.B. कृती केंद्र</h3>
                 <button class="btn-close-modal" onclick="closeModal('actionCenterModal')">X</button>
             </div>
-            
             <div style="background:#f9f9f9; border:1px solid #ddd; border-radius:8px; padding:10px; margin-bottom:15px;">
                 <div class="ac-detail-row"><span>M.B. क्रमांक:</span> <span id="acMbNo" style="color:#0d47a1; font-size:16px;">-</span></div>
                 <div class="ac-detail-row"><span>M.B. आकार:</span> <span id="acMbSize">-</span></div>
@@ -303,7 +241,6 @@
                 <div class="ac-detail-row"><span>शेवटचा दिनांक:</span> <span id="acDate">-</span></div>
                 <div class="ac-detail-row"><span>शेवटची कृती:</span> <span id="acStatus">-</span></div>
             </div>
-
             <div class="action-grid">
                 <button class="ac-btn btn-transfer" onclick="openTransferForm()"><i class="fa-solid fa-hand-holding-hand"></i> हस्तांतरण</button>
                 <button class="ac-btn btn-receive" onclick="openReceiveForm()"><i class="fa-solid fa-hands-holding"></i> घेणे</button>
@@ -323,10 +260,8 @@
                 <h3 id="actionFormTitle">M.B. हस्तांतरण</h3>
                 <button class="btn-close-modal" onclick="closeModal('actionFormModal')">X</button>
             </div>
-            
             <input type="hidden" id="formActionType" value="">
             <input type="hidden" id="formMbNo" value="">
-
             <div class="form-group">
                 <label>दिनांक *</label>
                 <div class="date-wrapper">
@@ -334,7 +269,6 @@
                     <span class="fake-placeholder">दिनांक निवडा</span>
                 </div>
             </div>
-
             <div class="form-group" id="formTypeDiv">
                 <label id="formTargetLabel">कुणाला देत आहात? *</label>
                 <select id="formTargetType" class="form-control" onchange="toggleFormTarget()">
@@ -342,17 +276,14 @@
                     <option value="Office">विभागीय कार्यालय</option>
                 </select>
             </div>
-
             <div class="form-group" id="formJeDiv">
                 <label>JE निवडा *</label>
                 <select id="formJE" class="form-control"></select>
             </div>
-
             <div class="form-group" id="formOfficeDiv" style="display:none;">
                 <label>कार्यालयाचे नाव *</label>
                 <input type="text" id="formOffice" class="form-control" placeholder="कार्यालयाचे नाव टाका">
             </div>
-            
             <div class="form-group" id="formSizeDiv" style="display:none;">
                 <label>M.B. आकार *</label>
                 <select id="formSize" class="form-control">
@@ -360,10 +291,7 @@
                     <option value="मोठी">मोठी M.B.</option>
                 </select>
             </div>
-
-            <button class="btn-search-main" style="width:100%; margin-top:15px;" onclick="saveActionForm()">
-                सेव्ह करा (Save)
-            </button>
+            <button class="btn-search-main" style="width:100%; margin-top:15px;" onclick="saveActionForm()">सेव्ह करा (Save)</button>
         </div>
     </div>
 
@@ -378,7 +306,18 @@
         </div>
     </div>
 
-    <!-- टोस्ट नोटिफिकेशन -->
+    <!-- 🌟 ६. अहवाल मोडल (Report Modal) -->
+    <div id="reportModal" class="custom-modal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="reportTitle"><i class="fa-solid fa-chart-pie"></i> अहवाल</h3>
+                <button class="btn-close-modal" onclick="closeModal('reportModal')">X</button>
+            </div>
+            <div id="reportContent" style="overflow-x:auto; margin-bottom: 15px;"></div>
+            <button class="btn-search-main" style="width:100%;" onclick="printReportModal()"><i class="fa-solid fa-print"></i> प्रिंट करा</button>
+        </div>
+    </div>
+
     <div id="toast">यशस्वी!</div>
 
     <script src="common.js"></script>
@@ -388,7 +327,6 @@
         let jeRecords = [];
         let currentActiveMB = '';
 
-        // 🔙 मोबाईल बॅक बटन हाताळणी
         window.onpopstate = function(event) {
             let openModals = document.querySelectorAll('.custom-modal[style*="display: flex"]');
             if (openModals.length > 0) {
@@ -419,7 +357,6 @@
             setTimeout(function(){ toast.className = toast.className.replace("show", "").replace("error", ""); }, 2500);
         }
 
-        // 🌟 दिनांकाचा क्लास टॉगल करण्यासाठी (प्लेसहोल्डर हाताळणी)
         function toggleDateClass(input) {
             if (input.value) {
                 input.classList.add('has-value');
@@ -433,10 +370,10 @@
             jeRecords = rawJEs ? JSON.parse(rawJEs) : [];
             let rawMBs = localStorage.getItem('mb_records');
             mbRecords = rawMBs ? JSON.parse(rawMBs) : [];
+            
             updateDashboard();
             populateJEList();
             
-            // पान लोड झाल्यावर सर्व दिनांकांची स्थिती तपासणे
             document.querySelectorAll('input[type="date"]').forEach(input => {
                 toggleDateClass(input);
             });
@@ -462,31 +399,18 @@
             document.getElementById('formJE').innerHTML = options;
         }
 
-        // --- स्मार्ट शोध आणि ऑटो-सजेशन ---
+        // --- स्मार्ट शोध ---
         function handleSmartSearch() {
             let query = document.getElementById('smartSearchInput').value.trim().toLowerCase();
             let box = document.getElementById('suggestionBox');
-            
-            if (!query) {
-                box.style.display = 'none';
-                return;
-            }
-
+            if (!query) { box.style.display = 'none'; return; }
             let uniqueMBs = {};
             mbRecords.forEach(rec => { uniqueMBs[rec.mbNo] = rec; });
-
             let matches = [];
             for (let mbNo in uniqueMBs) {
-                if (mbNo.toLowerCase().includes(query) || uniqueMBs[mbNo].detail.toLowerCase().includes(query)) {
-                    matches.push(mbNo);
-                }
+                if (mbNo.toLowerCase().includes(query) || uniqueMBs[mbNo].detail.toLowerCase().includes(query)) matches.push(mbNo);
             }
-
-            if (matches.length === 0) {
-                box.style.display = 'none';
-                return;
-            }
-
+            if (matches.length === 0) { box.style.display = 'none'; return; }
             box.innerHTML = '';
             matches.forEach(mbNo => {
                 let div = document.createElement('div');
@@ -498,15 +422,13 @@
             box.style.display = 'flex';
         }
 
-        // --- शोध फॉर्म ---
+        // --- सविस्तर शोध ---
         function performSearch() {
             let query = document.getElementById('smartSearchInput').value.trim().toLowerCase();
             let dateFrom = document.getElementById('searchDateFrom').value;
             let dateTo = document.getElementById('searchDateTo').value;
-
             let uniqueMBs = {};
             mbRecords.forEach(rec => { uniqueMBs[rec.mbNo] = rec; });
-
             let results = [];
             for (let mbNo in uniqueMBs) {
                 let rec = uniqueMBs[mbNo];
@@ -516,7 +438,6 @@
                 if(dateTo && rec.date > dateTo) match = false;
                 if (match) results.push(rec);
             }
-
             let tbody = document.getElementById('searchResultBody');
             tbody.innerHTML = '';
             if (results.length === 0) {
@@ -542,17 +463,124 @@
         function resetSearchForm() {
             document.getElementById('smartSearchInput').value = '';
             document.getElementById('suggestionBox').style.display = 'none';
-            
             let inputFrom = document.getElementById('searchDateFrom');
-            inputFrom.value = '';
-            inputFrom.classList.remove('has-value');
-
+            inputFrom.value = ''; inputFrom.classList.remove('has-value');
             let inputTo = document.getElementById('searchDateTo');
-            inputTo.value = '';
-            inputTo.classList.remove('has-value');
+            inputTo.value = ''; inputTo.classList.remove('has-value');
         }
 
-        // --- ॲक्शन सेंटर ---
+        // --- 🌟 नवीन: रिपोर्ट जनरेटर लॉजिक ---
+        function handleMainComponentChange() {
+            let mainComp = document.getElementById('reportMainComponent').value;
+            let subGroup = document.getElementById('reportSubGroup');
+            let subSelect = document.getElementById('reportSubComponent');
+            
+            subSelect.innerHTML = '';
+            if (!mainComp) { subGroup.style.display = 'none'; return; }
+            
+            subGroup.style.display = 'block';
+            
+            if (mainComp === 'JE') {
+                subSelect.innerHTML = '<option value="All">सर्व JE (All JE)</option>';
+                jeRecords.forEach(je => { subSelect.innerHTML += `<option value="${je.name}">${je.name}</option>`; });
+            } 
+            else if (mainComp === 'MBSize') {
+                subSelect.innerHTML = `
+                    <option value="All">सर्व MB (All MB)</option>
+                    <option value="लहान">लहान MB</option>
+                    <option value="मोठी">मोठी MB
+                `;
+            } 
+            else if (mainComp === 'Office' || mainComp === 'Bhandarpal') {
+                subSelect.innerHTML = '<option value="All">सर्व (All)</option>';
+                let uniqueNames = new Set();
+                mbRecords.forEach(rec => {
+                    // जर प्रकार 'मिळाली' असेल आणि तपशील 'कार्यालयात उपलब्ध' किंवा 'भांडारपाल' असेल
+                    if (rec.type === 'मिळाली' && rec.detail) {
+                        uniqueNames.add(rec.detail);
+                    }
+                });
+                uniqueNames.forEach(name => { subSelect.innerHTML += `<option value="${name}">${name}</option>`; });
+            }
+        }
+
+        function generateReport() {
+            let mainComp = document.getElementById('reportMainComponent').value;
+            let subComp = document.getElementById('reportSubComponent').value;
+            
+            if (!mainComp) { showToast('कृपया मुख्य घटक निवडा!', true); return; }
+
+            // Get Latest Status of all MBs
+            let uniqueMBs = {};
+            mbRecords.forEach(rec => { uniqueMBs[rec.mbNo] = rec; });
+
+            let filteredList = [];
+            for (let mbNo in uniqueMBs) {
+                let rec = uniqueMBs[mbNo];
+                let match = false;
+
+                if (mainComp === 'JE') {
+                    if (rec.type === 'दिली' && (subComp === 'All' || rec.detail === subComp)) match = true;
+                } else if (mainComp === 'MBSize') {
+                    if (subComp === 'All' || rec.size === subComp) match = true;
+                } else if (mainComp === 'Office' || mainComp === 'Bhandarpal') {
+                    if (rec.type === 'मिळाली' && (subComp === 'All' || rec.detail === subComp)) match = true;
+                }
+
+                if (match) filteredList.push(rec);
+            }
+
+            // Generate HTML for Modal
+            let title = "अहवाल: " + (subComp === 'All' ? "सर्व " + mainComp : subComp);
+            document.getElementById('reportTitle').innerHTML = `<i class="fa-solid fa-chart-pie"></i> ${title}`;
+
+            let html = `<p style="font-size:12px; margin-bottom:10px;">एकूण नोंदी: <b>${filteredList.length}</b></p>`;
+            if (filteredList.length === 0) {
+                html += `<p style="text-align:center; color:#d32f2f;">कोणतीही नोंद सापडली नाही.</p>`;
+            } else {
+                html += `<table class="data-table" id="reportTable">
+                            <thead><tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>धारक/तपशील</th></tr></thead><tbody>`;
+                filteredList.forEach((rec, i) => {
+                    html += `<tr>
+                        <td>${i + 1}</td>
+                        <td>${rec.mbNo}</td>
+                        <td>${rec.size}</td>
+                        <td>${formatDate(rec.date)}</td>
+                        <td>${rec.type} (${rec.detail})</td>
+                    </tr>`;
+                });
+                html += `</tbody></table>`;
+            }
+
+            document.getElementById('reportContent').innerHTML = html;
+            openModal('reportModal');
+        }
+
+        function printReportModal() {
+            let content = document.getElementById('reportContent').innerHTML;
+            let title = document.getElementById('reportTitle').innerText;
+            
+            let printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html><head><title>${title}</title>
+                <style>
+                    body { font-family: Arial; padding: 20px; }
+                    h2 { text-align: center; color: #0d47a1; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+                    th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                </style></head><body>
+                <h2>${title}</h2>
+                ${content}
+                <p style="text-align:right; margin-top:30px; font-size:10px;">Created by Vitthal Kokate Patil<br>Mob: 8446556141</p>
+                </body></html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+        }
+
+        // --- ॲक्शन सेंटर आणि इतर ---
         function openActionCenter(mbNo) {
             currentActiveMB = mbNo;
             let latestRec = null;
@@ -580,16 +608,13 @@
             openModal('actionCenterModal');
         }
 
-        // --- हस्तांतरण / घेणे / दुरुस्ती ---
         function openTransferForm() {
             document.getElementById('actionFormTitle').innerText = 'M.B. हस्तांतरण (Transfer)';
             document.getElementById('formActionType').value = 'दिली';
             document.getElementById('formMbNo').value = currentActiveMB;
-            
             let dateInput = document.getElementById('formDate');
             dateInput.value = new Date().toISOString().split('T')[0];
-            toggleDateClass(dateInput); // क्लास अपडेट करण्यासाठी
-
+            toggleDateClass(dateInput);
             document.getElementById('formTypeDiv').style.display = 'block';
             document.getElementById('formSizeDiv').style.display = 'none';
             document.getElementById('formTargetLabel').innerText = 'कुणाला देत आहात? *';
@@ -603,11 +628,9 @@
             document.getElementById('actionFormTitle').innerText = 'M.B. घेणे (Receive)';
             document.getElementById('formActionType').value = 'मिळाली';
             document.getElementById('formMbNo').value = currentActiveMB;
-            
             let dateInput = document.getElementById('formDate');
             dateInput.value = new Date().toISOString().split('T')[0];
             toggleDateClass(dateInput);
-
             document.getElementById('formTypeDiv').style.display = 'block';
             document.getElementById('formSizeDiv').style.display = 'none';
             document.getElementById('formTargetLabel').innerText = 'कोणाकडून घेत आहात? *';
@@ -624,11 +647,9 @@
             document.getElementById('actionFormTitle').innerText = 'M.B. दुरुस्ती (Edit)';
             document.getElementById('formActionType').value = 'दुरुस्ती';
             document.getElementById('formMbNo').value = currentActiveMB;
-            
             let dateInput = document.getElementById('formDate');
             dateInput.value = latestRec.date;
             toggleDateClass(dateInput);
-
             document.getElementById('formTypeDiv').style.display = 'none';
             document.getElementById('formJeDiv').style.display = 'none';
             document.getElementById('formOfficeDiv').style.display = 'none';
@@ -687,7 +708,6 @@
             openActionCenter(mbNo);
         }
 
-        // --- इतिहास ---
         function showHistory() {
             let historyList = document.getElementById('historyList');
             historyList.innerHTML = '';
@@ -735,6 +755,49 @@
             setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
         }
 
+        function openListModal(type) {
+            let title = "M.B. यादी";
+            let btnBulk = document.getElementById('btnBulkAdd');
+            btnBulk.style.display = 'none';
+
+            if(type === 'total') { title = "एकूण M.B. यादी"; btnBulk.style.display = 'flex'; }
+            else if(type === 'issued') { title = "दिलेली M.B. यादी"; }
+            else if(type === 'avail') { title = "उपलब्ध M.B. यादी"; }
+            document.getElementById('listModalTitle').innerHTML = `<i class="fa-solid fa-list"></i> ${title}`;
+
+            let uniqueMBs = {};
+            mbRecords.forEach(rec => { uniqueMBs[rec.mbNo] = rec; });
+
+            let results = [];
+            for (let mbNo in uniqueMBs) {
+                let rec = uniqueMBs[mbNo];
+                if (type === 'total') results.push(rec);
+                else if (type === 'issued' && rec.type === 'दिली') results.push(rec);
+                else if (type === 'avail' && rec.type === 'मिळाली') results.push(rec);
+            }
+
+            let tbody = document.getElementById('listModalBody');
+            tbody.innerHTML = '';
+            if (results.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#d32f2f;">कोणतीही नोंद सापडली नाही.</td></tr>';
+            } else {
+                results.forEach((rec, i) => {
+                    let holder = rec.type === 'दिली' ? rec.detail : 'कार्यालयात उपलब्ध';
+                    let holderColor = rec.type === 'दिली' ? '#f57c00' : '#2e7d32';
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td><span class="link-mb" onclick="openActionCenter('${rec.mbNo}')">${rec.mbNo}</span></td>
+                            <td>${rec.size}</td>
+                            <td>${formatDate(rec.date)}</td>
+                            <td style="color:${holderColor}; font-weight:bold;">${holder}</td>
+                        </tr>
+                    `;
+                });
+            }
+            openModal('listModal');
+        }
+
         window.onclick = function(event) {
             if (event.target.classList.contains('custom-modal')) {
                 event.target.style.display = 'none';
@@ -742,7 +805,6 @@
             }
         }
         
-        // पहिल्यांदा लोड झाल्यावर हिस्ट्रीमध्ये ॲड करणे
         history.pushState({ modalOpen: false }, '');
         window.onload = loadData;
     </script>
