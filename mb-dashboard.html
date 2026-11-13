@@ -30,7 +30,7 @@
         
         .form-control { width: 100%; padding: 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none; background: #fff; box-sizing: border-box; }
         
-        /* 🌟 ओव्हरले पद्धत (Date Overlay) - १००% फिक्स */
+        /* 🌟 ओव्हरले पद्धत (Date Overlay) */
         .date-wrapper { position: relative; width: 100%; display: block; }
         .fake-placeholder {
             position: absolute;
@@ -40,7 +40,7 @@
             color: #999;
             font-size: 13px;
             pointer-events: none;
-            z-index: 5; /* इनपुटच्या वर दिसण्यासाठी */
+            z-index: 5;
         }
         
         input[type="date"].form-control {
@@ -61,7 +61,7 @@
             text-align: left;
             padding: 0;
             margin: 0;
-            font-size: 14px; /* फॉन्ट साईज थोडा वाढवला */
+            font-size: 14px;
             display: block;
             width: 100%;
         }
@@ -71,16 +71,9 @@
             cursor: pointer;
         }
         
-        /* रिकामे असताना ब्राउझरचे अक्षर लपवणे */
-        input[type="date"]:not(.has-value):not(:focus)::-webkit-datetime-edit {
-            color: transparent;
-        }
-        
-        /* क्लिक किंवा तारीख निवडल्यावर प्लेसहोल्डर लपवणे */
+        input[type="date"]:not(.has-value):not(:focus)::-webkit-datetime-edit { color: transparent; }
         input[type="date"]:focus + .fake-placeholder,
-        input[type="date"].has-value + .fake-placeholder {
-            display: none;
-        }
+        input[type="date"].has-value + .fake-placeholder { display: none; }
 
         .search-btn-row { display: flex; gap: 10px; margin-top: 15px; }
         .btn-search-main { flex: 1; background: #0d47a1; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
@@ -215,7 +208,7 @@
             <div class="modal-header">
                 <h3 id="listModalTitle"><i class="fa-solid fa-list"></i> M.B. यादी</h3>
                 <div class="header-actions">
-                    <button class="btn-print-header" onclick="openReportGenerator()"><i class="fa-solid fa-print"></i> Print</button>
+                    <button class="btn-print-header" onclick="handleListPrint()"><i class="fa-solid fa-print"></i> Print</button>
                     <button class="btn-add-bulk" id="btnBulkAdd" onclick="window.location.href='mb-register.html'"><i class="fa-solid fa-plus"></i> नोंद</button>
                     <button class="btn-close-modal" onclick="closeModal('listModal')">X</button>
                 </div>
@@ -645,6 +638,63 @@
                         </tr>
                     `;
                 });
+            }
+        }
+
+        // 🌟 नवीन: यादीतील Print बटन हाताळणे
+        function handleListPrint() {
+            if (currentListType === 'issued') {
+                // थेट फिल्टर केलेला अहवाल प्रिंट करा
+                let sizeVal = document.getElementById('filterSize').value;
+                let holderVal = document.getElementById('filterHolder').value;
+
+                let filtered = currentListBaseData.filter(r => {
+                    let matchSize = (sizeVal === 'All' || r.size === sizeVal);
+                    let matchHolder = (holderVal === 'All' || r.detail === holderVal);
+                    return matchSize && matchHolder;
+                });
+                filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                let title = "दिलेली M.B. यादी अहवाल";
+                let filterText = `आकार: ${sizeVal === 'All' ? 'सर्व' : sizeVal} | धारक: ${holderVal === 'All' ? 'सर्व' : holderVal}`;
+                
+                let html = `<html><head><title>${title}</title><style>
+                    body { font-family: Arial; padding: 20px; }
+                    h2 { text-align: center; color: #0d47a1; }
+                    .filter-info { text-align: center; font-size: 14px; margin-bottom: 20px; font-weight: bold; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+                    th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                    .footer { text-align: right; margin-top: 30px; font-size: 10px; font-style: italic; }
+                </style></head><body>
+                <h2>${title}</h2>
+                <div class="filter-info">${filterText}</div>
+                <p>एकूण नोंदी: <b>${filtered.length}</b></p>
+                <table>
+                    <thead>
+                        <tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>धारक</th></tr>
+                    </thead>
+                    <tbody>`;
+                
+                filtered.forEach((rec, i) => {
+                    html += `<tr>
+                        <td>${i + 1}</td>
+                        <td>${rec.mbNo}</td>
+                        <td>${rec.size}</td>
+                        <td>${formatDate(rec.date)}</td>
+                        <td>${rec.detail}</td>
+                    </tr>`;
+                });
+                html += `</tbody></table><div class="footer">Created by Vitthal Kokate Patil<br>Mob: 8446556141</div></body></html>`;
+                
+                let printWindow = window.open('', '_blank');
+                printWindow.document.write(html);
+                printWindow.document.close();
+                printWindow.focus();
+                setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+            } else {
+                // एकूण किंवा उपलब्ध साठी रिपोर्ट जनरेटर उघडा
+                openReportGenerator();
             }
         }
 
