@@ -287,6 +287,8 @@
                 <label>मुख्य घटक निवडा (कोणाकडून मिळाली)</label>
                 <select id="reportMainComp" class="form-control" onchange="updateReportSubComp()">
                     <option value="">-- निवडा --</option>
+                    <!-- 🌟 सर्व घटक पर्याय ॲड केला -->
+                    <option value="AllSources">सर्व घटक (All Sources)</option>
                     <option value="JE">JE (कनिष्ठ अभियंता)</option>
                     <option value="Office">विभागीय कार्यालय</option>
                     <option value="Bhandarpal">भांडारपाल</option>
@@ -298,7 +300,6 @@
                 <select id="reportSubComp" class="form-control"></select>
             </div>
 
-            <!-- 🌟 नवीन आकार फिल्टर -->
             <div class="form-group">
                 <label>MB आकार निवडा</label>
                 <select id="reportSizeComp" class="form-control">
@@ -491,7 +492,10 @@
             let subSelect = document.getElementById('reportSubComp');
             
             subSelect.innerHTML = '';
-            if (!mainComp) { subGroup.style.display = 'none'; return; }
+            if (!mainComp || mainComp === 'AllSources') { 
+                subGroup.style.display = 'none'; 
+                return; 
+            }
             
             subGroup.style.display = 'block';
             
@@ -542,7 +546,12 @@
 
                 // ३. स्रोतानुसार फिल्टर
                 let match = false;
-                if (mainComp === 'JE') {
+                
+                // 🌟 जर 'सर्व घटक' निवडले असेल
+                if (mainComp === 'AllSources') {
+                    match = true; 
+                } 
+                else if (mainComp === 'JE') {
                     let isJE = (rec.sourceType === 'JE' || jeRecords.some(je => je.name === rec.detail));
                     if (isJE && (subComp === 'All' || rec.detail === subComp)) match = true;
                 } 
@@ -565,7 +574,7 @@
             });
 
             // रिपोर्ट रेंडर करणे
-            let title = "अहवाल: " + (subComp === 'All' ? "सर्व " + mainComp : subComp);
+            let title = "अहवाल: " + (mainComp === 'AllSources' ? "सर्व घटक" : (subComp === 'All' ? "सर्व " + mainComp : subComp));
             if (sizeFilter !== 'All') title += " (" + sizeFilter + ")";
             document.getElementById('reportResultTitle').innerHTML = `<i class="fa-solid fa-file-invoice"></i> ${title}`;
 
