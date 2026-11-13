@@ -25,54 +25,63 @@
         .btn-add { flex: 1; background: #f57c00; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-print-top { flex: 1; background: #0d47a1; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
-        /* 🌟 टेबल स्टाईल - पेज स्थिर आणि ७ नोंदींनंतर स्क्रोल */
+        /* 🌟 नवीन टेबल कोडिंग - स्क्रोल आणि स्टिकी बटणांसाठी */
         .table-container { 
             width: 100%; 
-            overflow-x: auto; 
-            overflow-y: auto; 
-            max-height: 380px; /* ७ ते ८ नोंदींची उंची */
+            height: 400px; /* पेज न हलता फक्त टेबलच स्क्रोल होण्यासाठी */
+            overflow: auto; 
             -webkit-overflow-scrolling: touch; 
             border: 1px solid #ddd; 
             border-radius: 6px;
             position: relative;
         }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; }
-        th, td { padding: 6px 4px; border: 1px solid #ddd; text-align: center; white-space: nowrap; vertical-align: middle !important; }
         
-        /* 🌟 हेडर स्थिर (Sticky Header) */
+        /* border-collapse: separate वापरल्याने sticky बॉर्डर व्यवस्थित काम करतात */
+        table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 11px; }
+        
+        th, td { 
+            padding: 8px 6px; 
+            border-bottom: 1px solid #ddd; 
+            border-right: 1px solid #ddd; 
+            text-align: center; 
+            white-space: nowrap; 
+            vertical-align: middle !important; 
+            background-color: #fff;
+        }
+        
+        /* हेडर स्थिर (Sticky Header) */
         th { 
             background-color: #f5f5f5; 
             font-size: 11px; 
             position: sticky; 
             top: 0; 
             z-index: 20; 
-            border-bottom: 2px solid #ccc;
+            border-top: 1px solid #ddd;
         }
         
-        th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 5; background-color: #fff; }
+        /* पहिला कॉलम स्थिर */
+        th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 15; background-color: #fff; }
         th:nth-child(1) { z-index: 25; background-color: #f5f5f5; }
         
         /* 🌟 Action कॉलम १००% स्थिर (Fix) */
-        th:nth-child(11), td:nth-child(11) { 
+        th.action-col, td.action-col { 
             position: sticky; 
             right: 0; 
             z-index: 50; 
             background-color: #fff !important; 
+            border-left: 1px solid #ddd;
             box-shadow: -2px 0 5px -2px rgba(0,0,0,0.2); 
         }
-        th:nth-child(11) { 
-            z-index: 60; 
-            background-color: #f5f5f5 !important; 
-        }
+        th.action-col { z-index: 60; background-color: #f5f5f5 !important; }
         
-        tr.total-row td { background-color: #f0f2f5 !important; font-weight: bold; vertical-align: middle !important; }
-        tr.total-row td:nth-child(1) { z-index: 5; background-color: #f0f2f5 !important; }
-        tr.total-row td:nth-child(11) { z-index: 50; background-color: #f0f2f5 !important; }
+        tr.total-row td { background-color: #f0f2f5 !important; font-weight: bold; }
+        tr.total-row td:nth-child(1) { z-index: 15; background-color: #f0f2f5 !important; }
+        tr.total-row td.action-col { z-index: 50; background-color: #f0f2f5 !important; }
 
         .text-left { text-align: left; }
         .text-right { text-align: right; }
         
-        /* 🌟 Action बटन्स (एकाच रेषेत आणि स्थिर) */
+        /* 🌟 Action बटन्स (एकाच रेषेत, स्थिर) */
         .action-btns { 
             display: flex; 
             flex-direction: row !important; 
@@ -271,7 +280,7 @@
                             <th class="text-right">पास रक्कम (₹)</th>
                             <th class="text-right">कपात (₹)</th>
                             <th class="text-right">नेट रक्कम (₹)</th>
-                            <th>Action</th>
+                            <th class="action-col">Action</th>
                         </tr>
                     </thead>
                     <tbody id="billTableBody"></tbody>
@@ -797,6 +806,7 @@
             showToast(editIndex === -1 ? 'देयक यशस्वीरित्या जतन झाले!' : 'देयक अपडेट झाले!');
         }
 
+        // 🌟 पूर्णपणे नवीन रेंडर टेबल कोड (स्टिकी ॲक्शन आणि स्क्रोलसाठी)
         function renderTable() {
             const tbody = document.getElementById('billTableBody');
             if (!tbody) return; tbody.innerHTML = '';
@@ -852,8 +862,8 @@
                     html += `<td class="text-right" style="color:#d32f2f; cursor:pointer;" onclick="showDeductionDetails(${item.originalIndex})">₹${tDed.toLocaleString('en-IN')}</td>`;
                     html += `<td class="text-right" style="color:#2e7d32; font-weight:bold;">₹${nPay.toLocaleString('en-IN')}</td>`;
                     
-                    // Action बटन्स (vertical-align: middle मुळे आता हे नेहमी मधोमध स्थिर राहतील)
-                    html += `<td><div class="action-btns"><button class="btn-edit" onclick="editBill(${item.originalIndex})">Edit</button><button class="btn-delete" onclick="showDeleteAlert(${item.originalIndex})">Del</button></div></td>`;
+                    // 🌟 Action बटन्स (action-col क्लाससह, १००% स्थिर)
+                    html += `<td class="action-col"><div class="action-btns"><button class="btn-edit" onclick="editBill(${item.originalIndex})">Edit</button><button class="btn-delete" onclick="showDeleteAlert(${item.originalIndex})">Del</button></div></td>`;
                     
                     html += `</tr>`;
                 });
@@ -864,7 +874,7 @@
                         <td class="text-right">₹${totalPassed.toLocaleString('en-IN')}</td>
                         <td class="text-right" style="color:#d32f2f;">₹${totalDed.toLocaleString('en-IN')}</td>
                         <td class="text-right" style="color:#2e7d32;">₹${totalNet.toLocaleString('en-IN')}</td>
-                        <td></td>
+                        <td class="action-col"></td>
                      </tr>`;
 
             tbody.innerHTML = html;
