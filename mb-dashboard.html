@@ -30,15 +30,58 @@
         
         .form-control { width: 100%; padding: 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none; background: #fff; box-sizing: border-box; }
         
-        .date-wrapper { position: relative; width: 100%; display: flex; align-items: center; }
-        .fake-placeholder { position: absolute; left: 12px; color: #999; font-size: 13px; pointer-events: none; z-index: 1; }
-        input[type="date"].form-control { -webkit-appearance: none; appearance: none; min-height: 42px; color: #333; background-color: #fff; position: relative; z-index: 2; }
-        input[type="date"]::-webkit-datetime-edit { text-align: left; padding: 0; margin: 0; }
-        input[type="date"]::-webkit-calendar-picker-indicator { margin-left: auto; padding: 0; cursor: pointer; }
-        input[type="date"]:not(.has-value):not(:focus)::-webkit-datetime-edit { color: transparent; }
-        input[type="date"]:focus + .fake-placeholder,
-        input[type="date"].has-value + .fake-placeholder { display: none; }
+        /* 🌟 ओव्हरले पद्धत (Date Overlay) - १००% फिक्स */
+        .date-wrapper { position: relative; width: 100%; display: block; }
+        .fake-placeholder {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 13px;
+            pointer-events: none;
+            z-index: 5; /* इनपुटच्या वर दिसण्यासाठी */
+        }
         
+        input[type="date"].form-control {
+            -webkit-appearance: none;
+            appearance: none;
+            min-height: 42px;
+            color: #333;
+            background-color: #fff;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px 10px;
+            text-align: left !important;
+            display: block;
+        }
+        input[type="date"]::-webkit-datetime-edit {
+            text-align: left;
+            padding: 0;
+            margin: 0;
+            font-size: 14px; /* फॉन्ट साईज थोडा वाढवला */
+            display: block;
+            width: 100%;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            margin-left: auto;
+            padding: 0;
+            cursor: pointer;
+        }
+        
+        /* रिकामे असताना ब्राउझरचे अक्षर लपवणे */
+        input[type="date"]:not(.has-value):not(:focus)::-webkit-datetime-edit {
+            color: transparent;
+        }
+        
+        /* क्लिक किंवा तारीख निवडल्यावर प्लेसहोल्डर लपवणे */
+        input[type="date"]:focus + .fake-placeholder,
+        input[type="date"].has-value + .fake-placeholder {
+            display: none;
+        }
+
         .search-btn-row { display: flex; gap: 10px; margin-top: 15px; }
         .btn-search-main { flex: 1; background: #0d47a1; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-reset-main { flex: 1; background: #607d8b; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
@@ -62,7 +105,6 @@
         .btn-print-header { background: #0d47a1; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; }
         .btn-close-modal { background: #d32f2f; color: #fff; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; }
 
-        /* 🌟 फिल्टर सेक्शन स्टाईल */
         .list-filter-section { display: none; margin-bottom: 10px; padding: 10px; background: #f9f9f9; border: 1px solid #eee; border-radius: 6px; }
         .filter-row { display: flex; gap: 10px; margin-bottom: 5px; }
         .filter-group { flex: 1; }
@@ -140,14 +182,14 @@
                 <div class="date-group">
                     <label>दिनांक पासून *</label>
                     <div class="date-wrapper">
-                        <input type="date" id="searchDateFrom" class="form-control" onchange="toggleDateClass(this)">
+                        <input type="date" id="searchDateFrom" class="form-control" onchange="toggleDateClass(this)" oninput="toggleDateClass(this)">
                         <span class="fake-placeholder">दिनांक निवडा</span>
                     </div>
                 </div>
                 <div class="date-group">
                     <label>दिनांक पर्यंत *</label>
                     <div class="date-wrapper">
-                        <input type="date" id="searchDateTo" class="form-control" onchange="toggleDateClass(this)">
+                        <input type="date" id="searchDateTo" class="form-control" onchange="toggleDateClass(this)" oninput="toggleDateClass(this)">
                         <span class="fake-placeholder">दिनांक निवडा</span>
                     </div>
                 </div>
@@ -179,7 +221,6 @@
                 </div>
             </div>
             
-            <!-- 🌟 फिल्टर सेक्शन -->
             <div id="listFilterSection" class="list-filter-section">
                 <div class="filter-row">
                     <div class="filter-group">
@@ -264,7 +305,7 @@
             <div class="form-group">
                 <label>दिनांक *</label>
                 <div class="date-wrapper">
-                    <input type="date" id="formDate" class="form-control" onchange="toggleDateClass(this)">
+                    <input type="date" id="formDate" class="form-control" onchange="toggleDateClass(this)" oninput="toggleDateClass(this)">
                     <span class="fake-placeholder">दिनांक निवडा</span>
                 </div>
             </div>
