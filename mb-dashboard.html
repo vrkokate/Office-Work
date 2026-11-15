@@ -98,13 +98,6 @@
         .btn-print-header { background: #0d47a1; color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; }
         .btn-close-modal { background: #d32f2f; color: #fff; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; }
 
-        .list-filter-section { display: none; margin-bottom: 10px; padding: 10px; background: #f9f9f9; border: 1px solid #eee; border-radius: 6px; }
-        .filter-row { display: flex; gap: 10px; margin-bottom: 5px; }
-        .filter-group { flex: 1; }
-        .filter-group label { font-size: 11px; font-weight: bold; display: block; margin-bottom: 3px; }
-        .filter-group select { padding: 6px; font-size: 12px; }
-        .filter-summary { font-size: 12px; font-weight: bold; color: #0d47a1; margin-top: 5px; text-align: center; }
-
         .ac-detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 13px; }
         .ac-detail-row span:first-child { color: #666; font-weight: bold; }
         .ac-detail-row span:last-child { color: #000; font-weight: bold; text-align: right; }
@@ -208,32 +201,12 @@
             <div class="modal-header">
                 <h3 id="listModalTitle"><i class="fa-solid fa-list"></i> M.B. यादी</h3>
                 <div class="header-actions">
-                    <button class="btn-print-header" onclick="handleListPrint()"><i class="fa-solid fa-print"></i> Print</button>
+                    <button class="btn-print-header" onclick="openReportGenerator()"><i class="fa-solid fa-print"></i> Print</button>
                     <button class="btn-add-bulk" id="btnBulkAdd" onclick="window.location.href='mb-register.html'"><i class="fa-solid fa-plus"></i> नोंद</button>
                     <button class="btn-close-modal" onclick="closeModal('listModal')">X</button>
                 </div>
             </div>
             
-            <div id="listFilterSection" class="list-filter-section">
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label>आकार:</label>
-                        <select id="filterSize" class="form-control" onchange="applyListFilters()">
-                            <option value="All">सर्व</option>
-                            <option value="लहान">लहान</option>
-                            <option value="मोठी">मोठी</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>धारक (कोणाकडे आहे):</label>
-                        <select id="filterHolder" class="form-control" onchange="applyListFilters()">
-                            <option value="All">सर्व</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="filterSummary" class="filter-summary"></div>
-            </div>
-
             <div style="overflow-x:auto;">
                 <table class="data-table">
                     <thead><tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>धारक</th></tr></thead>
@@ -396,8 +369,6 @@
         let mbRecords = [];
         let jeRecords = [];
         let currentActiveMB = '';
-        let currentListType = 'total';
-        let currentListBaseData = [];
 
         window.onpopstate = function(event) {
             let openModals = document.querySelectorAll('.custom-modal[style*="display: flex"]');
@@ -541,91 +512,38 @@
             inputTo.value = ''; inputTo.classList.remove('has-value');
         }
 
-        // --- 🌟 यादी आणि फिल्टर लॉजिक ---
+        // --- 🌟 यादी लॉजिक (आता फिल्टर नाही) ---
         function openListModal(type) {
-            currentListType = type;
             let title = "M.B. यादी";
             if(type === 'total') title = "एकूण M.B. यादी";
             else if(type === 'issued') title = "दिलेली M.B. यादी";
             else if(type === 'avail') title = "उपलब्ध M.B. यादी";
             document.getElementById('listModalTitle').innerHTML = `<i class="fa-solid fa-list"></i> ${title}`;
 
-            // बटणे सर्वांना दाखवण्यासाठी
             document.getElementById('btnBulkAdd').style.display = 'flex';
             document.querySelector('.btn-print-header').style.display = 'flex';
 
-            // फिल्टर सेक्शन फक्त 'दिलेली M.B.' साठी दाखवण्यासाठी
-            const filterSec = document.getElementById('listFilterSection');
-            if (type === 'issued') {
-                filterSec.style.display = 'block';
-                populateFilterHolder();
-                document.getElementById('filterSize').value = 'All';
-                document.getElementById('filterHolder').value = 'All';
-            } else {
-                filterSec.style.display = 'none';
-            }
-
             let uniqueMBs = {};
             mbRecords.forEach(rec => { uniqueMBs[rec.mbNo] = rec; });
-            currentListBaseData = [];
+
+            let results = [];
             for (let mbNo in uniqueMBs) {
                 let rec = uniqueMBs[mbNo];
-                if (type === 'total') currentListBaseData.push(rec);
-                else if (type === 'issued' && rec.type === 'दिली') currentListBaseData.push(rec);
-                else if (type === 'avail' && rec.type === 'मिळाली') currentListBaseData.push(rec);
-            }
-
-            applyListFilters();
-            openModal('listModal');
-        }
-
-        function populateFilterHolder() {
-            let uniqueHolders = new Set();
-            let uniqueMBs = {};
-            mbRecords.forEach(rec => { uniqueMBs[rec.mbNo] = rec; });
-            for(let mbNo in uniqueMBs) {
-                let rec = uniqueMBs[mbNo];
-                if(rec.type === 'दिली' && rec.detail) uniqueHolders.add(rec.detail);
-            }
-            let select = document.getElementById('filterHolder');
-            select.innerHTML = '<option value="All">सर्व (All)</option>';
-            uniqueHolders.forEach(name => { select.innerHTML += `<option value="${name}">${name}</option>`; });
-        }
-
-        function applyListFilters() {
-            let filtered = currentListBaseData;
-            if (currentListType === 'issued') {
-                let sizeVal = document.getElementById('filterSize').value;
-                let holderVal = document.getElementById('filterHolder').value;
-
-                if (sizeVal !== 'All') filtered = filtered.filter(r => r.size === sizeVal);
-                if (holderVal !== 'All') filtered = filtered.filter(r => r.detail === holderVal);
+                if (type === 'total') results.push(rec);
+                else if (type === 'issued' && rec.type === 'दिली') results.push(rec);
+                else if (type === 'avail' && rec.type === 'मिळाली') results.push(rec);
             }
 
             // तारखेनुसार क्रम (नवीन ते जुने)
-            filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+            results.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             let tbody = document.getElementById('listModalBody');
             tbody.innerHTML = '';
             
-            let smallCount = 0, bigCount = 0;
-            filtered.forEach(r => {
-                if(r.size === 'लहान') smallCount++;
-                if(r.size === 'मोठी') bigCount++;
-            });
-
-            let summaryEl = document.getElementById('filterSummary');
-            if(currentListType === 'issued') {
-                summaryEl.innerText = `एकूण: ${filtered.length} (लहान: ${smallCount}, मोठी: ${bigCount})`;
-                summaryEl.style.display = 'block';
-            } else {
-                summaryEl.style.display = 'none';
-            }
-
-            if (filtered.length === 0) {
+            if (results.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#d32f2f;">कोणतीही नोंद सापडली नाही.</td></tr>';
             } else {
-                filtered.forEach((rec, i) => {
+                results.forEach((rec, i) => {
                     let holder = rec.type === 'दिली' ? rec.detail : 'कार्यालयात उपलब्ध';
                     let holderColor = rec.type === 'दिली' ? '#f57c00' : '#2e7d32';
                     tbody.innerHTML += `
@@ -639,72 +557,7 @@
                     `;
                 });
             }
-        }
-
-        // 🌟 नवीन: यादीतील Print बटन हाताळणे
-        function handleListPrint() {
-            if (currentListType === 'issued') {
-                let sizeVal = document.getElementById('filterSize').value;
-                let holderVal = document.getElementById('filterHolder').value;
-
-                let filtered = currentListBaseData.filter(r => {
-                    let matchSize = (sizeVal === 'All' || r.size === sizeVal);
-                    let matchHolder = (holderVal === 'All' || r.detail === holderVal);
-                    return matchSize && matchHolder;
-                });
-                filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-                let smallCount = 0, bigCount = 0;
-                filtered.forEach(r => {
-                    if(r.size === 'लहान') smallCount++;
-                    if(r.size === 'मोठी') bigCount++;
-                });
-
-                let sizeText = (sizeVal === 'All') ? 'सर्व' : sizeVal;
-                let holderText = (holderVal === 'All') ? 'सर्व' : holderVal;
-                
-                let html = `<html><head><title>दिलेली M.B. यादी अहवाल</title><style>
-                    body { font-family: Arial; padding: 20px; }
-                    h2 { text-align: center; color: #0d47a1; margin-bottom: 20px; }
-                    .summary-box { background: #f9f9f9; border: 1px solid #ddd; padding: 15px; border-radius: 6px; margin-bottom: 20px; text-align: center; }
-                    .summary-box div { margin-bottom: 5px; font-size: 14px; }
-                    .summary-box .bold { font-weight: bold; color: #0d47a1; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-                    th, td { border: 1px solid #333; padding: 8px; text-align: left; }
-                    th { background-color: #f2f2f2; }
-                    .footer { text-align: right; margin-top: 30px; font-size: 10px; font-style: italic; }
-                </style></head><body>
-                <h2>दिलेली M.B. यादी अहवाल</h2>
-                <div class="summary-box">
-                    <div><span class="bold">आकार:</span> ${sizeText}</div>
-                    <div><span class="bold">धारक:</span> ${holderText}</div>
-                    <div class="bold">एकूण: ${filtered.length} (लहान: ${smallCount}, मोठी: ${bigCount})</div>
-                </div>
-                <table>
-                    <thead>
-                        <tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>धारक</th></tr>
-                    </thead>
-                    <tbody>`;
-                
-                filtered.forEach((rec, i) => {
-                    html += `<tr>
-                        <td>${i + 1}</td>
-                        <td>${rec.mbNo}</td>
-                        <td>${rec.size}</td>
-                        <td>${formatDate(rec.date)}</td>
-                        <td>${rec.detail}</td>
-                    </tr>`;
-                });
-                html += `</tbody></table><div class="footer">Created by Vitthal Kokate Patil<br>Mob: 8446556141</div></body></html>`;
-                
-                let printWindow = window.open('', '_blank');
-                printWindow.document.write(html);
-                printWindow.document.close();
-                printWindow.focus();
-                setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
-            } else {
-                openReportGenerator();
-            }
+            openModal('listModal');
         }
 
         // --- 🌟 रिपोर्ट जनरेटर लॉजिक ---
