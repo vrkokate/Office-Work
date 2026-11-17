@@ -59,6 +59,7 @@
             text-align: left !important;
             cursor: pointer;
             padding-right: 35px;
+            font-weight: bold;
         }
         .date-icon {
             position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
@@ -67,7 +68,6 @@
         .date-display-input.valid-date { 
             border-color: #2e7d32 !important; 
             background-color: #e8f5e9 !important; 
-            font-weight: bold; 
             color: #1b5e20;
         }
 
@@ -78,7 +78,7 @@
             justify-content: center; align-items: center; padding: 15px;
         }
         .calendar-box {
-            background: #fff; border-radius: 12px; width: 100%; max-width: 320px;
+            background: #fff; border-radius: 12px; width: 100%; max-width: 340px;
             padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         .calendar-header {
@@ -97,6 +97,7 @@
         
         .calendar-days {
             display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center;
+            max-height: 220px; overflow-y: auto; padding-bottom: 5px;
         }
         .calendar-days div {
             padding: 8px 0; font-size: 14px; border-radius: 6px; cursor: pointer; color: #333;
@@ -111,9 +112,16 @@
             border: 1px solid #0d47a1; color: #0d47a1; font-weight: bold;
         }
         
+        .calendar-footer {
+            display: flex; gap: 10px; margin-top: 15px;
+        }
+        .btn-today-cal {
+            flex: 1; background: #1976d2; color: #fff; border: none;
+            padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer;
+        }
         .btn-close-calendar {
-            width: 100%; background: #d32f2f; color: #fff; border: none;
-            padding: 10px; border-radius: 6px; font-weight: bold; margin-top: 15px; cursor: pointer;
+            flex: 1; background: #d32f2f; color: #fff; border: none;
+            padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer;
         }
 
         /* टेबल सेक्शन */
@@ -290,7 +298,10 @@
                 <span>रवि</span><span>सोम</span><span>मंगळ</span><span>बुध</span><span>गुरु</span><span>शुक्र</span><span>शनि</span>
             </div>
             <div class="calendar-days" id="calendarDays"></div>
-            <button class="btn-close-calendar" onclick="closeCalendar()">रद्द करा</button>
+            <div class="calendar-footer">
+                <button class="btn-today-cal" onclick="setTodayDate()">आज (Today)</button>
+                <button class="btn-close-calendar" onclick="closeCalendar()">रद्द करा</button>
+            </div>
         </div>
     </div>
 
@@ -502,7 +513,6 @@
 
         // 🌟 कस्टम कॅलेंडर लॉजिक (Custom Date Picker Logic)
         let currentCalDate = new Date();
-        let selectedDateObj = null;
         const marathiMonths = ["जानेवारी", "फेब्रुवारी", "मार्च", "एप्रिल", "मे", "जून", "जुलै", "ऑगस्ट", "सप्टेंबर", "ऑक्टोबर", "नोव्हेंबर", "डिसेंबर"];
 
         function openCalendar() {
@@ -571,12 +581,17 @@
             const selectedDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             document.getElementById('entryDateRaw').value = selectedDateStr;
             
-            const displayStr = `${String(day).padStart(2, '0')}/${String(month + 1).padStart(2, '0')}/${year}`;
+            const displayStr = `${String(day).padStart(2, '0')}-${String(month + 1).padStart(2, '0')}-${year}`;
             const displayInput = document.getElementById('entryDateDisplay');
             displayInput.value = displayStr;
             displayInput.classList.add('valid-date');
             
             closeCalendar();
+        }
+
+        function setTodayDate() {
+            const today = new Date();
+            selectDate(today.getFullYear(), today.getMonth(), today.getDate());
         }
 
         // 🌟 दिनांक रिसेट करणे
@@ -691,11 +706,11 @@
             });
         }
 
-        // 🌟 नियम ५ नुसार टेबलमध्ये दिनांक DD/MM/YYYY मध्ये दाखवणे
+        // 🌟 नियम ५ नुसार टेबलमध्ये दिनांक DD-MM-YYYY मध्ये दाखवणे
         function formatDate(dateStr) {
             if (!dateStr) return '';
             const parts = dateStr.split('-');
-            if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
             return dateStr;
         }
 
@@ -747,7 +762,7 @@
                 let parts = rec.date.split('-');
                 if(parts.length === 3) {
                     let displayInput = document.getElementById('entryDateDisplay');
-                    displayInput.value = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    displayInput.value = `${parts[2]}-${parts[1]}-${parts[0]}`;
                     displayInput.classList.add('valid-date');
                 }
             } else {
