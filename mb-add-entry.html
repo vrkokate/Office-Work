@@ -53,52 +53,32 @@
         }
         .btn-save:hover { background: #1b5e20; }
 
-        /* 🌟 ॲप आणि Chrome साठी एकसमान दिनांक डिझाईन (Cross-Platform Fix) */
-        input[type="date"].form-control {
-            -webkit-appearance: none; /* डीफॉल्ट डिझाईन काढण्यासाठी */
-            appearance: none;
-            text-align: left !important; /* मजकूर डावीकडे ठेवण्यासाठी */
-            padding: 12px; 
-            display: flex;
-            align-items: center;
-            background-color: #fff;
-            min-height: 44px; /* सर्व इनपुट सारखे उंची ठेवण्यासाठी */
-        }
-
-        /* दिनांकाचा मजकूर डावीकडे आणण्यासाठी WebKit Fix */
-        input[type="date"].form-control::-webkit-datetime-edit {
-            text-align: left;
-            padding: 0;
-            margin: 0;
-            flex: 1;
-        }
-
-        /* कॅलेंडर आयकॉन उजवीकडे ठेवण्यासाठी */
-        input[type="date"].form-control::-webkit-calendar-picker-indicator {
-            margin-left: auto;
-            padding: 0;
+        /* 🌟 सुधारित दिनांक रकाना (Text Input + Hidden Picker) */
+        .date-custom-wrapper { position: relative; width: 100%; }
+        
+        /* युझरला दिसणारा मजकूर रकाना */
+        .date-display-input {
+            text-align: left !important;
             cursor: pointer;
+            padding-right: 35px; /* कॅलेंडर आयकॉनसाठी जागा */
         }
-
-        /* दिनांक प्लेसहोल्डर (MB डॅशबोर्ड सारखेच) */
-        input[type="date"]:before {
-            content: attr(data-placeholder);
-            color: #999;
-            width: 100%;
-            display: block;
-            font-weight: normal;
-        }
-        input[type="date"]:focus:before,
-        input[type="date"].has-value:before {
-            content: "";
+        
+        .date-icon {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            color: #1976d2; font-size: 18px; pointer-events: none; z-index: 1;
         }
 
         /* दिनांक निवडल्यावर हिरवा रंग */
-        input[type="date"].has-value {
-            border-color: #2e7d32 !important;
-            background-color: #e8f5e9 !important;
-            font-weight: bold;
+        .date-display-input.valid-date { 
+            border-color: #2e7d32 !important; 
+            background-color: #e8f5e9 !important; 
+            font-weight: bold; 
             color: #1b5e20;
+        }
+
+        /* खरा डेट पिकर (पडद्याच्या बाहेर लपवलेला, जेणेकरून ॲपमध्ये तुटक दिसणार नाही) */
+        .hidden-date-picker {
+            position: absolute; bottom: 0; left: 50%; width: 1px; height: 1px; opacity: 0; z-index: -1;
         }
 
         /* टेबल सेक्शन */
@@ -229,12 +209,16 @@
                 <datalist id="previousNamesList"></datalist>
             </div>
 
-            <!-- ६. दिनांक (ॲप आणि Chrome साठी एकसमान, डाव्या बाजूला) -->
+            <!-- ६. दिनांक (पूर्णपणे नवीन आणि अचूक पद्धत) -->
             <div class="form-group hidden" id="groupDate">
-                <input type="date" id="entryDate" class="form-control" data-placeholder="दिनांक निवडा" 
-                       onfocus="this.removeAttribute('data-placeholder')" 
-                       onblur="if(!this.value)this.setAttribute('data-placeholder', 'दिनांक निवडा');" 
-                       onchange="this.classList.add('has-value')">
+                <div class="date-custom-wrapper">
+                    <!-- युझरला दिसणारा रकाना (डावीकडे मजकूर) -->
+                    <input type="text" id="entryDateDisplay" class="form-control date-display-input" placeholder="दिनांक निवडा" readonly onclick="openDatePicker()">
+                    <i class="fa-regular fa-calendar-days date-icon" onclick="openDatePicker()"></i>
+                    
+                    <!-- खरा डेट पिकर (स्क्रीनच्या बाहेर लपवलेला) -->
+                    <input type="date" id="entryDatePicker" class="hidden-date-picker" onchange="syncDate()">
+                </div>
             </div>
 
             <button class="btn-save hidden" id="saveBtn" onclick="saveEntry()">Save Entry</button>
@@ -468,12 +452,40 @@
             });
         }
 
+        // 🌟 नवीन दिनांक फंक्शन्स (ॲप आणि Chrome साठी एकच)
+
+        function openDatePicker() {
+            const picker = document.getElementById('entryDatePicker');
+            if (picker.showPicker) {
+                picker.showPicker(); // मॉडर्न ब्राउझरसाठी
+            } else {
+                picker.click(); // जुन्या ब्राउझरसाठी
+            }
+        }
+
+        function syncDate() {
+            const picker = document.getElementById('entryDatePicker');
+            const display = document.getElementById('entryDateDisplay');
+            
+            if (picker.value) {
+                // YYYY-MM-DD वरून DD/MM/YYYY मध्ये बदलणे
+                let parts = picker.value.split('-');
+                if (parts.length === 3) {
+                    display.value = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    display.classList.add('valid-date');
+                }
+            } else {
+                display.value = '';
+                display.classList.remove('valid-date');
+            }
+        }
+
         function saveEntry() {
             const type = document.getElementById('entryType').value;
             const size = document.getElementById('mbSize').value;
             
-            // 🌟 थेट इनपुटमधून YYYY-MM-DD दिनांक घेणे
-            let dbDate = document.getElementById('entryDate').value; 
+            // 🌟 थेट लपलेल्या इनपुटमधून YYYY-MM-DD दिनांक घेणे
+            let dbDate = document.getElementById('entryDatePicker').value; 
             const editIndex = parseInt(document.getElementById('editIndex').value);
 
             let mbNo = '';
@@ -624,13 +636,13 @@
             }
 
             // 🌟 दिनांक सेट करणे
-            let dateInput = document.getElementById('entryDate');
+            let picker = document.getElementById('entryDatePicker');
             if (rec.date) {
-                dateInput.value = rec.date; // YYYY-MM-DD
-                dateInput.classList.add('has-value');
+                picker.value = rec.date; // YYYY-MM-DD
+                syncDate();
             } else {
-                dateInput.value = '';
-                dateInput.classList.remove('has-value');
+                picker.value = '';
+                syncDate();
             }
             
             document.getElementById('saveBtn').innerText = 'Update Entry';
@@ -646,10 +658,9 @@
             document.getElementById('mbNumberInput').value = '';
             document.getElementById('mbNumberSelect').innerHTML = '';
             
-            let dateInput = document.getElementById('entryDate');
-            dateInput.value = '';
-            dateInput.classList.remove('has-value');
-            dateInput.setAttribute('data-placeholder', 'दिनांक निवडा');
+            let picker = document.getElementById('entryDatePicker');
+            picker.value = '';
+            syncDate(); // यामुळे display आपोआप रिकामे होईल
 
             document.getElementById('saveBtn').innerText = 'Save Entry';
             document.getElementById('cancelBtn').classList.add('hidden');
