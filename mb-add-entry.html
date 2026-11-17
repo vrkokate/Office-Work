@@ -53,7 +53,34 @@
         }
         .btn-save:hover { background: #1b5e20; }
 
-        /* 🌟 दिनांक प्लेसहोल्डर (MB डॅशबोर्ड सारखेच) */
+        /* 🌟 ॲप आणि Chrome साठी एकसमान दिनांक डिझाईन (Cross-Platform Fix) */
+        input[type="date"].form-control {
+            -webkit-appearance: none; /* डीफॉल्ट डिझाईन काढण्यासाठी */
+            appearance: none;
+            text-align: left !important; /* मजकूर डावीकडे ठेवण्यासाठी */
+            padding: 12px; 
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            min-height: 44px; /* सर्व इनपुट सारखे उंची ठेवण्यासाठी */
+        }
+
+        /* दिनांकाचा मजकूर डावीकडे आणण्यासाठी WebKit Fix */
+        input[type="date"].form-control::-webkit-datetime-edit {
+            text-align: left;
+            padding: 0;
+            margin: 0;
+            flex: 1;
+        }
+
+        /* कॅलेंडर आयकॉन उजवीकडे ठेवण्यासाठी */
+        input[type="date"].form-control::-webkit-calendar-picker-indicator {
+            margin-left: auto;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        /* दिनांक प्लेसहोल्डर (MB डॅशबोर्ड सारखेच) */
         input[type="date"]:before {
             content: attr(data-placeholder);
             color: #999;
@@ -65,10 +92,13 @@
         input[type="date"].has-value:before {
             content: "";
         }
-        /* दिनांक निवडल्यावर हिरवा रंग (ॲडव्हान्स फीडबॅक) */
+
+        /* दिनांक निवडल्यावर हिरवा रंग */
         input[type="date"].has-value {
             border-color: #2e7d32 !important;
             background-color: #e8f5e9 !important;
+            font-weight: bold;
+            color: #1b5e20;
         }
 
         /* टेबल सेक्शन */
@@ -199,7 +229,7 @@
                 <datalist id="previousNamesList"></datalist>
             </div>
 
-            <!-- ६. दिनांक (MB डॅशबोर्ड प्रमाणेच कोड) -->
+            <!-- ६. दिनांक (ॲप आणि Chrome साठी एकसमान, डाव्या बाजूला) -->
             <div class="form-group hidden" id="groupDate">
                 <input type="date" id="entryDate" class="form-control" data-placeholder="दिनांक निवडा" 
                        onfocus="this.removeAttribute('data-placeholder')" 
@@ -543,11 +573,11 @@
             });
         }
 
-        // 🌟 नियम ५ नुसार टेबलमध्ये दिनांक DD-MM-YYYY मध्ये दाखवणे
+        // 🌟 नियम ५ नुसार टेबलमध्ये दिनांक DD/MM/YYYY मध्ये दाखवणे
         function formatDate(dateStr) {
             if (!dateStr) return '';
             const parts = dateStr.split('-');
-            if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
             return dateStr;
         }
 
