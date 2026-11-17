@@ -38,9 +38,20 @@
         .form-control {
             width: 100%; padding: 12px; font-size: 14px; border: 1px solid #ccc;
             border-radius: 6px; outline: none; background: #fff; color: #333;
+            transition: 0.3s;
         }
         .form-control:focus { border-color: #1976d2; }
         .form-control::placeholder { color: #999; font-weight: normal; }
+
+        /* 🌟 दिनांक इनपुट डिझाईन (आज बटनाशिवाय) */
+        .date-input-wrapper { position: relative; display: flex; align-items: center; width: 100%; }
+        .date-icon { position: absolute; right: 15px; color: #1976d2; font-size: 18px; pointer-events: none; }
+        
+        /* दिनांक निवडल्यावर हिरवा रंग (ॲडव्हान्स फीडबॅक) */
+        .form-control.valid-date { 
+            border-color: #2e7d32 !important; 
+            background-color: #e8f5e9 !important; 
+        }
 
         /* ड्रॉपडाऊनसाठी */
         select.form-control { appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); background-repeat: no-repeat; background-position: right 10px center; }
@@ -95,18 +106,6 @@
         .alert-actions { display: flex; gap: 10px; }
         .btn-cancel-alert { flex: 1; background: #757575; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-confirm-alert { flex: 1; background: #d32f2f; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-
-        /* 🌟 दिनांक प्लेसहोल्डर */
-        input[type="date"]:before {
-            content: attr(data-placeholder);
-            color: #999;
-            width: 100%;
-            display: block;
-        }
-        input[type="date"]:focus:before,
-        input[type="date"].has-value:before {
-            content: "";
-        }
     </style>
 </head>
 <body>
@@ -142,16 +141,12 @@
 
             <!-- ३. M.B. क्रमांक (इनपुट आणि ड्रॉपडाऊन) -->
             <div class="form-group hidden" id="groupMBNo">
-                <!-- 'मिळाली' साठी इनपुट -->
                 <input type="text" id="mbNumberInput" class="form-control" placeholder="M.B. क्रमांक टाका" oninput="checkDuplicateMB()" autocomplete="off">
-                
-                <!-- 'दिली' साठी ड्रॉपडाऊन -->
                 <select id="mbNumberSelect" class="form-control" style="display: none;"></select>
-                
                 <div id="mbSmartMsg" class="smart-msg"></div>
             </div>
 
-            <!-- ४. M.B. दिली असल्यास (कुणाला दिली?) -->
+            <!-- ४. M.B. दिली असल्यास -->
             <div class="form-group hidden" id="groupGivenTo">
                 <select id="givenToType" class="form-control" onchange="handleGivenToChange()">
                     <option value="">-- कुणाला दिली? --</option>
@@ -159,20 +154,16 @@
                     <option value="Office">विभागीय कार्यालय</option>
                 </select>
             </div>
-
-            <!-- ४.अ JE ची यादी (दिली) -->
             <div class="form-group hidden" id="groupGivenJE">
                 <select id="givenJE" class="form-control">
                     <option value="">-- JE निवडा --</option>
                 </select>
             </div>
-
-            <!-- ४.ब विभागीय कार्यालय (दिली) -->
             <div class="form-group hidden" id="groupGivenOffice">
                 <input type="text" id="givenOffice" class="form-control" placeholder="विभागीय कार्यालयाचे नाव टाईप करा" autocomplete="off">
             </div>
 
-            <!-- ५. M.B. मिळाली असल्यास (नवीन/चालू) -->
+            <!-- ५. M.B. मिळाली असल्यास -->
             <div class="form-group hidden" id="groupReceivedType">
                 <select id="receivedType" class="form-control" onchange="handleReceivedTypeChange()">
                     <option value="">-- नवीन / चालू निवडा --</option>
@@ -180,13 +171,9 @@
                     <option value="चालू">चालू</option>
                 </select>
             </div>
-
-            <!-- ५.अ नवीन (भांडारपाल) -->
             <div class="form-group hidden" id="groupBhandarpal">
                 <input type="text" id="bhandarpalName" class="form-control" placeholder="भांडारपाल यांचे नाव टाका" autocomplete="off">
             </div>
-
-            <!-- ५.ब चालू (कोणाकडून मिळाली? - JE / Office) -->
             <div class="form-group hidden" id="groupReceivedFromType">
                 <select id="receivedFromType" class="form-control" onchange="handleReceivedFromTypeChange()">
                     <option value="">-- कोणाकडून मिळाली? --</option>
@@ -194,23 +181,26 @@
                     <option value="Office">विभागीय कार्यालय</option>
                 </select>
             </div>
-
-            <!-- ५.ब.१ चालू - JE ची यादी -->
             <div class="form-group hidden" id="groupReceivedJE">
                 <select id="receivedJE" class="form-control">
                     <option value="">-- JE निवडा --</option>
                 </select>
             </div>
-
-            <!-- ५.ब.२ चालू - विभागीय कार्यालय -->
             <div class="form-group hidden" id="groupReceivedOffice">
                 <input type="text" id="receivedOfficeInput" class="form-control" list="previousNamesList" placeholder="कार्यालयाचे नाव टाईप करा" autocomplete="off">
                 <datalist id="previousNamesList"></datalist>
             </div>
 
-            <!-- ६. दिनांक -->
+            <!-- ६. दिनांक (आज बटण काढून टाकले आहे) -->
             <div class="form-group hidden" id="groupDate">
-                <input type="date" id="entryDate" class="form-control" data-placeholder="दिनांक निवडा" onfocus="this.removeAttribute('data-placeholder')" onblur="if(!this.value)this.setAttribute('data-placeholder', 'दिनांक निवडा');" onchange="this.classList.add('has-value')">
+                <div class="date-input-wrapper">
+                    <input type="text" id="entryDate" class="form-control" placeholder="दिनांक निवडा" 
+                           onfocus="(this.type='date')" 
+                           onblur="handleDateBlur(this)" 
+                           onchange="handleDateChange(this)"
+                           style="color: #333; padding-right: 35px;">
+                    <i class="fa-regular fa-calendar-days date-icon"></i>
+                </div>
             </div>
 
             <button class="btn-save hidden" id="saveBtn" onclick="saveEntry()">Save Entry</button>
@@ -286,16 +276,14 @@
                 
                 if (type === 'दिली') {
                     document.getElementById('groupGivenTo').classList.remove('hidden');
-                    // 🌟 'दिली' साठी उपलब्ध M.B. ची यादी तयार करणे
                     document.getElementById('mbNumberInput').style.display = 'none';
                     document.getElementById('mbNumberSelect').style.display = 'block';
                     populateAvailableMBSelect(size);
                 } else if (type === 'मिळाली') {
                     document.getElementById('groupReceivedType').classList.remove('hidden');
-                    // 'मिळाली' साठी हाताने टाईप करण्याचे फील्ड
                     document.getElementById('mbNumberInput').style.display = 'block';
                     document.getElementById('mbNumberSelect').style.display = 'none';
-                    document.getElementById('mbNumberInput').value = ''; // रिकामे करणे
+                    document.getElementById('mbNumberInput').value = '';
                     document.getElementById('mbSmartMsg').style.display = 'none';
                 }
                 document.getElementById('groupDate').classList.remove('hidden');
@@ -305,7 +293,6 @@
             }
         }
 
-        // 🌟 उपलब्ध M.B. ची यादी शोधणे आणि ड्रॉपडाऊनमध्ये टाकणे
         function populateAvailableMBSelect(selectedSize) {
             let uniqueMBs = {};
             mbRecords.forEach(rec => {
@@ -333,7 +320,6 @@
                 });
             }
 
-            // जर एडिट करत असेल आणि सध्याची M.B. यादीत नसेल, तर ती ॲड करणे
             if (editIndex !== -1) {
                 let currentMB = mbRecords[editIndex].mbNo;
                 if (!availableMBs.includes(currentMB)) {
@@ -448,10 +434,34 @@
             });
         }
 
+        // 🌟 दिनांक निवडल्यावर हिरवा रंग देण्यासाठी फंक्शन
+        function handleDateChange(input) {
+            if (input.value) {
+                input.classList.add('valid-date');
+            } else {
+                input.classList.remove('valid-date');
+            }
+        }
+
+        // 🌟 दिनांक फॉरमॅट DD-MM-YYYY करण्यासाठी
+        function handleDateBlur(input) {
+            input.type = 'text';
+            if (input.value) {
+                let parts = input.value.split('-');
+                if (parts.length === 3) {
+                    input.value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                }
+                input.classList.add('valid-date');
+            } else {
+                input.placeholder = "दिनांक निवडा";
+                input.classList.remove('valid-date');
+            }
+        }
+
         function saveEntry() {
             const type = document.getElementById('entryType').value;
             const size = document.getElementById('mbSize').value;
-            const date = document.getElementById('entryDate').value;
+            let dateVal = document.getElementById('entryDate').value;
             const editIndex = parseInt(document.getElementById('editIndex').value);
 
             let mbNo = '';
@@ -474,9 +484,16 @@
                 }
             }
 
-            if (!date) {
+            if (!dateVal) {
                 alert('कृपया दिनांक निवडा!');
                 return;
+            }
+
+            // 🌟 डेटाबेससाठी दिनांक YYYY-MM-DD मध्ये सेव्ह करणे
+            let dbDate = dateVal;
+            let dateParts = dateVal.split('-');
+            if (dateParts.length === 3) {
+                dbDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
             }
 
             let detail = '';
@@ -510,7 +527,7 @@
                 size: size,
                 mbNo: mbNo,
                 detail: detail,
-                date: date
+                date: dbDate // YYYY-MM-DD सेव्ह होईल
             };
 
             if (editIndex === -1) {
@@ -551,6 +568,7 @@
             });
         }
 
+        // 🌟 नियम ५ नुसार टेबलमध्ये दिनांक DD-MM-YYYY मध्ये दाखवणे
         function formatDate(dateStr) {
             if (!dateStr) return '';
             const parts = dateStr.split('-');
@@ -566,8 +584,6 @@
             handleEntryTypeChange();
             
             document.getElementById('mbSize').value = rec.size;
-            
-            // handleSizeChange ला ट्रिगर करणे जेणेकरून अपलोड लिस्ट तयार होईल
             handleSizeChange();
 
             if (rec.type === 'दिली') {
@@ -603,8 +619,19 @@
             }
 
             let dateInput = document.getElementById('entryDate');
-            dateInput.value = rec.date;
-            if(rec.date) dateInput.classList.add('has-value');
+            dateInput.type = 'text';
+            if (rec.date) {
+                let parts = rec.date.split('-');
+                if(parts.length === 3) {
+                    dateInput.value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                } else {
+                    dateInput.value = rec.date;
+                }
+                dateInput.classList.add('valid-date');
+            } else {
+                dateInput.value = '';
+                dateInput.classList.remove('valid-date');
+            }
             
             document.getElementById('saveBtn').innerText = 'Update Entry';
             document.getElementById('cancelBtn').classList.remove('hidden');
@@ -620,9 +647,10 @@
             document.getElementById('mbNumberSelect').innerHTML = '';
             
             let dateInput = document.getElementById('entryDate');
+            dateInput.type = 'text';
             dateInput.value = '';
-            dateInput.classList.remove('has-value');
-            dateInput.setAttribute('data-placeholder', 'दिनांक निवडा');
+            dateInput.placeholder = 'दिनांक निवडा';
+            dateInput.classList.remove('valid-date');
 
             document.getElementById('saveBtn').innerText = 'Save Entry';
             document.getElementById('cancelBtn').classList.add('hidden');
