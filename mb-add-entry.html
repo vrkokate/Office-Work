@@ -1,1 +1,645 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Digital Hub - MB Entry</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f0f2f5; color: #212121; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
+        /* 🌟 हेडर */
+        .top-header {
+            display: flex; justify-content: space-between; align-items: center; padding: 15px;
+            background: #0d47a1; color: #fff; position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .back-btn, .home-icon {
+            color: #fff; font-size: 18px; cursor: pointer; 
+            text-decoration: none; display: flex; align-items: center;
+            transition: 0.3s;
+        }
+        .back-btn:hover, .home-icon:hover { color: #00e5ff; }
+
+        .header-title { 
+            font-size: 15px; font-weight: bold; color: #fff; text-align: center;
+            flex: 1; margin: 0 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        /* 🌟 मुख्य भाग */
+        .main-content { padding: 15px; flex: 1; max-width: 600px; margin: 0 auto; width: 100%; }
+        .card-box { background: #fff; border-radius: 10px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        /* फॉर्म सेक्शन */
+        .form-group { margin-bottom: 12px; position: relative; }
+        
+        .form-control {
+            width: 100%; padding: 12px; font-size: 14px; border: 1px solid #ccc;
+            border-radius: 6px; outline: none; background: #fff; color: #333;
+            transition: 0.3s;
+        }
+        .form-control:focus { border-color: #1976d2; }
+        .form-control::placeholder { color: #999; font-weight: normal; }
+
+        /* ड्रॉपडाऊनसाठी */
+        select.form-control { appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); background-repeat: no-repeat; background-position: right 10px center; }
+
+        .btn-save {
+            width: 100%; background: #2e7d32; color: #fff; border: none;
+            padding: 12px; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer;
+            margin-top: 5px; margin-bottom: 15px;
+        }
+        .btn-save:hover { background: #1b5e20; }
+
+        /* टेबल सेक्शन */
+        .table-container {
+            max-height: 250px; overflow-y: auto; overflow-x: auto; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px;
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: middle; white-space: nowrap; }
+        th { background: #f5f5f5; font-weight: bold; position: sticky; top: 0; z-index: 10; }
+        td { color: #333; }
+
+        /* टेबल ॲक्शन बटन्स */
+        .action-btns { display: flex; gap: 5px; justify-content: center; }
+        .btn-edit { background: #2e7d32; color: #fff; border: none; padding: 5px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .btn-delete { background: #d32f2f; color: #fff; border: none; padding: 5px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+
+        /* रिपोर्ट बटन */
+        .btn-report {
+            width: 100%; background: #0d47a1; color: #fff; border: none;
+            padding: 12px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        /* स्मार्ट सजेशन */
+        .smart-msg {
+            font-size: 11.5px; margin-top: 5px; font-weight: bold; display: none;
+            padding: 4px 8px; border-radius: 4px;
+        }
+        .msg-error { background: #ffebee; color: #d32f2f; }
+        .msg-success { background: #e8f5e9; color: #2e7d32; }
+
+        /* लपवण्यासाठी क्लास */
+        .hidden { display: none !important; }
+        
+        /* कस्टम अलर्ट */
+        .custom-alert-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 1000; display: none;
+            justify-content: center; align-items: center; padding: 20px;
+        }
+        .custom-alert-box { background: #fff; border-radius: 10px; padding: 20px; text-align: center; width: 100%; max-width: 300px; }
+        .custom-alert-box p { font-size: 14px; margin-bottom: 20px; font-weight: bold; }
+        .alert-actions { display: flex; gap: 10px; }
+        .btn-cancel-alert { flex: 1; background: #757575; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-confirm-alert { flex: 1; background: #d32f2f; color: #fff; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <header class="top-header">
+        <a href="mb-register.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <div class="header-title">📖 मोजमाप पुस्तिका (M.B.) नोंद</div>
+        <a href="dashboard.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
+    </header>
+
+    <div class="main-content">
+        <div class="card-box">
+            
+            <input type="hidden" id="editIndex" value="-1">
+
+            <!-- १. नोंद प्रकार -->
+            <div class="form-group">
+                <select id="entryType" class="form-control" onchange="handleEntryTypeChange()">
+                    <option value="">-- नोंद प्रकार निवडा --</option>
+                    <option value="दिली">M.B. दिली</option>
+                    <option value="मिळाली">M.B. मिळाली</option>
+                </select>
+            </div>
+
+            <!-- २. M.B. आकार -->
+            <div class="form-group hidden" id="groupMBSize">
+                <select id="mbSize" class="form-control" onchange="handleSizeChange()">
+                    <option value="">-- M.B. आकार निवडा --</option>
+                    <option value="लहान">लहान M.B.</option>
+                    <option value="मोठी">मोठी M.B.</option>
+                </select>
+            </div>
+
+            <!-- ३. M.B. क्रमांक -->
+            <div class="form-group hidden" id="groupMBNo">
+                <input type="text" id="mbNumberInput" class="form-control" placeholder="M.B. क्रमांक टाका" oninput="checkDuplicateMB()" autocomplete="off">
+                <select id="mbNumberSelect" class="form-control" style="display: none;"></select>
+                <div id="mbSmartMsg" class="smart-msg"></div>
+            </div>
+
+            <!-- ४. M.B. दिली असल्यास -->
+            <div class="form-group hidden" id="groupGivenTo">
+                <select id="givenToType" class="form-control" onchange="handleGivenToChange()">
+                    <option value="">-- कुणाला दिली? --</option>
+                    <option value="JE">JE (कनिष्ठ अभियंता)</option>
+                    <option value="Office">विभागीय कार्यालय</option>
+                </select>
+            </div>
+            <div class="form-group hidden" id="groupGivenJE">
+                <select id="givenJE" class="form-control">
+                    <option value="">-- JE निवडा --</option>
+                </select>
+            </div>
+            <div class="form-group hidden" id="groupGivenOffice">
+                <input type="text" id="givenOffice" class="form-control" placeholder="विभागीय कार्यालयाचे नाव टाईप करा" autocomplete="off">
+            </div>
+
+            <!-- ५. M.B. मिळाली असल्यास -->
+            <div class="form-group hidden" id="groupReceivedType">
+                <select id="receivedType" class="form-control" onchange="handleReceivedTypeChange()">
+                    <option value="">-- नवीन / चालू निवडा --</option>
+                    <option value="नवीन">नवीन</option>
+                    <option value="चालू">चालू</option>
+                </select>
+            </div>
+            <div class="form-group hidden" id="groupBhandarpal">
+                <input type="text" id="bhandarpalName" class="form-control" placeholder="भांडारपाल यांचे नाव टाका" autocomplete="off">
+            </div>
+            <div class="form-group hidden" id="groupReceivedFromType">
+                <select id="receivedFromType" class="form-control" onchange="handleReceivedFromTypeChange()">
+                    <option value="">-- कोणाकडून मिळाली? --</option>
+                    <option value="JE">JE (कनिष्ठ अभियंता)</option>
+                    <option value="Office">विभागीय कार्यालय</option>
+                </select>
+            </div>
+            <div class="form-group hidden" id="groupReceivedJE">
+                <select id="receivedJE" class="form-control">
+                    <option value="">-- JE निवडा --</option>
+                </select>
+            </div>
+            <div class="form-group hidden" id="groupReceivedOffice">
+                <input type="text" id="receivedOfficeInput" class="form-control" list="previousNamesList" placeholder="कार्यालयाचे नाव टाईप करा" autocomplete="off">
+                <datalist id="previousNamesList"></datalist>
+            </div>
+
+            <!-- 🌟 दिनांकाचा रकाना (Date Field) येथून पूर्णपणे डिलीट करण्यात आला आहे -->
+
+            <button class="btn-save hidden" id="saveBtn" onclick="saveEntry()">Save Entry</button>
+            <button class="btn-save hidden" id="cancelBtn" style="background: #757575; margin-top: -5px;" onclick="cancelEdit()">रद्द करा</button>
+
+            <!-- टेबल -->
+            <div class="table-container">
+                <table id="mbTable">
+                    <thead>
+                        <tr>
+                            <th style="text-align: center;">अ.क्र.</th>
+                            <th>दिनांक</th>
+                            <th>M.B. क्र.</th>
+                            <th>तपशील</th>
+                            <th style="text-align: center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mbTableBody"></tbody>
+                </table>
+            </div>
+
+            <button class="btn-report" onclick="printReport()">
+                <i class="fa-solid fa-print"></i> REPORT / PRINT
+            </button>
+        </div>
+    </div>
+
+    <div id="deleteAlert" class="custom-alert-overlay">
+        <div class="custom-alert-box">
+            <p>तुम्हाला ही नोंद नक्की डिलीट करायची आहे का?</p>
+            <div class="alert-actions">
+                <button class="btn-cancel-alert" onclick="closeDeleteAlert()">नाही (Cancel)</button>
+                <button class="btn-confirm-alert" id="confirmDeleteBtn">होय (Delete)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'index.html';
+
+        let mbRecords = [];
+        let jeRecords = [];
+        let deleteTargetIndex = -1;
+
+        function loadData() {
+            let jeData = localStorage.getItem('mb_je_records');
+            jeRecords = jeData ? JSON.parse(jeData) : [];
+
+            let mbData = localStorage.getItem('mb_records');
+            mbRecords = mbData ? JSON.parse(mbData) : [];
+
+            renderTable();
+            populateGivenJEList();
+            populateReceivedJEList();
+            populatePreviousOfficeNames();
+        }
+
+        function handleEntryTypeChange() {
+            const type = document.getElementById('entryType').value;
+            hideAllGroups();
+
+            if (type) {
+                document.getElementById('groupMBSize').classList.remove('hidden');
+            }
+        }
+
+        function handleSizeChange() {
+            const size = document.getElementById('mbSize').value;
+            const type = document.getElementById('entryType').value;
+
+            if (size) {
+                document.getElementById('groupMBNo').classList.remove('hidden');
+                
+                if (type === 'दिली') {
+                    document.getElementById('groupGivenTo').classList.remove('hidden');
+                    document.getElementById('mbNumberInput').style.display = 'none';
+                    document.getElementById('mbNumberSelect').style.display = 'block';
+                    populateAvailableMBSelect(size);
+                } else if (type === 'मिळाली') {
+                    document.getElementById('groupReceivedType').classList.remove('hidden');
+                    document.getElementById('mbNumberInput').style.display = 'block';
+                    document.getElementById('mbNumberSelect').style.display = 'none';
+                    document.getElementById('mbNumberInput').value = '';
+                    document.getElementById('mbSmartMsg').style.display = 'none';
+                }
+                document.getElementById('saveBtn').classList.remove('hidden');
+            } else {
+                hideAllGroups();
+            }
+        }
+
+        function populateAvailableMBSelect(selectedSize) {
+            let uniqueMBs = {};
+            mbRecords.forEach(rec => {
+                uniqueMBs[rec.mbNo] = rec; 
+            });
+
+            let availableMBs = [];
+            for (let mbNo in uniqueMBs) {
+                if (uniqueMBs[mbNo].type === 'मिळाली' && uniqueMBs[mbNo].size === selectedSize) {
+                    availableMBs.push(mbNo);
+                }
+            }
+
+            let select = document.getElementById('mbNumberSelect');
+            select.innerHTML = '';
+
+            let editIndex = parseInt(document.getElementById('editIndex').value);
+            
+            if (availableMBs.length === 0) {
+                select.innerHTML = '<option value="">M.B. उपलब्ध नाही</option>';
+            } else {
+                select.innerHTML = '<option value="">-- M.B. निवडा --</option>';
+                availableMBs.forEach(mb => {
+                    select.innerHTML += `<option value="${mb}">${mb}</option>`;
+                });
+            }
+
+            if (editIndex !== -1) {
+                let currentMB = mbRecords[editIndex].mbNo;
+                if (!availableMBs.includes(currentMB)) {
+                    select.innerHTML += `<option value="${currentMB}">${currentMB} (सध्याची नोंद)</option>`;
+                }
+                select.value = currentMB;
+            }
+        }
+
+        function handleGivenToChange() {
+            const givenTo = document.getElementById('givenToType').value;
+            document.getElementById('groupGivenJE').classList.add('hidden');
+            document.getElementById('groupGivenOffice').classList.add('hidden');
+
+            if (givenTo === 'JE') {
+                document.getElementById('groupGivenJE').classList.remove('hidden');
+            } else if (givenTo === 'Office') {
+                document.getElementById('groupGivenOffice').classList.remove('hidden');
+            }
+        }
+
+        function handleReceivedTypeChange() {
+            const recType = document.getElementById('receivedType').value;
+            
+            document.getElementById('groupBhandarpal').classList.add('hidden');
+            document.getElementById('groupReceivedFromType').classList.add('hidden');
+            document.getElementById('groupReceivedJE').classList.add('hidden');
+            document.getElementById('groupReceivedOffice').classList.add('hidden');
+
+            if (recType === 'नवीन') {
+                document.getElementById('groupBhandarpal').classList.remove('hidden');
+            } else if (recType === 'चालू') {
+                document.getElementById('groupReceivedFromType').classList.remove('hidden');
+            }
+        }
+
+        function handleReceivedFromTypeChange() {
+            const fromType = document.getElementById('receivedFromType').value;
+            
+            document.getElementById('groupReceivedJE').classList.add('hidden');
+            document.getElementById('groupReceivedOffice').classList.add('hidden');
+
+            if (fromType === 'JE') {
+                document.getElementById('groupReceivedJE').classList.remove('hidden');
+            } else if (fromType === 'Office') {
+                document.getElementById('groupReceivedOffice').classList.remove('hidden');
+            }
+        }
+
+        function hideAllGroups() {
+            const groups = [
+                'groupMBSize', 'groupMBNo', 'groupGivenTo', 'groupGivenJE', 'groupGivenOffice', 
+                'groupReceivedType', 'groupBhandarpal', 'groupReceivedFromType', 
+                'groupReceivedJE', 'groupReceivedOffice'
+            ];
+            groups.forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('mbSmartMsg').style.display = 'none';
+            document.getElementById('saveBtn').classList.add('hidden');
+            document.getElementById('cancelBtn').classList.add('hidden');
+        }
+
+        function checkDuplicateMB() {
+            const mbNo = document.getElementById('mbNumberInput').value.trim();
+            const msgBox = document.getElementById('mbSmartMsg');
+
+            if (!mbNo) {
+                msgBox.style.display = 'none';
+                return;
+            }
+
+            const isDuplicate = mbRecords.some(record => record.mbNo === mbNo);
+
+            msgBox.style.display = 'block';
+            if (isDuplicate) {
+                msgBox.className = 'smart-msg msg-error';
+                msgBox.innerHTML = '🔴 हा M.B. क्र. आधीच नोंदवला आहे!';
+            } else {
+                msgBox.className = 'smart-msg msg-success';
+                msgBox.innerHTML = '🟢 M.B. क्र. नोंद करू शकता.';
+            }
+        }
+
+        function populateGivenJEList() {
+            const jeSelect = document.getElementById('givenJE');
+            jeSelect.innerHTML = '<option value="">-- JE निवडा --</option>';
+            jeRecords.forEach(je => {
+                jeSelect.innerHTML += `<option value="${je.name}">${je.name}</option>`;
+            });
+        }
+
+        function populateReceivedJEList() {
+            const jeSelect = document.getElementById('receivedJE');
+            jeSelect.innerHTML = '<option value="">-- JE निवडा --</option>';
+            jeRecords.forEach(je => {
+                jeSelect.innerHTML += `<option value="${je.name}">${je.name}</option>`;
+            });
+        }
+
+        function populatePreviousOfficeNames() {
+            const dataList = document.getElementById('previousNamesList');
+            dataList.innerHTML = '';
+            
+            let uniqueOffices = new Set();
+            mbRecords.forEach(rec => {
+                if (rec.detail && !jeRecords.some(je => je.name === rec.detail) && rec.detail !== 'उपलब्ध') {
+                    uniqueOffices.add(rec.detail);
+                }
+            });
+
+            uniqueOffices.forEach(name => {
+                dataList.innerHTML += `<option value="${name}">`;
+            });
+        }
+
+        function saveEntry() {
+            const type = document.getElementById('entryType').value;
+            const size = document.getElementById('mbSize').value;
+            const editIndex = parseInt(document.getElementById('editIndex').value);
+
+            let dbDate = '';
+            
+            // 🌟 दिनांकाचा रकाना नसल्यामुळे, नवीन नोंद असेल तर आजचा दिनांक घेणे
+            if (editIndex === -1) {
+                let today = new Date();
+                dbDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+            } else {
+                // जर एडिट करत असेल, तर जुना दिनांक कायम ठेवणे
+                dbDate = mbRecords[editIndex].date;
+            }
+
+            let mbNo = '';
+
+            if (type === 'दिली') {
+                mbNo = document.getElementById('mbNumberSelect').value;
+                if (!mbNo) {
+                    alert('कृपया उपलब्ध M.B. मधून निवडा!');
+                    return;
+                }
+            } else {
+                mbNo = document.getElementById('mbNumberInput').value.trim();
+                if (!mbNo) {
+                    alert('कृपया M.B. क्रमांक टाका!');
+                    return;
+                }
+                if (editIndex === -1 && mbRecords.some(r => r.mbNo === mbNo)) {
+                    alert('हा M.B. क्रमांक आधीच नोंदवला आहे!');
+                    return;
+                }
+            }
+
+            let detail = '';
+
+            if (type === 'दिली') {
+                const givenTo = document.getElementById('givenToType').value;
+                if (givenTo === 'JE') {
+                    detail = document.getElementById('givenJE').value;
+                } else {
+                    detail = document.getElementById('givenOffice').value.trim();
+                }
+                if (!detail) { alert('कुणाला दिली हे निवडा किंवा टाईप करा!'); return; }
+            } else {
+                const recType = document.getElementById('receivedType').value;
+                if (recType === 'नवीन') {
+                    detail = document.getElementById('bhandarpalName').value.trim();
+                    if (!detail) { alert('भांडारपाल यांचे नाव टाका!'); return; }
+                } else {
+                    const fromType = document.getElementById('receivedFromType').value;
+                    if (fromType === 'JE') {
+                        detail = document.getElementById('receivedJE').value;
+                    } else {
+                        detail = document.getElementById('receivedOfficeInput').value.trim();
+                    }
+                    if (!detail) { alert('कोणाकडून मिळाली हे निवडा किंवा टाईप करा!'); return; }
+                }
+            }
+
+            const newRecord = {
+                type: type,
+                size: size,
+                mbNo: mbNo,
+                detail: detail,
+                date: dbDate // YYYY-MM-DD स्वरूपात सेव्ह होईल
+            };
+
+            if (editIndex === -1) {
+                mbRecords.push(newRecord);
+            } else {
+                mbRecords[editIndex] = newRecord;
+            }
+
+            localStorage.setItem('mb_records', JSON.stringify(mbRecords));
+            cancelEdit();
+            loadData();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('mbTableBody');
+            tbody.innerHTML = '';
+
+            if (mbRecords.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #888;">कोणतीही नोंद उपलब्ध नाही.</td></tr>';
+                return;
+            }
+
+            mbRecords.forEach((rec, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="text-align: center;">${index + 1}</td>
+                    <td>${formatDate(rec.date)}</td>
+                    <td><b>${rec.mbNo}</b></td>
+                    <td>${rec.type} (${rec.detail})</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn-edit" onclick="editEntry(${index})">Edit</button>
+                            <button class="btn-delete" onclick="showDeleteAlert(${index})">Delete</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 🌟 नियम ५ नुसार टेबलमध्ये दिनांक DD-MM-YYYY मध्ये दाखवणे
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            return dateStr;
+        }
+
+        function editEntry(index) {
+            const rec = mbRecords[index];
+            document.getElementById('editIndex').value = index;
+            
+            document.getElementById('entryType').value = rec.type;
+            handleEntryTypeChange();
+            
+            document.getElementById('mbSize').value = rec.size;
+            handleSizeChange();
+
+            if (rec.type === 'दिली') {
+                document.getElementById('mbNumberSelect').value = rec.mbNo;
+                
+                const isJE = jeRecords.some(j => j.name === rec.detail);
+                if (isJE) {
+                    document.getElementById('givenToType').value = 'JE';
+                    handleGivenToChange();
+                    document.getElementById('givenJE').value = rec.detail;
+                } else {
+                    document.getElementById('givenToType').value = 'Office';
+                    handleGivenToChange();
+                    document.getElementById('givenOffice').value = rec.detail;
+                }
+            } else {
+                document.getElementById('mbNumberInput').value = rec.mbNo;
+                checkDuplicateMB();
+
+                document.getElementById('receivedType').value = 'चालू';
+                handleReceivedTypeChange();
+                
+                const isJE = jeRecords.some(j => j.name === rec.detail);
+                if (isJE) {
+                    document.getElementById('receivedFromType').value = 'JE';
+                    handleReceivedFromTypeChange();
+                    document.getElementById('receivedJE').value = rec.detail;
+                } else {
+                    document.getElementById('receivedFromType').value = 'Office';
+                    handleReceivedFromTypeChange();
+                    document.getElementById('receivedOfficeInput').value = rec.detail;
+                }
+            }
+
+            document.getElementById('saveBtn').innerText = 'Update Entry';
+            document.getElementById('cancelBtn').classList.remove('hidden');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            document.getElementById('editIndex').value = '-1';
+            document.getElementById('entryType').value = '';
+            document.getElementById('mbSize').value = '';
+            document.getElementById('mbNumberInput').value = '';
+            document.getElementById('mbNumberSelect').innerHTML = '';
+
+            document.getElementById('saveBtn').innerText = 'Save Entry';
+            document.getElementById('cancelBtn').classList.add('hidden');
+            
+            hideAllGroups();
+        }
+
+        function showDeleteAlert(index) {
+            deleteTargetIndex = index;
+            document.getElementById('deleteAlert').style.display = 'flex';
+        }
+        function closeDeleteAlert() {
+            document.getElementById('deleteAlert').style.display = 'none';
+            deleteTargetIndex = -1;
+        }
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            if (deleteTargetIndex !== -1) {
+                mbRecords.splice(deleteTargetIndex, 1);
+                localStorage.setItem('mb_records', JSON.stringify(mbRecords));
+                closeDeleteAlert();
+                loadData();
+            }
+        });
+
+        function printReport() {
+            if (mbRecords.length === 0) {
+                alert('प्रिंट करण्यासाठी कोणतीही नोंद नाही!');
+                return;
+            }
+
+            let printWindow = window.open('', '_blank');
+            let html = `
+                <html><head><title>MB Report</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    h2 { text-align: center; color: #0d47a1; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                </style></head><body>
+                <h2>मोजमाप पुस्तिका (M.B.) नोंदवही</h2>
+                <table><thead><tr><th>अ.क्र.</th><th>दिनांक</th><th>M.B. क्र.</th><th>तपशील</th></tr></thead><tbody>
+            `;
+
+            mbRecords.forEach((rec, index) => {
+                html += `<tr><td>${index + 1}</td><td>${formatDate(rec.date)}</td><td>${rec.mbNo}</td><td>${rec.type} (${rec.detail})</td></tr>`;
+            });
+
+            html += `</tbody></table></body></html>`;
+
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>
