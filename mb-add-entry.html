@@ -43,16 +43,6 @@
         .form-control:focus { border-color: #1976d2; }
         .form-control::placeholder { color: #999; font-weight: normal; }
 
-        /* 🌟 दिनांक इनपुट डिझाईन (आज बटनाशिवाय) */
-        .date-input-wrapper { position: relative; display: flex; align-items: center; width: 100%; }
-        .date-icon { position: absolute; right: 15px; color: #1976d2; font-size: 18px; pointer-events: none; }
-        
-        /* दिनांक निवडल्यावर हिरवा रंग (ॲडव्हान्स फीडबॅक) */
-        .form-control.valid-date { 
-            border-color: #2e7d32 !important; 
-            background-color: #e8f5e9 !important; 
-        }
-
         /* ड्रॉपडाऊनसाठी */
         select.form-control { appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); background-repeat: no-repeat; background-position: right 10px center; }
 
@@ -62,6 +52,22 @@
             margin-top: 5px; margin-bottom: 15px;
         }
         .btn-save:hover { background: #1b5e20; }
+
+        /* 🌟 सार्वत्रिक दिनांक इनपुट डिझाईन (Universal Date Picker) */
+        .date-input-wrapper { position: relative; width: 100%; }
+        .date-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #1976d2; font-size: 18px; pointer-events: none; z-index: 1; }
+        
+        /* खरा दिनांक घेणारा इनपुट (अदृश्य पण क्लिक होण्यायोग्य) */
+        .date-input-wrapper input[type="date"] {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            opacity: 0; cursor: pointer; z-index: 2;
+        }
+
+        /* दिनांक निवडल्यावर हिरवा रंग */
+        .form-control.valid-date { 
+            border-color: #2e7d32 !important; 
+            background-color: #e8f5e9 !important; 
+        }
 
         /* टेबल सेक्शन */
         .table-container {
@@ -191,15 +197,15 @@
                 <datalist id="previousNamesList"></datalist>
             </div>
 
-            <!-- ६. दिनांक (आज बटण काढून टाकले आहे) -->
+            <!-- ६. दिनांक (सार्वत्रिक पद्धत) -->
             <div class="form-group hidden" id="groupDate">
                 <div class="date-input-wrapper">
-                    <input type="text" id="entryDate" class="form-control" placeholder="दिनांक निवडा" 
-                           onfocus="(this.type='date')" 
-                           onblur="handleDateBlur(this)" 
-                           onchange="handleDateChange(this)"
-                           style="color: #333; padding-right: 35px;">
+                    <!-- युझरला हा इनपुट दिसेल -->
+                    <input type="text" id="entryDateDisplay" class="form-control" placeholder="दिनांक निवडा" readonly style="color: #333; padding-right: 35px; background: #fff;">
                     <i class="fa-regular fa-calendar-days date-icon"></i>
+                    
+                    <!-- हा खरा दिनांक घेतो पण अदृश्य असतो -->
+                    <input type="date" id="hiddenDatePicker" onchange="syncDate()">
                 </div>
             </div>
 
@@ -434,34 +440,30 @@
             });
         }
 
-        // 🌟 दिनांक निवडल्यावर हिरवा रंग देण्यासाठी फंक्शन
-        function handleDateChange(input) {
-            if (input.value) {
-                input.classList.add('valid-date');
-            } else {
-                input.classList.remove('valid-date');
-            }
-        }
-
-        // 🌟 दिनांक फॉरमॅट DD-MM-YYYY करण्यासाठी
-        function handleDateBlur(input) {
-            input.type = 'text';
-            if (input.value) {
-                let parts = input.value.split('-');
+        // 🌟 दिनांक सिंक करण्याचे फंक्शन (अदृश्य डेट पिकर वरून मजकुरात टाकण्यासाठी)
+        function syncDate() {
+            const hiddenInput = document.getElementById('hiddenDatePicker');
+            const displayInput = document.getElementById('entryDateDisplay');
+            
+            if (hiddenInput.value) {
+                // YYYY-MM-DD वरून DD-MM-YYYY मध्ये बदलणे
+                let parts = hiddenInput.value.split('-');
                 if (parts.length === 3) {
-                    input.value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    displayInput.value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    displayInput.classList.add('valid-date');
                 }
-                input.classList.add('valid-date');
             } else {
-                input.placeholder = "दिनांक निवडा";
-                input.classList.remove('valid-date');
+                displayInput.value = '';
+                displayInput.classList.remove('valid-date');
             }
         }
 
         function saveEntry() {
             const type = document.getElementById('entryType').value;
             const size = document.getElementById('mbSize').value;
-            let dateVal = document.getElementById('entryDate').value;
+            
+            // 🌟 थेट लपलेल्या (Hidden) इनपुट मधून YYYY-MM-DD दिनांक घेणे
+            let dbDate = document.getElementById('hiddenDatePicker').value; 
             const editIndex = parseInt(document.getElementById('editIndex').value);
 
             let mbNo = '';
@@ -484,16 +486,9 @@
                 }
             }
 
-            if (!dateVal) {
+            if (!dbDate) {
                 alert('कृपया दिनांक निवडा!');
                 return;
-            }
-
-            // 🌟 डेटाबेससाठी दिनांक YYYY-MM-DD मध्ये सेव्ह करणे
-            let dbDate = dateVal;
-            let dateParts = dateVal.split('-');
-            if (dateParts.length === 3) {
-                dbDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
             }
 
             let detail = '';
@@ -527,7 +522,7 @@
                 size: size,
                 mbNo: mbNo,
                 detail: detail,
-                date: dbDate // YYYY-MM-DD सेव्ह होईल
+                date: dbDate // YYYY-MM-DD स्वरूपात सेव्ह होईल
             };
 
             if (editIndex === -1) {
@@ -618,19 +613,23 @@
                 }
             }
 
-            let dateInput = document.getElementById('entryDate');
-            dateInput.type = 'text';
+            // 🌟 दिनांक सेट करणे (Hidden आणि Display दोन्हीकडे)
+            let hiddenDateInput = document.getElementById('hiddenDatePicker');
+            let displayDateInput = document.getElementById('entryDateDisplay');
+            
             if (rec.date) {
+                hiddenDateInput.value = rec.date;
                 let parts = rec.date.split('-');
                 if(parts.length === 3) {
-                    dateInput.value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    displayDateInput.value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    displayDateInput.classList.add('valid-date');
                 } else {
-                    dateInput.value = rec.date;
+                    displayDateInput.value = rec.date;
                 }
-                dateInput.classList.add('valid-date');
             } else {
-                dateInput.value = '';
-                dateInput.classList.remove('valid-date');
+                hiddenDateInput.value = '';
+                displayDateInput.value = '';
+                displayDateInput.classList.remove('valid-date');
             }
             
             document.getElementById('saveBtn').innerText = 'Update Entry';
@@ -646,11 +645,11 @@
             document.getElementById('mbNumberInput').value = '';
             document.getElementById('mbNumberSelect').innerHTML = '';
             
-            let dateInput = document.getElementById('entryDate');
-            dateInput.type = 'text';
-            dateInput.value = '';
-            dateInput.placeholder = 'दिनांक निवडा';
-            dateInput.classList.remove('valid-date');
+            let hiddenDateInput = document.getElementById('hiddenDatePicker');
+            let displayDateInput = document.getElementById('entryDateDisplay');
+            hiddenDateInput.value = '';
+            displayDateInput.value = '';
+            displayDateInput.classList.remove('valid-date');
 
             document.getElementById('saveBtn').innerText = 'Save Entry';
             document.getElementById('cancelBtn').classList.add('hidden');
