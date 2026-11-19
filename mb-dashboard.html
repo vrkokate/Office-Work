@@ -139,7 +139,6 @@
 
     <div class="main-content">
         
-        <!-- 🌟 येथून 'active' क्लास काढून टाकला आहे -->
         <div class="top-nav-grid">
             <a href="mb-je.html" class="top-nav-item"><i class="fa-solid fa-user-tie"></i><span>JE</span></a>
             <a href="mb-register.html" class="top-nav-item"><i class="fa-solid fa-book"></i><span>M.B.</span></a>
@@ -415,6 +414,11 @@
             let rawMBs = localStorage.getItem('mb_records');
             mbRecords = rawMBs ? JSON.parse(rawMBs) : [];
             
+            // Fix undefined records by assigning a fallback ID if missing
+            mbRecords.forEach(rec => {
+                if(!rec.mbNo) rec.mbNo = "अज्ञात-" + Math.floor(Math.random() * 1000);
+            });
+
             updateDashboard();
             populateJEList();
             
@@ -490,10 +494,14 @@
                 results.forEach((rec, i) => {
                     let holder = rec.type === 'दिली' ? rec.detail : 'कार्यालयात उपलब्ध';
                     let holderColor = rec.type === 'दिली' ? '#f57c00' : '#2e7d32';
+                    
+                    let safeMbNo = rec.mbNo || "क्र. नाही";
+                    let mbHtml = rec.mbNo ? `<span class="link-mb" onclick="openActionCenter('${rec.mbNo}')">${rec.mbNo}</span>` : `<span style="color:#d32f2f; font-weight:bold;">${safeMbNo}</span>`;
+
                     tbody.innerHTML += `
                         <tr>
                             <td>${i + 1}</td>
-                            <td><span class="link-mb" onclick="openActionCenter('${rec.mbNo}')">${rec.mbNo}</span></td>
+                            <td>${mbHtml}</td>
                             <td>${rec.size}</td>
                             <td>${formatDate(rec.date)}</td>
                             <td style="color:${holderColor}; font-weight:bold;">${holder}</td>
@@ -546,10 +554,14 @@
                 results.forEach((rec, i) => {
                     let holder = rec.type === 'दिली' ? rec.detail : 'कार्यालयात उपलब्ध';
                     let holderColor = rec.type === 'दिली' ? '#f57c00' : '#2e7d32';
+                    
+                    let safeMbNo = rec.mbNo || "क्र. नाही";
+                    let mbHtml = rec.mbNo ? `<span class="link-mb" onclick="openActionCenter('${rec.mbNo}')">${rec.mbNo}</span>` : `<span style="color:#d32f2f; font-weight:bold;">${safeMbNo}</span>`;
+
                     tbody.innerHTML += `
                         <tr>
                             <td>${i + 1}</td>
-                            <td><span class="link-mb" onclick="openActionCenter('${rec.mbNo}')">${rec.mbNo}</span></td>
+                            <td>${mbHtml}</td>
                             <td>${rec.size}</td>
                             <td>${formatDate(rec.date)}</td>
                             <td style="color:${holderColor}; font-weight:bold;">${holder}</td>
@@ -664,7 +676,7 @@
                 filteredList.forEach((rec, i) => {
                     html += `<tr>
                         <td>${i + 1}</td>
-                        <td>${rec.mbNo}</td>
+                        <td>${rec.mbNo || 'क्र. नाही'}</td>
                         <td>${rec.size}</td>
                         <td>${formatDate(rec.date)}</td>
                         <td>${rec.detail}</td>
