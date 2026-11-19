@@ -89,7 +89,7 @@
         .suggestion-item:hover { text-decoration: underline; }
 
         .custom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 15px; }
-        .modal-box { background: #fff; border-radius: 12px; width: 100%; max-width: 450px; padding: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); max-height: 90vh; display: flex; flex-direction: column; overflow-y: auto; }
+        .modal-box { background: #fff; border-radius: 12px; width: 100%; max-width: 500px; padding: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); max-height: 90vh; display: flex; flex-direction: column; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
         .modal-header h3 { margin: 0; font-size: 15px; color: #0d47a1; display: flex; align-items: center; gap: 5px; }
         
@@ -115,11 +115,16 @@
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #333; }
         
-        .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .data-table th, .data-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        /* 🌟 टेबल डिझाईन (Padding 5px केले आहे) */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        .data-table th, .data-table td { border: 1px solid #ddd; padding: 5px; text-align: center; vertical-align: middle; }
         .data-table th { background: #f5f5f5; }
         .link-mb { color: #0d47a1; font-weight: bold; text-decoration: underline; cursor: pointer; }
         
+        /* नवीन बटन्स स्टाईल */
+        .btn-edit-row { background: #2e7d32; color: #fff; border: none; padding: 4px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; margin-right: 2px; }
+        .btn-delete-row { background: #d32f2f; color: #fff; border: none; padding: 4px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; }
+
         .history-item { background: #fff; padding: 10px; border-radius: 6px; margin-bottom: 8px; border-left: 4px solid #ccc; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
         #toast {
@@ -209,7 +214,7 @@
             
             <div style="overflow-x:auto;">
                 <table class="data-table">
-                    <thead><tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>धारक</th></tr></thead>
+                    <thead><tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>धारक</th><th>Action</th></tr></thead>
                     <tbody id="listModalBody"></tbody>
                 </table>
             </div>
@@ -521,7 +526,7 @@
             inputTo.value = ''; inputTo.classList.remove('has-value');
         }
 
-        // --- 🌟 यादी लॉजिक ---
+        // --- 🌟 यादी लॉजिक (नवीन Action कॉलमसह) ---
         function openListModal(type) {
             let title = "M.B. यादी";
             if(type === 'total') title = "एकूण M.B. यादी";
@@ -549,7 +554,7 @@
             tbody.innerHTML = '';
             
             if (results.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#d32f2f;">कोणतीही नोंद सापडली नाही.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#d32f2f;">कोणतीही नोंद सापडली नाही.</td></tr>';
             } else {
                 results.forEach((rec, i) => {
                     let holder = rec.type === 'दिली' ? rec.detail : 'कार्यालयात उपलब्ध';
@@ -564,12 +569,33 @@
                             <td>${mbHtml}</td>
                             <td>${rec.size}</td>
                             <td>${formatDate(rec.date)}</td>
-                            <td style="color:${holderColor}; font-weight:bold;">${holder}</td>
+                            <td style="color:${holderColor}; font-weight:bold; font-size:11px;">${holder}</td>
+                            <td style="white-space:nowrap;">
+                                <button class="btn-edit-row" onclick="editMBEntry('${rec.mbNo}')"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn-delete-row" onclick="deleteMBEntry('${rec.mbNo}')"><i class="fa-solid fa-trash"></i></button>
+                            </td>
                         </tr>
                     `;
                 });
             }
             openModal('listModal');
+        }
+
+        // 🌟 नवीन फंक्शन्स: दुरुस्ती आणि डिलीट
+        function editMBEntry(mbNo) {
+            closeModal('listModal');
+            currentActiveMB = mbNo;
+            openEditMBForm();
+        }
+
+        function deleteMBEntry(mbNo) {
+            if(confirm('तुम्हाला M.B. क्रमांक ' + mbNo + ' च्या सर्व नोंदी नक्की डिलीट करायच्या आहेत का?')) {
+                mbRecords = mbRecords.filter(rec => rec.mbNo !== mbNo);
+                localStorage.setItem('mb_records', JSON.stringify(mbRecords));
+                showToast('नोंद यशस्वीरित्या डिलीट झाली!');
+                loadData();
+                openListModal('total'); // रिफ्रेश यादी
+            }
         }
 
         // --- 🌟 रिपोर्ट जनरेटर लॉजिक ---
