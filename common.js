@@ -15,8 +15,8 @@ function formatDate(dateStr) {
     return dateStr;
 }
 
-// ३. दिनांक प्लेसहोल्डर हाताळणे
-function checkDatePlaceholder(input) {
+// ३. दिनांक प्लेसहोल्डर हाताळणे (स्टँडर्ड फंक्शन)
+function handleDateChange(input) {
     if (input.value) {
         input.classList.add('has-value');
     } else {
