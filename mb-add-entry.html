@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Digital Hub - MB Entry</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 🌟 स्टँडर्ड CSS लिंक केले (दिनांकाच्या प्लेसहोल्डरसाठी) -->
+    <link rel="stylesheet" href="common.css">
+    
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #f0f2f5; color: #212121; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        /* इथली स्टाईल जुनीच आहे, फक्त गरजेनुसार ॲडजस्ट केली आहे */
+        body { background: #f0f2f5; color: #212121; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; padding-bottom: 0 !important; }
 
-        /* 🌟 हेडर */
         .top-header {
             display: flex; justify-content: space-between; align-items: center; padding: 15px;
             background: #0d47a1; color: #fff; position: sticky; top: 0; z-index: 100;
@@ -28,11 +30,9 @@
             flex: 1; margin: 0 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
-        /* 🌟 मुख्य भाग */
         .main-content { padding: 15px; flex: 1; max-width: 600px; margin: 0 auto; width: 100%; }
         .card-box { background: #fff; border-radius: 10px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
-        /* फॉर्म सेक्शन */
         .form-group { margin-bottom: 12px; position: relative; }
         
         .form-control {
@@ -43,7 +43,6 @@
         .form-control:focus { border-color: #1976d2; }
         .form-control::placeholder { color: #999; font-weight: normal; }
 
-        /* ड्रॉपडाऊनसाठी */
         select.form-control { appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); background-repeat: no-repeat; background-position: right 10px center; }
 
         .btn-save {
@@ -53,7 +52,6 @@
         }
         .btn-save:hover { background: #1b5e20; }
 
-        /* टेबल सेक्शन */
         .table-container {
             max-height: 250px; overflow-y: auto; overflow-x: auto; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px;
         }
@@ -62,19 +60,16 @@
         th { background: #f5f5f5; font-weight: bold; position: sticky; top: 0; z-index: 10; }
         td { color: #333; }
 
-        /* टेबल ॲक्शन बटन्स */
         .action-btns { display: flex; gap: 5px; justify-content: center; }
         .btn-edit { background: #2e7d32; color: #fff; border: none; padding: 5px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
         .btn-delete { background: #d32f2f; color: #fff; border: none; padding: 5px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
 
-        /* रिपोर्ट बटन */
         .btn-report {
             width: 100%; background: #0d47a1; color: #fff; border: none;
             padding: 12px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
 
-        /* स्मार्ट सजेशन */
         .smart-msg {
             font-size: 11.5px; margin-top: 5px; font-weight: bold; display: none;
             padding: 4px 8px; border-radius: 4px;
@@ -82,10 +77,8 @@
         .msg-error { background: #ffebee; color: #d32f2f; }
         .msg-success { background: #e8f5e9; color: #2e7d32; }
 
-        /* लपवण्यासाठी क्लास */
         .hidden { display: none !important; }
         
-        /* कस्टम अलर्ट */
         .custom-alert-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 1000; display: none;
@@ -181,7 +174,10 @@
                 <datalist id="previousNamesList"></datalist>
             </div>
 
-            <!-- 🌟 दिनांकाचा रकाना (Date Field) येथून पूर्णपणे डिलीट करण्यात आला आहे -->
+            <!-- 🌟 ६. स्टँडर्ड दिनांक रकाना (येथे ॲड केला आहे) -->
+            <div class="form-group">
+                <input type="date" id="entryDate" class="form-control" style="text-align: left; padding: 10px;" data-placeholder="दिनांक निवडा" onchange="handleDateChange(this)">
+            </div>
 
             <button class="btn-save hidden" id="saveBtn" onclick="saveEntry()">Save Entry</button>
             <button class="btn-save hidden" id="cancelBtn" style="background: #757575; margin-top: -5px;" onclick="cancelEdit()">रद्द करा</button>
@@ -218,6 +214,8 @@
         </div>
     </div>
 
+    <!-- 🌟 स्टँडर्ड JS लिंक केले -->
+    <script src="common.js"></script>
     <script>
         if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'index.html';
 
@@ -362,6 +360,7 @@
 
         function checkDuplicateMB() {
             const mbNo = document.getElementById('mbNumberInput').value.trim();
+            const editIndex = parseInt(document.getElementById('editIndex').value);
             const msgBox = document.getElementById('mbSmartMsg');
 
             if (!mbNo) {
@@ -369,7 +368,8 @@
                 return;
             }
 
-            const isDuplicate = mbRecords.some(record => record.mbNo === mbNo);
+            // 🌟 सुधारणा: Edit करताना स्वतःचा नंबर डुप्लिकेट म्हणून ओळखू नये म्हणून बदल केला आहे
+            const isDuplicate = mbRecords.some((record, index) => index !== editIndex && record.mbNo === mbNo);
 
             msgBox.style.display = 'block';
             if (isDuplicate) {
@@ -417,16 +417,12 @@
             const type = document.getElementById('entryType').value;
             const size = document.getElementById('mbSize').value;
             const editIndex = parseInt(document.getElementById('editIndex').value);
-
-            let dbDate = '';
             
-            // 🌟 दिनांकाचा रकाना नसल्यामुळे, नवीन नोंद असेल तर आजचा दिनांक घेणे
-            if (editIndex === -1) {
-                let today = new Date();
-                dbDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-            } else {
-                // जर एडिट करत असेल, तर जुना दिनांक कायम ठेवणे
-                dbDate = mbRecords[editIndex].date;
+            // 🌟 दिनांक व्हॅलिडेशन
+            const dateVal = document.getElementById('entryDate').value;
+            if (!dateVal) {
+                alert('कृपया दिनांक निवडा!');
+                return;
             }
 
             let mbNo = '';
@@ -443,7 +439,8 @@
                     alert('कृपया M.B. क्रमांक टाका!');
                     return;
                 }
-                if (editIndex === -1 && mbRecords.some(r => r.mbNo === mbNo)) {
+                // 🌟 सुधारणा: Edit करताना स्वतःचा नंबर सोडून इतरांशी तपासणी
+                if (mbRecords.some((r, i) => i !== editIndex && r.mbNo === mbNo)) {
                     alert('हा M.B. क्रमांक आधीच नोंदवला आहे!');
                     return;
                 }
@@ -480,7 +477,7 @@
                 size: size,
                 mbNo: mbNo,
                 detail: detail,
-                date: dbDate // YYYY-MM-DD स्वरूपात सेव्ह होईल
+                date: dateVal // YYYY-MM-DD स्वरूपात सेव्ह होईल
             };
 
             if (editIndex === -1) {
@@ -519,14 +516,6 @@
                 `;
                 tbody.appendChild(tr);
             });
-        }
-
-        // 🌟 नियम ५ नुसार टेबलमध्ये दिनांक DD-MM-YYYY मध्ये दाखवणे
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            const parts = dateStr.split('-');
-            if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
-            return dateStr;
         }
 
         function editEntry(index) {
@@ -571,6 +560,11 @@
                 }
             }
 
+            // 🌟 दिनांक Edit करताना सेट करणे
+            const dateInput = document.getElementById('entryDate');
+            dateInput.value = rec.date || '';
+            handleDateChange(dateInput);
+
             document.getElementById('saveBtn').innerText = 'Update Entry';
             document.getElementById('cancelBtn').classList.remove('hidden');
             
@@ -583,6 +577,11 @@
             document.getElementById('mbSize').value = '';
             document.getElementById('mbNumberInput').value = '';
             document.getElementById('mbNumberSelect').innerHTML = '';
+            
+            // 🌟 दिनांक रिकामा करणे
+            const dateInput = document.getElementById('entryDate');
+            dateInput.value = '';
+            handleDateChange(dateInput);
 
             document.getElementById('saveBtn').innerText = 'Save Entry';
             document.getElementById('cancelBtn').classList.add('hidden');
