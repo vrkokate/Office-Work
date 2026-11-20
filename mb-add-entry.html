@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Digital Hub - MB Entry</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- 🌟 स्टँडर्ड CSS लिंक केले (दिनांकाच्या प्लेसहोल्डरसाठी) -->
     <link rel="stylesheet" href="common.css">
     
     <style>
-        /* इथली स्टाईल जुनीच आहे, फक्त गरजेनुसार ॲडजस्ट केली आहे */
         body { background: #f0f2f5; color: #212121; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; padding-bottom: 0 !important; }
 
         .top-header {
@@ -44,6 +42,29 @@
         .form-control::placeholder { color: #999; font-weight: normal; }
 
         select.form-control { appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); background-repeat: no-repeat; background-position: right 10px center; }
+
+        /* 🌟 Android WebView मध्ये दिनांक डावीकडे आणण्यासाठी खास CSS */
+        input[type="date"].form-control {
+            -webkit-appearance: none;
+            appearance: none;
+            text-align: left !important;
+            width: 100%;
+            min-height: 42px;
+            padding: 10px 12px;
+            display: block;
+            box-sizing: border-box;
+        }
+        input[type="date"]::-webkit-datetime-edit {
+            text-align: left;
+            padding: 0;
+            margin: 0;
+            font-size: 14px;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            margin-left: auto;
+            padding: 0;
+            cursor: pointer;
+        }
 
         .btn-save {
             width: 100%; background: #2e7d32; color: #fff; border: none;
@@ -174,9 +195,9 @@
                 <datalist id="previousNamesList"></datalist>
             </div>
 
-            <!-- 🌟 ६. स्टँडर्ड दिनांक रकाना (येथे ॲड केला आहे) -->
+            <!-- 🌟 ६. स्टँडर्ड दिनांक रकाना (डावीकडे अलाइन केलेला) -->
             <div class="form-group">
-                <input type="date" id="entryDate" class="form-control" style="text-align: left; padding: 10px;" data-placeholder="दिनांक निवडा" onchange="handleDateChange(this)">
+                <input type="date" id="entryDate" class="form-control" data-placeholder="दिनांक निवडा" onchange="handleDateChange(this)">
             </div>
 
             <button class="btn-save hidden" id="saveBtn" onclick="saveEntry()">Save Entry</button>
@@ -214,7 +235,6 @@
         </div>
     </div>
 
-    <!-- 🌟 स्टँडर्ड JS लिंक केले -->
     <script src="common.js"></script>
     <script>
         if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = 'index.html';
@@ -368,7 +388,6 @@
                 return;
             }
 
-            // 🌟 सुधारणा: Edit करताना स्वतःचा नंबर डुप्लिकेट म्हणून ओळखू नये म्हणून बदल केला आहे
             const isDuplicate = mbRecords.some((record, index) => index !== editIndex && record.mbNo === mbNo);
 
             msgBox.style.display = 'block';
@@ -417,9 +436,9 @@
             const type = document.getElementById('entryType').value;
             const size = document.getElementById('mbSize').value;
             const editIndex = parseInt(document.getElementById('editIndex').value);
-            
-            // 🌟 दिनांक व्हॅलिडेशन
             const dateVal = document.getElementById('entryDate').value;
+
+            // 🌟 World-Class Validation: दिनांक निवडल्याशिवाय सेव्ह होणार नाही
             if (!dateVal) {
                 alert('कृपया दिनांक निवडा!');
                 return;
@@ -439,7 +458,6 @@
                     alert('कृपया M.B. क्रमांक टाका!');
                     return;
                 }
-                // 🌟 सुधारणा: Edit करताना स्वतःचा नंबर सोडून इतरांशी तपासणी
                 if (mbRecords.some((r, i) => i !== editIndex && r.mbNo === mbNo)) {
                     alert('हा M.B. क्रमांक आधीच नोंदवला आहे!');
                     return;
@@ -472,12 +490,19 @@
                 }
             }
 
+            // 🌟 Audit Trail (createdAt) ॲड केले आहे
+            let createdAtTime = new Date().toISOString();
+            if (editIndex !== -1 && mbRecords[editIndex].createdAt) {
+                createdAtTime = mbRecords[editIndex].createdAt; // जुनी वेळ कायम ठेवणे
+            }
+
             const newRecord = {
                 type: type,
                 size: size,
                 mbNo: mbNo,
                 detail: detail,
-                date: dateVal // YYYY-MM-DD स्वरूपात सेव्ह होईल
+                date: dateVal, // YYYY-MM-DD स्वरूपात सेव्ह होईल
+                createdAt: createdAtTime // जागतिक दर्जाची नोंद
             };
 
             if (editIndex === -1) {
