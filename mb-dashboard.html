@@ -8,10 +8,6 @@
     <link rel="stylesheet" href="common.css">
     
     <style>
-        /* 🌟 स्मूथ ॲनिमेशन्स (Micro-Animations) */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
         .top-nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
         .top-nav-item { background: #0d47a1; color: #fff; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 5px; border-radius: 8px; font-size: 11px; font-weight: bold; gap: 5px; transition: 0.3s; }
         .top-nav-item i { font-size: 18px; }
@@ -37,16 +33,8 @@
         
         /* 🌟 ओव्हरले पद्धत (Date Overlay) */
         .date-wrapper { position: relative; width: 100%; display: block; }
-        .fake-placeholder {
-            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-            color: #999; font-size: 13px; pointer-events: none; z-index: 5;
-        }
-        
-        input[type="date"].form-control {
-            -webkit-appearance: none; appearance: none; min-height: 42px; color: #333;
-            background-color: #fff; position: relative; z-index: 2; width: 100%;
-            box-sizing: border-box; padding: 8px 10px; text-align: left !important; display: block;
-        }
+        .fake-placeholder { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #999; font-size: 13px; pointer-events: none; z-index: 5; }
+        input[type="date"].form-control { -webkit-appearance: none; appearance: none; min-height: 42px; color: #333; background-color: #fff; position: relative; z-index: 2; width: 100%; box-sizing: border-box; padding: 8px 10px; text-align: left !important; display: block; }
         input[type="date"]::-webkit-datetime-edit { text-align: left; padding: 0; margin: 0; font-size: 14px; display: block; width: 100%; }
         input[type="date"]::-webkit-calendar-picker-indicator { margin-left: auto; padding: 0; cursor: pointer; }
         input[type="date"]:not(.has-value):not(:focus)::-webkit-datetime-edit { color: transparent; }
@@ -57,9 +45,22 @@
         .btn-search-main:active { background: #0a357d; }
         .btn-reset-main { flex: 1; background: #607d8b; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-        .suggestion-box { position: absolute; right: 15px; top: 10px; z-index: 1000; max-height: 180px; overflow-y: auto; display: none; flex-direction: column; align-items: flex-end; padding-right: 5px; }
-        .suggestion-item { color: #0d47a1; font-size: 14px; font-weight: bold; cursor: pointer; line-height: 1.3; padding: 2px 0; text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff; }
-        .suggestion-item:hover { text-decoration: underline; }
+        /* 🌟 अपडेट ०१: स्मार्ट सर्च यादी उजवीकडे आणि स्क्रोल */
+        .suggestion-box { 
+            position: absolute; right: 15px; top: 75px; /* Adjust top to align with input */
+            z-index: 1000; max-height: 220px; overflow-y: auto; 
+            display: none; flex-direction: column; align-items: flex-end; 
+            background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.15); border-radius: 6px; padding: 5px;
+            width: 150px;
+        }
+        .suggestion-item { 
+            color: #0d47a1; font-size: 13px; font-weight: bold; 
+            cursor: pointer; line-height: 1.2; padding: 4px 8px; 
+            width: 100%; text-align: right; border-bottom: 1px solid #eee;
+        }
+        .suggestion-item:hover { text-decoration: underline; background: #e3f2fd; }
+        .suggestion-item:last-child { border-bottom: none; }
+        mark { background-color: #ffeb3b; color: #000; border-radius: 2px; padding: 0 1px; }
 
         .custom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 15px; animation: fadeIn 0.2s ease-out; }
         .modal-box { background: #fff; border-radius: 12px; width: 100%; max-width: 500px; padding: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); max-height: 90vh; display: flex; flex-direction: column; overflow-y: auto; animation: slideUp 0.3s ease-out; }
@@ -89,15 +90,27 @@
         .btn-bill { background: #1976d2; }
         .btn-print { background: #0d47a1; grid-column: span 2; }
 
-        .form-group { margin-bottom: 5px; } /* ५px अंतर */
+        .form-group { margin-bottom: 5px; } 
         .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #333; }
         
-        /* 🌟 टेबल डिझाईन (ओळींमध्ये ५px अंतर) */
-        .data-table { width: 100%; border-collapse: separate; border-spacing: 0 5px; font-size: 11.5px; }
-        .data-table th, .data-table td { border: 1px solid #ddd; padding: 8px 5px; text-align: center; vertical-align: middle; background: #fff; }
-        .data-table th { background: #f5f5f5; }
+        /* 🌟 अपडेट ०२, ०५, ०७, ०८, ११: एक्सेलसारखी रचना, ५px अंतर आणि स्थिर ॲक्शन कॉलम */
+        .table-container { width: 100%; overflow-x: auto; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px; -webkit-overflow-scrolling: touch; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
         
-        /* 🌟 लिंक्स स्टाईल */
+        .data-table th, .data-table td { 
+            padding: 8px 6px; 
+            border-bottom: 5px solid #f0f2f5; /* ५px अंतर */
+            border-right: 1px solid #ddd; 
+            text-align: center; 
+            vertical-align: middle; 
+            background: #fff;
+        }
+        .data-table th { background: #f5f5f5; font-weight: bold; position: sticky; top: 0; z-index: 10; border-top: 1px solid #ddd; border-bottom: 2px solid #ccc; }
+        
+        /* स्थिर ॲक्शन कॉलम */
+        .sticky-action { position: sticky; right: 0; z-index: 5; background-color: #fff !important; box-shadow: -2px 0 5px rgba(0,0,0,0.1); }
+        th.sticky-action { z-index: 15; background-color: #f5f5f5 !important; border-left: 1px solid #ddd; }
+
         .link-mb { color: #0d47a1; font-weight: bold; text-decoration: underline; cursor: pointer; }
         .link-name { color: #f57c00; font-weight: bold; text-decoration: underline; cursor: pointer; }
         
@@ -110,15 +123,17 @@
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
         #toast.error { background-color: #d32f2f; }
 
-        /* 🌟 नवीन ॲड केलेले CSS (Bulk Action साठी) */
+        /* 🌟 अपडेट ०६: बल्क एंट्रीसाठी नवीन CSS */
         .bulk-input-group { display: flex; gap: 8px; margin-bottom: 5px; }
         .bulk-input-group input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; }
         .bulk-input-group input:focus { border-color: #2e7d32; }
         .btn-add-number { background: #2e7d32; color: #fff; border: none; padding: 0 15px; border-radius: 6px; font-size: 16px; cursor: pointer; font-weight: bold; }
         
-        .vertical-list-box { max-height: 250px; overflow-y: auto; border: 1px dashed #ccc; border-radius: 6px; padding: 10px; margin-bottom: 15px; background: #f9f9f9; display: flex; flex-direction: column; gap: 5px; }
-        .list-item-row { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 8px 12px; border-radius: 4px; border: 1px solid #eee; font-size: 14px; font-weight: bold; color: #333; }
-        .list-item-row i { color: #d32f2f; cursor: pointer; }
+        .vertical-list-box { max-height: 250px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; background: #f9f9f9; }
+        .vertical-list-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .vertical-list-table td { padding: 8px 12px; border-bottom: 5px solid #f0f2f5; background: #fff; }
+        .vertical-list-table td:first-child { font-weight: bold; }
+        .vertical-list-table i { color: #d32f2f; cursor: pointer; padding: 5px; }
         
         .side-by-side-btns { display: flex; gap: 10px; margin-top: 10px; }
         .btn-half { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer; color: #fff; }
@@ -126,9 +141,6 @@
         .btn-half-confirm { background: #2e7d32; }
 
         .custom-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: #2e7d32; }
-        
-        /* 🌟 सर्च हायलाइट */
-        mark { background-color: #ffeb3b; color: #000; border-radius: 2px; padding: 0 2px; }
     </style>
 </head>
 <body>
@@ -199,26 +211,26 @@
 
     <!-- 🌟 १. M.B. यादी मोडल -->
     <div id="listModal" class="custom-modal">
-        <div class="modal-box">
+        <div class="modal-box" style="max-width: 600px;">
             <div class="modal-header">
                 <h3 id="listModalTitle"><i class="fa-solid fa-list"></i> M.B.</h3>
                 <div class="header-actions">
                     <button class="btn-icon btn-print-header" onclick="openReportGenerator()" title="Print"><i class="fa-solid fa-print"></i></button>
-                    <button class="btn-icon btn-plus-header" onclick="openBulkAction()" title="Add / Transfer"><i class="fa-solid fa-plus"></i></button>
+                    <!-- अपडेट ०९: हे बटन 'उपलब्ध' मध्ये लपवले जाईल -->
+                    <button class="btn-icon btn-plus-header" id="btnPlusHeader" onclick="openBulkAction()" title="Add / Transfer"><i class="fa-solid fa-plus"></i></button>
                     <button class="btn-icon btn-minus-header" onclick="toggleDeleteMode()" title="Delete"><i class="fa-solid fa-minus"></i></button>
                     <button class="btn-icon btn-close-modal" onclick="closeModal('listModal')"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
             
-            <!-- डिलीट साठी ॲक्शन बार -->
             <div id="deleteActionBar" style="display:none; margin-bottom:5px;">
                 <button class="btn-search-main" style="background:#d32f2f; width:100%;" onclick="confirmBulkDelete()"><i class="fa-solid fa-trash"></i> निवडलेल्या नोंदी डिलीट करा</button>
             </div>
 
-            <div style="overflow-x:auto;">
+            <div class="table-container">
                 <table class="data-table">
                     <thead id="listTableHead">
-                        <tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>धारक</th><th>Action</th></tr>
+                        <tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>धारक</th><th class="sticky-action">Action</th></tr>
                     </thead>
                     <tbody id="listModalBody"></tbody>
                 </table>
@@ -228,13 +240,13 @@
 
     <!-- 🌟 २. शोध रिझल्ट मोडल -->
     <div id="searchResultModal" class="custom-modal">
-        <div class="modal-box">
+        <div class="modal-box" style="max-width: 600px;">
             <div class="modal-header">
                 <h3><i class="fa-solid fa-magnifying-glass"></i> शोध तपशील</h3>
                 <button class="btn-icon btn-close-modal" onclick="closeModal('searchResultModal')"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <p style="font-size:12px; color:#666; margin-bottom:10px;">👉 Action Center साठी M.B. क्रमांक किंवा नावावर क्लिक करा.</p>
-            <div style="overflow-x:auto;">
+            <div class="table-container">
                 <table class="data-table">
                     <thead><tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>सद्यस्थिती व धारक</th></tr></thead>
                     <tbody id="searchResultBody"></tbody>
@@ -271,7 +283,7 @@
 
     <!-- 🌟 ३.१ व्यक्ती/कार्यालय कृती केंद्र (Person/Office Action Center) -->
     <div id="personActionCenterModal" class="custom-modal">
-        <div class="modal-box">
+        <div class="modal-box" style="max-width: 600px;">
             <div class="modal-header">
                 <h3 id="pacTitle"><i class="fa-solid fa-user-tie"></i> व्यक्ती तपशील</h3>
                 <button class="btn-icon btn-close-modal" onclick="closeModal('personActionCenterModal')"><i class="fa-solid fa-xmark"></i></button>
@@ -282,7 +294,7 @@
                 <div class="ac-detail-row"><span>सध्या असलेल्या मोठ्या M.B.:</span> <span id="pacBigCount" style="color:#f57c00;">0</span></div>
             </div>
             <h4 style="font-size:13px; color:#555; margin-bottom:5px;">सध्या असलेल्या M.B. ची यादी:</h4>
-            <div style="overflow-x:auto; max-height: 40vh;">
+            <div class="table-container" style="max-height: 40vh;">
                 <table class="data-table">
                     <thead><tr><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th></tr></thead>
                     <tbody id="pacTableBody"></tbody>
@@ -321,7 +333,8 @@
             </div>
             <div class="form-group" id="formOfficeDiv" style="display:none;">
                 <label>कार्यालयाचे नाव *</label>
-                <input type="text" id="formOffice" class="form-control" placeholder="कार्यालयाचे नाव टाका">
+                <!-- अपडेट १०: Datalist ऑटो सजेशन -->
+                <input type="text" id="formOffice" class="form-control" list="previousNamesList" placeholder="कार्यालयाचे नाव टाका किंवा निवडा" autocomplete="off">
             </div>
             <div class="form-group" id="formSizeDiv" style="display:none;">
                 <label>M.B. आकार *</label>
@@ -401,7 +414,7 @@
 
     <!-- 🌟 ७. रिपोर्ट रिझल्ट मोडल (Report Result) -->
     <div id="reportResultModal" class="custom-modal">
-        <div class="modal-box">
+        <div class="modal-box" style="max-width: 650px;">
             <div class="modal-header">
                 <h3 id="reportResultTitle"><i class="fa-solid fa-file-invoice"></i> अहवाल</h3>
                 <button class="btn-icon btn-close-modal" onclick="closeModal('reportResultModal')"><i class="fa-solid fa-xmark"></i></button>
@@ -423,6 +436,24 @@
                 
                 <!-- Bulk Add UI -->
                 <div id="bulkAddUI" style="display:none;">
+                    <!-- अपडेट ०६: कुणाकडून मिळाली -->
+                    <div class="form-group">
+                        <label>कुणाकडून मिळाली? *</label>
+                        <select id="bulkSourceType" class="form-control" onchange="toggleBulkSource()">
+                            <option value="Bhandarpal">भांडारपाल</option>
+                            <option value="Office">विभागीय कार्यालय</option>
+                            <option value="JE">JE (कनिष्ठ अभियंता)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="bulkSourceNameDiv">
+                        <label id="bulkSourceNameLabel">भांडारपाल यांचे नाव *</label>
+                        <input type="text" id="bulkSourceName" class="form-control" list="previousNamesList" placeholder="नाव टाका किंवा निवडा">
+                    </div>
+                    <div class="form-group" id="bulkSourceJEDiv" style="display:none;">
+                        <label>JE निवडा *</label>
+                        <select id="bulkSourceJE" class="form-control"></select>
+                    </div>
+
                     <div class="date-row" style="margin-bottom:5px;">
                         <div class="date-group" style="flex:1;">
                             <select id="bulkSizeSelect" class="form-control" style="min-height:42px;">
@@ -443,8 +474,11 @@
                         <button class="btn-add-number" onclick="addMbNumber()"><i class="fa-solid fa-plus"></i></button>
                     </div>
                     
+                    <!-- अपडेट ०५: उभी यादी एक्सेल स्टाईल -->
                     <div class="vertical-list-box" id="bulkListContainer">
-                        <!-- उभी यादी इथे दिसेल -->
+                        <table class="vertical-list-table" id="bulkListTable">
+                            <!-- उभी यादी इथे दिसेल -->
+                        </table>
                     </div>
                     
                     <button class="btn-search-main" style="width:100%; background:#2e7d32;" onclick="previewBulkAdd()">पुढील (Preview) <i class="fa-solid fa-arrow-right"></i></button>
@@ -473,10 +507,10 @@
                         <select id="transferJE" class="form-control"></select>
                     </div>
                     <div class="form-group" id="transferOfficeDiv" style="display:none;">
-                        <input type="text" id="transferOfficeName" class="form-control" placeholder="कार्यालयाचे नाव टाका">
+                        <input type="text" id="transferOfficeName" class="form-control" list="previousNamesList" placeholder="कार्यालयाचे नाव टाका">
                     </div>
                     
-                    <div style="overflow-x:auto; max-height:250px; margin-bottom:5px;">
+                    <div class="table-container" style="max-height:250px; margin-bottom:5px;">
                         <table class="data-table">
                             <thead>
                                 <tr>
@@ -495,7 +529,7 @@
                 <div id="bulkPreviewUI" style="display:none;">
                     <p style="margin-bottom:5px; font-weight:bold; color:#0d47a1;">तुम्ही खालील क्रमांक ॲड करत आहात:</p>
                     <div class="vertical-list-box" id="previewListContainer" style="background:#e3f2fd; border-color:#90caf9;">
-                        <!-- Preview यादी -->
+                        <table class="vertical-list-table" id="previewListTable"></table>
                     </div>
                     <div class="side-by-side-btns">
                         <button class="btn-half btn-half-back" onclick="backToBulkAdd()">मागे जा (Back)</button>
@@ -519,6 +553,9 @@
         </div>
     </div>
 
+    <!-- 🌟 अपडेट १०: नावांची ऑटो-सजेशन यादी (Datalist) -->
+    <datalist id="previousNamesList"></datalist>
+
     <div id="toast">यशस्वी!</div>
 
     <script src="common.js"></script>
@@ -529,7 +566,6 @@
         let currentActiveMB = '';
         let currentActivePerson = '';
         
-        // नवीन व्हेरिएबल्स
         let currentModalType = '';
         let isDeleteMode = false;
         let tempBulkList = [];
@@ -590,6 +626,7 @@
 
             updateDashboard();
             populateJEList();
+            populateDatalist(); // अपडेट १०
             
             document.querySelectorAll('input[type="date"]').forEach(input => {
                 toggleDateClass(input);
@@ -614,13 +651,26 @@
             let options = '<option value="">-- JE निवडा --</option>';
             jeRecords.forEach(je => { options += `<option value="${je.name}">${je.name}</option>`; });
             document.getElementById('formJE').innerHTML = options;
-            
-            let tOptions = '<option value="">-- JE निवडा --</option>';
-            jeRecords.forEach(je => { tOptions += `<option value="${je.name}">${je.name}</option>`; });
-            document.getElementById('transferJE').innerHTML = tOptions;
+            document.getElementById('bulkSourceJE').innerHTML = options;
+            document.getElementById('transferJE').innerHTML = options;
         }
 
-        // 🌟 Debounce Search (जलद गतीसाठी)
+        // अपडेट १०: जुनी नावे गोळा करून Datalist मध्ये टाकणे
+        function populateDatalist() {
+            let previousNames = new Set();
+            mbRecords.forEach(rec => {
+                if (rec.sourceType !== 'JE' && rec.detail) {
+                    previousNames.add(rec.detail);
+                }
+            });
+            let dataListHTML = '';
+            previousNames.forEach(name => {
+                dataListHTML += `<option value="${name}">`;
+            });
+            document.getElementById('previousNamesList').innerHTML = dataListHTML;
+        }
+
+        // 🌟 अपडेट ०१: Debounce Search
         function debouncedSmartSearch() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
@@ -628,7 +678,7 @@
             }, 300);
         }
 
-        // 🌟 स्मार्ट शोध (हायलाइटिंग सह)
+        // 🌟 अपडेट ०१: स्मार्ट शोध (उजवीकडे, १० लिमिट, हायलाइट)
         function handleSmartSearch() {
             let query = document.getElementById('smartSearchInput').value.trim().toLowerCase();
             let box = document.getElementById('suggestionBox');
@@ -640,15 +690,20 @@
                 if (mbNo.toLowerCase().includes(query) || uniqueMBs[mbNo].detail.toLowerCase().includes(query)) matches.push(mbNo);
             }
             if (matches.length === 0) { box.style.display = 'none'; return; }
+            
             box.innerHTML = '';
-            matches.forEach(mbNo => {
+            matches.forEach((mbNo, index) => {
+                if (index >= 10) return; // १० नंतर स्क्रोल होईल CSS मुळे
                 let div = document.createElement('div');
                 div.className = 'suggestion-item';
-                // Highlight logic
                 let regex = new RegExp(`(${query})`, "gi");
                 div.innerHTML = mbNo.replace(regex, "<mark>$1</mark>");
                 
-                div.onclick = function() { openActionCenter(mbNo); };
+                div.onclick = function() { 
+                    document.getElementById('smartSearchInput').value = mbNo;
+                    box.style.display = 'none';
+                    openActionCenter(mbNo); 
+                };
                 box.appendChild(div);
             });
             box.style.display = 'flex';
@@ -707,12 +762,20 @@
             inputTo.value = ''; inputTo.classList.remove('has-value');
         }
 
-        // --- 🌟 यादी लॉजिक ---
+        // 🌟 अपडेट ०२, ०७, ०८, ०९, ११: यादी लॉजिक
         function openListModal(type) {
             currentModalType = type;
             isDeleteMode = false;
             deleteTargets = [];
             document.getElementById('deleteActionBar').style.display = 'none';
+
+            // अपडेट ०९: 'उपलब्ध' मध्ये '+' बटन लपवणे
+            let plusBtn = document.getElementById('btnPlusHeader');
+            if (type === 'avail') {
+                plusBtn.style.display = 'none';
+            } else {
+                plusBtn.style.display = 'flex';
+            }
 
             let title = "M.B.";
             if(type === 'total') title = "एकूण M.B.";
@@ -747,13 +810,13 @@
                     <th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>धारक</th>
                 </tr>`;
             } else {
-                thead.innerHTML = `<tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>धारक</th><th>Action</th></tr>`;
+                thead.innerHTML = `<tr><th>अ.क्र.</th><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th><th>धारक</th><th class="sticky-action">Action</th></tr>`;
             }
 
             tbody.innerHTML = '';
             
             if (results.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${isDeleteMode ? 5 : 6}" style="text-align:center; color:#d32f2f;">कोणतीही नोंद सापडली नाही.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${isDeleteMode ? 5 : 6}" style="text-align:center; color:#d32f2f; padding:20px;">कोणतीही नोंद सापडली नाही.</td></tr>`;
             } else {
                 results.forEach((rec, i) => {
                     let holder = rec.type === 'दिली' ? rec.detail : 'कार्यालयात उपलब्ध';
@@ -782,7 +845,7 @@
                                 <td>${rec.size}</td>
                                 <td>${formatDate(rec.date)}</td>
                                 <td style="color:${holderColor}; font-weight:bold; font-size:11px;">${holderHtml}</td>
-                                <td style="white-space:nowrap;">
+                                <td class="sticky-action" style="white-space:nowrap;">
                                     <button class="btn-edit-row" onclick="editMBEntry('${rec.mbNo}')"><i class="fa-solid fa-pen"></i></button>
                                     <button class="btn-delete-row" onclick="deleteMBEntry('${rec.mbNo}')"><i class="fa-solid fa-trash"></i></button>
                                 </td>
@@ -793,7 +856,6 @@
             }
         }
 
-        // 🌟 डिलीट मोड लॉजिक
         function toggleDeleteMode() {
             isDeleteMode = !isDeleteMode;
             deleteTargets = [];
@@ -847,10 +909,14 @@
             });
         }
 
-        // --- 🌟 नवीन बल्क ऍक्शन (Bulk Action) ---
+        // --- 🌟 अपडेट ०३, ०६: नवीन बल्क ऍक्शन (Bulk Action) ---
         function openBulkAction() {
             tempBulkList = [];
             document.getElementById('bulkMbInput').value = '';
+            document.getElementById('bulkSourceName').value = '';
+            document.getElementById('bulkSourceType').value = 'Bhandarpal';
+            toggleBulkSource();
+            
             renderBulkListContainer();
             
             document.getElementById('bulkAddUI').style.display = 'none';
@@ -873,6 +939,19 @@
             openModal('bulkActionModal');
         }
 
+        function toggleBulkSource() {
+            let type = document.getElementById('bulkSourceType').value;
+            if (type === 'JE') {
+                document.getElementById('bulkSourceNameDiv').style.display = 'none';
+                document.getElementById('bulkSourceJEDiv').style.display = 'block';
+            } else {
+                document.getElementById('bulkSourceNameDiv').style.display = 'block';
+                document.getElementById('bulkSourceJEDiv').style.display = 'none';
+                document.getElementById('bulkSourceNameLabel').innerText = (type === 'Bhandarpal' ? 'भांडारपाल' : 'कार्यालय') + ' यांचे नाव *';
+            }
+        }
+
+        // 🌟 अपडेट ०४: डुप्लिकेट चेक
         function addMbNumber() {
             let input = document.getElementById('bulkMbInput');
             let val = input.value.trim();
@@ -881,9 +960,14 @@
             if (tempBulkList.includes(val)) {
                 showToast('हा क्रमांक आधीच यादीत आहे!', true); return;
             }
-            let exists = mbRecords.some(r => r.mbNo === val);
-            if (exists) {
-                showToast('हा M.B. क्रमांक सिस्टीममध्ये आधीच नोंदवलेला आहे!', true); return;
+            let existingRec = mbRecords.find(r => r.mbNo === val);
+            if (existingRec) {
+                showConfirm(`हा M.B. क्रमांक (${val}) आधीच सिस्टीममध्ये नोंदवलेला आहे. त्याची सविस्तर माहिती पाहायची आहे का?`, () => {
+                    closeConfirmModal();
+                    closeModal('bulkActionModal');
+                    openActionCenter(val);
+                });
+                return;
             }
 
             tempBulkList.push(val);
@@ -892,13 +976,19 @@
             renderBulkListContainer();
         }
 
+        // अपडेट ०५: एक्सेल स्टाईल यादी
         function renderBulkListContainer() {
             let container = document.getElementById('bulkListContainer');
-            container.innerHTML = tempBulkList.map((num, i) => `
-                <div class="list-item-row">
-                    <span>${num}</span>
-                    <i class="fa-solid fa-circle-xmark" onclick="removeBulkNumber(${i})"></i>
-                </div>
+            let table = document.getElementById('bulkListTable');
+            if (tempBulkList.length === 0) {
+                table.innerHTML = '';
+                return;
+            }
+            table.innerHTML = tempBulkList.map((num, i) => `
+                <tr>
+                    <td style="width: 80%;">${num}</td>
+                    <td style="text-align: center; width: 20%;"><i class="fa-solid fa-circle-xmark" onclick="removeBulkNumber(${i})"></i></td>
+                </tr>
             `).join('');
         }
 
@@ -914,8 +1004,8 @@
             document.getElementById('bulkAddUI').style.display = 'none';
             document.getElementById('bulkPreviewUI').style.display = 'block';
 
-            let container = document.getElementById('previewListContainer');
-            container.innerHTML = tempBulkList.map(num => `<div class="list-item-row">${num}</div>`).join('');
+            let table = document.getElementById('previewListTable');
+            table.innerHTML = tempBulkList.map(num => `<tr><td>${num}</td></tr>`).join('');
         }
 
         function backToBulkAdd() {
@@ -928,13 +1018,20 @@
             let dateVal = document.getElementById('bulkDateInput').value;
             if(!dateVal) { showToast('कृपया दिनांक निवडा!', true); return; }
             
-            let bhandarpal = prompt("कृपया भांडारपाल यांचे नाव टाका (M.B. मिळाल्याची नोंद):", "भांडारपाल");
-            if (!bhandarpal) return;
+            let sourceType = document.getElementById('bulkSourceType').value;
+            let detail = '';
+            if (sourceType === 'JE') {
+                detail = document.getElementById('bulkSourceJE').value;
+                if(!detail) { showToast('कृपया JE निवडा!', true); return; }
+            } else {
+                detail = document.getElementById('bulkSourceName').value.trim();
+                if(!detail) { showToast('कृपया नाव टाका!', true); return; }
+            }
 
             showConfirm(`तुम्हाला नक्की ${tempBulkList.length} M.B. नोंदी जमा करायच्या आहेत का?`, () => {
                 tempBulkList.forEach(num => {
                     mbRecords.push({
-                        type: 'मिळाली', size: size, mbNo: num, detail: bhandarpal, sourceType: 'Bhandarpal', date: dateVal
+                        type: 'मिळाली', size: size, mbNo: num, detail: detail, sourceType: sourceType, date: dateVal
                     });
                 });
                 localStorage.setItem('mb_records', JSON.stringify(mbRecords));
@@ -1170,12 +1267,11 @@
             setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
         }
 
-        // --- 🌟 व्यक्ती कृती केंद्र (Person Action Center) ---
+        // --- व्यक्ती कृती केंद्र (Person Action Center) ---
         function openPersonActionCenter(personName) {
             currentActivePerson = personName;
             let filtered = mbRecords.filter(rec => rec.type === 'दिली' && rec.detail === personName);
-            // Get unique MBs (latest status) - since we filter by 'दिली' and detail, it's the current holding.
-            // To avoid duplicates if re-transferred, we group by mbNo.
+            
             let uniqueMBs = {};
             filtered.forEach(rec => { uniqueMBs[rec.mbNo] = rec; });
             let currentHoldings = Object.values(uniqueMBs);
@@ -1216,7 +1312,7 @@
                     <thead><tr><th>M.B. क्र.</th><th>आकार</th><th>दिनांक</th></tr></thead>
                     <tbody>${content}</tbody>
                 </table>
-                <p style="text-align:right; margin-top:30px; font-size:12px;">Created by Vitthal Kokotal Patil<br>Mob: 8446556141</p>
+                <p style="text-align:right; margin-top:30px; font-size:12px;">Created by Vitthal Kokate Patil<br>Mob: 8446556141</p>
                 </body></html>
             `);
             printWindow.document.close();
