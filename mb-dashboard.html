@@ -8,11 +8,10 @@
     <link rel="stylesheet" href="common.css">
     
     <style>
-        /* 🌟 अपडेट १७: पेज १००% फिक्स करणे (एकही गोष्ट हलणार नाही) */
+        /* 🌟 पेज १००% फिक्स करणे (एकही गोष्ट हलणार नाही) */
         html, body { height: 100vh; overflow: hidden; margin: 0; padding: 0; }
         body { display: flex; flex-direction: column; background: #f0f2f5; padding-bottom: 0 !important; }
         
-        /* फक्त मुख्य आशयाचा भाग स्क्रोल होईल */
         .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 15px; max-width: 600px; margin: 0 auto; width: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
 
         .top-nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
@@ -52,15 +51,30 @@
         .btn-search-main:active { background: #0a357d; }
         .btn-reset-main { flex: 1; background: #607d8b; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-        /* 🌟 स्मार्ट सर्च यादी */
+        /* 🌟 अपडेट १९: स्मार्ट सर्च यादी खालच्या बॉर्डरपासून वर, फक्त ८ क्रमांक आणि स्क्रोल */
         .search-input-wrapper { position: relative; width: 100%; }
         .suggestion-box { 
-            position: absolute; right: -15px; bottom: 100%; margin-bottom: 5px;
-            z-index: 1000; max-height: 235px; overflow-y: auto; display: none; flex-direction: column; align-items: flex-end; 
-            background: transparent; box-shadow: none; padding-right: 5px;
+            position: absolute; 
+            right: -15px; /* उजवीकडे २ डिजिट बाहेर */
+            bottom: 0; /* सर्च बॉक्सच्या खालच्या बॉर्डरपासून सुरू */
+            z-index: 1000; 
+            max-height: 185px; /* नेमके ८ क्रमांक दिसतील इतकी उंची */
+            overflow-y: auto; /* ९ वा क्रमांक पाहण्यासाठी स्क्रोल */
+            display: none; 
+            flex-direction: column; 
+            align-items: flex-end; 
+            background: transparent; 
+            box-shadow: none; 
+            padding-right: 5px;
         }
         .suggestion-item { 
-            color: #0d47a1; font-size: 14px; font-weight: bold; cursor: pointer; line-height: 1.2; padding: 3px 0; white-space: nowrap;
+            color: #0d47a1; 
+            font-size: 14px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            line-height: 1.2; 
+            padding: 3px 0; 
+            white-space: nowrap;
             text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff; 
         }
         .suggestion-item:hover { text-decoration: underline; }
@@ -97,7 +111,7 @@
         .form-group { margin-bottom: 5px; } 
         .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #333; }
         
-        /* 🌟 अपडेट १५: टेबल कॉम्पॅक्ट करणे आणि स्थिर ॲक्शन कॉलम */
+        /* 🌟 टेबल कॉम्पॅक्ट करणे आणि स्थिर ॲक्शन कॉलम */
         .table-container { width: 100%; overflow-x: auto; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px; -webkit-overflow-scrolling: touch; }
         .data-table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
         .data-table th, .data-table td { 
@@ -434,7 +448,6 @@
                 
                 <!-- Bulk Add UI -->
                 <div id="bulkAddUI" style="display:none;">
-                    <!-- अपडेट १६: क्रम बदलला आणि डिफॉल्ट अंधुक अक्षर ॲड केले -->
                     <div class="form-group">
                         <label>कुणाकडून मिळाली? *</label>
                         <select id="bulkSourceType" class="form-control" onchange="toggleBulkSource()">
@@ -1127,7 +1140,6 @@
             openModal('reportGeneratorModal');
         }
 
-        // 🌟 अपडेट १८: डुप्लिकेट काढणे आणि रिकामा मेसेज दाखवणे
         function updateReportSubComp() {
             let mainComp = document.getElementById('reportMainComp').value;
             let subGroup = document.getElementById('reportSubGroup');
