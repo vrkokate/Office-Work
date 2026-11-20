@@ -45,21 +45,32 @@
         .btn-search-main:active { background: #0a357d; }
         .btn-reset-main { flex: 1; background: #607d8b; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-        /* 🌟 अपडेट ०१: स्मार्ट सर्च यादी उजवीकडे आणि स्क्रोल */
+        /* 🌟 अपडेट १२: स्मार्ट सर्च यादी वर उघडणे, उजवीकडे २ डिजिट बाहेर आणि पारदर्शक */
         .suggestion-box { 
-            position: absolute; right: 15px; top: 75px; /* Adjust top to align with input */
-            z-index: 1000; max-height: 220px; overflow-y: auto; 
-            display: none; flex-direction: column; align-items: flex-end; 
-            background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.15); border-radius: 6px; padding: 5px;
-            width: 150px;
+            position: absolute; 
+            right: -15px; /* उजवीकडे २ डिजिट बाहेर */
+            bottom: 100%; /* वर उघडण्यासाठी */
+            margin-bottom: 5px;
+            z-index: 1000; 
+            max-height: 220px; 
+            overflow-y: auto; 
+            display: none; 
+            flex-direction: column; 
+            align-items: flex-end; 
+            background: transparent; /* पारदर्शक */
+            box-shadow: none; /* सावली नाही */
         }
         .suggestion-item { 
-            color: #0d47a1; font-size: 13px; font-weight: bold; 
-            cursor: pointer; line-height: 1.2; padding: 4px 8px; 
-            width: 100%; text-align: right; border-bottom: 1px solid #eee;
+            color: #0d47a1; 
+            font-size: 14px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            line-height: 1.2; 
+            padding: 2px 0; 
+            white-space: nowrap;
+            text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff; /* मजकूर स्पष्ट दिसण्यासाठी */
         }
-        .suggestion-item:hover { text-decoration: underline; background: #e3f2fd; }
-        .suggestion-item:last-child { border-bottom: none; }
+        .suggestion-item:hover { text-decoration: underline; }
         mark { background-color: #ffeb3b; color: #000; border-radius: 2px; padding: 0 1px; }
 
         .custom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 15px; animation: fadeIn 0.2s ease-out; }
@@ -93,7 +104,7 @@
         .form-group { margin-bottom: 5px; } 
         .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #333; }
         
-        /* 🌟 अपडेट ०२, ०५, ०७, ०८, ११: एक्सेलसारखी रचना, ५px अंतर आणि स्थिर ॲक्शन कॉलम */
+        /* 🌟 अपडेट ११: एक्सेलसारखी रचना, ५px अंतर आणि स्थिर ॲक्शन कॉलम */
         .table-container { width: 100%; overflow-x: auto; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px; -webkit-overflow-scrolling: touch; }
         .data-table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
         
@@ -123,7 +134,7 @@
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
         #toast.error { background-color: #d32f2f; }
 
-        /* 🌟 अपडेट ०६: बल्क एंट्रीसाठी नवीन CSS */
+        /* 🌟 अपडेट ०५: बल्क एंट्रीसाठी नवीन CSS */
         .bulk-input-group { display: flex; gap: 8px; margin-bottom: 5px; }
         .bulk-input-group input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; }
         .bulk-input-group input:focus { border-color: #2e7d32; }
@@ -333,7 +344,6 @@
             </div>
             <div class="form-group" id="formOfficeDiv" style="display:none;">
                 <label>कार्यालयाचे नाव *</label>
-                <!-- अपडेट १०: Datalist ऑटो सजेशन -->
                 <input type="text" id="formOffice" class="form-control" list="previousNamesList" placeholder="कार्यालयाचे नाव टाका किंवा निवडा" autocomplete="off">
             </div>
             <div class="form-group" id="formSizeDiv" style="display:none;">
@@ -626,7 +636,7 @@
 
             updateDashboard();
             populateJEList();
-            populateDatalist(); // अपडेट १०
+            populateDatalist(); 
             
             document.querySelectorAll('input[type="date"]').forEach(input => {
                 toggleDateClass(input);
@@ -655,7 +665,6 @@
             document.getElementById('transferJE').innerHTML = options;
         }
 
-        // अपडेट १०: जुनी नावे गोळा करून Datalist मध्ये टाकणे
         function populateDatalist() {
             let previousNames = new Set();
             mbRecords.forEach(rec => {
@@ -670,7 +679,6 @@
             document.getElementById('previousNamesList').innerHTML = dataListHTML;
         }
 
-        // 🌟 अपडेट ०१: Debounce Search
         function debouncedSmartSearch() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
@@ -678,7 +686,6 @@
             }, 300);
         }
 
-        // 🌟 अपडेट ०१: स्मार्ट शोध (उजवीकडे, १० लिमिट, हायलाइट)
         function handleSmartSearch() {
             let query = document.getElementById('smartSearchInput').value.trim().toLowerCase();
             let box = document.getElementById('suggestionBox');
@@ -693,7 +700,7 @@
             
             box.innerHTML = '';
             matches.forEach((mbNo, index) => {
-                if (index >= 10) return; // १० नंतर स्क्रोल होईल CSS मुळे
+                if (index >= 10) return; 
                 let div = document.createElement('div');
                 div.className = 'suggestion-item';
                 let regex = new RegExp(`(${query})`, "gi");
@@ -709,7 +716,6 @@
             box.style.display = 'flex';
         }
 
-        // --- सविस्तर शोध (हायलाइटिंग सह) ---
         function performSearch() {
             let query = document.getElementById('smartSearchInput').value.trim().toLowerCase();
             let dateFrom = document.getElementById('searchDateFrom').value;
@@ -762,14 +768,12 @@
             inputTo.value = ''; inputTo.classList.remove('has-value');
         }
 
-        // 🌟 अपडेट ०२, ०७, ०८, ०९, ११: यादी लॉजिक
         function openListModal(type) {
             currentModalType = type;
             isDeleteMode = false;
             deleteTargets = [];
             document.getElementById('deleteActionBar').style.display = 'none';
 
-            // अपडेट ०९: 'उपलब्ध' मध्ये '+' बटन लपवणे
             let plusBtn = document.getElementById('btnPlusHeader');
             if (type === 'avail') {
                 plusBtn.style.display = 'none';
@@ -909,7 +913,6 @@
             });
         }
 
-        // --- 🌟 अपडेट ०३, ०६: नवीन बल्क ऍक्शन (Bulk Action) ---
         function openBulkAction() {
             tempBulkList = [];
             document.getElementById('bulkMbInput').value = '';
@@ -951,7 +954,6 @@
             }
         }
 
-        // 🌟 अपडेट ०४: डुप्लिकेट चेक
         function addMbNumber() {
             let input = document.getElementById('bulkMbInput');
             let val = input.value.trim();
@@ -976,7 +978,6 @@
             renderBulkListContainer();
         }
 
-        // अपडेट ०५: एक्सेल स्टाईल यादी
         function renderBulkListContainer() {
             let container = document.getElementById('bulkListContainer');
             let table = document.getElementById('bulkListTable');
@@ -1122,7 +1123,6 @@
             });
         }
 
-        // --- रिपोर्ट जनरेटर लॉजिक ---
         function openReportGenerator() {
             closeModal('listModal');
             document.getElementById('reportMainComp').value = '';
@@ -1267,7 +1267,6 @@
             setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
         }
 
-        // --- व्यक्ती कृती केंद्र (Person Action Center) ---
         function openPersonActionCenter(personName) {
             currentActivePerson = personName;
             let filtered = mbRecords.filter(rec => rec.type === 'दिली' && rec.detail === personName);
@@ -1320,7 +1319,6 @@
             setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
         }
 
-        // --- कन्फर्मेशन मोडल लॉजिक ---
         function showConfirm(text, callback) {
             document.getElementById('confirmActionText').innerText = text;
             document.getElementById('confirmActionModal').style.display = 'flex';
@@ -1336,7 +1334,6 @@
             if (confirmCallback) confirmCallback();
         });
 
-        // --- ॲक्शन सेंटर आणि इतर जुन्या फंक्शन्स ---
         function openActionCenter(mbNo) {
             currentActiveMB = mbNo;
             let latestRec = null;
