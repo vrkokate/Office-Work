@@ -43,7 +43,8 @@
   function mountNavigation() {
     if (!document.body || document.getElementById('shared-app-navigation')) return;
     // Login/registration screen intentionally has no in-app navigation.
-    if (page === 'index.html') return;
+    // Home/Dashboard वर स्वतंत्र Back, Home, Profile किंवा User Management बार नको.
+    if (page === 'index.html' || page === 'dashboard.html') return;
     addStyles();
 
     var nav = document.createElement('nav');
@@ -78,26 +79,18 @@
     home.setAttribute('title', 'होम');
     home.innerHTML = '<i class="fa-solid fa-house" aria-hidden="true"></i>';
 
-    nav.appendChild(back);
-    nav.appendChild(home);
-
-    // प्रत्येक लॉगिन केलेल्या वापरकर्त्यास स्वतःचे Profile; Admin ला User Management.
-    var profile = document.createElement('a');
-    profile.className = 'shared-app-nav__icon shared-app-nav__action';
-    profile.href = 'profile.html';
-    profile.setAttribute('aria-label', 'माझे प्रोफाइल');
-    profile.setAttribute('title', 'माझे प्रोफाइल');
-    profile.innerHTML = '<i class="fa-solid fa-user-circle" aria-hidden="true"></i>';
-    nav.appendChild(profile);
-
-    if (localStorage.getItem('userRole') === 'admin') {
-      var users = document.createElement('a');
-      users.className = 'shared-app-nav__icon shared-app-nav__action';
-      users.href = 'user-management.html';
-      users.setAttribute('aria-label', 'User Management');
-      users.setAttribute('title', 'User Management');
-      users.innerHTML = '<i class="fa-solid fa-users-gear" aria-hidden="true"></i>';
-      nav.appendChild(users);
+    if (page === 'user-management.html') {
+      // User Management पानावर फक्त Back - मध्यवर्ती शीर्षक - Home.
+      nav.classList.add('shared-app-nav--user-management');
+      var heading = document.createElement('strong');
+      heading.className = 'shared-app-nav__title';
+      heading.textContent = 'User Management';
+      nav.appendChild(back);
+      nav.appendChild(heading);
+      nav.appendChild(home);
+    } else {
+      nav.appendChild(back);
+      nav.appendChild(home);
     }
     document.body.insertBefore(nav, document.body.firstChild);
   }
