@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>माझे प्रोफाइल</title>
+<script src="app-shell.js" defer></script>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#020d1b;color:#f3f7ff;font-family:'Segoe UI',Arial,sans-serif}
+.profile-wrap{width:min(100% - 28px,1000px);margin:22px auto 40px}
+.profile-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.profile-head h1{font-size:clamp(21px,4vw,28px);margin:0}.muted{color:#a9bfd8;font-size:14px;line-height:1.6}
+.panel{background:#0c2038;border:1px solid #244365;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 6px 22px #0003}
+.profile-grid{display:grid;grid-template-columns:150px minmax(0,1fr);gap:18px;align-items:start}
+.avatar{width:140px;height:160px;border-radius:12px;object-fit:cover;border:2px solid #22d3ee;background:#102b49}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.field{padding:11px;background:#102b49;border:1px solid #294b6d;border-radius:9px;min-width:0;overflow-wrap:anywhere}
+.field small{display:block;color:#9dc8e4;margin-bottom:5px}.field strong{font-size:15px;font-weight:600}
+.btn{border:0;border-radius:8px;padding:11px 15px;background:#0e7490;color:white;font-weight:700;cursor:pointer;margin:4px 5px 4px 0}.btn.green{background:#15803d}.btn.gray{background:#475569}
+input{max-width:100%;padding:10px;border:1px solid #46617e;border-radius:8px;background:#fff;color:#172033}
+.form-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}.status{color:#86efac;font-weight:700}
+@media(max-width:560px){.profile-grid{grid-template-columns:1fr}.avatar{width:112px;height:128px}.profile-wrap{width:calc(100% - 18px);margin-top:14px}.panel{padding:13px}}
+</style>
+</head>
+<body>
+<main class="profile-wrap">
+ <div class="profile-head"><div><h1><i class="fa-solid fa-id-card"></i> माझे प्रोफाइल</h1><div class="muted">येथे तुमची नोंदवलेली माहिती पाहू शकता. वैयक्तिक फोटो व पासवर्ड स्वतः बदलू शकता.</div></div></div>
+ <section class="panel"><div class="profile-grid"><div><img id="photo" class="avatar" alt="प्रोफाइल फोटो" title="फोटो बदलण्यासाठी क्लिक करा" onclick="document.getElementById('photoInput').click()"><input id="photoInput" type="file" accept="image/*" hidden></div><div><div class="fields" id="details"></div></div></div></section>
+ <section class="panel"><h3>पासवर्ड बदला</h3><div class="form-row"><input id="oldPass" type="password" placeholder="सध्याचा पासवर्ड"><input id="newPass" type="password" minlength="6" placeholder="नवीन पासवर्ड (किमान ६ अक्षरे)"><input id="confirmPass" type="password" minlength="6" placeholder="नवीन पासवर्ड पुन्हा टाका"><button class="btn green" onclick="changePassword()">पासवर्ड जतन करा</button></div></section>
+ <p class="muted">नाव, पदनाम, कार्यालय, जिल्हा, मोबाईल व User ID यामध्ये बदल आवश्यक असल्यास Admin शी संपर्क करा.</p>
+</main>
+<script>
+(function(){if(localStorage.getItem('isLoggedIn')!=='true'){location.replace('index.html');}})();
+function readUsers(){try{return JSON.parse(localStorage.getItem('ow_users')||'{}')}catch(e){return {}}}
+function esc(v){return String(v??'-').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function current(){const id=localStorage.getItem('currentUser');return {id,u:readUsers()[id]}}
+function render(){const {id,u}=current();if(!id||!u){alert('प्रोफाइल माहिती उपलब्ध नाही. पुन्हा लॉगिन करा.');location.replace('index.html');return}
+document.getElementById('photo').src=u.photo||'';document.getElementById('photo').style.visibility=u.photo?'visible':'hidden';
+const items=[['नाव',u.name],['पदनाम',u.designation],['कार्यालय',u.office],['जिल्हा',u.district],['मोबाईल',u.mobile],['User ID',id],['Role',u.role==='admin'?'Admin':'User'],['खाते स्थिती',u.status==='approved'?'Active':u.status||'Pending']];
+document.getElementById('details').innerHTML=items.map(([k,v])=>`<div class="field"><small>${k}</small><strong>${esc(v)}</strong></div>`).join('');
+}
+async function updatePhoto(){const file=document.getElementById('photoInput').files[0];if(!file){alert('कृपया फोटो निवडा.');return}if(!file.type.startsWith('image/')||file.size>5*1024*1024){alert('फोटो ५ MB पेक्षा कमी आणि image स्वरूपात असावा.');return}const {id,u}=current();if(!u)return;const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});u.photoHistory=u.photoHistory||[];if(u.photo)u.photoHistory.push({photo:u.photo,changedAt:new Date().toISOString()});u.photo=data;const all=readUsers();all[id]=u;localStorage.setItem('ow_users',JSON.stringify(all));document.getElementById('photoInput').value='';render();alert('प्रोफाइल फोटो बदलला.');}
+function changePassword(){const {id,u}=current();if(!u)return;const old=document.getElementById('oldPass').value,n=document.getElementById('newPass').value,c=document.getElementById('confirmPass').value;if(old!==u.password){alert('सध्याचा पासवर्ड चुकीचा आहे.');return}if(n.length<6){alert('नवीन पासवर्ड किमान ६ अक्षरांचा असावा.');return}if(n!==c){alert('नवीन पासवर्ड जुळत नाहीत.');return}u.password=n;const all=readUsers();all[id]=u;localStorage.setItem('ow_users',JSON.stringify(all));['oldPass','newPass','confirmPass'].forEach(x=>document.getElementById(x).value='');alert('पासवर्ड बदलला.');}
+document.getElementById('photoInput').addEventListener('change',updatePhoto);
+render();
+</script>
+</body></html>
