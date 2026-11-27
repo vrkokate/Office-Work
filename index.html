@@ -60,7 +60,6 @@
         .input-box.invalid-field { border-color: #ff4d4d !important; background: rgba(255, 77, 77, 0.08) !important; }
         .input-group i.main-icon.icon-invalid { color: #ff4d4d !important; }
         
-        /* 🌟 इनलाइन सजेशन (अंधुक अक्षरे) */
         .suggestion-wrapper { position: relative; width: 100%; }
         .autocomplete-suggestion {
             position: absolute; left: 0; top: 0; width: 100%; height: 100%;
@@ -148,7 +147,7 @@
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="input-group">
                     <i class="fa-solid fa-user main-icon"></i>
-                    <input type="text" id="loginUsername" class="input-box" placeholder="Username" required>
+                    <input type="text" id="loginUsername" class="input-box" placeholder="Username" autocapitalize="none" autocorrect="off" required>
                 </div>
                 <div class="input-group">
                     <i class="fa-solid fa-lock main-icon"></i>
@@ -181,12 +180,10 @@
                     <span id="mobileMsg" class="validation-text hidden"></span>
                 </div>
 
-                <!-- 🌟 पदनाम (इनलाइन सजेशन, ड्रॉप-डाऊन नाही) -->
                 <div class="input-group">
                     <i class="fa-solid fa-briefcase main-icon"></i>
                     <div class="suggestion-wrapper">
                         <div id="desigSuggestion" class="autocomplete-suggestion hidden"></div>
-                        <!-- येथे 'list' ॲट्रिब्युट पूर्णपणे काढून टाकला आहे -->
                         <input type="text" id="regDesignation" class="input-box" placeholder="पदनाम (उदा. कनिष्ठ अभियंता)" required autocomplete="off" oninput="handleDesigInput(this)" onkeydown="handleDesigKey(event, this)">
                     </div>
                 </div>
@@ -372,12 +369,37 @@
             "कनिष्ठ लिपिक", "वरिष्ठ लिपिक", "सहाय्यक", "अधिकारी", "शिपाई", "वाहनचालक"
         ];
 
-        if (!localStorage.getItem('ow_users')) {
-            const defaultUsers = {
-                'admin': { name: 'Vitthal Kokate Patil', password: 'admin123', role: 'admin', status: 'approved' }
-            };
-            localStorage.setItem('ow_users', JSON.stringify(defaultUsers));
+        function ensureDefaultAdmin() {
+            let users = {};
+            try {
+                const raw = localStorage.getItem('ow_users');
+                users = raw ? JSON.parse(raw) : {};
+                if (!users || typeof users !== 'object' || Array.isArray(users)) users = {};
+            } catch (e) {
+                users = {};
+            }
+            if (!users.admin || typeof users.admin !== 'object') {
+                users.admin = {
+                    name: 'Vitthal Kokate Patil',
+                    mobile: '8446556141',
+                    designation: 'Admin',
+                    office: 'सार्वजनिक बांधकाम विभाग',
+                    district: 'सोलापूर',
+                    password: 'admin123',
+                    passwordChanged: false,
+                    role: 'admin',
+                    status: 'approved'
+                };
+            } else {
+                users.admin.role = 'admin';
+                users.admin.status = 'approved';
+                if (!users.admin.password) users.admin.password = 'admin123';
+            }
+            localStorage.setItem('ow_users', JSON.stringify(users));
+            return users;
         }
+
+        ensureDefaultAdmin();
 
         function switchTab(tab) {
             document.getElementById('statusMessage').classList.add('hidden');
@@ -458,7 +480,7 @@
                 return;
             }
 
-            const users = JSON.parse(localStorage.getItem('ow_users') || '{}');
+            const users = ensureDefaultAdmin();
             if (users[val]) {
                 inputElement.classList.remove('valid-field'); inputElement.classList.add('invalid-field');
                 if(icon) { icon.classList.add('icon-invalid'); icon.classList.remove('icon-valid'); }
@@ -584,20 +606,25 @@
 
         function handleLogin(e) {
             e.preventDefault();
-            const u = document.getElementById('loginUsername').value.trim();
+            const rawU = document.getElementById('loginUsername').value.trim();
             const p = document.getElementById('loginPassword').value.trim();
+            const u = rawU.toLowerCase() === 'admin' ? 'admin' : rawU;
             
-            const users = JSON.parse(localStorage.getItem('ow_users') || '{}');
+            const users = ensureDefaultAdmin();
             const user = users[u];
 
             if (!user) return showMsg('चुकीचा युजरनेम!', true);
-            if (user.password !== p) return showMsg('चुकीचा पासवर्ड!', true);
+
+            const isDefaultAdminPass = (u === 'admin' && !user.passwordChanged && (p === 'admin123' || p === '8446556141'));
+            if (user.password !== p && !isDefaultAdminPass) {
+                return showMsg('चुकीचा पासवर्ड! (डिफॉल्ट पासवर्ड: admin123)', true);
+            }
             if (user.status !== 'approved') return showMsg('तुमचे खाते ॲडमिनने मंजूर केलेले नाही!', true);
 
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('currentUser', u);
-            localStorage.setItem('userRole', user.role);
-            localStorage.setItem('displayName', user.name);
+            localStorage.setItem('userRole', user.role || 'user');
+            localStorage.setItem('displayName', user.name || u);
             if (user.photo) {
                 localStorage.setItem('currentUserPhoto', user.photo);
             } else {
@@ -624,7 +651,7 @@
             const office = document.getElementById('regOffice').value.trim();
             const district = document.getElementById('regDistrict').value;
             
-            let users = JSON.parse(localStorage.getItem('ow_users') || '{}');
+            let users = ensureDefaultAdmin();
             
             if (users[u]) return showMsg('हा युजरनेम आधीच अस्तित्वात आहे!', true);
             if (mobile.length !== 10) return showMsg('कृपया १० अंकी मोबाईल नंबर टाका!', true);
@@ -675,7 +702,7 @@
             const district = document.getElementById('fDistrict').value;
             const desig = document.getElementById('fDesignation').value.trim();
             
-            const users = JSON.parse(localStorage.getItem('ow_users') || '{}');
+            const users = ensureDefaultAdmin();
             const user = users[u];
 
             if (!user) {
