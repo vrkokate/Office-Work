@@ -12,13 +12,13 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         html, body {
-            height: 100%; overflow: hidden; background: #020d1b; color: #ffffff;
+            min-height: 100dvh; overflow-x: hidden; background: #020d1b; color: #ffffff;
         }
         body {
             display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px;
         }
         .main-wrapper {
-            width: 100%; max-width: 380px; display: flex; flex-direction: column; justify-content: center; height: 100%;
+            width: 100%; max-width: 380px; display: flex; flex-direction: column; justify-content: center;
         }
         .profile-container { text-align: center; margin-bottom: 8px; }
         .profile-pic {
@@ -35,6 +35,7 @@
             border: 1px solid #00f3ff; border-radius: 15px;
             box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
             padding: 12px 15px; position: relative;
+            max-height: 78dvh; overflow-y: auto;
         }
         
         .tab-buttons { display: flex; margin-bottom: 10px; border-bottom: 1px solid #1e3a5f; }
@@ -305,7 +306,7 @@
                         <option value="अहमदनगर">अहमदनगर</option>
                         <option value="अकोला">अकोला</option>
                         <option value="अमरावती">अमरावती</option>
-                        <option value="औरंगाबाद (छत्रपती संभाजीनगर)">औरंगाबाद</option>
+                        <option value="औरंगाबाद (छत्रपती संभाजीनगर)">औरंगाबाद (छत्रपती संभाजीनगर)</option>
                         <option value="बीड">बीड</option>
                         <option value="भंडारा">भंडारा</option>
                         <option value="बुलढाणा">बुलढाणा</option>
@@ -324,7 +325,7 @@
                         <option value="नांदेड">नांदेड</option>
                         <option value="नंदुरबार">नंदुरबार</option>
                         <option value="नाशिक">नाशिक</option>
-                        <option value="उस्मानाबाद (धाराशिव)">उस्मानाबाद</option>
+                        <option value="उस्मानाबाद (धाराशिव)">उस्मानाबाद (धाराशिव)</option>
                         <option value="पालघर">पालघर</option>
                         <option value="परभणी">परभणी</option>
                         <option value="पुणे">पुणे</option>
@@ -597,6 +598,11 @@
             localStorage.setItem('currentUser', u);
             localStorage.setItem('userRole', user.role);
             localStorage.setItem('displayName', user.name);
+            if (user.photo) {
+                localStorage.setItem('currentUserPhoto', user.photo);
+            } else {
+                localStorage.removeItem('currentUserPhoto');
+            }
             
             window.location.href = 'dashboard.html';
         }
@@ -624,9 +630,12 @@
             if (mobile.length !== 10) return showMsg('कृपया १० अंकी मोबाईल नंबर टाका!', true);
             if (p.length < 6) return showMsg('पासवर्ड कमीत कमी ६ अक्षरांचा असावा!', true);
 
+            const nowIso = new Date().toISOString();
             users[u] = {
                 name: name, mobile: mobile, designation: desig, office: office, district: district,
-                password: p, role: 'user', status: 'pending', photo: croppedImage
+                password: p, role: 'user', status: 'pending', photo: croppedImage,
+                photoHistory: [{ photo: croppedImage, updatedAt: nowIso }],
+                createdAt: nowIso
             };
 
             localStorage.setItem('ow_users', JSON.stringify(users));
