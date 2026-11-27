@@ -9,8 +9,24 @@
     
     <style>
         /* 🌟 पेज १००% फिक्स करणे (एकही गोष्ट हलणार नाही) */
-        html, body { height: 100vh; overflow: hidden; margin: 0; padding: 0; }
+        html, body { height: 100vh; height: 100dvh; overflow: hidden; margin: 0; padding: 0; }
         body { display: flex; flex-direction: column; background: #f0f2f5; padding-bottom: 0 !important; }
+
+        /* गडद नेव्ही हेडर व हिरवी Back / Home बटणे */
+        .top-header {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            min-height: 54px; padding: 0 14px; background: #020c1b !important;
+            border-bottom: 1px solid #1e3a5f; position: sticky; top: 0; z-index: 100; flex-shrink: 0;
+        }
+        .top-header .back-btn, .top-header .home-icon {
+            width: 40px; height: 40px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+            color: #00ff88 !important; background: rgba(0, 255, 136, 0.08); border: 1px solid rgba(0, 255, 136, 0.45);
+            text-decoration: none; font-size: 18px; flex-shrink: 0;
+        }
+        .top-header .header-title {
+            color: #ffffff !important; font-size: 15px; font-weight: bold; text-align: center; flex: 1;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
         
         .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 15px; max-width: 600px; margin: 0 auto; width: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
 
@@ -32,7 +48,7 @@
         .search-title { color: #0d47a1; font-size: 14px; font-weight: bold; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
         
         .date-row { display: flex; gap: 10px; margin-bottom: 5px; }
-        .date-group { flex: 1; }
+        .date-group { flex: 1; min-width: 0; }
         .date-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; }
         
         .form-control { width: 100%; padding: 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 6px; outline: none; background: #fff; box-sizing: border-box; }
@@ -55,9 +71,10 @@
         .search-input-wrapper { position: relative; width: 100%; }
         .suggestion-box { 
             position: absolute; 
-            right: -15px; /* उजवीकडे २ डिजिट बाहेर */
+            right: 0; 
             bottom: 0; /* सर्च बॉक्सच्या खालच्या बॉर्डरपासून सुरू */
             z-index: 1000; 
+            max-width: 100%;
             max-height: 185px; /* नेमके ८ क्रमांक दिसतील इतकी उंची */
             overflow-y: auto; /* ९ वा क्रमांक पाहण्यासाठी स्क्रोल */
             display: none; 
@@ -81,8 +98,8 @@
         mark { background-color: #ffeb3b; color: #000; border-radius: 2px; padding: 0 1px; }
 
         .custom-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 15px; }
-        .modal-box { background: #fff; border-radius: 12px; width: 100%; max-width: 500px; padding: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); max-height: 90vh; display: flex; flex-direction: column; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+        .modal-box { background: #fff; border-radius: 12px; width: 100%; max-width: 500px; padding: 0 15px 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); max-height: 90vh; display: flex; flex-direction: column; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding: 12px 0 10px; margin-bottom: 15px; position: sticky; top: 0; background: #fff; z-index: 20; }
         .modal-header h3 { margin: 0; font-size: 15px; color: #0d47a1; display: flex; align-items: center; gap: 5px; }
         
         .header-actions { display: flex; gap: 6px; align-items: center; }
@@ -158,9 +175,9 @@
 <body>
 
     <header class="top-header">
-        <a href="establishment.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <a href="establishment.html" class="back-btn" title="मागे"><i class="fa-solid fa-arrow-left"></i></a>
         <div class="header-title">📖 मोजमाप पुस्तिका (M.B.) स्थिती</div>
-        <a href="dashboard.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
+        <a href="dashboard.html" class="home-icon" title="होम"><i class="fa-solid fa-house"></i></a>
     </header>
 
     <div class="main-content">
@@ -979,7 +996,6 @@
         }
 
         function renderBulkListContainer() {
-            let container = document.getElementById('bulkListContainer');
             let table = document.getElementById('bulkListTable');
             if (tempBulkList.length === 0) {
                 table.innerHTML = '';
