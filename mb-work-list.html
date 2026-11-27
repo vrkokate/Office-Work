@@ -7,22 +7,42 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="common.css">
     <style>
+        html, body { height: 100dvh; overflow: hidden; margin: 0; padding: 0; }
+        body { display: flex; flex-direction: column; padding-bottom: 0 !important; overflow-x: hidden; }
+
+        /* गडद नेव्ही हेडर व हिरवी Back / Home बटणे */
+        .top-header {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            min-height: 54px; padding: 0 14px; background: #020c1b !important;
+            border-bottom: 1px solid #1e3a5f; position: sticky; top: 0; z-index: 100; flex-shrink: 0;
+        }
+        .top-header .back-btn, .top-header .home-icon {
+            width: 40px; height: 40px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+            color: #00ff88 !important; background: rgba(0, 255, 136, 0.08); border: 1px solid rgba(0, 255, 136, 0.45);
+            text-decoration: none; font-size: 18px; flex-shrink: 0;
+        }
+        .top-header .header-title {
+            color: #ffffff !important; font-size: 15px; font-weight: bold; text-align: center; flex: 1;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .main-content { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
         .top-nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
         .top-nav-item { background: #0d47a1; color: #fff; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 5px; border-radius: 8px; font-size: 11px; font-weight: bold; gap: 5px; transition: 0.3s; }
         .top-nav-item i { font-size: 18px; }
         .top-nav-item.active { background: #1976d2; box-shadow: 0 2px 8px rgba(25, 118, 210, 0.4); }
         .status-incomplete { color: #d32f2f; font-weight: bold; }
         .status-complete { color: #2e7d32; font-weight: bold; }
-        body { padding-bottom: 0 !important; }
+        .table-container { max-height: 44dvh; overflow-y: auto; overflow-x: auto; margin-top: 15px; }
     </style>
 </head>
 <body>
 
     <header class="top-header">
         <!-- 🌟 बॅक बटन: mb-dashboard.html -->
-        <a href="mb-dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i></a>
+        <a href="mb-dashboard.html" class="back-btn" title="मागे"><i class="fa-solid fa-arrow-left"></i></a>
         <div class="header-title">📋 कामांची यादी (Work List)</div>
-        <a href="dashboard.html" class="home-icon"><i class="fa-solid fa-house"></i></a>
+        <a href="dashboard.html" class="home-icon" title="होम"><i class="fa-solid fa-house"></i></a>
     </header>
 
     <div class="main-content">
@@ -99,7 +119,7 @@
 
     <div id="deleteAlert" class="custom-alert-overlay">
         <div class="custom-alert-box">
-            <p>तुम्हाला हे काम नक्की डिलीट करायचे आहे का?</p>
+            <p>तुम्हाला हे काम नक्की डिलीट करायची आहे का?</p>
             <div class="alert-actions">
                 <button class="btn-cancel-alert" onclick="closeDeleteAlert()">नाही (Cancel)</button>
                 <button class="btn-confirm-alert" id="confirmDeleteBtn">होय (Delete)</button>
@@ -200,13 +220,18 @@
             document.getElementById('editWorkIndex').value = index;
             document.getElementById('workJE').value = work.je;
             onWorkJEChange();
-            document.getElementById('workMB').value = work.mbNo;
+            const mbSelect = document.getElementById('workMB');
+            if (work.mbNo && !Array.from(mbSelect.options).some(o => o.value === work.mbNo)) {
+                mbSelect.innerHTML += `<option value="${work.mbNo}">${work.mbNo} (सध्याची)</option>`;
+            }
+            mbSelect.value = work.mbNo;
             document.getElementById('workName').value = work.name;
             document.getElementById('workContractor').value = work.contractor;
             document.getElementById('workStatus').value = work.status;
             document.getElementById('saveBtn').innerText = 'Update Work';
             document.getElementById('cancelBtn').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const mainEl = document.querySelector('.main-content');
+            if (mainEl) mainEl.scrollTop = 0;
         }
 
         function cancelEdit() {
