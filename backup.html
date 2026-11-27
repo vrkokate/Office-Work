@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data Backup</title>
+<script src="app-shell.js" defer></script>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100dvh;background:#020d1b;color:#f3f7ff;font-family:'Segoe UI',Arial,sans-serif;overflow-x:hidden}
+.bk-wrap{width:min(100% - 24px,920px);margin:14px auto 32px}
+.panel{background:#0c2038;border:1px solid #244365;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 6px 20px #0004}
+.panel h2{margin:0 0 8px;font-size:17px;color:#38bdf8;display:flex;align-items:center;gap:8px}
+.muted{color:#a9bfd8;font-size:13.5px;line-height:1.6;margin:0 0 12px}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;margin:12px 0}
+.stat{background:#102b49;border:1px solid #294b6d;border-radius:10px;padding:10px;text-align:center}
+.stat small{display:block;color:#9dc8e4;font-size:11.5px;margin-bottom:3px}
+.stat strong{font-size:18px;color:#86efac}
+.btn{border:0;border-radius:9px;padding:11px 16px;background:#0e7490;color:#fff;font-weight:700;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.green{background:#15803d}.btn.amber{background:#b45309}.btn.red{background:#b91c1c}
+.file-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+input[type="file"]{padding:9px;border-radius:8px;border:1px solid #46617e;background:#fff;color:#172033;font-size:13.5px;flex:1 1 240px;max-width:100%}
+.note-box{background:#102b49;border-left:4px solid #f59e0b;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#fde68a;margin-top:12px;line-height:1.5}
+@media(max-width:560px){
+  .bk-wrap{width:calc(100% - 16px)}
+  .panel{padding:14px}
+  .btn,.file-row input[type="file"]{width:100%}
+}
+</style>
+</head>
+<body>
+<main class="bk-wrap">
+  <section class="panel">
+    <h2><i class="fa-solid fa-database"></i> सध्याचा संचयित डेटा (Current Data Summary)</h2>
+    <p class="muted">तुमच्या ऑफिस वर्क वेबॲपमधील सर्व विभागांचा डेटा सुरक्षित ठेवण्यासाठी नियमित बॅकअप डाउनलोड करा.</p>
+    <div class="summary-grid" id="dataSummary"></div>
+    <div class="muted" id="lastBackupInfo" style="margin-top:8px;margin-bottom:0;font-size:12.5px;color:#86efac"></div>
+  </section>
+
+  <section class="panel">
+    <h2><i class="fa-solid fa-cloud-arrow-down"></i> १. बॅकअप डाउनलोड करा (Export Backup)</h2>
+    <p class="muted">सर्व युजर्स, M.B. नोंदवही, JE यादी, कामांची यादी, देयक नोंदवही, शासन निर्णय, वेतननिश्चिती व महत्त्वाचे दुवे एकाच JSON फाईलमध्ये जतन होतील.</p>
+    <button type="button" class="btn green" onclick="exportBackup()">
+      <i class="fa-solid fa-download"></i> संपूर्ण डेटा Backup डाउनलोड करा (.json)
+    </button>
+  </section>
+
+  <section class="panel">
+    <h2><i class="fa-solid fa-cloud-arrow-up"></i> २. बॅकअप पुनर्संचयित करा (Restore Backup)</h2>
+    <p class="muted">पूर्वी डाउनलोड केलेली <code>Office_Work_Backup_*.json</code> फाईल निवडून डेटा परत मिळवा.</p>
+    <div class="file-row">
+      <input type="file" id="backupFileInput" accept=".json,application/json">
+      <button type="button" class="btn amber" onclick="restoreBackup()">
+        <i class="fa-solid fa-rotate-left"></i> डेटा Restore करा
+      </button>
+    </div>
+    <div class="note-box">
+      <strong>महत्त्वाची सूचना:</strong> Restore केल्यास निवडलेल्या बॅकअप फाईलमधील नोंदी ब्राउझरमध्ये अद्ययावत होतील. सुरक्षिततेसाठी Restore करण्यापूर्वी सध्याचा बॅकअप डाउनलोड करून ठेवा.
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+  if(localStorage.getItem('isLoggedIn')!=='true'){
+    location.replace('index.html');
+  }
+})();
+
+const BACKUP_KEYS=[
+  'ow_users',
+  'mb_records',
+  'mb_je_records',
+  'work_records',
+  'bill_records',
+  'bill_deduction_rates',
+  'ow_gr_records',
+  'ow_pay_fixations',
+  'ow_important_links'
+];
+
+function safeParse(key,fallback){
+  try{
+    const raw=localStorage.getItem(key);
+    return raw?JSON.parse(raw):fallback;
+  }catch(e){
+    return fallback;
+  }
+}
+
+function renderSummary(){
+  const usersObj=safeParse('ow_users',{});
+  const userCount=Object.keys(usersObj).filter(k=>k!=='admin').length;
+  const mbCount=(safeParse('mb_records',[])||[]).length;
+  const jeCount=(safeParse('mb_je_records',[])||[]).length;
+  const workCount=(safeParse('work_records',[])||[]).length;
+  const billCount=(safeParse('bill_records',[])||[]).length;
+  const grCount=(safeParse('ow_gr_records',[])||[]).length;
+  const payCount=(safeParse('ow_pay_fixations',[])||[]).length;
+
+  const cards=[
+    ['नोंदणीकृत Users',userCount],
+    ['M.B. नोंदी',mbCount],
+    ['JE यादी',jeCount],
+    ['कामे (Works)',workCount],
+    ['देयके (Bills)',billCount],
+    ['GR / परिपत्रके',grCount],
+    ['वेतननिश्चिती',payCount]
+  ];
+
+  document.getElementById('dataSummary').innerHTML=cards.map(([label,val])=>
+    `<div class="stat"><small>${label}</small><strong>${val}</strong></div>`
+  ).join('');
+
+  const lastBk=localStorage.getItem('ow_last_backup_at');
+  document.getElementById('lastBackupInfo').textContent=lastBk
+    ? `शेवटचा बॅकअप घेतलेला दिनांक व वेळ: ${new Date(lastBk).toLocaleString('mr-IN')}`
+    : 'अद्याप या डिव्हाइसवर बॅकअप घेतलेला नाही.';
+}
+
+function exportBackup(){
+  const data={};
+  BACKUP_KEYS.forEach(k=>{
+    const raw=localStorage.getItem(k);
+    if(raw!==null)data[k]=safeParse(k,raw);
+  });
+
+  const payload={
+    app:'Office Work Digital Hub',
+    exportedAt:new Date().toISOString(),
+    exportedBy:localStorage.getItem('currentUser')||'user',
+    data
+  };
+
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const today=new Date().toISOString().split('T')[0];
+  a.href=url;
+  a.download=`Office_Work_Backup_${today}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  localStorage.setItem('ow_last_backup_at',new Date().toISOString());
+  renderSummary();
+  alert('संपूर्ण डेटा Backup फाईल यशस्वीरीत्या डाउनलोड झाली!');
+}
+
+async function restoreBackup(){
+  const input=document.getElementById('backupFileInput');
+  const file=input.files[0];
+  if(!file){
+    alert('कृपया आधी बॅकअप (.json) फाईल निवडा.');
+    return;
+  }
+
+  let parsed;
+  try{
+    const text=await file.text();
+    parsed=JSON.parse(text);
+  }catch(e){
+    alert('अवैध JSON फाईल! कृपया योग्य बॅकअप फाईल निवडा.');
+    return;
+  }
+
+  const incoming=(parsed&&typeof parsed.data==='object')?parsed.data:parsed;
+  if(!incoming||typeof incoming!=='object'){
+    alert('बॅकअप फाईलमध्ये योग्य डेटा सापडला नाही.');
+    return;
+  }
+
+  const hasKnownKey=BACKUP_KEYS.some(k=>Object.prototype.hasOwnProperty.call(incoming,k));
+  if(!hasKnownKey){
+    alert('ही Office Work ॲपची वैध बॅकअप फाईल नाही.');
+    return;
+  }
+
+  if(!confirm('निवडलेल्या बॅकअप फाईलमधून डेटा पुनर्संचयित (Restore) करायचा आहे का?'))return;
+
+  const currentAdmin=safeParse('ow_users',{}).admin;
+  BACKUP_KEYS.forEach(k=>{
+    if(Object.prototype.hasOwnProperty.call(incoming,k)){
+      let val=incoming[k];
+      if(k==='ow_users'&&val&&typeof val==='object'&&!val.admin&&currentAdmin){
+        val.admin=currentAdmin;
+      }
+      localStorage.setItem(k,typeof val==='string'?val:JSON.stringify(val));
+    }
+  });
+
+  input.value='';
+  renderSummary();
+  alert('डेटा यशस्वीरीत्या Restore झाला!');
+}
+
+renderSummary();
+</script>
+</body>
+</html>
