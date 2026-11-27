@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>कामाचा इतिहास</title>
+<script src="app-shell.js" defer></script>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100dvh;background:#020d1b;color:#f3f7ff;font-family:'Segoe UI',Arial,sans-serif;overflow-x:hidden}
+.hist-wrap{width:min(100% - 24px,1040px);margin:14px auto 32px}
+.summary-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:12px}
+.sum-card{background:#0c2038;border:1px solid #244365;border-radius:12px;padding:10px;text-align:center}
+.sum-card small{display:block;color:#9dc8e4;font-size:11.5px;margin-bottom:3px}
+.sum-card strong{font-size:19px;color:#38bdf8}
+.filter-bar{background:#0c2038;border:1px solid #244365;border-radius:12px;padding:12px;margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.filter-bar input,.filter-bar select{padding:10px 12px;border-radius:8px;border:1px solid #46617e;background:#fff;color:#172033;font-size:14px}
+.filter-bar input{flex:1 1 220px}
+.filter-bar select{flex:0 1 190px}
+.timeline{display:grid;gap:9px}
+.item-card{background:#0c2038;border:1px solid #244365;border-left:4px solid #38bdf8;border-radius:11px;padding:12px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.item-card.mb{border-left-color:#22d3ee}
+.item-card.work{border-left-color:#f59e0b}
+.item-card.bill{border-left-color:#4ade80}
+.item-card.gr{border-left-color:#c084fc}
+.item-card.pay{border-left-color:#f472b6}
+.item-main{flex:1 1 260px;min-width:0}
+.item-top{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:5px}
+.tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#102b49;border:1px solid #294b6d;color:#67e8f9}
+.date-tag{font-size:11.5px;color:#86efac;font-weight:600}
+.item-title{font-size:14.5px;font-weight:700;color:#fff;margin-bottom:3px;word-break:break-word}
+.item-sub{font-size:12.5px;color:#a9bfd8;line-height:1.45}
+.link-btn{padding:6px 10px;border-radius:7px;background:#102b49;border:1px solid #294b6d;color:#67e8f9;text-decoration:none;font-size:12px;font-weight:700;white-space:nowrap}
+.empty-box{background:#0c2038;border:1px dashed #334155;border-radius:12px;padding:28px 16px;text-align:center;color:#94a3b8;font-size:14px}
+@media(max-width:600px){
+  .hist-wrap{width:calc(100% - 16px)}
+  .filter-bar input,.filter-bar select{width:100%;flex:1 1 100%}
+}
+</style>
+</head>
+<body>
+<main class="hist-wrap">
+  <section class="summary-row">
+    <div class="sum-card"><small>एकूण नोंदी</small><strong id="cntAll">0</strong></div>
+    <div class="sum-card"><small>M.B. नोंदी</small><strong id="cntMb">0</strong></div>
+    <div class="sum-card"><small>कामे (Works)</small><strong id="cntWork">0</strong></div>
+    <div class="sum-card"><small>देयके (Bills)</small><strong id="cntBill">0</strong></div>
+    <div class="sum-card"><small>GR / परिपत्रके</small><strong id="cntGr">0</strong></div>
+  </section>
+
+  <section class="filter-bar">
+    <input type="text" id="histSearch" placeholder="M.B. क्र., कंत्राटदार, JE, GR विषय किंवा कर्मचारी शोधा..." oninput="renderHistory()">
+    <select id="histType" onchange="renderHistory()">
+      <option value="ALL">सर्व विभाग (All)</option>
+      <option value="mb">M.B. नोंदवही</option>
+      <option value="work">कामांची यादी (Work List)</option>
+      <option value="bill">देयक नोंदवही (Bills)</option>
+      <option value="gr">शासन निर्णय (GR)</option>
+      <option value="pay">वेतननिश्चिती (Pay Fixation)</option>
+    </select>
+  </section>
+
+  <section id="timelineList" class="timeline"></section>
+</main>
+
+<script>
+(function(){
+  if(localStorage.getItem('isLoggedIn')!=='true'){
+    location.replace('index.html');
+  }
+})();
+
+function readArr(key){try{const v=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(v)?v:[]}catch(e){return []}}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fmtDate(d){if(!d)return '-';const s=String(d).slice(0,10);const p=s.split('-');return p.length===3&&p[0].length===4?`${p[2]}-${p[1]}-${p[0]}`:s}
+
+function collectAllRecords(){
+  const items=[];
+  const mbs=readArr('mb_records');
+  const works=readArr('work_records');
+  const bills=readArr('bill_records');
+  const grs=readArr('ow_gr_records');
+  const pays=readArr('ow_pay_fixations');
+
+  document.getElementById('cntMb').textContent=mbs.length;
+  document.getElementById('cntWork').textContent=works.length;
+  document.getElementById('cntBill').textContent=bills.length;
+  document.getElementById('cntGr').textContent=grs.length;
+
+  mbs.forEach(r=>{
+    items.push({
+      type:'mb',
+      badge:'M.B. नोंदवही',
+      date:r.date||r.createdAt||'',
+      title:`M.B. क्र. ${r.mbNo||'-'} (${r.size||'-'}) — ${r.type||'-'}`,
+      sub:`तपशील: ${r.detail||'-'}`,
+      link:'mb-dashboard.html'
+    });
+  });
+
+  works.forEach(w=>{
+    items.push({
+      type:'work',
+      badge:'काम नोंद',
+      date:w.date||w.createdAt||'',
+      title:w.name||'काम',
+      sub:`कंत्राटदार: ${w.contractor||'-'} | JE: ${w.je||'-'} | M.B.: ${w.mbNo||'-'} | स्थिती: ${w.status||'-'}`,
+      link:'mb-work-list.html'
+    });
+  });
+
+  bills.forEach(b=>{
+    const net=(Number(b.netPay)||0).toLocaleString('en-IN');
+    items.push({
+      type:'bill',
+      badge:'देयक नोंद',
+      date:b.date||'',
+      title:`${b.billType||'देयक'} — ${b.workName||'-'}`,
+      sub:`कंत्राटदार: ${b.contractor||'-'} | JE: ${b.je||'-'} | M.B.: ${b.mb||'-'} | नेट देय: ₹ ${net}`,
+      link:'mb-bill-reg.html'
+    });
+  });
+
+  grs.forEach(g=>{
+    items.push({
+      type:'gr',
+      badge:g.category||'शासन निर्णय',
+      date:g.grDate||g.uploadedAt||'',
+      title:`${g.grNo||'-'} : ${g.subject||'-'}`,
+      sub:`विभाग: ${g.dept||'-'} | अपलोड: ${g.uploadedByName||'User'}`,
+      link:'gr.html'
+    });
+  });
+
+  pays.forEach(p=>{
+    items.push({
+      type:'pay',
+      badge:'वेतननिश्चिती',
+      date:p.effectiveDate||p.savedAt||'',
+      title:`कर्मचारी: ${p.empName||p.name||'-'}`,
+      sub:`पदनाम: ${p.designation||'-'} | नवीन मूळ वेतन: ₹ ${p.newBasic||p.revisedBasic||'-'}`,
+      link:'pay-fixation.html'
+    });
+  });
+
+  items.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  document.getElementById('cntAll').textContent=items.length;
+  return items;
+}
+
+function renderHistory(){
+  const all=collectAllRecords();
+  const q=(document.getElementById('histSearch').value||'').trim().toLowerCase();
+  const t=document.getElementById('histType').value;
+
+  const filtered=all.filter(it=>{
+    if(t!=='ALL'&&it.type!==t)return false;
+    if(!q)return true;
+    return [it.badge,it.title,it.sub,fmtDate(it.date)].join(' ').toLowerCase().includes(q);
+  });
+
+  const box=document.getElementById('timelineList');
+  if(filtered.length===0){
+    box.innerHTML='<div class="empty-box">निवडलेल्या फिल्टरनुसार कोणतीही ऐतिहासिक नोंद आढळली नाही.</div>';
+    return;
+  }
+
+  box.innerHTML=filtered.map(it=>`
+    <article class="item-card ${esc(it.type)}">
+      <div class="item-main">
+        <div class="item-top">
+          <span class="tag">${esc(it.badge)}</span>
+          <span class="date-tag">${it.date?'दि. '+esc(fmtDate(it.date)):''}</span>
+        </div>
+        <div class="item-title">${esc(it.title)}</div>
+        <div class="item-sub">${esc(it.sub)}</div>
+      </div>
+      <a class="link-btn" href="${esc(it.link)}">उघडा ↗</a>
+    </article>
+  `).join('');
+}
+
+renderHistory();
+</script>
+</body>
+</html>
