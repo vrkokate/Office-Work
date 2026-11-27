@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>महत्त्वाचे दुवे</title>
+<script src="app-shell.js" defer></script>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100dvh;background:#020d1b;color:#f3f7ff;font-family:'Segoe UI',Arial,sans-serif;overflow-x:hidden}
+.lk-wrap{width:min(100% - 24px,1000px);margin:14px auto 32px}
+.toolbar{background:#0c2038;border:1px solid #244365;border-radius:14px;padding:14px;margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.toolbar input,.toolbar select{padding:10px 12px;border-radius:8px;border:1px solid #46617e;background:#fff;color:#172033;font-size:14px}
+.toolbar input{flex:1 1 220px}
+.toolbar select{flex:0 1 170px}
+.btn{border:0;border-radius:8px;padding:10px 14px;background:#0e7490;color:#fff;font-weight:700;cursor:pointer;font-size:13.5px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.btn.green{background:#15803d}.btn.red{background:#b91c1c}.btn.gray{background:#475569}
+.btn.sm{padding:7px 11px;font-size:12.5px}
+.links-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}
+.link-card{background:#0c2038;border:1px solid #244365;border-radius:13px;padding:15px;display:flex;flex-direction:column;justify-content:space-between;gap:12px;transition:.2s}
+.link-card:hover{border-color:#38bdf8;transform:translateY(-2px)}
+.cat-pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:#102b49;border:1px solid #294b6d;color:#67e8f9;margin-bottom:6px}
+.link-title{font-size:15.5px;font-weight:700;color:#fff;margin:0 0 5px}
+.link-desc{font-size:12.5px;color:#a9bfd8;line-height:1.45;margin:0}
+.link-url{font-size:11.5px;color:#86efac;margin-top:6px;word-break:break-all}
+.card-foot{display:flex;gap:8px;align-items:center}
+.card-foot .btn:first-child{flex:1}
+
+/* मोडल */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:11000;overflow:auto;padding:12px}
+.modal-box{max-width:480px;margin:18px auto;background:#0c2038;border:1px solid #4c6b8c;border-radius:14px;overflow:hidden;box-shadow:0 12px 32px #0009}
+.modal-head{position:sticky;top:0;z-index:5;background:#0a192f;border-bottom:1px solid #244365;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{margin:0;font-size:16px;color:#86efac}
+.modal-close{background:#b91c1c;color:#fff;border:0;border-radius:6px;padding:5px 10px;font-weight:700;cursor:pointer}
+.modal-body{padding:14px 16px 18px}
+.field{margin-bottom:11px}
+.field label{display:block;font-size:12.5px;font-weight:600;color:#a9dff2;margin-bottom:4px}
+.field input,.field select{width:100%;padding:10px;border-radius:8px;border:1px solid #46617e;background:#fff;color:#172033;font-size:14px}
+@media(max-width:560px){
+  .lk-wrap{width:calc(100% - 16px)}
+  .toolbar input,.toolbar select,.toolbar .btn{width:100%;flex:1 1 100%}
+}
+</style>
+</head>
+<body>
+<main class="lk-wrap">
+  <section class="toolbar">
+    <input type="text" id="linkSearch" placeholder="पोर्टलचे नाव, विभाग किंवा तपशील शोधा..." oninput="renderLinks()">
+    <select id="linkCatFilter" onchange="renderLinks()">
+      <option value="ALL">सर्व श्रेणी (All)</option>
+      <option value="शासन निर्णय">शासन निर्णय</option>
+      <option value="वेतन व कोषागार">वेतन व कोषागार</option>
+      <option value="बांधकाम व निविदा">बांधकाम व निविदा</option>
+      <option value="इतर">इतर</option>
+    </select>
+    <button type="button" class="btn green" onclick="openAddLinkModal()">
+      <i class="fa-solid fa-plus"></i> नवीन दुवा जोडा
+    </button>
+  </section>
+
+  <section id="linksContainer" class="links-grid"></section>
+</main>
+
+<!-- Add Link Modal -->
+<div class="modal" id="addLinkModal" onclick="if(event.target===this)closeAddLinkModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-link"></i> नवीन महत्त्वाचा दुवा जोडा</h3>
+      <button type="button" class="modal-close" onclick="closeAddLinkModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="addLinkForm" onsubmit="saveCustomLink(event)">
+        <div class="field">
+          <label>श्रेणी निवडा *</label>
+          <select id="lkCat" required>
+            <option value="शासन निर्णय">शासन निर्णय</option>
+            <option value="वेतन व कोषागार">वेतन व कोषागार</option>
+            <option value="बांधकाम व निविदा">बांधकाम व निविदा</option>
+            <option value="इतर">इतर</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>पोर्टल / दुव्याचे नाव *</label>
+          <input type="text" id="lkTitle" placeholder="उदा. ई-ऑफिस महाराष्ट्र" required>
+        </div>
+        <div class="field">
+          <label>संकेतस्थळ URL *</label>
+          <input type="url" id="lkUrl" placeholder="https://..." required>
+        </div>
+        <div class="field">
+          <label>थोडक्यात माहिती</label>
+          <input type="text" id="lkDesc" placeholder="या पोर्टलचा उपयोग कशासाठी होतो...">
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button type="submit" class="btn green" style="flex:1">दुवा जतन करा</button>
+          <button type="button" class="btn gray" onclick="closeAddLinkModal()">रद्द</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  if(localStorage.getItem('isLoggedIn')!=='true'){
+    location.replace('index.html');
+  }
+})();
+
+const LINKS_KEY='ow_important_links';
+
+const DEFAULT_LINKS=[
+  {id:'def_1',category:'शासन निर्णय',title:'महाराष्ट्र शासन निर्णय (GR Portal)',url:'https://gr.maharashtra.gov.in',desc:'महाराष्ट्र शासनाचे सर्व अधिकृत शासन निर्णय व परिपत्रके पाहण्यासाठी व डाउनलोड करण्यासाठी.',builtin:true},
+  {id:'def_2',category:'वेतन व कोषागार',title:'सेवार्थ (Sevaarth Payroll)',url:'https://sevaarth.mahakosh.gov.in',desc:'शासकीय कर्मचाऱ्यांची वेतन देयके, वेतननिश्चिती व पे-स्लिप प्रणाली.',builtin:true},
+  {id:'def_3',category:'वेतन व कोषागार',title:'महाकोष (Mahakosh Treasury)',url:'https://mahakosh.gov.in',desc:'कोषागार देयके, चलन व लेखा विषयक अधिकृत संकेतस्थळ.',builtin:true},
+  {id:'def_4',category:'बांधकाम व निविदा',title:'सार्वजनिक बांधकाम विभाग (PWD Maharashtra)',url:'https://pwd.maharashtra.gov.in',desc:'सार्वजनिक बांधकाम विभागाची धोरणे, परिपत्रके व प्रकल्प माहिती.',builtin:true},
+  {id:'def_5',category:'बांधकाम व निविदा',title:'महाटेंडर्स (Mahatenders e-Procurement)',url:'https://mahatenders.gov.in',desc:'शासकीय कामांच्या ई-निविदा व निविदा स्थिती तपासण्यासाठी अधिकृत पोर्टल.',builtin:true}
+];
+
+function readCustomLinks(){
+  try{
+    const arr=JSON.parse(localStorage.getItem(LINKS_KEY)||'[]');
+    return Array.isArray(arr)?arr:[];
+  }catch(e){return []}
+}
+function writeCustomLinks(arr){localStorage.setItem(LINKS_KEY,JSON.stringify(arr))}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+function openAddLinkModal(){
+  document.getElementById('addLinkForm').reset();
+  document.getElementById('addLinkModal').style.display='block';
+}
+function closeAddLinkModal(){document.getElementById('addLinkModal').style.display='none'}
+
+function saveCustomLink(e){
+  e.preventDefault();
+  const title=document.getElementById('lkTitle').value.trim();
+  let url=document.getElementById('lkUrl').value.trim();
+  if(!/^https?:\/\//i.test(url))url='https://'+url;
+  const item={
+    id:'lk_'+Date.now(),
+    category:document.getElementById('lkCat').value,
+    title,
+    url,
+    desc:document.getElementById('lkDesc').value.trim()||'शासकीय कामकाजासाठी उपयुक्त दुवा.',
+    addedBy:localStorage.getItem('currentUser')||'user',
+    builtin:false
+  };
+  const list=readCustomLinks();
+  list.unshift(item);
+  writeCustomLinks(list);
+  closeAddLinkModal();
+  renderLinks();
+}
+
+function deleteCustomLink(id){
+  if(!confirm('हा दुवा हटवायचा आहे का?'))return;
+  writeCustomLinks(readCustomLinks().filter(x=>x.id!==id));
+  renderLinks();
+}
+
+function renderLinks(){
+  const q=(document.getElementById('linkSearch').value||'').trim().toLowerCase();
+  const cat=document.getElementById('linkCatFilter').value;
+  const isAdmin=(localStorage.getItem('userRole')==='admin');
+  const me=localStorage.getItem('currentUser')||'';
+
+  const all=[...readCustomLinks(),...DEFAULT_LINKS];
+  const filtered=all.filter(it=>{
+    if(cat!=='ALL'&&it.category!==cat)return false;
+    if(!q)return true;
+    return [it.category,it.title,it.desc,it.url].join(' ').toLowerCase().includes(q);
+  });
+
+  const box=document.getElementById('linksContainer');
+  if(filtered.length===0){
+    box.innerHTML='<div style="grid-column:1/-1;background:#0c2038;border:1px dashed #334155;border-radius:12px;padding:24px;text-align:center;color:#94a3b8">कोणताही दुवा आढळला नाही.</div>';
+    return;
+  }
+
+  box.innerHTML=filtered.map(it=>{
+    const canDel=!it.builtin&&(isAdmin||it.addedBy===me);
+    return `
+      <article class="link-card">
+        <div>
+          <span class="cat-pill">${esc(it.category)}</span>
+          <h3 class="link-title">${esc(it.title)}</h3>
+          <p class="link-desc">${esc(it.desc)}</p>
+          <div class="link-url">${esc(it.url)}</div>
+        </div>
+        <div class="card-foot">
+          <a class="btn sm" href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> उघडा (Open)
+          </a>
+          ${canDel?`<button type="button" class="btn red sm" onclick="deleteCustomLink('${esc(it.id)}')"><i class="fa-solid fa-trash"></i></button>`:''}
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
+renderLinks();
+</script>
+</body>
+</html>
