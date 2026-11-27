@@ -5,41 +5,234 @@
 <title>माझे प्रोफाइल</title>
 <script src="app-shell.js" defer></script>
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#020d1b;color:#f3f7ff;font-family:'Segoe UI',Arial,sans-serif}
-.profile-wrap{width:min(100% - 28px,1000px);margin:22px auto 40px}
-.profile-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
-.profile-head h1{font-size:clamp(21px,4vw,28px);margin:0}.muted{color:#a9bfd8;font-size:14px;line-height:1.6}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100dvh;background:#020d1b;color:#f3f7ff;font-family:'Segoe UI',Arial,sans-serif;overflow-x:hidden}
+.profile-wrap{width:min(100% - 24px,1000px);margin:14px auto 32px}
+.profile-head{position:sticky;top:56px;z-index:20;background:rgba(2,13,27,.96);backdrop-filter:blur(4px);padding:8px 0 10px;border-bottom:1px solid #1e3a5f;margin-bottom:14px}
+.profile-head h1{font-size:clamp(20px,4vw,26px);margin:0;color:#86efac}
+.muted{color:#a9bfd8;font-size:13.5px;line-height:1.55;margin-top:4px}
 .panel{background:#0c2038;border:1px solid #244365;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 6px 22px #0003}
+.panel h3{margin:0 0 10px;color:#38bdf8;font-size:16px}
 .profile-grid{display:grid;grid-template-columns:150px minmax(0,1fr);gap:18px;align-items:start}
-.avatar{width:140px;height:160px;border-radius:12px;object-fit:cover;border:2px solid #22d3ee;background:#102b49}
+.photo-col{display:flex;flex-direction:column;align-items:center;gap:8px}
+.avatar{width:140px;height:150px;border-radius:12px;object-fit:cover;border:2px solid #22d3ee;background:#102b49;cursor:pointer}
 .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
 .field{padding:11px;background:#102b49;border:1px solid #294b6d;border-radius:9px;min-width:0;overflow-wrap:anywhere}
-.field small{display:block;color:#9dc8e4;margin-bottom:5px}.field strong{font-size:15px;font-weight:600}
-.btn{border:0;border-radius:8px;padding:11px 15px;background:#0e7490;color:white;font-weight:700;cursor:pointer;margin:4px 5px 4px 0}.btn.green{background:#15803d}.btn.gray{background:#475569}
-input{max-width:100%;padding:10px;border:1px solid #46617e;border-radius:8px;background:#fff;color:#172033}
-.form-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}.status{color:#86efac;font-weight:700}
-@media(max-width:560px){.profile-grid{grid-template-columns:1fr}.avatar{width:112px;height:128px}.profile-wrap{width:calc(100% - 18px);margin-top:14px}.panel{padding:13px}}
+.field small{display:block;color:#9dc8e4;margin-bottom:5px;font-size:12px}.field strong{font-size:15px;font-weight:600}
+.btn{border:0;border-radius:8px;padding:10px 14px;background:#0e7490;color:white;font-weight:700;cursor:pointer;font-size:13.5px;margin:4px 5px 4px 0}
+.btn.green{background:#15803d}.btn.gray{background:#475569}.btn.sm{padding:7px 11px;font-size:12px;width:100%;margin:0}
+input,select{max-width:100%;padding:10px;border:1px solid #46617e;border-radius:8px;background:#fff;color:#172033;font-size:14px}
+.form-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.form-row input{flex:1 1 200px}
+.admin-edit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:8px}
+.admin-edit-grid label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:#bae6fd}
+.history-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:10px;margin-top:10px}
+.history-card{background:#102b49;border:1px solid #294b6d;border-radius:10px;padding:6px;text-align:center}
+.history-card img{width:100%;height:88px;object-fit:cover;border-radius:7px;cursor:pointer;border:1px solid #38bdf8}
+.history-card small{display:block;color:#cbd5e1;font-size:10.5px;margin-top:4px}
+.hidden{display:none!important}
+.photo-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:12000;display:none;align-items:center;justify-content:center;padding:14px}
+.photo-modal-box{background:#0c2038;border:1px solid #22d3ee;border-radius:12px;width:min(100%,420px);max-height:88dvh;display:flex;flex-direction:column;overflow:hidden}
+.photo-modal-head{position:sticky;top:0;background:#0c2038;border-bottom:1px solid #244365;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.photo-modal-head strong{color:#86efac;font-size:15px}
+.photo-modal-close{background:#dc2626;color:#fff;border:0;border-radius:6px;padding:5px 10px;font-weight:700;cursor:pointer}
+.photo-modal-body{padding:14px;overflow-y:auto;text-align:center}
+.photo-modal-body img{max-width:100%;max-height:68dvh;border-radius:8px;object-fit:contain}
+@media(max-width:560px){
+  .profile-grid{grid-template-columns:1fr}
+  .avatar{width:116px;height:124px}
+  .photo-col .btn.sm{max-width:150px}
+  .profile-wrap{width:calc(100% - 16px);margin-top:10px}
+  .panel{padding:13px}
+  .form-row input,.form-row .btn{width:100%;flex:1 1 100%}
+}
 </style>
 </head>
 <body>
 <main class="profile-wrap">
- <div class="profile-head"><div><h1><i class="fa-solid fa-id-card"></i> माझे प्रोफाइल</h1><div class="muted">येथे तुमची नोंदवलेली माहिती पाहू शकता. वैयक्तिक फोटो व पासवर्ड स्वतः बदलू शकता.</div></div></div>
- <section class="panel"><div class="profile-grid"><div><img id="photo" class="avatar" alt="प्रोफाइल फोटो" title="फोटो बदलण्यासाठी क्लिक करा" onclick="document.getElementById('photoInput').click()"><input id="photoInput" type="file" accept="image/*" hidden></div><div><div class="fields" id="details"></div></div></div></section>
- <section class="panel"><h3>पासवर्ड बदला</h3><div class="form-row"><input id="oldPass" type="password" placeholder="सध्याचा पासवर्ड"><input id="newPass" type="password" minlength="6" placeholder="नवीन पासवर्ड (किमान ६ अक्षरे)"><input id="confirmPass" type="password" minlength="6" placeholder="नवीन पासवर्ड पुन्हा टाका"><button class="btn green" onclick="changePassword()">पासवर्ड जतन करा</button></div></section>
- <p class="muted">नाव, पदनाम, कार्यालय, जिल्हा, मोबाईल व User ID यामध्ये बदल आवश्यक असल्यास Admin शी संपर्क करा.</p>
+ <div class="profile-head">
+   <h1><i class="fa-solid fa-id-card"></i> माझे प्रोफाइल</h1>
+   <div class="muted" id="profileSubtitle">येथे तुमची नोंदवलेली माहिती पाहू शकता. वैयक्तिक फोटो व पासवर्ड स्वतः बदलू शकता.</div>
+ </div>
+
+ <section class="panel">
+   <div class="profile-grid">
+     <div class="photo-col">
+       <img id="photo" class="avatar" alt="प्रोफाइल फोटो" title="फोटो बदलण्यासाठी क्लिक करा" onclick="document.getElementById('photoInput').click()" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+       <button type="button" class="btn sm" onclick="document.getElementById('photoInput').click()"><i class="fa-solid fa-camera"></i> फोटो बदला</button>
+       <input id="photoInput" type="file" accept="image/*" hidden>
+     </div>
+     <div><div class="fields" id="details"></div></div>
+   </div>
+ </section>
+
+ <!-- फक्त Admin साठी स्वतःचे Profile तपशील संपादित करण्याची सुविधा -->
+ <section class="panel hidden" id="adminEditPanel">
+   <h3><i class="fa-solid fa-user-pen"></i> Admin प्रोफाइल माहिती अद्ययावत करा</h3>
+   <div class="admin-edit-grid">
+     <label>पूर्ण नाव <input id="admName" type="text" placeholder="पूर्ण नाव"></label>
+     <label>पदनाम <input id="admDesig" type="text" placeholder="पदनाम"></label>
+     <label>कार्यालय <input id="admOffice" type="text" placeholder="कार्यालयाचे नाव"></label>
+     <label>जिल्हा <input id="admDistrict" type="text" placeholder="जिल्हा"></label>
+     <label>मोबाईल <input id="admMobile" type="tel" maxlength="10" placeholder="१० अंकी मोबाईल"></label>
+   </div>
+   <div class="form-row">
+     <button type="button" class="btn green" onclick="saveAdminProfile()">प्रोफाइल माहिती जतन करा</button>
+   </div>
+ </section>
+
+ <section class="panel">
+   <h3><i class="fa-solid fa-key"></i> पासवर्ड बदला</h3>
+   <div class="form-row">
+     <input id="oldPass" type="password" placeholder="सध्याचा पासवर्ड">
+     <input id="newPass" type="password" minlength="6" placeholder="नवीन पासवर्ड (किमान ६ अक्षरे)">
+     <input id="confirmPass" type="password" minlength="6" placeholder="नवीन पासवर्ड पुन्हा टाका">
+     <button type="button" class="btn green" onclick="changePassword()">पासवर्ड जतन करा</button>
+   </div>
+ </section>
+
+ <!-- जुने फोटो फक्त Admin पाहू शकेल -->
+ <section class="panel hidden" id="adminPhotoHistoryPanel">
+   <h3><i class="fa-solid fa-clock-rotate-left"></i> जुने प्रोफाइल फोटो इतिहास (फक्त Admin साठी)</h3>
+   <div id="photoHistoryList" class="history-grid"></div>
+ </section>
+
+ <p class="muted" id="userHelpNote">नाव, पदनाम, कार्यालय, जिल्हा, मोबाईल व User ID यामध्ये बदल आवश्यक असल्यास Admin शी संपर्क करा.</p>
 </main>
+
+<div id="photoPreviewModal" class="photo-modal" onclick="if(event.target===this)closePhotoModal()">
+  <div class="photo-modal-box">
+    <div class="photo-modal-head">
+      <strong id="photoModalTitle">प्रोफाइल फोटो</strong>
+      <button type="button" class="photo-modal-close" onclick="closePhotoModal()">✕</button>
+    </div>
+    <div class="photo-modal-body">
+      <img id="photoModalImg" src="" alt="Preview">
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){if(localStorage.getItem('isLoggedIn')!=='true'){location.replace('index.html');}})();
+const DEFAULT_AVATAR='https://cdn-icons-png.flaticon.com/512/3135/3135715.png';
 function readUsers(){try{return JSON.parse(localStorage.getItem('ow_users')||'{}')}catch(e){return {}}}
 function esc(v){return String(v??'-').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function current(){const id=localStorage.getItem('currentUser');return {id,u:readUsers()[id]}}
-function render(){const {id,u}=current();if(!id||!u){alert('प्रोफाइल माहिती उपलब्ध नाही. पुन्हा लॉगिन करा.');location.replace('index.html');return}
-document.getElementById('photo').src=u.photo||'';document.getElementById('photo').style.visibility=u.photo?'visible':'hidden';
-const items=[['नाव',u.name],['पदनाम',u.designation],['कार्यालय',u.office],['जिल्हा',u.district],['मोबाईल',u.mobile],['User ID',id],['Role',u.role==='admin'?'Admin':'User'],['खाते स्थिती',u.status==='approved'?'Active':u.status||'Pending']];
-document.getElementById('details').innerHTML=items.map(([k,v])=>`<div class="field"><small>${k}</small><strong>${esc(v)}</strong></div>`).join('');
+
+function render(){
+  const {id,u}=current();
+  if(!id||!u){alert('प्रोफाइल माहिती उपलब्ध नाही. पुन्हा लॉगिन करा.');location.replace('index.html');return}
+  document.getElementById('photo').src=u.photo||DEFAULT_AVATAR;
+  const isAdmin=(u.role==='admin');
+  const items=[
+    ['नाव',u.name],
+    ['पदनाम',u.designation],
+    ['कार्यालय',u.office],
+    ['जिल्हा',u.district],
+    ['मोबाईल',u.mobile],
+    ['User ID',id],
+    ['Role',isAdmin?'Admin':'User'],
+    ['खाते स्थिती',u.status==='approved'?'Active':u.status||'Pending']
+  ];
+  document.getElementById('details').innerHTML=items.map(([k,v])=>`<div class="field"><small>${k}</small><strong>${esc(v)}</strong></div>`).join('');
+
+  if(isAdmin){
+    document.getElementById('adminEditPanel').classList.remove('hidden');
+    document.getElementById('userHelpNote').classList.add('hidden');
+    document.getElementById('profileSubtitle').textContent='Admin प्रोफाइल: तुम्ही तुमची माहिती, फोटो आणि पासवर्ड अद्ययावत करू शकता.';
+    document.getElementById('admName').value=u.name||'';
+    document.getElementById('admDesig').value=u.designation||'';
+    document.getElementById('admOffice').value=u.office||'';
+    document.getElementById('admDistrict').value=u.district||'';
+    document.getElementById('admMobile').value=u.mobile||'';
+
+    const histPanel=document.getElementById('adminPhotoHistoryPanel');
+    const histList=document.getElementById('photoHistoryList');
+    histPanel.classList.remove('hidden');
+    const hist=Array.isArray(u.photoHistory)?u.photoHistory:[];
+    if(hist.length===0){
+      histList.innerHTML='<div class="muted">कोणताही जुना फोटो उपलब्ध नाही.</div>';
+    }else{
+      histList.innerHTML=hist.slice().reverse().map((h,idx)=>{
+        const dt=h.changedAt||h.updatedAt||'';
+        const label=dt?new Date(dt).toLocaleDateString('mr-IN'):('फोटो '+(hist.length-idx));
+        return `<div class="history-card"><img src="${esc(h.photo)}" alt="Old Photo" onclick="openPhotoModal('${esc(h.photo)}','जुना फोटो (${esc(label)})')"><small>${esc(label)}</small></div>`;
+      }).join('');
+    }
+  }else{
+    document.getElementById('adminEditPanel').classList.add('hidden');
+    document.getElementById('adminPhotoHistoryPanel').classList.add('hidden');
+    document.getElementById('userHelpNote').classList.remove('hidden');
+  }
 }
-async function updatePhoto(){const file=document.getElementById('photoInput').files[0];if(!file){alert('कृपया फोटो निवडा.');return}if(!file.type.startsWith('image/')||file.size>5*1024*1024){alert('फोटो ५ MB पेक्षा कमी आणि image स्वरूपात असावा.');return}const {id,u}=current();if(!u)return;const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});u.photoHistory=u.photoHistory||[];if(u.photo)u.photoHistory.push({photo:u.photo,changedAt:new Date().toISOString()});u.photo=data;const all=readUsers();all[id]=u;localStorage.setItem('ow_users',JSON.stringify(all));document.getElementById('photoInput').value='';render();alert('प्रोफाइल फोटो बदलला.');}
-function changePassword(){const {id,u}=current();if(!u)return;const old=document.getElementById('oldPass').value,n=document.getElementById('newPass').value,c=document.getElementById('confirmPass').value;if(old!==u.password){alert('सध्याचा पासवर्ड चुकीचा आहे.');return}if(n.length<6){alert('नवीन पासवर्ड किमान ६ अक्षरांचा असावा.');return}if(n!==c){alert('नवीन पासवर्ड जुळत नाहीत.');return}u.password=n;const all=readUsers();all[id]=u;localStorage.setItem('ow_users',JSON.stringify(all));['oldPass','newPass','confirmPass'].forEach(x=>document.getElementById(x).value='');alert('पासवर्ड बदलला.');}
+
+function saveAdminProfile(){
+  const {id,u}=current();
+  if(!u||u.role!=='admin')return;
+  const name=document.getElementById('admName').value.trim();
+  const desig=document.getElementById('admDesig').value.trim();
+  const office=document.getElementById('admOffice').value.trim();
+  const district=document.getElementById('admDistrict').value.trim();
+  const mobile=document.getElementById('admMobile').value.trim();
+  if(!name){alert('कृपया पूर्ण नाव भरा.');return}
+  if(mobile&&!/^\d{10}$/.test(mobile)){alert('कृपया १० अंकी मोबाईल नंबर टाका.');return}
+  u.name=name;
+  u.designation=desig;
+  u.office=office;
+  u.district=district;
+  u.mobile=mobile;
+  const all=readUsers();
+  all[id]=u;
+  localStorage.setItem('ow_users',JSON.stringify(all));
+  localStorage.setItem('displayName',name);
+  render();
+  alert('Admin प्रोफाइल माहिती यशस्वीरीत्या अद्ययावत झाली.');
+}
+
+async function updatePhoto(){
+  const file=document.getElementById('photoInput').files[0];
+  if(!file){alert('कृपया फोटो निवडा.');return}
+  if(!file.type.startsWith('image/')||file.size>5*1024*1024){alert('फोटो ५ MB पेक्षा कमी आणि image स्वरूपात असावा.');return}
+  const {id,u}=current();
+  if(!u)return;
+  const data=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});
+  u.photoHistory=u.photoHistory||[];
+  if(u.photo)u.photoHistory.push({photo:u.photo,changedAt:new Date().toISOString()});
+  u.photo=data;
+  const all=readUsers();
+  all[id]=u;
+  localStorage.setItem('ow_users',JSON.stringify(all));
+  localStorage.setItem('currentUserPhoto',data);
+  document.getElementById('photoInput').value='';
+  render();
+  alert('प्रोफाइल फोटो बदलला.');
+}
+
+function changePassword(){
+  const {id,u}=current();
+  if(!u)return;
+  const old=document.getElementById('oldPass').value,n=document.getElementById('newPass').value,c=document.getElementById('confirmPass').value;
+  if(old!==u.password){alert('सध्याचा पासवर्ड चुकीचा आहे.');return}
+  if(n.length<6){alert('नवीन पासवर्ड किमान ६ अक्षरांचा असावा.');return}
+  if(n!==c){alert('नवीन पासवर्ड जुळत नाहीत.');return}
+  u.password=n;
+  const all=readUsers();
+  all[id]=u;
+  localStorage.setItem('ow_users',JSON.stringify(all));
+  ['oldPass','newPass','confirmPass'].forEach(x=>document.getElementById(x).value='');
+  alert('पासवर्ड बदलला.');
+}
+
+function openPhotoModal(src,title){
+  document.getElementById('photoModalTitle').textContent=title||'प्रोफाइल फोटो';
+  document.getElementById('photoModalImg').src=src;
+  document.getElementById('photoPreviewModal').style.display='flex';
+}
+function closePhotoModal(){
+  document.getElementById('photoPreviewModal').style.display='none';
+  document.getElementById('photoModalImg').src='';
+}
+
 document.getElementById('photoInput').addEventListener('change',updatePhoto);
 render();
 </script>
