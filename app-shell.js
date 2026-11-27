@@ -9,7 +9,6 @@
 
   var page = (location.pathname.split('/').pop() || 'dashboard.html').toLowerCase();
   var backTargets = {
-    'dashboard.html': 'index.html',
     'establishment.html': 'dashboard.html',
     'mb-dashboard.html': 'establishment.html',
     'mb-je.html': 'mb-dashboard.html',
@@ -54,6 +53,7 @@
 
     var back = document.createElement('a');
     back.className = 'shared-app-nav__icon';
+    back.setAttribute('data-nav-role', 'back');
     back.href = backTargets[page] || 'dashboard.html';
     back.setAttribute('aria-label', 'मागील पृष्ठ');
     back.setAttribute('title', 'मागे');
@@ -74,6 +74,7 @@
 
     var home = document.createElement('a');
     home.className = 'shared-app-nav__icon';
+    home.setAttribute('data-nav-role', 'home');
     home.href = 'dashboard.html';
     home.setAttribute('aria-label', 'मुख्य पृष्ठ');
     home.setAttribute('title', 'होम');
@@ -84,6 +85,7 @@
       nav.classList.add('shared-app-nav--user-management');
       var heading = document.createElement('strong');
       heading.className = 'shared-app-nav__title';
+      heading.setAttribute('data-nav-role', 'title');
       heading.textContent = 'User Management';
       nav.appendChild(back);
       nav.appendChild(heading);
