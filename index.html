@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <title>Digital Hub - Login & Registration</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- फोटो क्रॉप करण्यासाठी Cropper.js लायब्ररी -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 
@@ -35,7 +35,7 @@
             border: 1px solid #00f3ff; border-radius: 15px;
             box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
             padding: 12px 15px; position: relative;
-            max-height: 78dvh; overflow-y: auto;
+            max-height: 82dvh; overflow-y: auto;
         }
         
         .tab-buttons { display: flex; margin-bottom: 10px; border-bottom: 1px solid #1e3a5f; }
@@ -96,6 +96,10 @@
             width: 100%; background: #00f3ff; color: #020d1b; border: none;
             border-radius: 8px; padding: 10px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 4px;
         }
+        .btn-admin-reset {
+            width: 100%; background: #ff9800; color: #020d1b; border: none;
+            border-radius: 8px; padding: 8px; font-size: 12.5px; font-weight: bold; cursor: pointer; margin-top: 6px;
+        }
         .forgot-link { display: block; text-align: center; margin-top: 8px; font-size: 11.5px; color: #00f3ff; cursor: pointer; text-decoration: none; }
         
         .hidden { display: none !important; }
@@ -113,7 +117,6 @@
         .btn-call { background: #2196F3; }
         .btn-wa { background: #25D366; }
 
-        /* फोटो क्रॉप मोडल */
         #cropModal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 9999; display: flex; flex-direction: column;
@@ -155,12 +158,14 @@
                     <i class="fa-solid fa-eye eye-icon" onclick="togglePassword('loginPassword', this)"></i>
                 </div>
                 <button type="submit" class="btn-submit">Sign In</button>
+                <button type="button" id="adminResetQuickBtn" class="btn-admin-reset hidden" onclick="resetAdminPasswordInstant()">
+                    <i class="fa-solid fa-key"></i> Admin पासवर्ड रिसेट करा (admin123)
+                </button>
                 <a class="forgot-link" onclick="showForgotScreen()">Forgot Password?</a>
             </form>
 
             <!-- REGISTRATION FORM -->
             <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
-                
                 <div class="photo-upload-group">
                     <label class="photo-label" id="photoLabel">
                         <i class="fa-solid fa-image" id="photoIcon"></i> 
@@ -168,18 +173,15 @@
                         <input type="file" id="regPhoto" accept="image/*" onchange="openCropModal(event)" required>
                     </label>
                 </div>
-
                 <div class="input-group">
                     <i class="fa-solid fa-id-card main-icon"></i>
                     <input type="text" id="regName" class="input-box" placeholder="पूर्ण नाव" required oninput="checkField(this)">
                 </div>
-                
                 <div class="input-group">
                     <i class="fa-solid fa-phone main-icon"></i>
                     <input type="tel" id="regMobile" class="input-box" placeholder="मोबाईल नंबर (१० अंक)" required maxlength="10" oninput="checkMobile(this)">
                     <span id="mobileMsg" class="validation-text hidden"></span>
                 </div>
-
                 <div class="input-group">
                     <i class="fa-solid fa-briefcase main-icon"></i>
                     <div class="suggestion-wrapper">
@@ -187,12 +189,10 @@
                         <input type="text" id="regDesignation" class="input-box" placeholder="पदनाम (उदा. कनिष्ठ अभियंता)" required autocomplete="off" oninput="handleDesigInput(this)" onkeydown="handleDesigKey(event, this)">
                     </div>
                 </div>
-                
                 <div class="input-group">
                     <i class="fa-solid fa-building main-icon"></i>
                     <input type="text" id="regOffice" class="input-box" placeholder="कार्यालयाचे नाव" required autocomplete="off" oninput="checkField(this)">
                 </div>
-
                 <div class="input-group">
                     <i class="fa-solid fa-map-location-dot main-icon"></i>
                     <select id="regDistrict" class="input-box" required onchange="checkField(this)">
@@ -236,20 +236,17 @@
                     </select>
                     <i class="fa-solid fa-chevron-down select-arrow"></i>
                 </div>
-
                 <div class="input-group">
                     <i class="fa-solid fa-user-tag main-icon" id="userIcon"></i>
                     <input type="text" id="regUsername" class="input-box" placeholder="Username" required oninput="checkUsername(this)" autocomplete="off">
                     <span id="userMsg" class="validation-text hidden"></span>
                 </div>
-
                 <div class="input-group">
                     <i class="fa-solid fa-key main-icon" id="passIcon"></i>
                     <input type="password" id="regPassword" class="input-box" placeholder="पासवर्ड (कमीत कमी ६ अक्षरे)" required minlength="6" oninput="checkPassword(this)">
                     <i class="fa-solid fa-eye eye-icon" onclick="togglePassword('regPassword', this)"></i>
                     <span id="passMsg" class="validation-text hidden"></span>
                 </div>
-                
                 <button type="submit" class="btn-submit" style="background:#00ff88; color:#000;">रजिस्टर करा</button>
             </form>
         </div>
@@ -258,7 +255,6 @@
             <div class="icon-big"><i class="fa-solid fa-circle-check"></i></div>
             <h3 style="color: #00ff88; margin-bottom: 4px; font-size: 15px;">रजिस्ट्रेशन यशस्वी!</h3>
             <p style="font-size: 11px; color: #ccc; margin-bottom: 8px;">तुमचे ॲक्टिव्हेशन ॲडमिनकडे प्रलंबित आहे.</p>
-            
             <div class="info-box">
                 <p><strong>नाव:</strong> <span id="sucName"></span></p>
                 <p><strong>पदनाम:</strong> <span id="sucDesig"></span></p>
@@ -267,18 +263,15 @@
                 <p><strong>युजरनेम:</strong> <span id="sucUsername" style="color: #00f3ff; font-weight: bold;"></span></p>
                 <p><strong>पासवर्ड:</strong> <span id="sucPassword" style="color: #00f3ff; font-weight: bold;"></span></p>
             </div>
-
             <div class="contact-btns">
                 <a href="#" id="btnCallAdmin" class="contact-btn btn-call"><i class="fa-solid fa-phone"></i> कॉल</a>
                 <a href="#" id="btnWaAdmin" class="contact-btn btn-wa" target="_blank"><i class="fa-brands fa-whatsapp"></i> व्हॉट्सॲप</a>
             </div>
-            
             <button onclick="location.reload()" style="margin-top: 12px; background: none; border: none; color: #888; text-decoration: underline; cursor: pointer; font-size: 11px;">लॉगिन पेजवर परत जा</button>
         </div>
 
         <div class="login-card hidden" id="forgotScreen">
             <h3 style="color: #00f3ff; font-size: 14px; margin-bottom: 10px; text-align: center;">पासवर्ड रिसेट विनंती</h3>
-            
             <form id="forgotForm" onsubmit="handleForgotSubmit(event)">
                 <div class="input-group">
                     <i class="fa-solid fa-user-tag main-icon"></i>
@@ -343,7 +336,6 @@
                     <i class="fa-solid fa-briefcase main-icon"></i>
                     <input type="text" id="fDesignation" class="input-box" placeholder="पदनाम" required>
                 </div>
-                
                 <button type="submit" class="btn-submit" style="background:#ff9800;">रिसेट विनंती पाठवा</button>
                 <a onclick="backToLogin()" style="display:block; text-align:center; margin-top:10px; color:#00f3ff; font-size:12px; cursor:pointer;">लॉगिन वर परत जा</a>
             </form>
@@ -395,7 +387,7 @@
                 users.admin.status = 'approved';
                 if (!users.admin.password) users.admin.password = 'admin123';
             }
-            localStorage.setItem('ow_users', JSON.stringify(users));
+            try { localStorage.setItem('ow_users', JSON.stringify(users)); } catch (e) {}
             return users;
         }
 
@@ -403,6 +395,7 @@
 
         function switchTab(tab) {
             document.getElementById('statusMessage').classList.add('hidden');
+            document.getElementById('adminResetQuickBtn').classList.add('hidden');
             document.getElementById('forgotScreen').classList.add('hidden');
             document.getElementById('successScreen').classList.add('hidden');
             document.getElementById('formContainer').classList.remove('hidden');
@@ -552,11 +545,8 @@
                 reader.onload = function(e) {
                     const cropImage = document.getElementById('cropImage');
                     cropImage.src = e.target.result;
-                    
                     document.getElementById('cropModal').classList.remove('hidden');
-                    
                     if (cropper) { cropper.destroy(); }
-                    
                     setTimeout(() => {
                         cropper = new Cropper(cropImage, {
                             aspectRatio: NaN,
@@ -585,9 +575,8 @@
 
         function saveCrop() {
             if (!cropper) return;
-            
-            const canvas = cropper.getCroppedCanvas();
-            const croppedImageUrl = canvas.toDataURL('image/jpeg');
+            const canvas = cropper.getCroppedCanvas({ width: 320, height: 320 });
+            const croppedImageUrl = canvas.toDataURL('image/jpeg', 0.8);
 
             const label = document.getElementById('photoLabel');
             const text = document.getElementById('photoText');
@@ -604,6 +593,24 @@
             if (cropper) { cropper.destroy(); cropper = null; }
         }
 
+        function resetAdminPasswordInstant() {
+            const mob = prompt("Admin ओळख पटवण्यासाठी नोंदणीकृत १० अंकी मोबाईल नंबर टाका:");
+            if (mob === null) return;
+            if (mob.trim() !== "8446556141") {
+                return showMsg("मोबाईल नंबर जुळत नाही!", true);
+            }
+            const users = ensureDefaultAdmin();
+            users.admin.password = "admin123";
+            users.admin.passwordChanged = false;
+            users.admin.role = "admin";
+            users.admin.status = "approved";
+            localStorage.setItem('ow_users', JSON.stringify(users));
+            document.getElementById('loginUsername').value = "admin";
+            document.getElementById('loginPassword').value = "admin123";
+            document.getElementById('adminResetQuickBtn').classList.add('hidden');
+            showMsg("Admin पासवर्ड 'admin123' वर रिसेट झाला आहे! आता Sign In दाबा.", false);
+        }
+
         function handleLogin(e) {
             e.preventDefault();
             const rawU = document.getElementById('loginUsername').value.trim();
@@ -615,9 +622,12 @@
 
             if (!user) return showMsg('चुकीचा युजरनेम!', true);
 
-            const isDefaultAdminPass = (u === 'admin' && !user.passwordChanged && (p === 'admin123' || p === '8446556141'));
+            const isDefaultAdminPass = (u === 'admin' && (p === 'admin123' || p === '8446556141') && !user.passwordChanged);
             if (user.password !== p && !isDefaultAdminPass) {
-                return showMsg('चुकीचा पासवर्ड! (डिफॉल्ट पासवर्ड: admin123)', true);
+                if (u === 'admin') {
+                    document.getElementById('adminResetQuickBtn').classList.remove('hidden');
+                }
+                return showMsg('चुकीचा पासवर्ड! खालील बटणाने Admin पासवर्ड रिसेट करू शकता.', true);
             }
             if (user.status !== 'approved') return showMsg('तुमचे खाते ॲडमिनने मंजूर केलेले नाही!', true);
 
@@ -665,7 +675,11 @@
                 createdAt: nowIso
             };
 
-            localStorage.setItem('ow_users', JSON.stringify(users));
+            try {
+                localStorage.setItem('ow_users', JSON.stringify(users));
+            } catch (err) {
+                return showMsg('ब्राउझर स्टोरेज पूर्ण झाले आहे. कृपया लहान फोटो निवडा.', true);
+            }
             
             document.getElementById('formContainer').classList.add('hidden');
             document.getElementById('successScreen').classList.remove('hidden');
